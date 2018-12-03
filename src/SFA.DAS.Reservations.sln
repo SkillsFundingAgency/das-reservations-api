@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Web", "SFA.DAS.Reservations\SFA.DAS.Reservations.Web.csproj", "{C01D2727-A694-4F08-A136-2A344211AFED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E180DA61-5A94-442F-930D-F01342D586DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.UnitTests", "SFA.DAS.Reservations.UnitTests\SFA.DAS.Reservations.UnitTests.csproj", "{A941965A-90C5-4265-8920-491DFB242F37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{C01D2727-A694-4F08-A136-2A344211AFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C01D2727-A694-4F08-A136-2A344211AFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C01D2727-A694-4F08-A136-2A344211AFED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A941965A-90C5-4265-8920-491DFB242F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A941965A-90C5-4265-8920-491DFB242F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A941965A-90C5-4265-8920-491DFB242F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A941965A-90C5-4265-8920-491DFB242F37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A941965A-90C5-4265-8920-491DFB242F37} = {E180DA61-5A94-442F-930D-F01342D586DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B4A5AB-1434-411A-BBD1-A7F1F2E74021}
