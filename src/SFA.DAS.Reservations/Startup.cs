@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SFA.DAS.Reservations.Web
+namespace SFA.DAS.Reservations.Api
 {
     public class Startup
     {
@@ -46,7 +46,6 @@ namespace SFA.DAS.Reservations.Web
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
 
@@ -58,7 +57,7 @@ namespace SFA.DAS.Reservations.Web
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Reservation}/{action=Index}/{id?}");
             });
         }
     }

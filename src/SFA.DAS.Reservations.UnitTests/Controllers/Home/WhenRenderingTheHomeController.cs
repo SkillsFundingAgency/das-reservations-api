@@ -1,35 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Web.Controllers;
+using SFA.DAS.Reservations.Api.Controllers;
 
 namespace SFA.DAS.Reservations.UnitTests.Controllers.Home
 {
     public class WhenRenderingTheHomeController
     {
-        private HomeController _homeController;
+        private ReservationController _reservationController;
 
         [SetUp]
         public void Arrange()
         {
-            _homeController = new HomeController();
+            _reservationController = new ReservationController();
         }
 
         [Test]
-        public async Task Then_The_Correct_View_Is_Displayed()
+        public async Task Then_The_Correct_Response_Code_Is_Returned()
         {
             //Act
-            var actual = await _homeController.Index();
+            var actual = await _reservationController.Index();
 
             //Assert
             Assert.IsNotNull(actual);
-            var result = actual as ViewResult;
-            Assert.IsNotNull(result);
-            Assert.AreEqual("Index", result.ViewName);
+            var result = actual as ObjectResult;
+            Assert.IsNotNull(result?.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
         }
     }
 }

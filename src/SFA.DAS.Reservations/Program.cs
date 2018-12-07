@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace SFA.DAS.Reservations.Web
+namespace SFA.DAS.Reservations.Api
 {
     public class Program
     {

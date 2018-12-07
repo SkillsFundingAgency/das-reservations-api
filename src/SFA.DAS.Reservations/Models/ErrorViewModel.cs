@@ -1,4 +1,4 @@
-namespace SFA.DAS.Reservations.Web.Models
+namespace SFA.DAS.Reservations.Api.Models
 {
     public class ErrorViewModel
     {
