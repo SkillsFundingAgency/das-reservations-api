@@ -12,6 +12,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SFA.DAS.Reservations\SFA.DAS.Reservations.Api.csproj" />
+    <ProjectReference Include="..\SFA.DAS.Reservations.Api\SFA.DAS.Reservations.Api.csproj" />
   </ItemGroup>
 </Project>
