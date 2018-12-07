@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 
-namespace SFA.DAS.Reservations.UnitTests.Controllers.Home
+namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Home
 {
     public class WhenRenderingTheHomeController
     {
