@@ -5,11 +5,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.Reservations.Application.Rules.Services;
+using SFA.DAS.Reservations.Data;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Api
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             var builder = new ConfigurationBuilder()
@@ -17,10 +22,8 @@ namespace SFA.DAS.Reservations.Api
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
-            Configuration = configuration;
+            Configuration = builder;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -32,8 +35,10 @@ namespace SFA.DAS.Reservations.Api
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
+            services.AddTransient<IRuleRepository,RuleRepository>();
+            services.AddTransient<IRulesService, RulesService>();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
@@ -57,7 +62,7 @@ namespace SFA.DAS.Reservations.Api
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Reservation}/{action=Index}/{id?}");
+                    template: "api/{controller=Reservation}/{action=Index}/{id?}");
             });
         }
     }
