@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             var response = await _mediator.Send(new GetRulesQuery());
 
-            return Ok(JsonConvert.SerializeObject(response));
+            return Ok(response.Rules);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
+using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
@@ -33,7 +37,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
-        public async Task Then_The_Reservations_Returned()
+        public async Task Then_The_Reservations_Are_Returned()
         {
             //Act
             var actual = await _reservationsController.GetAll(ExpectedAccountId);
@@ -49,9 +53,25 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
-        public async Task Then_If_A_Validation_Error_Is_Returned_A_Bad_Request_Is_Returned()
+        public async Task Then_If_A_Validation_Error_Occurs_A_Bad_Request_Is_Returned_With_Errors()
         {
+            //Arrange
+            var expectedValidationMessage = "The following parameters have failed validation";
+            var expectedParam = "AccountId";
+            _mediator.Setup(x => x.Send(It.IsAny<GetAccountReservationsQuery>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
+            
+            //Act
+            var actual = await _reservationsController.GetAll(0);
 
+            //Assert
+            var result = actual as ObjectResult;
+            Assert.IsNotNull(result?.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
+            var actualError = result.Value as ArgumentErrorViewModel;
+            Assert.IsNotNull(actualError);
+            Assert.AreEqual($"{expectedValidationMessage}\r\nParameter name: {expectedParam}", actualError.Message);
+            Assert.AreEqual(expectedParam, actualError.Params);
         }
     }
 }
