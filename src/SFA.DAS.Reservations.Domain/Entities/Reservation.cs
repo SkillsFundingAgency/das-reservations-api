@@ -12,5 +12,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public DateTime StartDate { get; set; }
         public DateTime ExpiryDate { get; set; }
         public long? VacancyId { get; set; }
+        public short Status { get; set; }
     }
 }

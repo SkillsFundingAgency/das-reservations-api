@@ -18,6 +18,7 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.StartDate).HasColumnName(@"StartDate").HasColumnType("datetime").IsRequired();
             builder.Property(x => x.ExpiryDate).HasColumnName(@"ExpiryDate").HasColumnType("datetime").IsRequired();
             builder.Property(x => x.IsLevyAccount).HasColumnName(@"IsLevyAccount").HasColumnType("tinyint").IsRequired();
+            builder.Property(x => x.Status).HasColumnName(@"Status").HasColumnType("tinyint").IsRequired();
         }
     }
 }

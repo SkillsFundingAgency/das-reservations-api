@@ -75,7 +75,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 It.Is<Reservation>(
                     c=>
                         c.AccountId.Equals(_command.Reservation.AccountId) 
-                       && c.StartDate.Equals(_expectedDateTime))), Times.Once);
+                       && c.StartDate.Equals(_expectedDateTime)
+                        )), Times.Once);
         }
 
         [Test]

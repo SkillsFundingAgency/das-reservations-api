@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public bool IsActive => ExpiryDate <= DateTime.UtcNow;
         public List<ReservationRule> Rules { get; private set; }
         public long? VacancyId { get; set; }
-        
+        public ReservationStatus Status { get; set; }
         public virtual async Task GetReservationRules()
         {
             var rules = (await _ruleRepository.GetReservationRules(StartDate, ExpiryDate)).ToList();

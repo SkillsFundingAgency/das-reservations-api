@@ -37,6 +37,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         public async Task<long> CreateAccountReservation(Reservation reservation)
         {
             reservation.ExpiryDate = reservation.StartDate.AddMonths(_options.Value.ExpiryPeriodInMonths);
+            reservation.Status = ReservationStatus.Pending;
             var result = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
 
             return result;
@@ -53,7 +54,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 AccountId = reservation.AccountId,
                 ApprenticeId = reservation.ApprenticeId,
                 VacancyId = reservation.VacancyId,
-                IsLevyAccount = reservation.IsLevyAccount
+                IsLevyAccount = reservation.IsLevyAccount,
+                Status = (ReservationStatus)reservation.Status
             };
             await mapReservation.GetReservationRules();
             return mapReservation;
@@ -70,6 +72,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 StartDate = reservation.StartDate,
                 ApprenticeId = reservation.ApprenticeId,
                 VacancyId = reservation.VacancyId,
+                Status = (short)reservation.Status
             };
         }
     }
