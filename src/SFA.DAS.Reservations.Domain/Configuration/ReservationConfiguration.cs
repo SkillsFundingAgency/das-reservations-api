@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Domain.Configuration
 {
     public class ReservationConfiguration
     {
-        public int ExpiryPeriodInMonths { get; set; }
+        public virtual int ExpiryPeriodInMonths { get; set; }
     }
 }

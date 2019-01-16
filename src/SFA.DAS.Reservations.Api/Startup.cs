@@ -1,13 +1,20 @@
 ﻿using System.IO;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data;
+using SFA.DAS.Reservations.Data.Repository;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -36,9 +43,14 @@ namespace SFA.DAS.Reservations.Api
             });
 
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
+            services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>), typeof(GetAccountReservationsValidator));
+            services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
+            services.AddTransient<IAccountReservationService, AccountReservationService>();
             services.AddTransient<IRulesService, RulesService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Reservations"]));
+            services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
