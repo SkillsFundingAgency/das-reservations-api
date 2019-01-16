@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -39,7 +41,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             };
             _reservationRepository.Setup(x => x.GetAccountReservations(ExpectedAccountId))
                 .ReturnsAsync(new List<Reservation> {_expectedReservation});
-            _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object);
+            _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, Mock.Of<IOptions<ReservationConfiguration>>());
         }
 
         [Test]
