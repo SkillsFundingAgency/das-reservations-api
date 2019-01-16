@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -11,11 +13,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
     {
         private readonly IReservationRepository _reservationRepository;
         private readonly IRuleRepository _ruleRepository;
+        private readonly IOptions<ReservationConfiguration> _options;
 
-        public AccountReservationService(IReservationRepository reservationRepository, IRuleRepository ruleRepository)
+        public AccountReservationService(IReservationRepository reservationRepository, IRuleRepository ruleRepository, IOptions<ReservationConfiguration> options)
         {
             _reservationRepository = reservationRepository;
             _ruleRepository = ruleRepository;
+            _options = options;
         }
 
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
@@ -23,16 +27,17 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             var result = await _reservationRepository.GetAccountReservations(accountId);
 
             var reservations = result
-                                .Select(async reservation => await MapReservation(reservation))
-                                .Select(t=>t.Result)
-                                .ToList();
+                .Select(async reservation => await MapReservation(reservation))
+                .Select(t => t.Result)
+                .ToList();
 
             return reservations;
         }
 
-        public async Task<long> CreateAccountReservation(long accountId, DateTime startDate)
+        public async Task<long> CreateAccountReservation(Reservation reservation)
         {
-            var result = await _reservationRepository.CreateAccountReservation(accountId, startDate);
+            reservation.ExpiryDate = reservation.StartDate.AddMonths(_options.Value.ExpiryPeriodInMonths);
+            var result = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
 
             return result;
         }
@@ -56,7 +61,16 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         private Domain.Entities.Reservation MapReservation(Reservation reservation)
         {
-            return new Domain.Entities.Reservation();
+            return new Domain.Entities.Reservation
+            {
+                ExpiryDate = reservation.ExpiryDate,
+                AccountId = reservation.AccountId,
+                CreatedDate = reservation.CreatedDate,
+                IsLevyAccount = reservation.IsLevyAccount,
+                StartDate = reservation.StartDate,
+                ApprenticeId = reservation.ApprenticeId,
+                VacancyId = reservation.VacancyId,
+            };
         }
     }
 }
