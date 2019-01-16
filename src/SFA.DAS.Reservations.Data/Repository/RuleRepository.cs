@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             var result = await _reservationsDataContext
                 .Rules
                 .Where(c => startDate >= c.ActiveFrom && c.ActiveTo >= endDate)
-                .Include(c=>c.ApprenticeshipCourse)
+                .Include(c=>c.Course)
                 .ToListAsync();
 
             return result;

@@ -13,13 +13,13 @@ namespace SFA.DAS.Reservations.Data.Configuration
             
             builder.Property(x => x.Id).HasColumnName(@"Id").HasColumnType("bigint").IsRequired().ValueGeneratedOnAdd();
             builder.Property(x => x.Restriction).HasColumnName(@"Restriction").HasColumnType("tinyint").IsRequired();
-            builder.Property(x => x.ApprenticeshipId).HasColumnName(@"ApprenticeshipId").HasColumnType("bigint").IsRequired();
+            builder.Property(x => x.CourseId).HasColumnName(@"CourseId").HasColumnType("varchar").HasMaxLength(20).IsRequired();
             builder.Property(x => x.CreatedDate).HasColumnName(@"CreatedDate").HasColumnType("datetime").IsRequired();
             builder.Property(x => x.ActiveFrom).HasColumnName(@"ActiveFrom").HasColumnType("datetime").IsRequired();
             builder.Property(x => x.ActiveTo).HasColumnName(@"ActiveTo").HasColumnType("datetime").IsRequired();
 
-            builder.HasOne(c => c.ApprenticeshipCourse).WithMany(c => c.ReservationRule)
-                .HasForeignKey(c => c.ApprenticeshipId);
+            builder.HasOne(c => c.Course).WithMany(c => c.ReservationRule)
+                .HasForeignKey(c => c.CourseId);
 
         }
     }

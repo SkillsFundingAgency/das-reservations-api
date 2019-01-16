@@ -26,13 +26,12 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                     CreatedDate = repositoryRule.CreatedDate,
                     ActiveFrom = repositoryRule.ActiveFrom,
                     ActiveTo = repositoryRule.ActiveTo,
-                    ApprenticeshipId = repositoryRule.ApprenticeshipId,
-                    ApprenticeshipCourse = new Apprenticeship
+                    CourseId = repositoryRule.CourseId,
+                    Course = new Course
                     {
-                        Id = repositoryRule.ApprenticeshipCourse.Id,
-                        CourseId = repositoryRule.ApprenticeshipCourse.CourseId,
-                        Level = repositoryRule.ApprenticeshipCourse.Level.ToString(),
-                        Title = repositoryRule.ApprenticeshipCourse.Title
+                        CourseId = repositoryRule.Course.CourseId,
+                        Level = repositoryRule.Course.Level.ToString(),
+                        Title = repositoryRule.Course.Title
                     }
                 }).ToList();
 

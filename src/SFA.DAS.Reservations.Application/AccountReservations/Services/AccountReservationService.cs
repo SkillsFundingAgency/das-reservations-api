@@ -52,8 +52,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 CreatedDate = reservation.CreatedDate,
                 StartDate = reservation.StartDate,
                 AccountId = reservation.AccountId,
-                ApprenticeId = reservation.ApprenticeId,
-                VacancyId = reservation.VacancyId,
                 IsLevyAccount = reservation.IsLevyAccount,
                 Status = (ReservationStatus)reservation.Status
             };
@@ -70,8 +68,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 CreatedDate = reservation.CreatedDate,
                 IsLevyAccount = reservation.IsLevyAccount,
                 StartDate = reservation.StartDate,
-                ApprenticeId = reservation.ApprenticeId,
-                VacancyId = reservation.VacancyId,
                 Status = (short)reservation.Status
             };
         }

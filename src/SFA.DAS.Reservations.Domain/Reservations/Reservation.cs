@@ -19,13 +19,11 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public long Id { get; set; }
         public long AccountId { get; set; }
         public bool IsLevyAccount { get; set; }
-        public long? ApprenticeId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime ExpiryDate { get; set; }
         public bool IsActive => ExpiryDate <= DateTime.UtcNow;
         public List<ReservationRule> Rules { get; private set; }
-        public long? VacancyId { get; set; }
         public ReservationStatus Status { get; set; }
         public virtual async Task GetReservationRules()
         {
@@ -42,13 +40,12 @@ namespace SFA.DAS.Reservations.Domain.Reservations
                     ActiveTo = rule.ActiveTo,
                     Id = rule.Id,
                     Restriction = (AccountRestriction) rule.Restriction,
-                    ApprenticeshipId = rule.ApprenticeshipId,
-                    ApprenticeshipCourse = new Apprenticeship
+                    CourseId = rule.CourseId,
+                    Course = new Course
                     {
-                        CourseId = rule.ApprenticeshipCourse.CourseId,
-                        Id = rule.ApprenticeshipCourse.Id,
-                        Level = rule.ApprenticeshipCourse.Level.ToString(),
-                        Title = rule.ApprenticeshipCourse.Title
+                        CourseId = rule.Course.CourseId,
+                        Level = rule.Course.Level.ToString(),
+                        Title = rule.Course.Title
                     }
                 });
             }

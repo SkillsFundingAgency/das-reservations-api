@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Data
 {
     public interface IReservationsDataContext 
     {
-        DbSet<Domain.Entities.Apprenticeship> Apprenticeships { get; set; }
+        DbSet<Domain.Entities.Course> Apprenticeships { get; set; }
         DbSet<Domain.Entities.Reservation> Reservations { get; set; }
         DbSet<Domain.Entities.Rule> Rules { get; set; }
         int SaveChanges();
@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Data
 
     public partial class ReservationsDataContext : DbContext, IReservationsDataContext
     {
-        public DbSet<Domain.Entities.Apprenticeship> Apprenticeships { get; set; }
+        public DbSet<Domain.Entities.Course> Apprenticeships { get; set; }
         public DbSet<Domain.Entities.Reservation> Reservations { get; set; }
         public DbSet<Domain.Entities.Rule> Rules { get; set; }
         public ReservationsDataContext()
@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new Apprenticeship());
+            modelBuilder.ApplyConfiguration(new Course());
             modelBuilder.ApplyConfiguration(new Reservation());
             modelBuilder.ApplyConfiguration(new Rule());
             

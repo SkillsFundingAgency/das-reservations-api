@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -12,53 +13,39 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
     public class WhenGettingReservationsForAnAccount
     {
-        private ReservationController _reservationController;
+        private ReservationsController _reservationsController;
         private Mock<IMediator> _mediator;
+        private GetAccountReservationsResult _accountReservationsResult;
+        private const long ExpectedAccountId = 123234;
 
         [SetUp]
         public void Arrange()
         {
             _mediator = new Mock<IMediator>();
+            _accountReservationsResult = new GetAccountReservationsResult{Reservations= new List<Domain.Reservations.Reservation>()};
+            
+            _mediator.Setup(x => x.Send(It.Is<GetAccountReservationsQuery>(c => c.AccountId.Equals(ExpectedAccountId)),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_accountReservationsResult);
 
-            _reservationController = new ReservationController(_mediator.Object);
+            _reservationsController = new ReservationsController(_mediator.Object);
+            
         }
 
         [Test]
-        public async Task Then_The_Correct_Response_Code_Is_Returned()
+        public async Task Then_The_Reservations_Returned()
         {
             //Act
-            var actual = await _reservationController.GetAll(54321);
+            var actual = await _reservationsController.GetAll(ExpectedAccountId);
 
             //Assert
             Assert.IsNotNull(actual);
             var result = actual as ObjectResult;
             Assert.IsNotNull(result?.StatusCode);
             Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-        }
-
-        [Test]
-        public async Task Then_The_Request_Is_Made_Passing_The_AccountId()
-        {
-            //Arrange
-            var expectedAccountId = 54321;
-
-            //Act
-            await _reservationController.GetAll(expectedAccountId);
-
-            //Assert
-            _mediator.Verify(x=>x.Send(It.Is<GetAccountReservationsQuery>(c=>c.AccountId.Equals(expectedAccountId)),It.IsAny<CancellationToken>()),Times.Once);
-        }
-
-        [Test]
-        public async Task Then_The_Results_Are_Returned_In_The_Response()
-        {
-
-        }
-
-        [Test]
-        public async Task Then_A_Not_Found_Response_Code_Is_Returned()
-        {
-
+            Assert.IsNotNull(result.Value);
+            var actualReservations = result.Value as List<Domain.Reservations.Reservation>;
+            Assert.AreEqual(_accountReservationsResult.Reservations,actualReservations);
         }
 
         [Test]

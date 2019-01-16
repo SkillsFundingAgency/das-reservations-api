@@ -26,12 +26,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 Id = 123,
                 ActiveFrom = DateTime.UtcNow,
                 ActiveTo = DateTime.UtcNow.AddMonths(6),
-                ApprenticeshipId = 3,
+                CourseId = "3",
                 CreatedDate = DateTime.UtcNow.AddMonths(-1),
                 Restriction = 0,
-                ApprenticeshipCourse = new Apprenticeship
+                Course = new Course
                 {
-                    Id = 10,
                     CourseId = "2-123-3",
                     Level = 1,
                     Title = "Test Course"
@@ -67,13 +66,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Assert.AreEqual(_rule.Id, actualRule.Id);
             Assert.AreEqual(_rule.ActiveFrom, actualRule.ActiveFrom);
             Assert.AreEqual(_rule.ActiveTo, actualRule.ActiveTo);
-            Assert.AreEqual(_rule.ApprenticeshipId, actualRule.ApprenticeshipId);
+            Assert.AreEqual(_rule.CourseId, actualRule.CourseId);
             Assert.AreEqual(_rule.CreatedDate, actualRule.CreatedDate);
             Assert.AreEqual((AccountRestriction)_rule.Restriction, actualRule.Restriction);
-            Assert.AreEqual(_rule.ApprenticeshipCourse.Id, actualRule.ApprenticeshipCourse.Id);
-            Assert.AreEqual(_rule.ApprenticeshipCourse.CourseId, actualRule.ApprenticeshipCourse.CourseId);
-            Assert.AreEqual(_rule.ApprenticeshipCourse.Level.ToString(), actualRule.ApprenticeshipCourse.Level);
-            Assert.AreEqual(_rule.ApprenticeshipCourse.Title, actualRule.ApprenticeshipCourse.Title);
+            Assert.AreEqual(_rule.Course.CourseId, actualRule.Course.CourseId);
+            Assert.AreEqual(_rule.Course.Level.ToString(), actualRule.Course.Level);
+            Assert.AreEqual(_rule.Course.Title, actualRule.Course.Title);
             
         }
     }

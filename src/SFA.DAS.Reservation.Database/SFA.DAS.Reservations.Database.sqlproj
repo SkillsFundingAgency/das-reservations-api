@@ -61,7 +61,7 @@
     <Folder Include="Tables" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tables\Apprenticeship.sql" />
+    <Build Include="Tables\Course.sql" />
     <Build Include="Tables\Reservation.sql" />
     <Build Include="Tables\Rule.sql" />
   </ItemGroup>

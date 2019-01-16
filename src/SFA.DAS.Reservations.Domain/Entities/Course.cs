@@ -2,9 +2,8 @@
 
 namespace SFA.DAS.Reservations.Domain.Entities
 {
-    public class Apprenticeship
+    public class Course
     {
-        public long Id { get; set; }
         public string CourseId { get; set; }
         public string Title { get; set; }
         public int Level { get; set; }

@@ -37,7 +37,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 CreatedDate= DateTime.Today,
                 Id = 332,
                 IsLevyAccount = true,
-                ApprenticeId = 65,
                 Status = 2
             };
             _reservationRepository.Setup(x => x.GetAccountReservations(ExpectedAccountId))
@@ -67,7 +66,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.IsNotNull(actualReservation);
             Assert.AreEqual(_expectedReservation.Id, actualReservation.Id);
             Assert.AreEqual(_expectedReservation.AccountId, actualReservation.AccountId);
-            Assert.AreEqual(_expectedReservation.ApprenticeId, actualReservation.ApprenticeId);
             Assert.AreEqual(_expectedReservation.StartDate, actualReservation.StartDate);
             Assert.AreEqual(_expectedReservation.ExpiryDate, actualReservation.ExpiryDate);
             Assert.AreEqual(_expectedReservation.CreatedDate, actualReservation.CreatedDate);

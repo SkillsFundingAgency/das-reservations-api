@@ -9,8 +9,8 @@ namespace SFA.DAS.Reservations.Domain.Rules
         public DateTime CreatedDate { get; set; }
         public DateTime ActiveFrom { get; set; }
         public DateTime ActiveTo { get; set; }
-        public long ApprenticeshipId { get; set; }
+        public string CourseId { get; set; }
         public AccountRestriction Restriction { get; set; }
-        public Apprenticeship ApprenticeshipCourse { get; set; }
+        public Course Course { get; set; }
     }
 }

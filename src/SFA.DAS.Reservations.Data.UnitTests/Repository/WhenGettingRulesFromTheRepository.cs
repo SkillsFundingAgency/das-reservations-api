@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                     ActiveTo = DateTime.UtcNow.AddDays(1),
                     Restriction = 1,
                     CreatedDate = DateTime.UtcNow,
-                    ApprenticeshipId = 10
+                    CourseId = "10"
                 },
                 new Rule
                 {
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                     ActiveTo = DateTime.UtcNow.AddDays(10),
                     Restriction = 1,
                     CreatedDate = DateTime.UtcNow,
-                    ApprenticeshipId = 10
+                    CourseId = "10"
                 },
                 new Rule
                 {
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                     ActiveTo = DateTime.UtcNow.AddDays(10),
                     Restriction = 1,
                     CreatedDate = DateTime.UtcNow,
-                    ApprenticeshipId = 10
+                    CourseId = "10"
                 }
             };
             

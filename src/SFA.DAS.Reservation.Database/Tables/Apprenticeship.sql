@@ -1,7 +1,0 @@
-﻿CREATE TABLE [dbo].[Apprenticeship]
-(
-	[Id] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
-	[CourseId] VARCHAR(20) NOT NULL,
-	[Title] VARCHAR(500) NOT NULL,
-	[Level] TINYINT NOT NULL,
-)

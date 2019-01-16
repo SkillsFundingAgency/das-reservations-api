@@ -7,7 +7,6 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
-using Apprenticeship = SFA.DAS.Reservations.Domain.Entities.Apprenticeship;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
@@ -16,15 +15,14 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
     {
         private Reservation _reservation;
         private Mock<IRuleRepository> _ruleRepository;
-        private Apprenticeship _expectedApprenticeshipCourse;
+        private Course _expectedCourse;
 
         [SetUp]
         public void Arrange()
         {
             _ruleRepository = new Mock<IRuleRepository>();
-            _expectedApprenticeshipCourse = new Apprenticeship
+            _expectedCourse = new Course
             {
-                Id = 2,
                 CourseId = "123-4",
                 Level = 1,
                 Title = "Test Course"
@@ -33,20 +31,20 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             {
                 new Rule
                 {
-                    ApprenticeshipId = 1,
-                    ApprenticeshipCourse = _expectedApprenticeshipCourse,
+                    CourseId = "1",
+                    Course = _expectedCourse,
                     Restriction = 0
                 },
                 new Rule
                 {
-                    ApprenticeshipId = 1,
-                    ApprenticeshipCourse = _expectedApprenticeshipCourse,
+                    CourseId = "1",
+                    Course = _expectedCourse,
                     Restriction = 1
                 },
                 new Rule
                 {
-                    ApprenticeshipId = 1,
-                    ApprenticeshipCourse = _expectedApprenticeshipCourse,
+                    CourseId = "1",
+                    Course = _expectedCourse,
                     Restriction = 2
                 }
             });
@@ -101,13 +99,12 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
 
             //Assert
             Assert.AreEqual(2, _reservation.Rules.Count);
-            Assert.IsTrue(_reservation.Rules.All(c=>c.ApprenticeshipCourse!=null));
-            var actualRuleCourse = _reservation.Rules.FirstOrDefault()?.ApprenticeshipCourse;
+            Assert.IsTrue(_reservation.Rules.All(c=>c.Course!=null));
+            var actualRuleCourse = _reservation.Rules.FirstOrDefault()?.Course;
             Assert.IsNotNull(actualRuleCourse);
-            Assert.AreEqual(_expectedApprenticeshipCourse.Id, actualRuleCourse.Id);
-            Assert.AreEqual(_expectedApprenticeshipCourse.CourseId, actualRuleCourse.CourseId);
-            Assert.AreEqual(_expectedApprenticeshipCourse.Title, actualRuleCourse.Title);
-            Assert.AreEqual(_expectedApprenticeshipCourse.Level.ToString(), actualRuleCourse.Level);
+            Assert.AreEqual(_expectedCourse.CourseId, actualRuleCourse.CourseId);
+            Assert.AreEqual(_expectedCourse.Title, actualRuleCourse.Title);
+            Assert.AreEqual(_expectedCourse.Level.ToString(), actualRuleCourse.Level);
         }
     }
 }
