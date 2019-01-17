@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Validation;
 
@@ -10,7 +8,18 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
     {
         public Task<ValidationResult> ValidateAsync(CreateAccountReservationCommand item)
         {
-            throw new NotImplementedException();
+            var validationResult = new ValidationResult();
+
+            if (item.Reservation.AccountId == 0)
+            {
+                validationResult.AddError(nameof(item.Reservation.AccountId));
+            }
+            if (item.Reservation.StartDate == DateTime.MinValue)
+            {
+                validationResult.AddError(nameof(item.Reservation.StartDate));
+            }
+
+            return Task.FromResult(validationResult);
         }
     }
 }
