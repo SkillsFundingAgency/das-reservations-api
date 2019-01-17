@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 
 namespace SFA.DAS.Reservations.Api.Controllers

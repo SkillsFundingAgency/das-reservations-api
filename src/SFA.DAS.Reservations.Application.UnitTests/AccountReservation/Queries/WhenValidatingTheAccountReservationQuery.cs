@@ -15,8 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         }
 
         [Test]
-        public async Task
-            Then_The_Query_Is_Invalid_If_The_Required_Fields_Are_Not_Passed_And_Validation_Errors_Returned()
+        public async Task Then_The_Query_Is_Invalid_If_The_Required_Fields_Are_Not_Passed_And_Validation_Errors_Returned()
         {
             //Act
             var actual = await _validator.ValidateAsync(new GetAccountReservationsQuery());
