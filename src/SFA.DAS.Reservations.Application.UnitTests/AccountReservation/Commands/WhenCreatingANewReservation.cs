@@ -31,7 +31,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _reservation = new Reservation(Mock.Of<IRuleRepository>())
             {
                 AccountId = ExpectedAccountId,
-                StartDate = _expectedDateTime
+                StartDate = _expectedDateTime,
+                CreatedDate = DateTime.UtcNow
             };
             _reservationCreated = new Reservation(Mock.Of<IRuleRepository>())
             {
@@ -64,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var expectedCommand = new CreateAccountReservationCommand {Reservation = new Reservation(Mock.Of<IRuleRepository>()){AccountId = 1 }};
 
             //Act Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async() =>
+            Assert.ThrowsAsync<ArgumentException>(async() =>
             {
                 await _handler.Handle(expectedCommand, _cancellationToken);
             });
@@ -83,6 +84,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                     c=>
                         c.AccountId.Equals(_command.Reservation.AccountId) 
                        && c.StartDate.Equals(_expectedDateTime)
+                        && !c.CreatedDate.Equals(DateTime.MinValue)
                         )), Times.Once);
         }
 

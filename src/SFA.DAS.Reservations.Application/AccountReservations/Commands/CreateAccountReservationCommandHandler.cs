@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -24,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
 
             if (!validationResult.IsValid())
             {
-                throw new InvalidOperationException();
+                throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
             var reservation = await _accountReservationService.CreateAccountReservation(request.Reservation);
