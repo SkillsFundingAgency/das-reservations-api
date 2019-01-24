@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
     {
         private Reservation _reservation;
         private Course _expectedCourse;
-        private Func<DateTime,DateTime?, Task<IList<Rule>>> _rules;
+        private Func<DateTime, Task<IList<Rule>>> _rules;
 
         [SetUp]
         public void Arrange()
@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
                 Level = 1,
                 Title = "Test Course"
             };
-            _rules = (startDate, expiryDate) =>
+            _rules = (startDate) =>
             {
                 var rules = new List<Rule>
                     {
@@ -68,17 +68,18 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_The_Reservation_Is_Valid_If_It_Is_Within_The_Expiry_Period()
         {
             //Act
-            _reservation = new Reservation(null,1,1,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1),ReservationStatus.Pending);
+            _reservation = new Reservation(null, 1, 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending);
 
             //Assert
             Assert.IsTrue(_reservation.IsActive);
+            
         }
 
         [Test]
         public void Then_The_Reservation_Is_Not_Valid_If_It_Has_Fallen_Out_Of_The_Expiry_Period()
         {
             //Act
-            _reservation = new Reservation(null, 1, 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending);
+            _reservation = new Reservation(null, 1, 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending);
 
             //Assert
             Assert.IsFalse(_reservation.IsActive);

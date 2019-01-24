@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             ExpiryDate = startDate.AddMonths(expiryPeriodInMonths);
         }
 
-        public Reservation(Func<DateTime, DateTime?, Task<IList<Rule>>> rules, 
+        public Reservation(Func<DateTime, Task<IList<Rule>>> rules, 
             long id, 
             long accountId, 
             bool isLevyAccount, 
@@ -49,15 +49,15 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         public DateTime ExpiryDate { get; }
 
-        public bool IsActive => ExpiryDate <= DateTime.UtcNow;
+        public bool IsActive => ExpiryDate >= DateTime.UtcNow;
 
         public List<ReservationRule> Rules { get; }
 
         public ReservationStatus Status { get; }
 
-        private IList<Rule> GetRules(Func<DateTime, DateTime?, Task<IList<Rule>>> getRules)
+        private IList<Rule> GetRules(Func<DateTime, Task<IList<Rule>>> getRules)
         {
-            var task = getRules(StartDate, ExpiryDate);
+            var task = getRules(StartDate);
             return task.Result;
         }
 
