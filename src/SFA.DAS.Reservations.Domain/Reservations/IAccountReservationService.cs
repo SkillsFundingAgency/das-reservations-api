@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     public interface IAccountReservationService
     {
         Task<IList<Reservation>> GetAccountReservations(long accountId);
-        Task<long> CreateAccountReservation(Reservation reservation);
+        Task<Reservation> CreateAccountReservation(Reservation reservation);
     }
 }

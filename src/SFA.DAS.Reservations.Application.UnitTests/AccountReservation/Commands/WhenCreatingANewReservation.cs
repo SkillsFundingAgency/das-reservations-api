@@ -22,6 +22,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         private Mock<IAccountReservationService> _accountReservationsService;
         private Mock<IValidator<CreateAccountReservationCommand>> _validator;
         private Reservation _reservation;
+        private Reservation _reservationCreated;
 
         [SetUp]
         public void Arrange()
@@ -29,6 +30,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _cancellationToken = new CancellationToken();
             _reservation = new Reservation(Mock.Of<IRuleRepository>())
             {
+                AccountId = ExpectedAccountId,
+                StartDate = _expectedDateTime
+            };
+            _reservationCreated = new Reservation(Mock.Of<IRuleRepository>())
+            {
+                Id = ExpectedReservationId,
                 AccountId = ExpectedAccountId,
                 StartDate = _expectedDateTime
             };
@@ -41,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 
             _accountReservationsService = new Mock<IAccountReservationService>();
             _accountReservationsService.Setup(x => x.CreateAccountReservation(It.Is<Reservation>(c=>c.AccountId.Equals(ExpectedAccountId) && c.StartDate.Equals(_expectedDateTime))))
-                .ReturnsAsync(ExpectedReservationId);
+                .ReturnsAsync(_reservationCreated);
 
             
 
@@ -86,7 +93,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var actual = await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            Assert.AreEqual(ExpectedReservationId, actual.ReservationId);
+            Assert.AreEqual(_reservationCreated, actual.Reservation);
         }
     }
 }

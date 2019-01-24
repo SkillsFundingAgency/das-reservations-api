@@ -34,11 +34,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservations;
         }
 
-        public async Task<long> CreateAccountReservation(Reservation reservation)
+        public async Task<Reservation> CreateAccountReservation(Reservation reservation)
         {
             reservation.ExpiryDate = reservation.StartDate.AddMonths(_options.Value.ExpiryPeriodInMonths);
             reservation.Status = ReservationStatus.Pending;
-            var result = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
+
+            var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
+            var result = await MapReservation(entity);
 
             return result;
         }

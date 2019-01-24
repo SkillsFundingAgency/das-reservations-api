@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -23,12 +22,12 @@ namespace SFA.DAS.Reservations.Data.Repository
             return result;
         }
 
-        public async Task<long> CreateAccountReservation(Reservation reservation)
+        public async Task<Reservation> CreateAccountReservation(Reservation reservation)
         {
             var reservationResult = await _reservationsDataContext.Reservations.AddAsync(reservation);
             _reservationsDataContext.SaveChanges();
 
-            return reservationResult.Entity.Id;
+            return reservationResult.Entity;
         }
     }
 }

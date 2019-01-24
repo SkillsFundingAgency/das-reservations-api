@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -7,6 +8,7 @@ using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
+using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 {
@@ -30,9 +32,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _options.Setup(x => x.Value.ExpiryPeriodInMonths).Returns(ExpiryPeriodInMonths);
             _reservationRepository = new Mock<IReservationRepository>();
             _ruleRepository = new Mock<IRuleRepository>();
+            _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(new List<Domain.Entities.Rule>());
 
             _reservationRepository.Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.AccountId.Equals(ExpectedAccountId))))
-                .ReturnsAsync(ExpectedReservationId);
+                .ReturnsAsync(new Domain.Entities.Reservation{Id=ExpectedReservationId, AccountId = ExpectedAccountId});
 
             _reservation = new Reservation(_ruleRepository.Object)
             {
@@ -69,13 +72,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         }
 
         [Test]
-        public async Task Then_The_ReservationId_Is_Returned()
+        public async Task Then_The_New_Reservation_Is_Returned_Mapped_From_The_Entity()
         {
             //Act
             var actual = await _accountReservationService.CreateAccountReservation(_reservation);
 
             //Assert
-            Assert.AreEqual(ExpectedReservationId, actual);
+            Assert.IsAssignableFrom<Reservation>(actual);
+            Assert.AreEqual(ExpectedReservationId, actual.Id);
+            Assert.AreEqual(ExpectedAccountId, actual.AccountId);
+            Assert.IsNotNull(actual.Rules);
         }
 
     }

@@ -27,11 +27,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
                 throw new InvalidOperationException();
             }
 
-            var reservationId = await _accountReservationService.CreateAccountReservation(request.Reservation);
+            var reservation = await _accountReservationService.CreateAccountReservation(request.Reservation);
 
             return new CreateAccountReservationResult
             {
-                ReservationId = reservationId
+                Reservation = reservation
             };
         }
     }
