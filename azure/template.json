@@ -97,7 +97,7 @@
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('appInsights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('applicationInsights').outputs.InstrumentationKey.value]"
                             }
                         ]
                     },
