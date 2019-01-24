@@ -5,7 +5,7 @@ using SFA.DAS.Reservations.Application.Rules.Queries;
 
 namespace SFA.DAS.Reservations.Api.Controllers
 {
-    [Route("api/rule")]
+    [Route("api/[controller]")]
     [ApiController]
     public class RulesController : ControllerBase
     {
