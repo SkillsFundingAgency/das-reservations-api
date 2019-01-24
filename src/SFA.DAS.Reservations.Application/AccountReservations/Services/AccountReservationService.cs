@@ -38,6 +38,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         {
             reservation.ExpiryDate = reservation.StartDate.AddMonths(_options.Value.ExpiryPeriodInMonths);
             reservation.Status = ReservationStatus.Pending;
+            reservation.CreatedDate = DateTime.UtcNow;
 
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = await MapReservation(entity);

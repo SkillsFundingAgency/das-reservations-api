@@ -66,6 +66,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _reservationRepository.Verify(x=>x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(
                 c=>c.AccountId.Equals(ExpectedAccountId) &&
                    c.StartDate.Equals(_expectedStartDate) &&
+                   !c.CreatedDate.Equals(DateTime.MinValue) &&
                    c.ExpiryDate.Equals(_expectedStartDate.AddMonths(ExpiryPeriodInMonths)) &&
                    c.Status.Equals((short)ReservationStatus.Pending)
                 )));
