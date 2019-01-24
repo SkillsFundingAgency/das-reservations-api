@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
                 throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var reservation = await _accountReservationService.CreateAccountReservation(request.Reservation);
+            var reservation = await _accountReservationService.CreateAccountReservation(request.AccountId, request.StartDate);
 
             return new CreateAccountReservationResult
             {

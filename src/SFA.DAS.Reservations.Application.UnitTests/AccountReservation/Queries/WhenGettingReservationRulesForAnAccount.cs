@@ -6,7 +6,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
@@ -18,8 +17,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         private CancellationToken _cancellationToken;
         private GetAccountReservationsQuery _query;
         private Mock<IAccountReservationService> _service;
-        private Mock<IRuleRepository> _ruleRepository;
-        private Reservation _reservation;
         private const long ExpectedAccountId = 553234;
 
         [SetUp]
@@ -31,10 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 .ReturnsAsync(new ValidationResult {ValidationDictionary = new Dictionary<string, string>()});
             _cancellationToken = new CancellationToken();
             _service = new Mock<IAccountReservationService>();
-
-            _ruleRepository = new Mock<IRuleRepository>();
-            _reservation = new Reservation(_ruleRepository.Object){AccountId = ExpectedAccountId};
-
+            
             _handler = new GetAccountReservationsQueryHandler(_validator.Object, _service.Object);
         }
 
@@ -84,7 +78,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         public async Task Then_The_Values_Are_Returned_In_The_Response()
         {
             //Arrange
-            _service.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{_reservation});
+            var reservation = new Reservation(ExpectedAccountId , DateTime.UtcNow ,1);
+            _service.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{ reservation });
 
             //Act
             var actual = await _handler.Handle(_query, _cancellationToken);

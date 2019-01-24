@@ -5,12 +5,23 @@ namespace SFA.DAS.Reservations.Domain.Rules
 {
     public class ReservationRule
     {
-        public long Id { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ActiveFrom { get; set; }
-        public DateTime ActiveTo { get; set; }
-        public string CourseId { get; set; }
-        public AccountRestriction Restriction { get; set; }
-        public Course Course { get; set; }
+        public ReservationRule(Entities.Rule rule)
+        {
+            CreatedDate = rule.CreatedDate;
+            ActiveFrom = rule.ActiveFrom;
+            ActiveTo = rule.ActiveTo;
+            Id = rule.Id;
+            Restriction = (AccountRestriction) rule.Restriction;
+            CourseId = rule.CourseId;
+            Course = new Course(rule.Course.CourseId, rule.Course.Title, rule.Course.Level.ToString());
+        }
+
+        public long Id { get;  }
+        public DateTime CreatedDate { get;  }
+        public DateTime ActiveFrom { get;  }
+        public DateTime ActiveTo { get;  }
+        public string CourseId { get;  }
+        public AccountRestriction Restriction { get;  }
+        public Course Course { get;  }
     }
 }

@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
@@ -22,19 +23,17 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private CreateAccountReservationResult _accountReservationsResult;
         private const long ExpectedAccountId = 123234;
         private const long ExpectedReservationId = 55874;
-        private DateTime _expectedStartDate = new DateTime(2018,5,24);
+        private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);
         private Mock<HttpContext> _httpContext;
 
         [SetUp]
         public void Arrange()
         {
-            _accountReservationsResult=new CreateAccountReservationResult{Reservation = new Domain.Reservations.Reservation(Mock.Of<IRuleRepository>())
-            {
-                AccountId = ExpectedAccountId,
-                Id = ExpectedReservationId,
-            }};
+            _accountReservationsResult = new CreateAccountReservationResult
+                {Reservation = new Domain.Reservations.Reservation(null,ExpectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending)};
+            ;
             _mediator = new Mock<IMediator>();
-            _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => c.Reservation.AccountId.Equals(ExpectedAccountId) && c.Reservation.StartDate.Equals(_expectedStartDate)),
+            _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => c.AccountId.Equals(ExpectedAccountId) && c.StartDate.Equals(_expectedStartDate)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountReservationsResult);
             _httpContext = new Mock<HttpContext>();

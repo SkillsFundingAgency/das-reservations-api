@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
-using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 {
@@ -23,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         public async Task Then_The_Commands_Required_Parameters_Are_Validated_And_Error_Messages_Returned()
         {
             //Act
-            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand{Reservation = new Reservation(Mock.Of<IRuleRepository>()) });
+            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand( ));
 
             //Assert
             Assert.IsFalse(actual.IsValid());
@@ -37,11 +34,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Act
             var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand
             {
-                Reservation = new Reservation(Mock.Of<IRuleRepository>())
-                {
-                    AccountId = 5432,
-                    StartDate = DateTime.UtcNow
-                }
+                AccountId = 5432,
+                StartDate = DateTime.UtcNow
             });
 
             //Assert

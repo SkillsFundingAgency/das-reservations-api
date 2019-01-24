@@ -13,11 +13,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
         public void Then_The_ApprenticeshipType_Is_Correctly_Worked_Out_From_The_Course_Id(string courseId, bool isStandard)
         {
             //Arrange Act
-            var actualApprenticeship = new Course
-            {
-                CourseId = courseId
-            };
-
+            var actualApprenticeship = new Course(courseId, "", "");
+            
             //Assert
             var expectedType = isStandard ? ApprenticeshipType.Standard : ApprenticeshipType.Framework;
             Assert.AreEqual(expectedType, actualApprenticeship.Type);
@@ -27,12 +24,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
         public void Then_The_Course_Description_Is_Taken_From_The_Title_And_Level()
         {
             //Arrange Act
-            var actualApprenticeship = new Course
-            {
-                Title = "Some title",
-                Level = "1"
-            };
-
+            var actualApprenticeship = new Course("", "Some title", "1");
+            
             //Assert
             Assert.AreEqual("Some title - Level 1", actualApprenticeship.CourseDescription);
         }

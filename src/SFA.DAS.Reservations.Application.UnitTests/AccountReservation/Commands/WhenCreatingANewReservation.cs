@@ -28,32 +28,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         public void Arrange()
         {
             _cancellationToken = new CancellationToken();
-            _reservation = new Reservation(Mock.Of<IRuleRepository>())
-            {
-                AccountId = ExpectedAccountId,
-                StartDate = _expectedDateTime,
-                CreatedDate = DateTime.UtcNow
-            };
-            _reservationCreated = new Reservation(Mock.Of<IRuleRepository>())
-            {
-                Id = ExpectedReservationId,
-                AccountId = ExpectedAccountId,
-                StartDate = _expectedDateTime
-            };
-
+            _reservation = new Reservation(ExpectedAccountId, _expectedDateTime, 3);
+              
+            _reservationCreated = new Reservation(null,ExpectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending);
+            
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
                 .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>{{"",""}}});
-            _validator.Setup(x=>x.ValidateAsync(It.Is<CreateAccountReservationCommand>(c=>c.Reservation.AccountId.Equals(ExpectedAccountId))))
+            _validator.Setup(x=>x.ValidateAsync(It.Is<CreateAccountReservationCommand>(c=>c.AccountId.Equals(ExpectedAccountId))))
                 .ReturnsAsync(new ValidationResult());
 
             _accountReservationsService = new Mock<IAccountReservationService>();
-            _accountReservationsService.Setup(x => x.CreateAccountReservation(It.Is<Reservation>(c=>c.AccountId.Equals(ExpectedAccountId) && c.StartDate.Equals(_expectedDateTime))))
-                .ReturnsAsync(_reservationCreated);
+            _accountReservationsService.Setup(x => x.CreateAccountReservation(ExpectedAccountId, _expectedDateTime)).ReturnsAsync(_reservationCreated);
 
             
 
-            _command = new CreateAccountReservationCommand {Reservation = _reservation};
+            _command = new CreateAccountReservationCommand {AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
 
             _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object);
         }
@@ -62,14 +52,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         public void Then_The_Command_Is_Validated_And_The_Service_Not_Called_If_Not_Valid()
         {
             //Arrange
-            var expectedCommand = new CreateAccountReservationCommand {Reservation = new Reservation(Mock.Of<IRuleRepository>()){AccountId = 1 }};
+            var expectedCommand = new CreateAccountReservationCommand {AccountId = 1};
 
             //Act Assert
             Assert.ThrowsAsync<ArgumentException>(async() =>
             {
                 await _handler.Handle(expectedCommand, _cancellationToken);
             });
-            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<Reservation>()), Times.Never);
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<long>(), It.IsAny<DateTime>()), Times.Never);
         }
 
         [Test]
@@ -79,13 +69,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            _accountReservationsService.Verify(x=>x.CreateAccountReservation(
-                It.Is<Reservation>(
-                    c=>
-                        c.AccountId.Equals(_command.Reservation.AccountId) 
-                       && c.StartDate.Equals(_expectedDateTime)
-                        && !c.CreatedDate.Equals(DateTime.MinValue)
-                        )), Times.Once);
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command.AccountId,_expectedDateTime),Times.Once());
         }
 
         [Test]

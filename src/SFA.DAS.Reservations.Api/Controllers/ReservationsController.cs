@@ -44,11 +44,11 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new CreateAccountReservationCommand { Reservation = new Domain.Reservations.Reservation
+                var response = await _mediator.Send(new CreateAccountReservationCommand
                 {
                     AccountId = reservation.AccountId,
                     StartDate = reservation.StartDate
-                }});
+                });
                 return Created($"api/accounts/{response.Reservation.AccountId}/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
             }
             catch (ArgumentException e)

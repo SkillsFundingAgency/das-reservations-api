@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
@@ -26,10 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
 
             _rules = new List<ReservationRule>
             {
-                new ReservationRule
-                {
-                    Id = ExpectedReservationRuleId
-                }
+                new ReservationRule(new Rule{Id = ExpectedReservationRuleId, Course = new Course()})
             };
 
             _handler = new GetRulesQueryHandler(_service.Object);

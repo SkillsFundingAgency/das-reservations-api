@@ -10,13 +10,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
         {
             var validationResult = new ValidationResult();
 
-            if (item.Reservation.AccountId == 0)
+            if (item.AccountId == 0)
             {
-                validationResult.AddError(nameof(item.Reservation.AccountId));
+                validationResult.AddError(nameof(item.AccountId));
             }
-            if (item.Reservation.StartDate == DateTime.MinValue)
+            if (item.StartDate == DateTime.MinValue)
             {
-                validationResult.AddError(nameof(item.Reservation.StartDate));
+                validationResult.AddError(nameof(item.StartDate));
             }
 
             return Task.FromResult(validationResult);

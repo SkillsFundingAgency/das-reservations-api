@@ -27,38 +27,33 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             var result = await _reservationRepository.GetAccountReservations(accountId);
 
             var reservations = result
-                .Select(async reservation => await MapReservation(reservation))
-                .Select(t => t.Result)
+                .Select(MapReservation)
                 .ToList();
 
             return reservations;
         }
 
-        public async Task<Reservation> CreateAccountReservation(Reservation reservation)
+        public async Task<Reservation> CreateAccountReservation(long accountId, DateTime startDate)
         {
-            reservation.ExpiryDate = reservation.StartDate.AddMonths(_options.Value.ExpiryPeriodInMonths);
-            reservation.Status = ReservationStatus.Pending;
-            reservation.CreatedDate = DateTime.UtcNow;
-
+            var reservation = new Reservation(accountId, startDate, _options.Value.ExpiryPeriodInMonths);
+            
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
-            var result = await MapReservation(entity);
+            var result = MapReservation(entity);
 
             return result;
         }
 
-        private async Task<Reservation> MapReservation(Domain.Entities.Reservation reservation)
+        private Reservation MapReservation(Domain.Entities.Reservation reservation)
         {
-            var mapReservation = new Reservation(_ruleRepository)
-            {
-                Id = reservation.Id,
-                ExpiryDate = reservation.ExpiryDate,
-                CreatedDate = reservation.CreatedDate,
-                StartDate = reservation.StartDate,
-                AccountId = reservation.AccountId,
-                IsLevyAccount = reservation.IsLevyAccount,
-                Status = (ReservationStatus)reservation.Status
-            };
-            await mapReservation.GetReservationRules();
+            var mapReservation = new Reservation(_ruleRepository.GetReservationRules, 
+                reservation.Id,
+                reservation.AccountId,
+                reservation.IsLevyAccount,
+                reservation.CreatedDate,
+                reservation.StartDate,
+                reservation.ExpiryDate,
+                (ReservationStatus)reservation.Status
+            );
             return mapReservation;
         }
 
