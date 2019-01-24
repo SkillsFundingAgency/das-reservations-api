@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Domain.Rules
 {
     public interface IRuleRepository
     {
-        Task<IList<Entities.Rule>> GetReservationRules(DateTime startDate, DateTime? endDate);
+        Task<IList<Entities.Rule>> GetReservationRules(DateTime startDate);
     }
 }

@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 }
             };
             _ruleRepository = new Mock<IRuleRepository>();
-            _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>(), It.IsAny<DateTime?>())).ReturnsAsync(new List<Rule>{_rule});
+            _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>())).ReturnsAsync(new List<Rule>{_rule});
             
             _service = new RulesService(_ruleRepository.Object);
         }
@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _service.GetRules();
 
             //Assert
-            _ruleRepository.Verify(x => x.GetReservationRules(It.Is<DateTime>(c=>c.ToShortDateString().Equals(DateTime.UtcNow.ToShortDateString())),null));
+            _ruleRepository.Verify(x => x.GetReservationRules(It.Is<DateTime>(c=>c.ToShortDateString().Equals(DateTime.UtcNow.ToShortDateString()))));
             Assert.IsNotNull(actual);
         }
 

@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _options.Setup(x => x.Value.ExpiryPeriodInMonths).Returns(ExpiryPeriodInMonths);
             _reservationRepository = new Mock<IReservationRepository>();
             _ruleRepository = new Mock<IRuleRepository>();
-            _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(new List<Domain.Entities.Rule>());
+            _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>())).ReturnsAsync(new List<Domain.Entities.Rule>());
 
             _reservationRepository.Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.AccountId.Equals(ExpectedAccountId))))
                 .ReturnsAsync(new Domain.Entities.Reservation{Id=ExpectedReservationId, AccountId = ExpectedAccountId});

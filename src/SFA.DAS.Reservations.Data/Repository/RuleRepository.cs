@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Data.Repository
@@ -16,13 +15,11 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             _reservationsDataContext = reservationsDataContext;
         }
-        public async Task<IList<Domain.Entities.Rule>> GetReservationRules(DateTime startDate, DateTime? endDate)
+        public async Task<IList<Domain.Entities.Rule>> GetReservationRules(DateTime startDate)
         {
-            if (!endDate.HasValue)
-            {
-                endDate = DateTime.UtcNow;
-            }
-
+            
+            var endDate = DateTime.UtcNow;
+            
             var result = await _reservationsDataContext
                 .Rules
                 .Where(c => startDate >= c.ActiveFrom && c.ActiveTo >= endDate)

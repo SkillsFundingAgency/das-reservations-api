@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public void Arrange()
         {
             _ruleRepository = new Mock<IRuleRepository>();
-            _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>(), It.IsAny<DateTime>())).ReturnsAsync(new List<Rule>());
+            _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>())).ReturnsAsync(new List<Rule>());
             _reservationRepository = new Mock<IReservationRepository>();
             _expectedReservation = new Reservation
             {
