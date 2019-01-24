@@ -11,6 +11,10 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     {
         private readonly IRuleRepository _ruleRepository;
 
+        public Reservation()
+        {
+            
+        }
         public Reservation(IRuleRepository ruleRepository)
         {
             _ruleRepository = ruleRepository;

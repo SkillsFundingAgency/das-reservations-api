@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Data.Repository;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
@@ -35,6 +37,8 @@ namespace SFA.DAS.Reservations.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ReservationConfiguration>(Configuration);
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -44,6 +48,7 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
             services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>), typeof(GetAccountReservationsValidator));
+            services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>), typeof(CreateAccountReservationValidator));
             services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();
