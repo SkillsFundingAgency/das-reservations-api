@@ -147,5 +147,14 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "databaseName": {
+            "type": "string",
+            "value": "[variables('databaseName')]"
+        },
+        "appServiceName": {
+            "type": "string",
+            "value": "[variables('appServiceName')]"
+        }
+    }
 }

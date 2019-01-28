@@ -51,6 +51,14 @@ steps:
     command: publish
     publishWebProjects: true
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+
+- task: VSBuild@1
+  displayName: 'Build DACPAC'
+  inputs:
+    solution: 'src/SFA.DAS.Reservation.Database/SFA.DAS.Reservations.Database.sqlproj'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
     
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
