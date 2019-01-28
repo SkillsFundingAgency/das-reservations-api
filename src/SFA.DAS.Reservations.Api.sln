@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Data",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Domain.UnitTests", "SFA.DAS.Reservations.Domain.UnitTests\SFA.DAS.Reservations.Domain.UnitTests.csproj", "{E54A40B7-0103-46AB-8D8C-E4725EE722A4}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SFA.DAS.Reservations.Database", "SFA.DAS.Reservation.Database\SFA.DAS.Reservations.Database.sqlproj", "{6CAC5F3B-6837-4DB6-A5A1-F080EEAC5476}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SFA.DAS.Reservations.Database", "SFA.DAS.Reservations.Database\SFA.DAS.Reservations.Database.sqlproj", "{6CAC5F3B-6837-4DB6-A5A1-F080EEAC5476}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Data.UnitTests", "SFA.DAS.Reservations.Data.UnitTests\SFA.DAS.Reservations.Data.UnitTests.csproj", "{3454ACAF-DE01-452B-B3A5-19AB1B0F77D3}"
 EndProject
