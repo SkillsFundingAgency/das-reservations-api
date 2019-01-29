@@ -15,12 +15,31 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _validator = new CreateAccountReservationValidator();
         }
 
+        [TestCase(0, null, false)]
+        [TestCase(1, null, false)]
+        [TestCase(0, "2019-08-08", false)]
+        [TestCase(1, "2019-08-08", true)]
+        public async Task Then_The_Command_Is_Validated_For_Each_Parameter(long accountId, string date, bool expected)
+        {
+            //Arrange
+            var startDate = DateTime.TryParse(date, out var dateParsed);
+            //Act
+            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand
+            {
+                AccountId = accountId,
+                StartDate = startDate ? dateParsed : DateTime.MinValue
+            });
+
+            //Assert
+            Assert.AreEqual(expected, actual.IsValid());
+        }
+
 
         [Test]
         public async Task Then_The_Commands_Required_Parameters_Are_Validated_And_Error_Messages_Returned()
         {
             //Act
-            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand( ));
+            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand());
 
             //Assert
             Assert.IsFalse(actual.IsValid());

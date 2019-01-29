@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         }
 
         [Test]
-        public async Task Then_The_Repository_Is_Called_If_Valid_With_The_Request_Details()
+        public async Task Then_The_Repository_Is_Called_With_The_Request_Details()
         {
             //Act
             await _handler.Handle(_query, _cancellationToken);

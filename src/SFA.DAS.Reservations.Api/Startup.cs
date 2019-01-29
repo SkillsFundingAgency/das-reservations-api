@@ -22,9 +22,9 @@ namespace SFA.DAS.Reservations.Api
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
