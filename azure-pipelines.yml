@@ -55,7 +55,7 @@ steps:
 - task: VSBuild@1
   displayName: 'Build DACPAC'
   inputs:
-    solution: 'src/SFA.DAS.Reservation.Database/SFA.DAS.Reservations.Database.sqlproj'
+    solution: 'src/SFA.DAS.Reservations.Database/SFA.DAS.Reservations.Database.sqlproj'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
@@ -65,6 +65,7 @@ steps:
   inputs:
     Contents: |
      azure\**
+     src\**\*.dacpac
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
 
