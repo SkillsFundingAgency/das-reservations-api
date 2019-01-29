@@ -4,8 +4,9 @@ using System.Text;
 
 namespace SFA.DAS.Reservations.Domain.Configuration
 {
-    public class ReservationConfiguration
+    public class ReservationsConfiguration
     {
         public virtual int ExpiryPeriodInMonths { get; set; }
+        public virtual string ConnectionString { get; set; }
     }
 }

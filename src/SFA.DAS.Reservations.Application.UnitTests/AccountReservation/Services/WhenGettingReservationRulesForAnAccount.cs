@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             };
             _reservationRepository.Setup(x => x.GetAccountReservations(ExpectedAccountId))
                 .ReturnsAsync(new List<Reservation> {_expectedReservation});
-            _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, Mock.Of<IOptions<ReservationConfiguration>>());
+            _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, Mock.Of<IOptions<ReservationsConfiguration>>());
         }
 
         [Test]

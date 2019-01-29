@@ -22,12 +22,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         private const long ExpectedAccountId = 12344;
         private const long ExpectedReservationId = 55323;
         private readonly DateTime _expectedStartDate = DateTime.UtcNow.AddMonths(1);
-        private Mock<IOptions<ReservationConfiguration>> _options;
+        private Mock<IOptions<ReservationsConfiguration>> _options;
         
         [SetUp]
         public void Arrange()
         {
-            _options = new Mock<IOptions<ReservationConfiguration>>();
+            _options = new Mock<IOptions<ReservationsConfiguration>>();
             _options.Setup(x => x.Value.ExpiryPeriodInMonths).Returns(ExpiryPeriodInMonths);
             _reservationRepository = new Mock<IReservationRepository>();
             _ruleRepository = new Mock<IRuleRepository>();

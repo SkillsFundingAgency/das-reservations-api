@@ -13,9 +13,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
     {
         private readonly IReservationRepository _reservationRepository;
         private readonly IRuleRepository _ruleRepository;
-        private readonly IOptions<ReservationConfiguration> _options;
+        private readonly IOptions<ReservationsConfiguration> _options;
 
-        public AccountReservationService(IReservationRepository reservationRepository, IRuleRepository ruleRepository, IOptions<ReservationConfiguration> options)
+        public AccountReservationService(IReservationRepository reservationRepository, IRuleRepository ruleRepository, IOptions<ReservationsConfiguration> options)
         {
             _reservationRepository = reservationRepository;
             _ruleRepository = ruleRepository;
