@@ -10,4 +10,9 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions">
+      <HintPath>..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.authentication.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>
