@@ -8,17 +8,18 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
 {
     public class AzureTableStorageConfigurationProvider : ConfigurationProvider
     {
+        private readonly string _connection;
         private readonly string _environment;
         private readonly string _version;
         private readonly string _appName;
-        private readonly CloudStorageAccount _storageAccount;
+
 
         public AzureTableStorageConfigurationProvider(string connection,string appName, string environment, string version)
         {
+            _connection = connection;
             _environment = environment;
             _version = version;
             _appName = appName;
-            _storageAccount = CloudStorageAccount.Parse(connection);
         }
 
         public override void Load()
@@ -43,7 +44,8 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
 
         private CloudTable GetTable()
         {
-            var tableClient = _storageAccount.CreateCloudTableClient();
+            var storageAccount = CloudStorageAccount.Parse(_connection);
+            var tableClient = storageAccount.CreateCloudTableClient();
             return tableClient.GetTableReference("Configuration");
         }
 
