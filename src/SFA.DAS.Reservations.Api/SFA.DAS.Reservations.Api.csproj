@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Data\SFA.DAS.Reservations.Data.csproj" />
+    <ProjectReference Include="..\SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

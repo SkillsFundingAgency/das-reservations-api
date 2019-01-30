@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Domain
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SFA.DAS.Reservations.Database", "SFA.DAS.Reservations.Database\SFA.DAS.Reservations.Database.sqlproj", "{6CAC5F3B-6837-4DB6-A5A1-F080EEAC5476}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Data.UnitTests", "SFA.DAS.Reservations.Data.UnitTests\SFA.DAS.Reservations.Data.UnitTests.csproj", "{3454ACAF-DE01-452B-B3A5-19AB1B0F77D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Data.UnitTests", "SFA.DAS.Reservations.Data.UnitTests\SFA.DAS.Reservations.Data.UnitTests.csproj", "{3454ACAF-DE01-452B-B3A5-19AB1B0F77D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Infrastructure", "SFA.DAS.Reservations.Infrastructure\SFA.DAS.Reservations.Infrastructure.csproj", "{64980D61-797B-4F51-8D72-FB1BE0F3B562}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{3454ACAF-DE01-452B-B3A5-19AB1B0F77D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3454ACAF-DE01-452B-B3A5-19AB1B0F77D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3454ACAF-DE01-452B-B3A5-19AB1B0F77D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64980D61-797B-4F51-8D72-FB1BE0F3B562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64980D61-797B-4F51-8D72-FB1BE0F3B562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64980D61-797B-4F51-8D72-FB1BE0F3B562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64980D61-797B-4F51-8D72-FB1BE0F3B562}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
