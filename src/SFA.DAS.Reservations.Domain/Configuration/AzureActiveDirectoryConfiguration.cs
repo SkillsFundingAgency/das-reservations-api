@@ -2,8 +2,8 @@
 {
     public class AzureActiveDirectoryConfiguration
     {
-        public string Authority { get; set; }
-        public string IdentifierUri { get; set; }
-        public string ClientId { get; set; }
+        public string Tenant { get; set; }
+        public string Identifier { get; set; }
+        public string Id { get; set; }
     }
 }

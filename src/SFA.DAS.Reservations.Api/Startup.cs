@@ -85,13 +85,13 @@ namespace SFA.DAS.Reservations.Api
 
             }).AddJwtBearer(auth =>
             {
-                auth.Authority = azureActiveDirectoryConfiguration.Value.Authority;
+                auth.Authority = $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
                 auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                 {
                     ValidAudiences = new List<string>
                     {
-                        azureActiveDirectoryConfiguration.Value.IdentifierUri,
-                        azureActiveDirectoryConfiguration.Value.ClientId
+                        azureActiveDirectoryConfiguration.Value.Identifier,
+                        azureActiveDirectoryConfiguration.Value.Id
                     }
                 };
             });
