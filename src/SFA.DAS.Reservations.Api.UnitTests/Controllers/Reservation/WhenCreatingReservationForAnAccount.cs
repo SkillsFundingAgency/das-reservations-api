@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private Mock<IMediator> _mediator;
         private CreateAccountReservationResult _accountReservationsResult;
         private const long ExpectedAccountId = 123234;
-        private const long ExpectedReservationId = 55874;
+        private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);
         private Mock<HttpContext> _httpContext;
 
@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public void Arrange()
         {
             _accountReservationsResult = new CreateAccountReservationResult
-                {Reservation = new Domain.Reservations.Reservation(null,ExpectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending)};
+                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending)};
             ;
             _mediator = new Mock<IMediator>();
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => c.AccountId.Equals(ExpectedAccountId) && c.StartDate.Equals(_expectedStartDate)),
@@ -61,7 +61,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             Assert.IsNotNull(result.Value);
             var actualReservations = result.Value as Domain.Reservations.Reservation;
             Assert.AreEqual(_accountReservationsResult.Reservation, actualReservations);
-            Assert.AreEqual("api/accounts/123234/reservations/55874", result.Location);
+            Assert.AreEqual($"api/accounts/123234/reservations/{_expectedReservationId}", result.Location);
         }
 
         [Test]

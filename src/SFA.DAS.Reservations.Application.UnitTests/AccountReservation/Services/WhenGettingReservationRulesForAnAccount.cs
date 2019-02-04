@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 ExpiryDate = DateTime.Today.AddDays(45),
                 StartDate = DateTime.Today.AddDays(15),
                 CreatedDate= DateTime.Today,
-                Id = 332,
+                Id = Guid.NewGuid(),
                 IsLevyAccount = true,
                 Status = 2
             };

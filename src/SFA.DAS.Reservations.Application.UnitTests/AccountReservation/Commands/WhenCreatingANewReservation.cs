@@ -6,7 +6,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
@@ -16,21 +15,19 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         private CreateAccountReservationCommand _command;
         private CreateAccountReservationCommandHandler _handler;
         private const long ExpectedAccountId = 43532;
-        private const long ExpectedReservationId = 44212;
+        private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedDateTime = DateTime.UtcNow;
         private CancellationToken _cancellationToken;
         private Mock<IAccountReservationService> _accountReservationsService;
         private Mock<IValidator<CreateAccountReservationCommand>> _validator;
-        private Reservation _reservation;
         private Reservation _reservationCreated;
 
         [SetUp]
         public void Arrange()
         {
             _cancellationToken = new CancellationToken();
-            _reservation = new Reservation(ExpectedAccountId, _expectedDateTime, 3);
               
-            _reservationCreated = new Reservation(null,ExpectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending);
+            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending);
             
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
@@ -40,9 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 
             _accountReservationsService = new Mock<IAccountReservationService>();
             _accountReservationsService.Setup(x => x.CreateAccountReservation(ExpectedAccountId, _expectedDateTime)).ReturnsAsync(_reservationCreated);
-
             
-
             _command = new CreateAccountReservationCommand {AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
 
             _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object);

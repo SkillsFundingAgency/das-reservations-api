@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
         private const int ExpiryPeriodInMonths = 5;
         private const long ExpectedAccountId = 12344;
-        private const long ExpectedReservationId = 55323;
+        private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = DateTime.UtcNow.AddMonths(1);
         private Mock<IOptions<ReservationsConfiguration>> _options;
         
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>())).ReturnsAsync(new List<Domain.Entities.Rule>());
 
             _reservationRepository.Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.AccountId.Equals(ExpectedAccountId))))
-                .ReturnsAsync(new Domain.Entities.Reservation{Id=ExpectedReservationId, AccountId = ExpectedAccountId});
+                .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId});
             
             _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object);
         }
@@ -73,7 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             //Assert
             Assert.IsAssignableFrom<Reservation>(actual);
-            Assert.AreEqual(ExpectedReservationId, actual.Id);
+            Assert.AreEqual(_expectedReservationId, actual.Id);
             Assert.AreEqual(ExpectedAccountId, actual.AccountId);
             Assert.IsNotNull(actual.Rules);
         }

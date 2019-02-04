@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         }
 
         public Reservation(Func<DateTime, Task<IList<Rule>>> rules, 
-            long id, 
+            Guid id, 
             long accountId, 
             bool isLevyAccount, 
             DateTime createdDate, 
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             Rules = rules != null ? GetRulesForAccountType(GetRules(rules)) : null;
         }
 
-        public long Id { get; }
+        public Guid Id { get; }
 
         public long AccountId { get; }
 
