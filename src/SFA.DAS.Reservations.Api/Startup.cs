@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Authentication;
 using MediatR;
@@ -72,30 +73,33 @@ namespace SFA.DAS.Reservations.Api
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddAuthorization(o =>
+            if (!Configuration["ASPNETCORE_ENVIRONMENT"].Equals("Development", StringComparison.CurrentCultureIgnoreCase))
             {
-                o.AddPolicy("default", policy =>
+                services.AddAuthorization(o =>
                 {
-                    policy.RequireAuthenticatedUser();
-                });
-            });
-            services.AddAuthentication(auth =>
-            {
-                auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-
-            }).AddJwtBearer(auth =>
-            {
-                auth.Authority = $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
-                auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                {
-                    ValidAudiences = new List<string>
+                    o.AddPolicy("default", policy =>
                     {
-                        azureActiveDirectoryConfiguration.Value.Identifier,
-                        azureActiveDirectoryConfiguration.Value.Id
-                    }
-                };
-            });
-            services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
+                        policy.RequireAuthenticatedUser();
+                    });
+                });
+                services.AddAuthentication(auth =>
+                {
+                    auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+
+                }).AddJwtBearer(auth =>
+                {
+                    auth.Authority = $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
+                    auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidAudiences = new List<string>
+                        {
+                            azureActiveDirectoryConfiguration.Value.Identifier,
+                            azureActiveDirectoryConfiguration.Value.Id
+                        }
+                    };
+                });
+                services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
+            }
             
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
             services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>), typeof(GetAccountReservationsValidator));
@@ -107,7 +111,12 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddMvc(o =>
             {
-                o.Filters.Add(new AuthorizeFilter("default"));
+                if (!Configuration["ASPNETCORE_ENVIRONMENT"].Equals("Development", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    o.Filters.Add(new AuthorizeFilter("default"));
+                }
+                    
+                
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
@@ -126,14 +135,13 @@ namespace SFA.DAS.Reservations.Api
             else
             {
                 app.UseHsts();
+                app.UseAuthentication();
             }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
-            app.UseAuthentication();
-
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
