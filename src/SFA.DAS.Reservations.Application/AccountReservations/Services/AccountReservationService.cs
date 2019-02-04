@@ -61,6 +61,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         {
             return new Domain.Entities.Reservation
             {
+                Id = Guid.NewGuid(),
                 ExpiryDate = reservation.ExpiryDate,
                 AccountId = reservation.AccountId,
                 CreatedDate = reservation.CreatedDate,
