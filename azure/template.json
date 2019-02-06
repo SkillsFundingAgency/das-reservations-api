@@ -98,6 +98,10 @@
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                                 "value": "[reference('applicationInsights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "ASPNETCORE_ENVIRONMENT",
+                                "value": "[toUpper(parameters('environmentName'))]"
                             }
                         ]
                     },
