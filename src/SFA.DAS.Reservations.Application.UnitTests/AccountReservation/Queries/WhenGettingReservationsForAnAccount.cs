@@ -10,7 +10,7 @@ using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 {
-    public class WhenGettingReservationForAnAccount
+    public class WhenGettingReservationsForAnAccount
     {
         private GetAccountReservationsQueryHandler _handler;
         private Mock<IValidator<GetAccountReservationsQuery>> _validator;
