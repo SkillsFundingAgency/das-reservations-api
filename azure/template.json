@@ -5,6 +5,9 @@
         "resourceEnvironmentName": {
             "type": "string"
         },
+        "serviceName": {
+            "type": "string"
+        },
         "environmentName": {
             "type": "string"
         },
@@ -40,19 +43,20 @@
         }
     },
     "variables": {
-        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName')))]",
-        "appServiceName": "[concat(variables('resourceNamePrefix'), '-rsrvapi-as')]",
-        "databaseName": "[concat(variables('resourceNamePrefix'), '-rsrv-db')]"
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+        "appServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
+        "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]"
     },
     "resources": [
         {
             "apiVersion": "2017-05-10",
-            "name": "applicationInsights",
+            "name": "application-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/application-insights.json",
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -67,12 +71,12 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "appService",
+            "name": "app-service",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/app-service.json",
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -97,7 +101,7 @@
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('applicationInsights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('application-insights').outputs.InstrumentationKey.value]"
                             },
                             {
                                 "name": "ASPNETCORE_ENVIRONMENT",
@@ -116,13 +120,13 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "sqlDatabase",
+            "name": "sql-database",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/sql-database.json",
+                    "uri": "[concat(variables('deploymentUrlBase'),'sql-database.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
