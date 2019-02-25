@@ -98,7 +98,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
             services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>), typeof(GetAccountReservationsValidator));
             services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>), typeof(CreateAccountReservationValidator));
-            services.AddScoped(typeof(IValidator<GetAccountReservationsValidator>), typeof(GetAccountReservationsValidator));
+            services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
             services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();

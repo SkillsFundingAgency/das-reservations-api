@@ -28,6 +28,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
             _cancellationToken = new CancellationToken();
             _service = new Mock<IAccountReservationService>();
+            var reservation = new Reservation(12345, DateTime.UtcNow, 1);
+            _service.Setup(x => x.GetReservation(_expectedReservationId)).ReturnsAsync(reservation);
 
             _handler = new GetReservationQueryHandler(_validator.Object, _service.Object);
         }
@@ -76,10 +78,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         [Test]
         public async Task Then_The_Values_Are_Returned_In_The_Response()
         {
-            //Arrange
-            var reservation = new Reservation(12345, DateTime.UtcNow, 1);
-            _service.Setup(x => x.GetReservation(_expectedReservationId)).ReturnsAsync(reservation);
-
             //Act
             var actual = await _handler.Handle(_query, _cancellationToken);
 

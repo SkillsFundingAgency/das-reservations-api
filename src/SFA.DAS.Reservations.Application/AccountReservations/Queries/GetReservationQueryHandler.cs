@@ -30,6 +30,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 
             var reservation = await _accountReservationService.GetReservation(request.Id);
 
+            if (reservation == null)
+            {
+                return null;
+            }
+
             return new GetReservationResponse
             {
                 Reservation = reservation
