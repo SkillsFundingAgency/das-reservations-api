@@ -31,23 +31,17 @@ namespace SFA.DAS.Reservations.Api
     {
         private IConfiguration Configuration { get; }
 
-        public Startup()
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
-
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
-                    builder["ConfigurationStorageConnectionString"],
-                    builder["AppName"],
-                    builder["Environment"],
-                    builder["Version"]
+                    configuration["ConfigurationStorageConnectionString"],
+                    configuration["AppName"],
+                    configuration["Environment"],
+                    configuration["Version"]
                 )
                 .Build();
             Configuration = config;
@@ -73,7 +67,7 @@ namespace SFA.DAS.Reservations.Api
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            if (!Configuration["ASPNETCORE_ENVIRONMENT"].Equals("Development", StringComparison.CurrentCultureIgnoreCase))
+            if (!Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
             {
                 services.AddAuthorization(o =>
                 {
@@ -112,7 +106,7 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddMvc(o =>
             {
-                if (!Configuration["ASPNETCORE_ENVIRONMENT"].Equals("Development", StringComparison.CurrentCultureIgnoreCase))
+                if (!Configuration["Environment"].Equals("Local", StringComparison.CurrentCultureIgnoreCase))
                 {
                     o.Filters.Add(new AuthorizeFilter("default"));
                 }
@@ -129,7 +123,7 @@ namespace SFA.DAS.Reservations.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsEnvironment("LOCAL"))
             {
                 app.UseDeveloperExceptionPage();
             }
