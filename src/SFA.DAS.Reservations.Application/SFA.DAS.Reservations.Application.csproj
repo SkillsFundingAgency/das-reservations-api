@@ -13,4 +13,9 @@
     <ProjectReference Include="..\SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Courses\Commands\" />
+    <Folder Include="Courses\Queries\" />
+  </ItemGroup>
+
 </Project>
