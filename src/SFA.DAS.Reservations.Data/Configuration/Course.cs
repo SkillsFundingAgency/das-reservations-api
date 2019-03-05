@@ -7,7 +7,7 @@ namespace SFA.DAS.Reservations.Data.Configuration
     {
         public void Configure(EntityTypeBuilder<Domain.Entities.Course> builder)
         {
-            builder.ToTable("Course");
+            builder.ToTable("Courses");
             builder.HasKey(x => x.CourseId);
             
             builder.Property(x => x.CourseId).HasColumnName(@"CourseId").HasColumnType("varchar").HasMaxLength(20).IsRequired();
