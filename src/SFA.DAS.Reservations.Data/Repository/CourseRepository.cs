@@ -17,7 +17,9 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<IEnumerable<Domain.Entities.Course>> GetCourses()
         {
-            return await _reservationsDataContext.Courses.ToArrayAsync();
+
+            var x =  await _reservationsDataContext.Courses.ToArrayAsync();
+            return x;
         }
     }
 }
