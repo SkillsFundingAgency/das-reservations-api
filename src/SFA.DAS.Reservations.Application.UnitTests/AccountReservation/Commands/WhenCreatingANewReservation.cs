@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
+using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 {
@@ -27,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             _cancellationToken = new CancellationToken();
               
-            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending);
+            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending, new Course());
             
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))

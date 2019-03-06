@@ -37,7 +37,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 CreatedDate= DateTime.Today,
                 Id = Guid.NewGuid(),
                 IsLevyAccount = true,
-                Status = 2
+                Status = 2,
+                CourseId = "123-1",
+                Course = new Course
+                {
+                    CourseId = "123-1",
+                    Level = 1,
+                    Title = "Course 123-1"
+                }
             };
             _reservationRepository.Setup(x => x.GetAccountReservations(ExpectedAccountId))
                 .ReturnsAsync(new List<Reservation> {_expectedReservation});
@@ -71,6 +78,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.AreEqual(_expectedReservation.CreatedDate, actualReservation.CreatedDate);
             Assert.AreEqual(_expectedReservation.IsLevyAccount, actualReservation.IsLevyAccount);
             Assert.AreEqual(_expectedReservation.Status, (short)actualReservation.Status);
+            Assert.AreEqual(_expectedReservation.Course.CourseId, actualReservation.Course.Id);
+            Assert.AreEqual(_expectedReservation.Course.Title, actualReservation.Course.Title);
+            Assert.AreEqual(_expectedReservation.Course.Level, actualReservation.Course.Level);
         }
     }
 }

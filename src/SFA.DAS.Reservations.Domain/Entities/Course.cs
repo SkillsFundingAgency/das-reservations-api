@@ -8,5 +8,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public string Title { get; set; }
         public int Level { get; set; }
         public virtual ICollection<Rule> ReservationRule { get; set; }
+        public virtual ICollection<Reservation> Reservations { get; set; }
     }
 }
