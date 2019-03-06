@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             Assert.IsNotNull(result.Value);
             var actualReservations = result.Value as Domain.Reservations.Reservation;
             Assert.AreEqual(_accountReservationsResult.Reservation, actualReservations);
-            Assert.AreEqual($"api/accounts/123234/reservations/{_expectedReservationId}", result.Location);
+            Assert.AreEqual($"api/reservations/{_expectedReservationId}", result.Location);
         }
 
         [Test]

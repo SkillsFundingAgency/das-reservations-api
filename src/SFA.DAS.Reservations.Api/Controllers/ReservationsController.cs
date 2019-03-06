@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     AccountId = reservation.AccountId,
                     StartDate = reservation.StartDate
                 });
-                return Created($"api/accounts/{response.Reservation.AccountId}/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
+                return Created($"api/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
             }
             catch (ArgumentException e)
             {
