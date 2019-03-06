@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Courses
         public string Id { get;  }
         public string Title { get;  }
         public int Level { get; }
-        public IList<ReservationRule> ReservationRules { get;  }
+        public ICollection<ReservationRule> ReservationRules { get;  }
 
         public Course(string id, string title, int level)
         {

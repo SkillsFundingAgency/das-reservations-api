@@ -22,5 +22,4 @@ namespace SFA.DAS.Reservations.Api.Controllers
             return Ok(response.Courses);
         }
     }
-
 }

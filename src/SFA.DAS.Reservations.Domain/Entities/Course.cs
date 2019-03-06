@@ -7,6 +7,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public string CourseId { get; set; }
         public string Title { get; set; }
         public int Level { get; set; }
-        public virtual IList<Rule> ReservationRule { get; set; }
+        public virtual ICollection<Rule> ReservationRule { get; set; }
     }
 }
