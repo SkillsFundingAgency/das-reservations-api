@@ -80,7 +80,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         private DateTime GetExpiryDateFromStartDate(int expiryPeriodInMonths)
         {
             var expiryDate = StartDate.AddMonths(expiryPeriodInMonths);
-            var lastDayInMonth = DateTime.DaysInMonth(ExpiryDate.Year, ExpiryDate.Month);
+            var lastDayInMonth = DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month);
             return new DateTime(expiryDate.Year, expiryDate.Month, lastDayInMonth);
         }
     }
