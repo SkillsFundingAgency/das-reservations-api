@@ -86,6 +86,11 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         private static Courses.Course MapCourse(Course reservationCourse)
         {
+            if (reservationCourse == null)
+            {
+                return null;
+            }
+
             return new Courses.Course(
                 reservationCourse.CourseId,
                 reservationCourse.Title,
