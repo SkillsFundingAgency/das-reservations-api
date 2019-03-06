@@ -60,13 +60,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test]
-        public async Task Then_If_The_Command_IsValid_Then_CreateReservation_Is_Called_On_The_Service()
+        public async Task Then_If_The_Command_Without_CourseId_IsValid_Then_CreateReservation_Is_Called_On_The_Service()
         {
             //Act
             await _handler.Handle(_command, _cancellationToken);
 
             //Assert
             _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command.AccountId,_expectedDateTime),Times.Once());
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command.AccountId,_expectedDateTime, _command.CourseId),Times.Never);
+        }
+
+        [Test]
+        public async Task Then_If_The_Command_IsValid_And_Has_CourseId_Then_CreateReservation_Is_Called_On_The_Service()
+        {
+            //Arrange
+            _command.CourseId = "123-1";
+
+            //Act
+            await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command.AccountId,_expectedDateTime),Times.Never);
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command.AccountId,_expectedDateTime, _command.CourseId),Times.Once);
         }
 
         [Test]
