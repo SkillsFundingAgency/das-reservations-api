@@ -66,6 +66,32 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
+        public async Task Then_The_Reservation_With_Course_Is_Created_And_Returned()
+        {
+            //Act
+            var actual = await _reservationsController.Create(
+                new Models.Reservation
+                {
+                    AccountId = ExpectedAccountId, 
+                    StartDate = _expectedStartDate,
+                    CourseId = "123-1"
+                });
+
+            //Assert
+            _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => command.CourseId.Equals("123-1")), 
+                It.IsAny<CancellationToken>()), Times.Once);
+
+            Assert.IsNotNull(actual);
+            var result = actual as CreatedResult;
+            Assert.IsNotNull(result?.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, (HttpStatusCode)result.StatusCode);
+            Assert.IsNotNull(result.Value);
+            var actualReservations = result.Value as Domain.Reservations.Reservation;
+            Assert.AreEqual(_accountReservationsResult.Reservation, actualReservations);
+            Assert.AreEqual($"api/reservations/{_expectedReservationId}", result.Location);
+        }
+
+        [Test]
         public async Task Then_If_There_Is_A_Validation_Error_A_Bad_Request_Is_Returned_With_Errors()
         {
             //Arrange
