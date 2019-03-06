@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             StartDate = startDate;
             Status = ReservationStatus.Pending;
             CreatedDate = DateTime.UtcNow;
-            ExpiryDate = startDate.AddMonths(expiryPeriodInMonths);
+            ExpiryDate = GetExpiryDateFromStartDate(expiryPeriodInMonths);
         }
 
         public Reservation(Func<DateTime, Task<IList<Rule>>> rules, 
@@ -75,6 +75,13 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             }
 
             return c => (c.Restriction == (byte) AccountRestriction.All || c.Restriction == (byte) accountType);
+        }
+
+        private DateTime GetExpiryDateFromStartDate(int expiryPeriodInMonths)
+        {
+            var expiryDate = StartDate.AddMonths(expiryPeriodInMonths);
+            var lastDayInMonth = DateTime.DaysInMonth(ExpiryDate.Year, ExpiryDate.Month);
+            return new DateTime(expiryDate.Year, expiryDate.Month, lastDayInMonth);
         }
     }
 }
