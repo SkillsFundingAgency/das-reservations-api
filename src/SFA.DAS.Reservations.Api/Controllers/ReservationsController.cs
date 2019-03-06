@@ -9,7 +9,7 @@ using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 
 namespace SFA.DAS.Reservations.Api.Controllers
 {
-    [Route("api/accounts/{accountId}/[controller]/")]
+    
     [ApiController]
     public class ReservationsController : ControllerBase
     {
@@ -21,6 +21,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         }
 
         [ProducesResponseType(400)]
+        [Route("api/accounts/{accountId}/[controller]/")]
         public async Task<IActionResult> GetAll(long accountId)
         {
             try
@@ -40,6 +41,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
 
         [HttpPost]
         [ProducesResponseType(400)]
+        [Route("api/accounts/{accountId}/[controller]/")]
         public async Task<IActionResult> Create(Reservation reservation)
         {
             try
@@ -50,6 +52,36 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     StartDate = reservation.StartDate
                 });
                 return Created($"api/accounts/{response.Reservation.AccountId}/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [Route("api/[controller]/{id}")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetReservationQuery
+                {
+                    Id = id
+                });
+
+                if (response == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(response.Reservation);
             }
             catch (ArgumentException e)
             {

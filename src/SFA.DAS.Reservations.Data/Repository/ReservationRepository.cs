@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,13 @@ namespace SFA.DAS.Reservations.Data.Repository
             _reservationsDataContext.SaveChanges();
 
             return reservationResult.Entity;
+        }
+
+        public async Task<Reservation> GetById(Guid id)
+        {
+            var reservationResult = await _reservationsDataContext.Reservations.FindAsync(id);
+
+            return reservationResult;
         }
     }
 }

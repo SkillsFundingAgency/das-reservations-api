@@ -61,6 +61,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         [Test]
         public async Task Then_The_Repository_Is_Called_To_Create_A_Reservation_Mapping_To_The_Entity()
         {
+            //Arrange
+            var expiryDate = _expectedStartDate.AddMonths(ExpiryPeriodInMonths);
+            var expectedExpiryDate = new DateTime(expiryDate.Year,expiryDate.Month, DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month));
+
             //Act
             await _accountReservationService.CreateAccountReservation(ExpectedAccountId, _expectedStartDate);
 
@@ -69,7 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 c=>c.AccountId.Equals(ExpectedAccountId) &&
                    c.StartDate.Equals(_expectedStartDate) &&
                    !c.CreatedDate.Equals(DateTime.MinValue) &&
-                   c.ExpiryDate.Equals(_expectedStartDate.AddMonths(ExpiryPeriodInMonths)) &&
+                   c.ExpiryDate.Equals(expectedExpiryDate) &&
                    c.Status.Equals((short)ReservationStatus.Pending)
                 )));
         }

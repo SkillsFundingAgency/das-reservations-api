@@ -100,5 +100,21 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             Assert.AreEqual(_expectedCourse.Title, actualRuleCourse.Title);
             Assert.AreEqual(_expectedCourse.Level.ToString(), actualRuleCourse.Level);
         }
+
+        [TestCase(2018,04,30)]
+        [TestCase(2018,02,28)]
+        [TestCase(2018,10,31)]
+        public void Then_When_Creating_A_New_Reservation_The_Expiry_Is_Set_To_The_Last_Day_Of_The_Month_With_Added_Expiry_Months(int year, int month, int day)
+        {
+            //Arrange
+            var expectedExpiryDate = new DateTime(year, month, day);
+            var expiryPeriod = 1;
+
+            //Act
+            _reservation = new Reservation(123, new DateTime(2018,month-expiryPeriod,03),expiryPeriod);
+
+            //Assert
+            Assert.AreEqual(expectedExpiryDate,_reservation.ExpiryDate);
+        }
     }
 }

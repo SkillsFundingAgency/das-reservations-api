@@ -49,6 +49,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return result;
         }
 
+        public async Task<Reservation> GetReservation(Guid id)
+        {
+            var reservation = await _reservationRepository.GetById(id);
+
+            return reservation == null ? null : MapReservation(reservation);
+        }
+
         private Reservation MapReservation(Domain.Entities.Reservation reservation)
         {
             var mapReservation = new Reservation(_ruleRepository.GetReservationRules, 

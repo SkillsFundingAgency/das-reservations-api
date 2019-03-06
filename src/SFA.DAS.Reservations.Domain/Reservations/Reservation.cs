@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             StartDate = startDate;
             Status = ReservationStatus.Pending;
             CreatedDate = DateTime.UtcNow;
-            ExpiryDate = startDate.AddMonths(expiryPeriodInMonths);
+            ExpiryDate = GetExpiryDateFromStartDate(expiryPeriodInMonths);
             CourseId = courseId;
         }
 
@@ -90,6 +90,13 @@ namespace SFA.DAS.Reservations.Domain.Reservations
                 reservationCourse.CourseId,
                 reservationCourse.Title,
                 reservationCourse.Level);
+        }
+		
+		private DateTime GetExpiryDateFromStartDate(int expiryPeriodInMonths)
+        {
+            var expiryDate = StartDate.AddMonths(expiryPeriodInMonths);
+            var lastDayInMonth = DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month);
+            return new DateTime(expiryDate.Year, expiryDate.Month, lastDayInMonth);
         }
     }
 }

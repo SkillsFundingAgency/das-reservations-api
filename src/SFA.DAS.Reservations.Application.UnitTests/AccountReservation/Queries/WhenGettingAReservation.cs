@@ -10,28 +10,29 @@ using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 {
-    public class WhenGettingReservationRulesForAnAccount
+    public class WhenGettingAReservation
     {
-        private GetAccountReservationsQueryHandler _handler;
-        private Mock<IValidator<GetAccountReservationsQuery>> _validator;
+        private readonly Guid _expectedReservationId = Guid.NewGuid();
+        private GetReservationQuery _query;
+        private Mock<IValidator<GetReservationQuery>> _validator;
         private CancellationToken _cancellationToken;
-        private GetAccountReservationsQuery _query;
         private Mock<IAccountReservationService> _service;
-        private const long ExpectedAccountId = 553234;
+        private GetReservationQueryHandler _handler;
 
         [SetUp]
         public void Arrange()
         {
-            _query = new GetAccountReservationsQuery{AccountId = ExpectedAccountId};
-            _validator = new Mock<IValidator<GetAccountReservationsQuery>>();
-            _validator.Setup(x => x.ValidateAsync(It.IsAny<GetAccountReservationsQuery>()))
-                .ReturnsAsync(new ValidationResult {ValidationDictionary = new Dictionary<string, string>()});
+            _query = new GetReservationQuery {Id = _expectedReservationId};
+            _validator = new Mock<IValidator<GetReservationQuery>>();
+            _validator.Setup(x => x.ValidateAsync(It.IsAny<GetReservationQuery>()))
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
             _cancellationToken = new CancellationToken();
             _service = new Mock<IAccountReservationService>();
-            
-            _handler = new GetAccountReservationsQueryHandler(_validator.Object, _service.Object);
-        }
+            var reservation = new Reservation(12345, DateTime.UtcNow, 1);
+            _service.Setup(x => x.GetReservation(_expectedReservationId)).ReturnsAsync(reservation);
 
+            _handler = new GetReservationQueryHandler(_validator.Object, _service.Object);
+        }
         [Test]
         public async Task Then_The_Query_Is_Validated()
         {
@@ -39,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            _validator.Verify(x=>x.ValidateAsync(_query), Times.Once);
+            _validator.Verify(x => x.ValidateAsync(_query), Times.Once);
 
         }
 
@@ -47,8 +48,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         public void Then_If_The_Query_Fails_Validation_Then_An_Argument_Exception_Is_Thrown()
         {
             //Arrange
-            _validator.Setup(x => x.ValidateAsync(It.IsAny<GetAccountReservationsQuery>()))
-                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>{{"",""}} });
+            _validator.Setup(x => x.ValidateAsync(It.IsAny<GetReservationQuery>()))
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string> { { "", "" } } });
 
             //Act Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await _handler.Handle(_query, _cancellationToken));
@@ -61,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsAssignableFrom<GetAccountReservationsResult>(actual);
+            Assert.IsAssignableFrom<GetReservationResponse>(actual);
         }
 
         [Test]
@@ -71,22 +72,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            _service.Verify(x=>x.GetAccountReservations(ExpectedAccountId));
+            _service.Verify(x => x.GetReservation(_expectedReservationId));
         }
 
         [Test]
         public async Task Then_The_Values_Are_Returned_In_The_Response()
         {
-            //Arrange
-            var reservation = new Reservation(ExpectedAccountId , DateTime.UtcNow ,1);
-            _service.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{ reservation });
-
             //Act
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsNotNull(actual.Reservations);
-            Assert.AreEqual(ExpectedAccountId, actual.Reservations[0].AccountId);
+            Assert.IsNotNull(actual.Reservation);
+            Assert.AreEqual(12345, actual.Reservation.AccountId);
         }
     }
 }
