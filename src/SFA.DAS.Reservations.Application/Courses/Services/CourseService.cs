@@ -18,12 +18,7 @@ namespace SFA.DAS.Reservations.Application.Courses.Services
         {
             var courseEntities = await _repository.GetCourses();
 
-            return courseEntities.Select(MapCourse).ToArray();
-        }
-
-        private static Course MapCourse(Domain.Entities.Course entity)
-        {
-            return new Course(entity.CourseId, entity.Title, entity.Level);
+            return courseEntities.Select(entity => new Course(entity)).ToArray();
         }
     }
 }

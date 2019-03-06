@@ -6,7 +6,8 @@
 	[CreatedDate] DATETIME NOT NULL DEFAULT GETDATE(),
 	[StartDate] DATETIME NOT NULL,
 	[ExpiryDate] DATETIME NOT NULL, 
-    [Status] TINYINT NOT NULL DEFAULT 0,
+    [Status] TINYINT NOT NULL DEFAULT 0, 
+    [CourseId] VARCHAR(20) NULL,
 )
 GO;
 

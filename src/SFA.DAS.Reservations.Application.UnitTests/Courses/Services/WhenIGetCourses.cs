@@ -26,14 +26,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Courses.Services
 
             for (var index = 1; index <= 3; index++)
             {
-                _courseEntities.Add(new Domain.Entities.Course
+                var entity = new Domain.Entities.Course
                 {
                     CourseId = index.ToString(),
                     Title = $"Course {index}",
                     Level = index
-                });
+                };
 
-                _expectedCourses.Add(new Course(index.ToString(), $"Course {index}", index));
+                _courseEntities.Add(entity);
+                _expectedCourses.Add(new Course(entity));
             }
 
             _repository.Setup(r => r.GetCourses()).ReturnsAsync(_courseEntities);

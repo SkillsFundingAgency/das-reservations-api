@@ -10,11 +10,11 @@ namespace SFA.DAS.Reservations.Domain.Courses
         public int Level { get; }
         public ICollection<ReservationRule> ReservationRules { get;  }
 
-        public Course(string id, string title, int level)
+        public Course(Entities.Course entity)
         {
-            Id = id;
-            Title = title;
-            Level = level;
+            Id = entity.CourseId;
+            Title = entity.Title;
+            Level = entity.Level;
             ReservationRules = new List<ReservationRule>();
         }
     }
