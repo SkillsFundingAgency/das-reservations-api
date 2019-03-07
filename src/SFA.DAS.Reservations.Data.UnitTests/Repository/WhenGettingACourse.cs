@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -10,6 +11,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 {
     public class WhenGettingACourses
     {
+        private const string ExpectedCourseId = "2";
+
         private Mock<IReservationsDataContext> _reservationsDataContext;
         private CourseRepository _courseRepository;
         private List<Course> _courses;
@@ -40,7 +43,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
            };
 
             _reservationsDataContext = new Mock<IReservationsDataContext>();
-            _reservationsDataContext.Setup(x => x.Courses).ReturnsDbSet(_courses);
+            _reservationsDataContext.Setup(x => x.Courses.FindAsync(ExpectedCourseId))
+                .ReturnsAsync(_courses.FirstOrDefault(c => c.CourseId.Equals(ExpectedCourseId)));
 
             _courseRepository = new CourseRepository(_reservationsDataContext.Object);
         }

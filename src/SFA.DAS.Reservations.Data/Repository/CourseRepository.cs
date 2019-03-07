@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<Course> GetCourseById(string id)
         {
-            return await _reservationsDataContext.Courses.SingleOrDefaultAsync(c => c.CourseId.Equals(id));
+            return await _reservationsDataContext.Courses.FindAsync(id);
         }
     }
 }

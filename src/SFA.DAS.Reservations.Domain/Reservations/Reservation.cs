@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -54,6 +55,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         public bool IsActive => ExpiryDate >= DateTime.UtcNow;
 
+        [JsonIgnore]
         public string CourseId { get; }
 
         public Courses.Course Course { get; }
