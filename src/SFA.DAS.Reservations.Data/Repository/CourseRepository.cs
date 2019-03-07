@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.Reservations.Domain.Courses;
+using Course = SFA.DAS.Reservations.Domain.Entities.Course;
 
 
 namespace SFA.DAS.Reservations.Data.Repository
@@ -15,9 +16,14 @@ namespace SFA.DAS.Reservations.Data.Repository
             _reservationsDataContext = reservationsDataContext;
         }
 
-        public async Task<IEnumerable<Domain.Entities.Course>> GetCourses()
+        public async Task<IEnumerable<Course>> GetCourses()
         {
             return  await _reservationsDataContext.Courses.ToArrayAsync();
+        }
+
+        public async Task<Course> GetCourseById(string id)
+        {
+            return await _reservationsDataContext.Courses.SingleOrDefaultAsync(c => c.CourseId.Equals(id));
         }
     }
 }

@@ -7,12 +7,13 @@
 	[StartDate] DATETIME NOT NULL,
 	[ExpiryDate] DATETIME NOT NULL, 
     [Status] TINYINT NOT NULL DEFAULT 0, 
-    [CourseId] VARCHAR(20) NULL,
+    [CourseId] VARCHAR(20) NULL, 
+    CONSTRAINT [FK_Reservation_Course] FOREIGN KEY (CourseId) REFERENCES [Course]([CourseId]),
 )
 GO;
 
 CREATE NONCLUSTERED INDEX [IDX_Reservation_AccountId] ON [dbo].[Reservation] (AccountId) 
-INCLUDE (Id,IsLevyAccount,CreatedDate,ExpiryDate,  StartDate, [Status]) WITH (ONLINE = ON) 
+INCLUDE (Id,IsLevyAccount,CreatedDate,ExpiryDate,  StartDate, [Status], CourseId) WITH (ONLINE = ON) 
 GO;
 
 

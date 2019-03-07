@@ -20,5 +20,12 @@ namespace SFA.DAS.Reservations.Application.Courses.Services
 
             return courseEntities.Select(entity => new Course(entity)).ToArray();
         }
+
+        public async Task<Course> GetCourseById(string id)
+        {
+            var entity = await _repository.GetCourseById(id);
+
+            return entity == null ? null : new Course(entity);
+        }
     }
 }

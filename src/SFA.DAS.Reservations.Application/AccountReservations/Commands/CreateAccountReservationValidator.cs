@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
 {
     public class CreateAccountReservationValidator : IValidator<CreateAccountReservationCommand>
     {
-        public Task<ValidationResult> ValidateAsync(CreateAccountReservationCommand item)
+        private readonly ICourseService _courseService;
+
+        public CreateAccountReservationValidator(ICourseService courseService)
+        {
+            _courseService = courseService;
+        }
+
+        public async Task<ValidationResult> ValidateAsync(CreateAccountReservationCommand item)
         {
             var validationResult = new ValidationResult();
 
@@ -19,7 +27,17 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
                 validationResult.AddError(nameof(item.StartDate));
             }
 
-            return Task.FromResult(validationResult);
+            if (string.IsNullOrEmpty(item.CourseId))
+            {
+                return validationResult;
+            }
+                
+            if (await _courseService.GetCourseById(item.CourseId) == null)
+            {
+                validationResult.AddError(nameof(item.CourseId), "Course with CourseId cannot be found");
+            }
+
+            return validationResult;
         }
     }
 }
