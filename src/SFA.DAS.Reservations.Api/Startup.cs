@@ -38,11 +38,11 @@ namespace SFA.DAS.Reservations.Api
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
-                    configuration["AppName"],
+                    configuration["ConfigNames"],
                     configuration["Environment"],
                     configuration["Version"]
                 )
