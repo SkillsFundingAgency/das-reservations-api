@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
 
 namespace SFA.DAS.Reservations.Api.Controllers
@@ -18,8 +19,11 @@ namespace SFA.DAS.Reservations.Api.Controllers
         
         public async Task<IActionResult> GetAll()
         {
-            var response = await _mediator.Send(new GetCoursesQuery( ));
-            return Ok(response.Courses);
+            var response = await _mediator.Send(new GetCoursesQuery());
+
+            var viewModel = new CoursesViewModel(response.Courses);
+
+            return Ok(viewModel);
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
+using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Courses
@@ -16,7 +17,6 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Courses
         private CoursesController _coursesController;
         private Mock<IMediator> _mediator;
         private GetCoursesResponse _coursesResponse;
-        private const long ExpectedAccountId = 123234;
 
         [SetUp]
         public void Arrange()
@@ -42,8 +42,9 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Courses
             Assert.IsNotNull(result?.StatusCode);
             Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
             Assert.IsNotNull(result.Value);
-            var actualCourses = result.Value as List<Domain.Courses.Course>;
-            Assert.AreEqual(_coursesResponse.Courses,actualCourses);
+
+            var viewModel = result.Value as CoursesViewModel;
+            Assert.AreEqual(_coursesResponse.Courses,viewModel?.Courses);
         }
     }
 }
