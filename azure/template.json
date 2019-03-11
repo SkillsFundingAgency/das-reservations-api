@@ -40,6 +40,12 @@
         },
         "logAnalyticsWorkspaceName": {
             "type": "string"
+        },
+        "customHostname": {
+            "type": "string"
+        },
+        "certificateName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -110,10 +116,10 @@
                         ]
                     },
                     "customHostName": {
-                        "value": ""
+                        "value": "[parameters('customHostname')]"
                     },
                     "certificateThumbprint": {
-                        "value": ""
+                        "value": "[reference(resourceId(parameters('sharedResourceGroup'), 'Microsoft.Web/certificates', parameters('certificateName')), '2016-03-01').Thumbprint]"
                     }
                 }
             }
