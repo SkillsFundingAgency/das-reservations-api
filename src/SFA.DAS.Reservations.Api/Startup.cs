@@ -16,10 +16,13 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
+using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
+using SFA.DAS.Reservations.Application.Courses.Services;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
@@ -35,11 +38,11 @@ namespace SFA.DAS.Reservations.Api
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
-                    configuration["AppName"],
+                    configuration["ConfigNames"],
                     configuration["Environment"],
                     configuration["Version"]
                 )
@@ -103,6 +106,10 @@ namespace SFA.DAS.Reservations.Api
             services.AddTransient<IRuleRepository,RuleRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();
             services.AddTransient<IRulesService, RulesService>();
+
+            services.AddMediatR(typeof(GetCoursesQueryHandler).Assembly);
+            services.AddTransient<ICourseRepository,CourseRepository>();
+            services.AddTransient<ICourseService, CourseService>();
 
             services.AddMvc(o =>
             {

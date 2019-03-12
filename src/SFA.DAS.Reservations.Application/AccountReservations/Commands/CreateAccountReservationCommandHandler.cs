@@ -28,7 +28,16 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
                 throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var reservation = await _accountReservationService.CreateAccountReservation(request.Id, request.AccountId, request.StartDate);
+            Reservation reservation;
+
+            if (request.CourseId != null)
+            {
+                reservation = await _accountReservationService.CreateAccountReservation(request.Id, request.AccountId, request.StartDate, request.CourseId);
+            }
+            else
+            {
+                reservation = await _accountReservationService.CreateAccountReservation(request.Id, request.AccountId, request.StartDate);
+            }
 
             return new CreateAccountReservationResult
             {

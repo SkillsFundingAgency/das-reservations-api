@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
+using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 {
@@ -27,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             _cancellationToken = new CancellationToken();
               
-            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending);
+            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending, new Course());
             
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
@@ -60,13 +62,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test]
-        public async Task Then_If_The_Command_IsValid_Then_CreateReservation_Is_Called_On_The_Service()
+        public async Task Then_If_The_Command_Without_CourseId_IsValid_Then_CreateReservation_Is_Called_On_The_Service()
         {
             //Act
             await _handler.Handle(_command, _cancellationToken);
 
             //Assert
             _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime),Times.Once());
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime, _command.CourseId),Times.Never);
+        }
+
+        [Test]
+        public async Task Then_If_The_Command_IsValid_And_Has_CourseId_Then_CreateReservation_Is_Called_On_The_Service()
+        {
+            //Arrange
+            _command.CourseId = "123-1";
+
+            //Act
+            await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime),Times.Never);
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime, _command.CourseId),Times.Once);
         }
 
         [Test]

@@ -8,6 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     {
         Task<IList<Reservation>> GetAccountReservations(long accountId);
         Task<Reservation> CreateAccountReservation(Guid id, long accountId, DateTime startDate);
+        Task<Reservation> CreateAccountReservation(Guid id, long accountId, DateTime startDate, string courseId);
         Task<Reservation> GetReservation(Guid id);
     }
 }

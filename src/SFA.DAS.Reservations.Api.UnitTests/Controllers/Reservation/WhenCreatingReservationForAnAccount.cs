@@ -11,6 +11,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -30,7 +31,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public void Arrange()
         {
             _accountReservationsResult = new CreateAccountReservationResult
-                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending)};
+                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course())};
             ;
             _mediator = new Mock<IMediator>();
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
@@ -69,7 +70,34 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             Assert.IsNotNull(result.Value);
             var actualReservations = result.Value as Domain.Reservations.Reservation;
             Assert.AreEqual(_accountReservationsResult.Reservation, actualReservations);
-            Assert.AreEqual($"api/accounts/123234/reservations/{_expectedReservationId}", result.Location);
+            Assert.AreEqual($"api/reservations/{_expectedReservationId}", result.Location);
+        }
+
+        [Test]
+        public async Task Then_The_Reservation_With_Course_Is_Created_And_Returned()
+        {
+            //Act
+            var actual = await _reservationsController.Create(
+                new Models.Reservation
+                {
+                    Id = _expectedReservationId,
+                    AccountId = ExpectedAccountId, 
+                    StartDate = _expectedStartDate,
+                    CourseId = "123-1"
+                });
+
+            //Assert
+            _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => command.CourseId.Equals("123-1")), 
+                It.IsAny<CancellationToken>()), Times.Once);
+
+            Assert.IsNotNull(actual);
+            var result = actual as CreatedResult;
+            Assert.IsNotNull(result?.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Created, (HttpStatusCode)result.StatusCode);
+            Assert.IsNotNull(result.Value);
+            var actualReservations = result.Value as Domain.Reservations.Reservation;
+            Assert.AreEqual(_accountReservationsResult.Reservation, actualReservations);
+            Assert.AreEqual($"api/reservations/{_expectedReservationId}", result.Location);
         }
 
         [Test]

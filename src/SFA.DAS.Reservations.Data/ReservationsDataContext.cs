@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Data
 {
     public interface IReservationsDataContext 
     {
-        DbSet<Domain.Entities.Course> Apprenticeships { get; set; }
+        DbSet<Domain.Entities.Course> Courses { get; set; }
         DbSet<Domain.Entities.Reservation> Reservations { get; set; }
         DbSet<Domain.Entities.Rule> Rules { get; set; }
         int SaveChanges();
@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Data
 
     public partial class ReservationsDataContext : DbContext, IReservationsDataContext
     {
-        public DbSet<Domain.Entities.Course> Apprenticeships { get; set; }
+        public DbSet<Domain.Entities.Course> Courses { get; set; }
         public DbSet<Domain.Entities.Reservation> Reservations { get; set; }
         public DbSet<Domain.Entities.Rule> Rules { get; set; }
         public ReservationsDataContext()
