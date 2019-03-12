@@ -13,7 +13,6 @@ using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
@@ -25,6 +24,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private const long ExpectedAccountId = 123234;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);
+        private readonly string _expectedCourseId = "asdfopi";
         private Mock<HttpContext> _httpContext;
 
         [SetUp]
@@ -37,7 +37,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
                         c.Id.Equals(_expectedReservationId) &&
                         c.AccountId.Equals(ExpectedAccountId) && 
-                        c.StartDate.Equals(_expectedStartDate)),
+                        c.StartDate.Equals(_expectedStartDate) &&
+                        c.CourseId.Equals(_expectedCourseId)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountReservationsResult);
             _httpContext = new Mock<HttpContext>();
@@ -59,7 +60,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             {
                 Id = _expectedReservationId, 
                 AccountId = ExpectedAccountId, 
-                StartDate = _expectedStartDate
+                StartDate = _expectedStartDate,
+                CourseId = _expectedCourseId
             });
 
             //Assert
@@ -83,11 +85,11 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     Id = _expectedReservationId,
                     AccountId = ExpectedAccountId, 
                     StartDate = _expectedStartDate,
-                    CourseId = "123-1"
+                    CourseId = _expectedCourseId
                 });
 
             //Assert
-            _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => command.CourseId.Equals("123-1")), 
+            _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => command.CourseId.Equals(_expectedCourseId)), 
                 It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.IsNotNull(actual);
