@@ -32,13 +32,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
                 .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>{{"",""}}});
-            _validator.Setup(x=>x.ValidateAsync(It.Is<CreateAccountReservationCommand>(c=>c.AccountId.Equals(ExpectedAccountId))))
+            _validator.Setup(x=>x.ValidateAsync(It.Is<CreateAccountReservationCommand>(c=>c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new ValidationResult());
 
             _accountReservationsService = new Mock<IAccountReservationService>();
-            _accountReservationsService.Setup(x => x.CreateAccountReservation(ExpectedAccountId, _expectedDateTime)).ReturnsAsync(_reservationCreated);
+            _accountReservationsService
+                .Setup(x => x.CreateAccountReservation(_expectedReservationId, ExpectedAccountId, _expectedDateTime))
+                .ReturnsAsync(_reservationCreated);
             
-            _command = new CreateAccountReservationCommand {AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
+            _command = new CreateAccountReservationCommand {Id = _expectedReservationId, AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
 
             _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object);
         }
@@ -54,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 await _handler.Handle(expectedCommand, _cancellationToken);
             });
-            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<long>(), It.IsAny<DateTime>()), Times.Never);
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<DateTime>()), Times.Never);
         }
 
         [Test]
@@ -64,7 +66,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command.AccountId,_expectedDateTime),Times.Once());
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime),Times.Once());
         }
 
         [Test]

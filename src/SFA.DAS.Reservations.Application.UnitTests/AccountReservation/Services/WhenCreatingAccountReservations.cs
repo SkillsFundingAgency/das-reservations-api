@@ -33,7 +33,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _ruleRepository = new Mock<IRuleRepository>();
             _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>())).ReturnsAsync(new List<Domain.Entities.Rule>());
 
-            _reservationRepository.Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.AccountId.Equals(ExpectedAccountId))))
+            _reservationRepository
+                .Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId});
             
             _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object);
@@ -43,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public async Task Then_The_Expiry_Period_For_The_Reservation_Is_Taken_From_Configuration()
         {
             //Act
-            await _accountReservationService.CreateAccountReservation(ExpectedAccountId, _expectedStartDate);
+            await _accountReservationService.CreateAccountReservation(_expectedReservationId, ExpectedAccountId, _expectedStartDate);
 
             //Assert
             _options.Verify(x=>x.Value.ExpiryPeriodInMonths,Times.Once);
@@ -57,23 +58,24 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             var expectedExpiryDate = new DateTime(expiryDate.Year,expiryDate.Month, DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month));
 
             //Act
-            await _accountReservationService.CreateAccountReservation(ExpectedAccountId, _expectedStartDate);
+            await _accountReservationService.CreateAccountReservation(_expectedReservationId, ExpectedAccountId, _expectedStartDate);
 
             //Assert
-            _reservationRepository.Verify(x=>x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(
-                c=>c.AccountId.Equals(ExpectedAccountId) &&
-                   c.StartDate.Equals(_expectedStartDate) &&
-                   !c.CreatedDate.Equals(DateTime.MinValue) &&
-                   c.ExpiryDate.Equals(expectedExpiryDate) &&
-                   c.Status.Equals((short)ReservationStatus.Pending)
-                )));
+            _reservationRepository.Verify(x=>x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>
+                c.Id.Equals(_expectedReservationId) &&
+                c.AccountId.Equals(ExpectedAccountId) &&
+                c.StartDate.Equals(_expectedStartDate) &&
+                !c.CreatedDate.Equals(DateTime.MinValue) &&
+                c.ExpiryDate.Equals(expectedExpiryDate) &&
+                c.Status.Equals((short)ReservationStatus.Pending)
+             )));
         }
 
         [Test]
         public async Task Then_The_New_Reservation_Is_Returned_Mapped_From_The_Entity()
         {
             //Act
-            var actual = await _accountReservationService.CreateAccountReservation(ExpectedAccountId, _expectedStartDate);
+            var actual = await _accountReservationService.CreateAccountReservation(_expectedReservationId, ExpectedAccountId, _expectedStartDate);
 
             //Assert
             Assert.IsAssignableFrom<Reservation>(actual);

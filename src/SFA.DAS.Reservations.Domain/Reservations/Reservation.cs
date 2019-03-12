@@ -9,8 +9,9 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class Reservation
     {
-        public Reservation(long accountId, DateTime startDate, int expiryPeriodInMonths)
+        public Reservation(Guid id, long accountId, DateTime startDate, int expiryPeriodInMonths)
         {
+            Id = id;
             AccountId = accountId;
             StartDate = startDate;
             Status = ReservationStatus.Pending;

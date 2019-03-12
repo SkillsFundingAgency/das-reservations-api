@@ -111,7 +111,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var expiryPeriod = 1;
 
             //Act
-            _reservation = new Reservation(123, new DateTime(2018,month-expiryPeriod,03),expiryPeriod);
+            _reservation = new Reservation(Guid.NewGuid(), 123, new DateTime(2018,month-expiryPeriod,03),expiryPeriod);
 
             //Assert
             Assert.AreEqual(expectedExpiryDate,_reservation.ExpiryDate);

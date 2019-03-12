@@ -48,6 +48,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             {
                 var response = await _mediator.Send(new CreateAccountReservationCommand
                 {
+                    Id = reservation.Id,
                     AccountId = reservation.AccountId,
                     StartDate = reservation.StartDate
                 });

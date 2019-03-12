@@ -33,7 +33,10 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending)};
             ;
             _mediator = new Mock<IMediator>();
-            _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => c.AccountId.Equals(ExpectedAccountId) && c.StartDate.Equals(_expectedStartDate)),
+            _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
+                        c.Id.Equals(_expectedReservationId) &&
+                        c.AccountId.Equals(ExpectedAccountId) && 
+                        c.StartDate.Equals(_expectedStartDate)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountReservationsResult);
             _httpContext = new Mock<HttpContext>();
@@ -51,7 +54,12 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public async Task Then_The_Reservation_Is_Created_And_Returned()
         {
             //Act
-            var actual = await _reservationsController.Create(new Models.Reservation{AccountId = ExpectedAccountId, StartDate = _expectedStartDate});
+            var actual = await _reservationsController.Create(new Models.Reservation
+            {
+                Id = _expectedReservationId, 
+                AccountId = ExpectedAccountId, 
+                StartDate = _expectedStartDate
+            });
 
             //Assert
             Assert.IsNotNull(actual);

@@ -33,9 +33,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservations;
         }
 
-        public async Task<Reservation> CreateAccountReservation(long accountId, DateTime startDate)
+        public async Task<Reservation> CreateAccountReservation(Guid id, long accountId, DateTime startDate)
         {
-            var reservation = new Reservation(accountId, startDate, _options.Value.ExpiryPeriodInMonths);
+            var reservation = new Reservation(id, accountId, startDate, _options.Value.ExpiryPeriodInMonths);
             
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);
