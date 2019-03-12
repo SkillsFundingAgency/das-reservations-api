@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json.Linq;
@@ -24,6 +25,11 @@ namespace SFA.DAS.Reservations.Infrastructure.Configuration
 
         public override void Load()
         {
+            if (_environment.Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return;
+            }
+
             var table = GetTable();
             var operation = GetOperation(_appName, _environment, _version);
             var result = table.ExecuteAsync(operation).Result;
