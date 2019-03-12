@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -9,23 +10,25 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class Reservation
     {
-        public Reservation(long accountId, DateTime startDate, int expiryPeriodInMonths)
+        public Reservation(long accountId, DateTime startDate, int expiryPeriodInMonths, string courseId = null)
         {
             AccountId = accountId;
             StartDate = startDate;
             Status = ReservationStatus.Pending;
             CreatedDate = DateTime.UtcNow;
             ExpiryDate = GetExpiryDateFromStartDate(expiryPeriodInMonths);
+            CourseId = courseId;
         }
 
-        public Reservation(Func<DateTime, Task<IList<Rule>>> rules, 
-            Guid id, 
-            long accountId, 
-            bool isLevyAccount, 
-            DateTime createdDate, 
-            DateTime startDate, 
-            DateTime expiryDate, 
-            ReservationStatus status)
+        public Reservation(Func<DateTime, Task<IList<Rule>>> rules,
+            Guid id,
+            long accountId,
+            bool isLevyAccount,
+            DateTime createdDate,
+            DateTime startDate,
+            DateTime expiryDate,
+            ReservationStatus status, 
+            Course reservationCourse)
         {
             Id = id;
             AccountId = accountId;
@@ -35,6 +38,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             ExpiryDate = expiryDate;
             Status = status;
             Rules = rules != null ? GetRulesForAccountType(GetRules(rules)) : null;
+            Course = MapCourse(reservationCourse);
         }
 
         public Guid Id { get; }
@@ -51,7 +55,12 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         public bool IsActive => ExpiryDate >= DateTime.UtcNow;
 
-        public List<ReservationRule> Rules { get; }
+        [JsonIgnore]
+        public string CourseId { get; }
+
+        public Courses.Course Course { get; }
+
+        public ICollection<ReservationRule> Rules { get; }
 
         public ReservationStatus Status { get; }
 
@@ -61,7 +70,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             return task.Result;
         }
 
-        private List<ReservationRule> GetRulesForAccountType(IList<Rule> rules)
+        private ICollection<ReservationRule> GetRulesForAccountType(IList<Rule> rules)
         {
             return rules.Where(FilterByAccountType()).Select(x => new ReservationRule(x)).ToList();
         }
@@ -77,7 +86,12 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             return c => (c.Restriction == (byte) AccountRestriction.All || c.Restriction == (byte) accountType);
         }
 
-        private DateTime GetExpiryDateFromStartDate(int expiryPeriodInMonths)
+        private static Courses.Course MapCourse(Course reservationCourse)
+        {
+            return reservationCourse == null ? null : new Courses.Course(reservationCourse);
+        }
+		
+		private DateTime GetExpiryDateFromStartDate(int expiryPeriodInMonths)
         {
             var expiryDate = StartDate.AddMonths(expiryPeriodInMonths);
             var lastDayInMonth = DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month);

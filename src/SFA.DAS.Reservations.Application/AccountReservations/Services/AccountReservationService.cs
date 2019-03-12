@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
+using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 {
@@ -35,7 +36,12 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         public async Task<Reservation> CreateAccountReservation(long accountId, DateTime startDate)
         {
-            var reservation = new Reservation(accountId, startDate, _options.Value.ExpiryPeriodInMonths);
+            return await CreateAccountReservation(accountId, startDate, null);
+        }
+
+        public async Task<Reservation> CreateAccountReservation(long accountId, DateTime startDate, string courseId)
+        {
+            var reservation = new Reservation(accountId, startDate, _options.Value.ExpiryPeriodInMonths, courseId);
             
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);
@@ -59,7 +65,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 reservation.CreatedDate,
                 reservation.StartDate,
                 reservation.ExpiryDate,
-                (ReservationStatus)reservation.Status
+                (ReservationStatus)reservation.Status,
+                reservation.Course
             );
             return mapReservation;
         }
@@ -74,7 +81,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 CreatedDate = reservation.CreatedDate,
                 IsLevyAccount = reservation.IsLevyAccount,
                 StartDate = reservation.StartDate,
-                Status = (short)reservation.Status
+                Status = (short)reservation.Status,
+                CourseId = reservation.CourseId
             };
         }
     }

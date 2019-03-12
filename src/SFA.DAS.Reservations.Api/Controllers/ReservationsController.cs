@@ -49,9 +49,11 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 var response = await _mediator.Send(new CreateAccountReservationCommand
                 {
                     AccountId = reservation.AccountId,
-                    StartDate = reservation.StartDate
+                    StartDate = reservation.StartDate,
+                    CourseId = reservation.CourseId
                 });
-                return Created($"api/accounts/{response.Reservation.AccountId}/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
+
+                return Created($"api/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
             }
             catch (ArgumentException e)
             {

@@ -1,18 +1,26 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Domain.Courses;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 {
     public class WhenValidatingTheCreateAccountReservationCommand
     {
         private CreateAccountReservationValidator _validator;
+        private Mock<ICourseService> _courseService;
 
         [SetUp]
         public void Arrange()
         {
-            _validator = new CreateAccountReservationValidator();
+            _courseService = new Mock<ICourseService>();
+
+            _validator = new CreateAccountReservationValidator(_courseService.Object);
+
+            _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
+                .ReturnsAsync(new Course(new Domain.Entities.Course()));
         }
 
         [TestCase(0, null, false)]
@@ -60,6 +68,41 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Assert
             Assert.IsTrue(actual.IsValid());
             Assert.AreEqual(0, actual.ValidationDictionary.Count);
+        }
+
+        [Test]
+        public async Task Then_The_Command_Is_Valid_If_Course_Exists()
+        {
+            //Act
+            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand
+            {
+                AccountId = 1,
+                StartDate = DateTime.Now,
+                CourseId = "1"
+            });
+
+            //Assert
+            Assert.IsTrue(actual.IsValid());
+        }
+
+        [Test]
+        public async Task Then_The_Command_Is_InValid_If_Course_Does_Not_Exists()
+        {
+            //Assign
+            _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
+                .ReturnsAsync((Course) null);
+
+            //Act
+            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand
+            {
+                AccountId = 1,
+                StartDate = DateTime.Now,
+                CourseId = "1"
+            });
+
+            //Assert
+            Assert.IsFalse(actual.IsValid());
+            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("Course with CourseId cannot be found"));
         }
     }
 }

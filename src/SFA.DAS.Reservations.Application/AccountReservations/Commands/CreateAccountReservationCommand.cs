@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
     {
         public long AccountId { get; set; }
         public DateTime StartDate { get; set; }
+        public string CourseId { get; set; }
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.Reservations.Api.Models
 {
@@ -9,5 +6,6 @@ namespace SFA.DAS.Reservations.Api.Models
     {
         public long AccountId { get; set; }
         public DateTime StartDate { get; set; }
+        public string CourseId { get; set; }
     }
 }
