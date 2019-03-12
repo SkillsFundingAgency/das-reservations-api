@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Courses;
+using Course = SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course;
+
 
 namespace SFA.DAS.Reservations.Application.Courses.Services
 {

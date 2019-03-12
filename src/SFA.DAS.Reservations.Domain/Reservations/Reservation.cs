@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         [JsonIgnore]
         public string CourseId { get; }
 
-        public Courses.Course Course { get; }
+        public ApprenticeshipCourse.Course Course { get; }
 
         public ICollection<ReservationRule> Rules { get; }
 
@@ -86,9 +86,9 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             return c => (c.Restriction == (byte) AccountRestriction.All || c.Restriction == (byte) accountType);
         }
 
-        private static Courses.Course MapCourse(Course reservationCourse)
+        private static ApprenticeshipCourse.Course MapCourse(Course reservationCourse)
         {
-            return reservationCourse == null ? null : new Courses.Course(reservationCourse);
+            return reservationCourse == null ? null : new ApprenticeshipCourse.Course(reservationCourse);
         }
 		
 		private DateTime GetExpiryDateFromStartDate(int expiryPeriodInMonths)

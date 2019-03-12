@@ -126,9 +126,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.IsAssignableFrom<Reservation>(actual);
             Assert.AreEqual(_expectedReservationId, actual.Id);
             Assert.AreEqual(ExpectedAccountId, actual.AccountId);
-            Assert.AreEqual(_expectedCourse.CourseId, actual.Course.Id);
+            Assert.AreEqual(_expectedCourse.CourseId, actual.Course.CourseId);
             Assert.AreEqual(_expectedCourse.Title, actual.Course.Title);
-            Assert.AreEqual(_expectedCourse.Level, actual.Course.Level);
+            Assert.AreEqual(_expectedCourse.Level.ToString(), actual.Course.Level);
             Assert.IsNotNull(actual.Rules);
         }
     }

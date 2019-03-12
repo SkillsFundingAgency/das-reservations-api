@@ -4,6 +4,14 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
 {
     public class Course
     {
+
+        public Course(Entities.Course entity)
+        {
+            CourseId = entity.CourseId;
+            Title = entity.Title;
+            Level = entity.Level.ToString();
+        }
+
         public Course(string courseId, string title, string level)
         {
             CourseId = courseId;

@@ -78,9 +78,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.AreEqual(_expectedReservation.CreatedDate, actualReservation.CreatedDate);
             Assert.AreEqual(_expectedReservation.IsLevyAccount, actualReservation.IsLevyAccount);
             Assert.AreEqual(_expectedReservation.Status, (short)actualReservation.Status);
-            Assert.AreEqual(_expectedReservation.Course.CourseId, actualReservation.Course.Id);
+            Assert.AreEqual(_expectedReservation.Course.CourseId, actualReservation.Course.CourseId);
             Assert.AreEqual(_expectedReservation.Course.Title, actualReservation.Course.Title);
-            Assert.AreEqual(_expectedReservation.Course.Level, actualReservation.Course.Level);
+            Assert.AreEqual(_expectedReservation.Course.Level.ToString(), actualReservation.Course.Level);
         }
     }
 }
