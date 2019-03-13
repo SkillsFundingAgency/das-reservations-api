@@ -32,11 +32,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
 
             if (request.CourseId != null)
             {
-                reservation = await _accountReservationService.CreateAccountReservation(request.AccountId, request.StartDate, request.CourseId);
+                reservation = await _accountReservationService.CreateAccountReservation(request.Id, request.AccountId, request.StartDate, request.CourseId);
             }
             else
             {
-                reservation = await _accountReservationService.CreateAccountReservation(request.AccountId, request.StartDate);
+                reservation = await _accountReservationService.CreateAccountReservation(request.Id, request.AccountId, request.StartDate);
             }
 
             return new CreateAccountReservationResult

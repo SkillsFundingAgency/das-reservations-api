@@ -18,6 +18,10 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
         {
             var validationResult = new ValidationResult();
 
+            if (item.Id == Guid.Empty)
+            {
+                validationResult.AddError(nameof(item.Id));
+            }
             if (item.AccountId == 0)
             {
                 validationResult.AddError(nameof(item.AccountId));

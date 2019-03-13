@@ -34,14 +34,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservations;
         }
 
-        public async Task<Reservation> CreateAccountReservation(long accountId, DateTime startDate)
+        public async Task<Reservation> CreateAccountReservation(Guid id, long accountId, DateTime startDate)
         {
-            return await CreateAccountReservation(accountId, startDate, null);
+            return await CreateAccountReservation(id, accountId, startDate, null);
         }
 
-        public async Task<Reservation> CreateAccountReservation(long accountId, DateTime startDate, string courseId)
+        public async Task<Reservation> CreateAccountReservation(Guid id, long accountId, DateTime startDate, string courseId)
         {
-            var reservation = new Reservation(accountId, startDate, _options.Value.ExpiryPeriodInMonths, courseId);
+            var reservation = new Reservation(id, accountId, startDate, _options.Value.ExpiryPeriodInMonths, courseId);
             
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         {
             return new Domain.Entities.Reservation
             {
-                Id = Guid.NewGuid(),
+                Id = reservation.Id,
                 ExpiryDate = reservation.ExpiryDate,
                 AccountId = reservation.AccountId,
                 CreatedDate = reservation.CreatedDate,
