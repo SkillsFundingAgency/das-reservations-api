@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class Reservation
     {
-        public Reservation(Guid id, long accountId, DateTime startDate, int expiryPeriodInMonths, string courseId = null)
+        public Reservation(Guid id, long accountId, DateTime startDate, int expiryPeriodInMonths, string courseId = null, int providerId = 0, long legalEntityAccountId = 0)
         {
             Id = id;
             AccountId = accountId;
@@ -19,6 +19,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             CreatedDate = DateTime.UtcNow;
             ExpiryDate = GetExpiryDateFromStartDate(expiryPeriodInMonths);
             CourseId = courseId;
+            ProviderId = providerId;
+            LegalEntityAccountId = legalEntityAccountId;
         }
 
         public Reservation(Func<DateTime, Task<IList<Rule>>> rules,
@@ -64,6 +66,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public ICollection<ReservationRule> Rules { get; }
 
         public ReservationStatus Status { get; }
+        public int ProviderId { get; }
+        public long LegalEntityAccountId { get; }
 
         private IList<Rule> GetRules(Func<DateTime, Task<IList<Rule>>> getRules)
         {

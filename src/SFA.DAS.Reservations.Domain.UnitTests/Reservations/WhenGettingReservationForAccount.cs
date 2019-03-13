@@ -116,5 +116,50 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             //Assert
             Assert.AreEqual(expectedExpiryDate,_reservation.ExpiryDate);
         }
+
+        [Test]
+        public void Then_When_A_New_Reservation_It_Is_Initalised_Correctly()
+        {
+            //Arrange
+            var expectedId = Guid.NewGuid();
+            var expectedAccountId = 123;
+            var expectedStartDate = DateTime.UtcNow;
+            var expectedCourseId = "1-345-1";
+            var expiryPeriodInMonths = 2;
+            var expectedProviderId = 443322;
+            var expectedLegalEntityAccountId = 339988;
+
+            //Act
+            _reservation = new Reservation(expectedId,expectedAccountId, expectedStartDate,expiryPeriodInMonths,expectedCourseId,expectedProviderId,expectedLegalEntityAccountId);
+
+            //Assert
+            Assert.AreEqual(expectedId, _reservation.Id);
+            Assert.AreEqual(expectedAccountId, _reservation.AccountId);
+            Assert.AreEqual(expectedStartDate, _reservation.StartDate);
+            Assert.AreEqual(expectedCourseId, _reservation.CourseId);
+            Assert.AreEqual(expectedProviderId, _reservation.ProviderId);
+            Assert.AreEqual(expectedLegalEntityAccountId, _reservation.LegalEntityAccountId);
+        }
+
+        [Test]
+        public void Then_When_A_New_Reservation_Default_Values_Are_Used_If_Not_Provided()
+        {
+            //Arrange
+            var expectedId = Guid.NewGuid();
+            var expectedAccountId = 123;
+            var expectedStartDate = DateTime.UtcNow;
+            var expiryPeriodInMonths = 2;
+
+            //Act
+            _reservation = new Reservation(expectedId, expectedAccountId, expectedStartDate, expiryPeriodInMonths);
+
+            //Assert
+            Assert.AreEqual(expectedId, _reservation.Id);
+            Assert.AreEqual(expectedAccountId, _reservation.AccountId);
+            Assert.AreEqual(expectedStartDate, _reservation.StartDate);
+            Assert.IsNull(_reservation.CourseId);
+            Assert.AreEqual(0, _reservation.ProviderId);
+            Assert.AreEqual(0,_reservation.LegalEntityAccountId);
+        }
     }
 }
