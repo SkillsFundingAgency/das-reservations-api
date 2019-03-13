@@ -112,11 +112,18 @@ namespace SFA.DAS.Reservations.Api
                 {
                     o.Filters.Add(new AuthorizeFilter("default"));
                 }
-                    
                 
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
+            if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
+            }
+            else
+            {
+                services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
+            }
+            
             services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
 
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
