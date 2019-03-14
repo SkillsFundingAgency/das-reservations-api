@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public short Status { get; set; }
         public string CourseId { get; set; }
         public virtual Course Course{ get; set; }
-        public long AccountLegalEntityId { get; set; }
-        public int ProviderId { get; set; }
+        public long? AccountLegalEntityId { get; set; }
+        public int? ProviderId { get; set; }
     }
 }
