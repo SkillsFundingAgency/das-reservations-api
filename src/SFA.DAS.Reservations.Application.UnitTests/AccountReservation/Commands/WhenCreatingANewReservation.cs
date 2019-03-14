@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             _cancellationToken = new CancellationToken();
               
-            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending, new Course());
+            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending, new Course(),0,0);
             
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
@@ -37,12 +37,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _validator.Setup(x=>x.ValidateAsync(It.Is<CreateAccountReservationCommand>(c=>c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new ValidationResult());
 
+            _command = new CreateAccountReservationCommand {Id = _expectedReservationId, AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
+
             _accountReservationsService = new Mock<IAccountReservationService>();
             _accountReservationsService
-                .Setup(x => x.CreateAccountReservation(_expectedReservationId, ExpectedAccountId, _expectedDateTime))
+                .Setup(x => x.CreateAccountReservation(_command))
                 .ReturnsAsync(_reservationCreated);
-            
-            _command = new CreateAccountReservationCommand {Id = _expectedReservationId, AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
+
 
             _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object);
         }
@@ -58,36 +59,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 await _handler.Handle(expectedCommand, _cancellationToken);
             });
-            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<DateTime>()), Times.Never);
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<CreateAccountReservationCommand>()), Times.Never);
         }
 
         [Test]
-        public async Task Then_If_The_Command_Without_CourseId_IsValid_Then_CreateReservation_Is_Called_On_The_Service()
+        public async Task Then_The_Request_Is_Sent_To_The_Service_If_Valid()
         {
             //Act
             await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime),Times.Once());
-            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime, _command.CourseId),Times.Never);
+            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command),Times.Once);
         }
 
-        [Test]
-        public async Task Then_If_The_Command_IsValid_And_Has_CourseId_Then_CreateReservation_Is_Called_On_The_Service()
-        {
-            //Arrange
-            _command.CourseId = "123-1";
-
-            //Act
-            await _handler.Handle(_command, _cancellationToken);
-
-            //Assert
-            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime),Times.Never);
-            _accountReservationsService.Verify(x=>x.CreateAccountReservation(_expectedReservationId, _command.AccountId,_expectedDateTime, _command.CourseId),Times.Once);
-        }
 
         [Test]
-        public async Task Then_The_ReservationId_Is_Returned_In_The_Response()
+        public async Task Then_The_Reservation_Is_Returned_In_The_Response()
         {
             //Act
             var actual = await _handler.Handle(_command, _cancellationToken);

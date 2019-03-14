@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public void Arrange()
         {
             _accountReservationsResult = new CreateAccountReservationResult
-                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course())};
+                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course(),0,0)};
             ;
             _mediator = new Mock<IMediator>();
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
