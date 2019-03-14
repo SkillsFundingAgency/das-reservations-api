@@ -22,6 +22,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private Mock<IMediator> _mediator;
         private CreateAccountReservationResult _accountReservationsResult;
         private const long ExpectedAccountId = 123234;
+        private readonly long? _expectedLegalEntityAccountId = 18723918;
+        private readonly int? _expectedProviderId = 18723918;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);
         private readonly string _expectedCourseId = "asdfopi";
@@ -37,8 +39,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
                         c.Id.Equals(_expectedReservationId) &&
                         c.AccountId.Equals(ExpectedAccountId) && 
-                        c.StartDate.Equals(_expectedStartDate) &&
-                        c.CourseId.Equals(_expectedCourseId)),
+                        c.StartDate.Equals(_expectedStartDate)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountReservationsResult);
             _httpContext = new Mock<HttpContext>();
@@ -60,8 +61,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             {
                 Id = _expectedReservationId, 
                 AccountId = ExpectedAccountId, 
-                StartDate = _expectedStartDate,
-                CourseId = _expectedCourseId
+                StartDate = _expectedStartDate
             });
 
             //Assert
@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
-        public async Task Then_The_Reservation_With_Course_Is_Created_And_Returned()
+        public async Task Then_The_Reservation_Is_Created_From_The_Request_And_Returned()
         {
             //Act
             var actual = await _reservationsController.Create(
@@ -85,11 +85,20 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     Id = _expectedReservationId,
                     AccountId = ExpectedAccountId, 
                     StartDate = _expectedStartDate,
-                    CourseId = _expectedCourseId
+                    CourseId = _expectedCourseId,
+                    ProviderId = _expectedProviderId,
+                    LegalEntityAccountId = _expectedLegalEntityAccountId
                 });
 
             //Assert
-            _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => command.CourseId.Equals(_expectedCourseId)), 
+            _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => 
+                    command.CourseId.Equals(_expectedCourseId) &&
+                    command.ProviderId.Equals(_expectedProviderId) &&
+                    command.LegalEntityAccountId.Equals(_expectedLegalEntityAccountId) &&
+                    command.AccountId.Equals(ExpectedAccountId) &&
+                    command.StartDate.Equals(_expectedStartDate) &&
+                    command.Id.Equals(_expectedReservationId) 
+                    ), 
                 It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.IsNotNull(actual);
