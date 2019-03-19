@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         public async Task Then_The_Values_Are_Returned_In_The_Response()
         {
             //Arrange
-            var reservation = new Reservation(ExpectedAccountId , DateTime.UtcNow ,1);
+            var reservation = new Reservation(Guid.Empty, ExpectedAccountId , DateTime.UtcNow ,1);
             _service.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{ reservation });
 
             //Act
