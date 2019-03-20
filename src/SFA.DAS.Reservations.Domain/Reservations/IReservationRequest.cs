@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         string CourseId { get;  }
         int? ProviderId { get; }
         long? LegalEntityAccountId { get; }
+        string AccountLegalEntityName { get; }
     }
 }
