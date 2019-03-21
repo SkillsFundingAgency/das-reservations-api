@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 reservation.Course,
                 reservation.ProviderId,
                 reservation.AccountLegalEntityId,
-                ""
+                reservation.AccountLegalEntityName
             );
             return mapReservation;
         }
