@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
             _cancellationToken = new CancellationToken();
             _service = new Mock<IAccountReservationService>();
-            var reservation = new Reservation(Guid.Empty, 12345, DateTime.UtcNow, 1);
+            var reservation = new Reservation(Guid.Empty, 12345, DateTime.UtcNow, 1,"TestName");
             _service.Setup(x => x.GetReservation(_expectedReservationId)).ReturnsAsync(reservation);
 
             _handler = new GetReservationQueryHandler(_validator.Object, _service.Object);

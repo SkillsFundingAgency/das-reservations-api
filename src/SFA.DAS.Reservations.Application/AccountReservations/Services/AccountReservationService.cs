@@ -71,7 +71,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 (ReservationStatus)reservation.Status,
                 reservation.Course,
                 reservation.ProviderId,
-                reservation.AccountLegalEntityId
+                reservation.AccountLegalEntityId,
+                ""
             );
             return mapReservation;
         }

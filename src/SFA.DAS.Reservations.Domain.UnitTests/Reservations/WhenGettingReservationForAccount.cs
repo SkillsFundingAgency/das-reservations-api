@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_The_Reservation_Is_Valid_If_It_Is_Within_The_Expiry_Period()
         {
             //Act
-            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0);
+            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"");
 
             //Assert
             Assert.IsTrue(_reservation.IsActive);
@@ -168,7 +168,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
 
         private Reservation CreateReservation()
         {
-            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0);
+            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0, "TestName");
         }
     }
 }

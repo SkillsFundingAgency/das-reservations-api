@@ -31,10 +31,10 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             DateTime createdDate,
             DateTime startDate,
             DateTime expiryDate,
-            ReservationStatus status, 
+            ReservationStatus status,
             Course reservationCourse,
             int? providerId,
-            long? legalEntityAccountId)
+            long? legalEntityAccountId, string accountLegalEntityName)
         {
             Id = id;
             AccountId = accountId;
@@ -47,6 +47,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             Course = MapCourse(reservationCourse);
             ProviderId = providerId;
             LegalEntityAccountId = legalEntityAccountId;
+            AccountLegalEntityName = accountLegalEntityName;
         }
 
         public Guid Id { get; }
