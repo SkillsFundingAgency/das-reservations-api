@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Api.Models
         public string CourseId { get; set; }
         public int? ProviderId { get; set; }
         public long? LegalEntityAccountId { get; set; }
+        public string AccountLegalEntityName { get; set; }
     }
 }

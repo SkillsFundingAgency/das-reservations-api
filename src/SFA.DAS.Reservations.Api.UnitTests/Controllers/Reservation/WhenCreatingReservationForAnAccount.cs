@@ -22,6 +22,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private Mock<IMediator> _mediator;
         private CreateAccountReservationResult _accountReservationsResult;
         private const long ExpectedAccountId = 123234;
+        private const string ExpectedAccountLegalEntityName= "TestName";
         private readonly long? _expectedLegalEntityAccountId = 18723918;
         private readonly int? _expectedProviderId = 18723918;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
@@ -54,41 +55,23 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
-        public async Task Then_The_Reservation_Is_Created_And_Returned()
-        {
-            //Act
-            var actual = await _reservationsController.Create(new Models.Reservation
-            {
-                Id = _expectedReservationId, 
-                AccountId = ExpectedAccountId, 
-                StartDate = _expectedStartDate
-            });
-
-            //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as CreatedResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.Created, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualReservations = result.Value as Domain.Reservations.Reservation;
-            Assert.AreEqual(_accountReservationsResult.Reservation, actualReservations);
-            Assert.AreEqual($"api/reservations/{_expectedReservationId}", result.Location);
-        }
-
-        [Test]
         public async Task Then_The_Reservation_Is_Created_From_The_Request_And_Returned()
         {
+            //Arrange
+            var reservation = new Models.Reservation
+            {
+                Id = _expectedReservationId,
+                AccountId = ExpectedAccountId, 
+                StartDate = _expectedStartDate,
+                CourseId = _expectedCourseId,
+                ProviderId = _expectedProviderId,
+                LegalEntityAccountId = _expectedLegalEntityAccountId,
+                AccountLegalEntityName = ExpectedAccountLegalEntityName
+            };
+
+
             //Act
-            var actual = await _reservationsController.Create(
-                new Models.Reservation
-                {
-                    Id = _expectedReservationId,
-                    AccountId = ExpectedAccountId, 
-                    StartDate = _expectedStartDate,
-                    CourseId = _expectedCourseId,
-                    ProviderId = _expectedProviderId,
-                    LegalEntityAccountId = _expectedLegalEntityAccountId
-                });
+            var actual = await _reservationsController.Create(reservation);
 
             //Assert
             _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => 
@@ -97,7 +80,9 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     command.LegalEntityAccountId.Equals(_expectedLegalEntityAccountId) &&
                     command.AccountId.Equals(ExpectedAccountId) &&
                     command.StartDate.Equals(_expectedStartDate) &&
-                    command.Id.Equals(_expectedReservationId) 
+                    command.Id.Equals(_expectedReservationId) &&
+                    command.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName)
+                    
                     ), 
                 It.IsAny<CancellationToken>()), Times.Once);
 
