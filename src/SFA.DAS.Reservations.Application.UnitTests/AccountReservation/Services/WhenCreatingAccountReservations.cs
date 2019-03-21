@@ -24,6 +24,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         private const long ExpectedAccountId = 12344;
         private const int ExpectedProviderId = 66552;
         private const long ExpectedLegalEntityAccountId = 549785;
+        private const string ExpectedAccountLegalEntityName = "TestName";
         private Course _expectedCourse;
         private DateTime _expectedExpiryDate;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
@@ -83,7 +84,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             {
                 AccountId = ExpectedAccountId,
                 StartDate = _expectedStartDate,
-                Id = _expectedReservationId
+                Id = _expectedReservationId,
+                AccountLegalEntityName = ExpectedAccountLegalEntityName
             };
 
             //Act
@@ -96,7 +98,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 c.StartDate.Equals(_expectedStartDate) &&
                 !c.CreatedDate.Equals(DateTime.MinValue) &&
                 c.ExpiryDate.Equals(_expectedExpiryDate) &&
-                c.Status.Equals((short)ReservationStatus.Pending)
+                c.Status.Equals((short)ReservationStatus.Pending) &&
+                c.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName)
              )));
         }
 
