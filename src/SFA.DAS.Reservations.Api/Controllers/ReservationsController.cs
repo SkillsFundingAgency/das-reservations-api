@@ -53,7 +53,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     StartDate = reservation.StartDate,
                     CourseId = reservation.CourseId,
                     ProviderId = reservation.ProviderId,
-                    LegalEntityAccountId = reservation.LegalEntityAccountId
+                    LegalEntityAccountId = reservation.LegalEntityAccountId,
+                    AccountLegalEntityName = reservation.AccountLegalEntityName
+                    
                 });
 
                 return Created($"api/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);

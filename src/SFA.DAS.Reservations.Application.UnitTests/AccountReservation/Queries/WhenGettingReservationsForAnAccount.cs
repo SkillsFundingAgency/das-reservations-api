@@ -18,6 +18,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         private GetAccountReservationsQuery _query;
         private Mock<IAccountReservationService> _service;
         private const long ExpectedAccountId = 553234;
+        private const string ExpectedAccountLegalEntityName = "TestName";
 
         [SetUp]
         public void Arrange()
@@ -78,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         public async Task Then_The_Values_Are_Returned_In_The_Response()
         {
             //Arrange
-            var reservation = new Reservation(Guid.Empty, ExpectedAccountId , DateTime.UtcNow ,1);
+            var reservation = new Reservation(Guid.Empty, ExpectedAccountId , DateTime.UtcNow ,1,"TestName");
             _service.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{ reservation });
 
             //Act
@@ -87,6 +88,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(actual.Reservations);
             Assert.AreEqual(ExpectedAccountId, actual.Reservations[0].AccountId);
+            Assert.AreEqual(ExpectedAccountLegalEntityName, actual.Reservations[0].AccountLegalEntityName);
+            
         }
     }
 }

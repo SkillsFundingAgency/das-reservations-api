@@ -15,5 +15,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public virtual Course Course{ get; set; }
         public long? AccountLegalEntityId { get; set; }
         public int? ProviderId { get; set; }
+        public string AccountLegalEntityName { get; set; }
     }
 }

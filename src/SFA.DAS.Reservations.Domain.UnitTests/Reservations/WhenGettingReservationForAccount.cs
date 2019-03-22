@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_The_Reservation_Is_Valid_If_It_Is_Within_The_Expiry_Period()
         {
             //Act
-            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0);
+            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"");
 
             //Assert
             Assert.IsTrue(_reservation.IsActive);
@@ -110,7 +110,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var expiryPeriod = 1;
 
             //Act
-            _reservation = new Reservation(Guid.NewGuid(), 123, new DateTime(2018,month-expiryPeriod,03),expiryPeriod);
+            _reservation = new Reservation(Guid.NewGuid(), 123, new DateTime(2018,month-expiryPeriod,03),expiryPeriod,"TestName");
 
             //Assert
             Assert.AreEqual(expectedExpiryDate,_reservation.ExpiryDate);
@@ -127,9 +127,10 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var expiryPeriodInMonths = 2;
             var expectedProviderId = 443322;
             var expectedLegalEntityAccountId = 339988;
+            var expectedLegalEntityAccountName = "TestName";
 
             //Act
-            _reservation = new Reservation(expectedId,expectedAccountId, expectedStartDate,expiryPeriodInMonths,expectedCourseId,expectedProviderId,expectedLegalEntityAccountId);
+            _reservation = new Reservation(expectedId,expectedAccountId, expectedStartDate,expiryPeriodInMonths, expectedLegalEntityAccountName, expectedCourseId, expectedProviderId, expectedLegalEntityAccountId);
 
             //Assert
             Assert.AreEqual(expectedId, _reservation.Id);
@@ -138,6 +139,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             Assert.AreEqual(expectedCourseId, _reservation.CourseId);
             Assert.AreEqual(expectedProviderId, _reservation.ProviderId);
             Assert.AreEqual(expectedLegalEntityAccountId, _reservation.LegalEntityAccountId);
+            Assert.AreEqual(expectedLegalEntityAccountName, _reservation.AccountLegalEntityName);
+
         }
 
         [Test]
@@ -148,14 +151,16 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var expectedAccountId = 123;
             var expectedStartDate = DateTime.UtcNow;
             var expiryPeriodInMonths = 2;
+            var expecteLegalEntityAccountName = "TestName";
 
             //Act
-            _reservation = new Reservation(expectedId, expectedAccountId, expectedStartDate, expiryPeriodInMonths);
+            _reservation = new Reservation(expectedId, expectedAccountId, expectedStartDate, expiryPeriodInMonths,expecteLegalEntityAccountName);
 
             //Assert
             Assert.AreEqual(expectedId, _reservation.Id);
             Assert.AreEqual(expectedAccountId, _reservation.AccountId);
             Assert.AreEqual(expectedStartDate, _reservation.StartDate);
+            Assert.AreEqual(expecteLegalEntityAccountName, _reservation.AccountLegalEntityName);
             Assert.IsNull(_reservation.CourseId);
             Assert.IsNull(_reservation.ProviderId);
             Assert.IsNull(_reservation.LegalEntityAccountId);
@@ -163,7 +168,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
 
         private Reservation CreateReservation()
         {
-            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0);
+            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0, "TestName");
         }
     }
 }

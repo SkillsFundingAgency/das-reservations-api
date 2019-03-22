@@ -48,6 +48,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 command.AccountId, 
                 command.StartDate,
                 _options.Value.ExpiryPeriodInMonths,
+                command.AccountLegalEntityName,
                 command.CourseId,
                 command.ProviderId, 
                 command.LegalEntityAccountId);
@@ -70,7 +71,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 (ReservationStatus)reservation.Status,
                 reservation.Course,
                 reservation.ProviderId,
-                reservation.AccountLegalEntityId
+                reservation.AccountLegalEntityId,
+                reservation.AccountLegalEntityName
             );
             return mapReservation;
         }
@@ -88,7 +90,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 Status = (short)reservation.Status,
                 CourseId = reservation.CourseId,
                 AccountLegalEntityId = reservation.LegalEntityAccountId,
-                ProviderId = reservation.ProviderId
+                ProviderId = reservation.ProviderId,
+                AccountLegalEntityName = reservation.AccountLegalEntityName
             };
         }
     }

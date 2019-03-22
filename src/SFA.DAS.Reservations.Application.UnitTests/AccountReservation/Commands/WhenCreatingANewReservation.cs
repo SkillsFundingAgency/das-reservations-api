@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             _cancellationToken = new CancellationToken();
               
-            _reservationCreated = new Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow,DateTime.UtcNow, ReservationStatus.Pending, new Course(),0,0);
+            _reservationCreated = new Reservation(_expectedReservationId,ExpectedAccountId,DateTime.UtcNow, 1, "TestName");
             
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
