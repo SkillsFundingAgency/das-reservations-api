@@ -35,7 +35,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 CreatedDate = DateTime.Today,
                 Id = _expectedReservationId,
                 IsLevyAccount = true,
-                Status = 2
+                Status = 2,
+                AccountLegalEntityName = "TestName"
             };
             _reservationRepository.Setup(x => x.GetById(_expectedReservationId))
                 .ReturnsAsync(_expectedReservation);
@@ -68,6 +69,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.AreEqual(_expectedReservation.CreatedDate, actual.CreatedDate);
             Assert.AreEqual(_expectedReservation.IsLevyAccount, actual.IsLevyAccount);
             Assert.AreEqual(_expectedReservation.Status, (short)actual.Status);
+            Assert.AreEqual(_expectedReservation.AccountLegalEntityName, actual.AccountLegalEntityName);
+            
         }
 
         [Test]

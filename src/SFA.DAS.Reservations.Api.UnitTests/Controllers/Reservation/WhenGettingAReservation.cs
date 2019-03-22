@@ -11,7 +11,6 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
-using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
@@ -30,7 +29,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         {
             _accountReservationsResult = new GetReservationResponse
             {
-                Reservation = new Domain.Reservations.Reservation(null, _expectedReservationId, ExpectedAccountId, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow, ReservationStatus.Pending, null)
+                Reservation = new Domain.Reservations.Reservation(null, _expectedReservationId, ExpectedAccountId, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow, ReservationStatus.Pending, null,0,0,"")
             };
             
             _mediator = new Mock<IMediator>();

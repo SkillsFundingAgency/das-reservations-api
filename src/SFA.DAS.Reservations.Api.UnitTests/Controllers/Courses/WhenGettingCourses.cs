@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Courses
         public void Arrange()
         {
             _mediator = new Mock<IMediator>();
-            _coursesResponse = new GetCoursesResponse{Courses = new List<Domain.Courses.Course>()};
+            _coursesResponse = new GetCoursesResponse{Courses = new List<Domain.ApprenticeshipCourse.Course>()};
             
             _mediator.Setup(x => x.Send(It.IsAny<GetCoursesQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_coursesResponse);

@@ -18,6 +18,9 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.IsLevyAccount).HasColumnName(@"IsLevyAccount").HasColumnType("tinyint").IsRequired();
             builder.Property(x => x.Status).HasColumnName(@"Status").HasColumnType("tinyint").IsRequired();
             builder.Property(x => x.CourseId).HasColumnName(@"CourseId").HasColumnType("varchar").HasMaxLength(20);
+            builder.Property(x => x.AccountLegalEntityName).HasColumnName(@"AccountLegalEntityName").HasColumnType("varchar").HasMaxLength(100);
+            builder.Property(x => x.ProviderId).HasColumnName(@"ProviderId").HasColumnType("int");
+            builder.Property(x => x.AccountLegalEntityId).HasColumnName(@"AccountLegalEntityId").HasColumnType("bigint");
 
             builder.HasOne(c => c.Course).WithMany(c => c.Reservations)
                    .HasForeignKey(c => c.CourseId);

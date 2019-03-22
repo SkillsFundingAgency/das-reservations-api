@@ -34,26 +34,29 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservations;
         }
 
-        public async Task<Reservation> CreateAccountReservation(Guid id, long accountId, DateTime startDate)
-        {
-            return await CreateAccountReservation(id, accountId, startDate, null);
-        }
-
-        public async Task<Reservation> CreateAccountReservation(Guid id, long accountId, DateTime startDate, string courseId)
-        {
-            var reservation = new Reservation(id, accountId, startDate, _options.Value.ExpiryPeriodInMonths, courseId);
-            
-            var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
-            var result = MapReservation(entity);
-
-            return result;
-        }
-
         public async Task<Reservation> GetReservation(Guid id)
         {
             var reservation = await _reservationRepository.GetById(id);
 
             return reservation == null ? null : MapReservation(reservation);
+        }
+
+        public async Task<Reservation> CreateAccountReservation(IReservationRequest command)
+        {
+            var reservation = new Reservation(
+                command.Id,
+                command.AccountId, 
+                command.StartDate,
+                _options.Value.ExpiryPeriodInMonths,
+                command.AccountLegalEntityName,
+                command.CourseId,
+                command.ProviderId, 
+                command.LegalEntityAccountId);
+
+            var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
+            var result = MapReservation(entity);
+
+            return result;
         }
 
         private Reservation MapReservation(Domain.Entities.Reservation reservation)
@@ -66,7 +69,10 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 reservation.StartDate,
                 reservation.ExpiryDate,
                 (ReservationStatus)reservation.Status,
-                reservation.Course
+                reservation.Course,
+                reservation.ProviderId,
+                reservation.AccountLegalEntityId,
+                reservation.AccountLegalEntityName
             );
             return mapReservation;
         }
@@ -82,7 +88,10 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 IsLevyAccount = reservation.IsLevyAccount,
                 StartDate = reservation.StartDate,
                 Status = (short)reservation.Status,
-                CourseId = reservation.CourseId
+                CourseId = reservation.CourseId,
+                AccountLegalEntityId = reservation.LegalEntityAccountId,
+                ProviderId = reservation.ProviderId,
+                AccountLegalEntityName = reservation.AccountLegalEntityName
             };
         }
     }

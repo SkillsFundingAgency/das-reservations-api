@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 
 namespace SFA.DAS.Reservations.Api.Models
 {

@@ -30,7 +30,10 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
             {
                 validationResult.AddError(nameof(item.StartDate));
             }
-
+            if (string.IsNullOrEmpty(item.AccountLegalEntityName))
+            {
+                validationResult.AddError(nameof(item.AccountLegalEntityName));
+            }
             if (string.IsNullOrEmpty(item.CourseId))
             {
                 return validationResult;

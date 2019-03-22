@@ -6,7 +6,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -36,9 +35,12 @@ namespace SFA.DAS.Reservations.Api
 
         public Startup(IConfiguration configuration)
         {
+            Configuration = configuration;
+
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("appsettings.development.json", !Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
@@ -61,17 +63,10 @@ namespace SFA.DAS.Reservations.Api
 
             var serviceProvider = services.BuildServiceProvider();
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
-            var azureActiveDirectoryConfiguration = serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
 
-            services.Configure<CookiePolicyOptions>(options =>
+            if (!ConfigurationIsLocalOrDev())
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            if (!Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
-            {
+                var azureActiveDirectoryConfiguration = serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
                 services.AddAuthorization(o =>
                 {
                     o.AddPolicy("default", policy =>
@@ -113,24 +108,30 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddMvc(o =>
             {
-                if (!Configuration["Environment"].Equals("Local", StringComparison.CurrentCultureIgnoreCase))
+                if (!ConfigurationIsLocalOrDev())
                 {
                     o.Filters.Add(new AuthorizeFilter("default"));
                 }
-                    
                 
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
+            if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
+            }
+            else
+            {
+                services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
+            }
+            
             services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
 
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsEnvironment("LOCAL"))
+            if (ConfigurationIsLocalOrDev())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -141,8 +142,6 @@ namespace SFA.DAS.Reservations.Api
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
             
             app.UseMvc(routes =>
             {
@@ -150,6 +149,11 @@ namespace SFA.DAS.Reservations.Api
                     name: "default",
                     template: "api/{controller=Reservation}/{action=Index}/{id?}");
             });
+        }
+        private bool ConfigurationIsLocalOrDev()
+        {
+            return Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }

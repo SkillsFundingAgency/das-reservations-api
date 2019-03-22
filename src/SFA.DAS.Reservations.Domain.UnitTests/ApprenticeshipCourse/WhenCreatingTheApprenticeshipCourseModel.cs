@@ -19,15 +19,6 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
             var expectedType = isStandard ? ApprenticeshipType.Standard : ApprenticeshipType.Framework;
             Assert.AreEqual(expectedType, actualApprenticeship.Type);
         }
-
-        [Test]
-        public void Then_The_Course_Description_Is_Taken_From_The_Title_And_Level()
-        {
-            //Arrange Act
-            var actualApprenticeship = new Course("", "Some title", "1");
-            
-            //Assert
-            Assert.AreEqual("Some title - Level 1", actualApprenticeship.CourseDescription);
-        }
+        
     }
 }
