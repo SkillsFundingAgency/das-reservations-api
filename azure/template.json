@@ -12,7 +12,8 @@
       "type": "string"
     },
     "sharedAppServicePlanName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "sharedSqlServerName": {
       "type": "string"
