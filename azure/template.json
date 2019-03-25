@@ -11,10 +11,6 @@
     "environmentName": {
       "type": "string"
     },
-    "sharedAppServicePlanName": {
-      "type": "string",
-      "defaultValue": ""
-    },
     "sharedSqlServerName": {
       "type": "string"
     },
@@ -57,12 +53,10 @@
       "type": "string"
     },
     "keyVaultName": {
-      "type": "string",
-      "defaultValue": ""
+      "type": "string"
     },
     "keyVaultResourceGroup": {
-      "type": "string",
-      "defaultValue": ""
+      "type": "string"
     }
   },
   "variables": {
@@ -70,14 +64,12 @@
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "appServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
     "appServicePlanName": "[concat(variables('resourceNamePrefix'), 'api-asp')]",
-    "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
-    "deployAppServicePlan": "[equals(length(parameters('sharedAppServicePlanName')), 0)]"
+    "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]"
   },
   "resources": [
     {
       "apiVersion": "2017-05-10",
       "name": "app-service-plan",
-      "condition": "[variables('deployAppServicePlan')]",
       "type": "Microsoft.Resources/deployments",
       "properties": {
         "mode": "Incremental",
@@ -101,7 +93,6 @@
     {
       "apiVersion": "2017-05-10",
       "name": "app-service-certificate",
-      "condition": "[variables('deployAppServicePlan')]",
       "type": "Microsoft.Resources/deployments",
       "properties": {
         "mode": "Incremental",
@@ -157,10 +148,10 @@
             "value": "[variables('appServiceName')]"
           },
           "appServicePlanName": {
-            "value": "[if(variables('deployAppServicePlan'), variables('appServicePlanName'), parameters('sharedAppServicePlanName'))]"
+            "value": "[variables('appServicePlanName')]"
           },
           "appServicePlanResourceGroup": {
-            "value": "[if(variables('deployAppServicePlan'), resourceGroup().name, parameters('sharedResourceGroup'))]"
+            "value": "[resourceGroup().name]"
           },
           "appServiceAppSettings": {
             "value": [
