@@ -8,6 +8,10 @@
     "serviceName": {
       "type": "string"
     },
+    "appServiceAllowedIPs": {
+      "type": "array",
+      "defaultValue": []
+    },
     "environmentName": {
       "type": "string"
     },
@@ -186,6 +190,9 @@
           },
           "certificateThumbprint": {
             "value": "[reference(resourceId(parameters('sharedResourceGroup'), 'Microsoft.Web/certificates', parameters('certificateName')), '2016-03-01').Thumbprint]"
+          },
+          "ipSecurityRestrictions": {
+            "value": "[parameters('appServiceAllowedIPs')]"
           }
         }
       }
