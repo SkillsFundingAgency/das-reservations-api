@@ -3,7 +3,7 @@
 
 ## Build Status
 
-[![Build Status](https://sfa-gov-uk.visualstudio.com/Digital Apprenticeship Service/_apis/build/status/Manage Funding/das-reservations-api?branchName=master)](https://sfa-gov-uk.visualstudio.com/Digital Apprenticeship Service/_build/latest?definitionId=1387&branchName=master)
+![Build Status](https://sfa-gov-uk.visualstudio.com/Digital%20Apprenticeship%20Service/_apis/build/status/Manage%20Funding/das-reservations-api?branchName=master)
 
 ## Requirements
 
