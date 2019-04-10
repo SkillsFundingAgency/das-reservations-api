@@ -99,13 +99,12 @@ namespace SFA.DAS.Reservations.Api
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
             services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
+            services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
+            services.AddTransient<ICourseRepository,CourseRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();
             services.AddTransient<IRulesService, RulesService>();
-
-            services.AddMediatR(typeof(GetCoursesQueryHandler).Assembly);
-            services.AddTransient<ICourseRepository,CourseRepository>();
             services.AddTransient<ICourseService, CourseService>();
-
+            
             services.AddMvc(o =>
             {
                 if (!ConfigurationIsLocalOrDev())

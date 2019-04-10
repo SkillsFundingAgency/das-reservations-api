@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class GlobalRuleRepository
+    public class GlobalRuleRepository : IGlobalRuleRepository
     {
         private readonly IReservationsDataContext _context;
 
