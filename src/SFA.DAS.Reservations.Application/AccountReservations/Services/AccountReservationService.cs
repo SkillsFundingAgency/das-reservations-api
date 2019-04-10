@@ -51,7 +51,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 command.AccountLegalEntityName,
                 command.CourseId,
                 command.ProviderId, 
-                command.LegalEntityAccountId);
+                command.AccountLegalEntityId);
 
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);
@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 StartDate = reservation.StartDate,
                 Status = (short)reservation.Status,
                 CourseId = reservation.CourseId,
-                AccountLegalEntityId = reservation.LegalEntityAccountId,
+                AccountLegalEntityId = reservation.AccountLegalEntityId,
                 ProviderId = reservation.ProviderId,
                 AccountLegalEntityName = reservation.AccountLegalEntityName
             };

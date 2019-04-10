@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         private const int ExpiryPeriodInMonths = 5;
         private const long ExpectedAccountId = 12344;
         private const int ExpectedProviderId = 66552;
-        private const long ExpectedLegalEntityAccountId = 549785;
+        private const long ExpectedAccountLegalEntityId = 549785;
         private const string ExpectedAccountLegalEntityName = "TestName";
         private Course _expectedCourse;
         private DateTime _expectedExpiryDate;
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             _reservationRepository
                 .Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.Id.Equals(_expectedReservationId))))
-                .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId, Course = _expectedCourse,ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedLegalEntityAccountId});
+                .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId, Course = _expectedCourse,ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedAccountLegalEntityId});
             
             _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object);
         }
@@ -157,7 +157,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 StartDate = _expectedStartDate,
                 Id = _expectedReservationId,
                 CourseId = _expectedCourse.CourseId,
-                LegalEntityAccountId = ExpectedLegalEntityAccountId,
+                AccountLegalEntityId = ExpectedAccountLegalEntityId,
                 ProviderId = ExpectedProviderId
             };
 
@@ -174,7 +174,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                    c.CourseId.Equals(_expectedCourse.CourseId) &&
                    c.Course == null &&
                    c.ProviderId.Equals(ExpectedProviderId) &&
-                   c.AccountLegalEntityId.Equals(ExpectedLegalEntityAccountId)
+                   c.AccountLegalEntityId.Equals(ExpectedAccountLegalEntityId)
             )));
         }
 
@@ -188,7 +188,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 StartDate = _expectedStartDate,
                 Id = _expectedReservationId,
                 CourseId = _expectedCourse.CourseId,
-                LegalEntityAccountId = ExpectedLegalEntityAccountId,
+                AccountLegalEntityId = ExpectedAccountLegalEntityId,
                 ProviderId = ExpectedProviderId
             };
 
@@ -202,7 +202,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.AreEqual(_expectedCourse.CourseId, actual.Course.CourseId);
             Assert.AreEqual(_expectedCourse.Title, actual.Course.Title);
             Assert.AreEqual(ExpectedProviderId, actual.ProviderId);
-            Assert.AreEqual(ExpectedLegalEntityAccountId, actual.LegalEntityAccountId);
+            Assert.AreEqual(ExpectedAccountLegalEntityId, actual.AccountLegalEntityId);
             Assert.AreEqual(_expectedCourse.Level.ToString(), actual.Course.Level);
             Assert.IsNotNull(actual.Rules);
         }

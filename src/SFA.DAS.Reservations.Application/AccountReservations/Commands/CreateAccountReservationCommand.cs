@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
         public DateTime StartDate { get; set; }
         public string CourseId { get; set; }
         public int? ProviderId { get; set; }
-        public long? LegalEntityAccountId { get; set; }
+        public long? AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
     }
 }

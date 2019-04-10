@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private CreateAccountReservationResult _accountReservationsResult;
         private const long ExpectedAccountId = 123234;
         private const string ExpectedAccountLegalEntityName= "TestName";
-        private readonly long? _expectedLegalEntityAccountId = 18723918;
+        private readonly long? _expectedAccountLegalEntityId = 18723918;
         private readonly int? _expectedProviderId = 18723918;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);
@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 StartDate = _expectedStartDate,
                 CourseId = _expectedCourseId,
                 ProviderId = _expectedProviderId,
-                LegalEntityAccountId = _expectedLegalEntityAccountId,
+                AccountLegalEntityId = _expectedAccountLegalEntityId,
                 AccountLegalEntityName = ExpectedAccountLegalEntityName
             };
 
@@ -77,7 +77,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             _mediator.Verify(m => m.Send(It.Is<CreateAccountReservationCommand>(command => 
                     command.CourseId.Equals(_expectedCourseId) &&
                     command.ProviderId.Equals(_expectedProviderId) &&
-                    command.LegalEntityAccountId.Equals(_expectedLegalEntityAccountId) &&
+                    command.AccountLegalEntityId.Equals(_expectedAccountLegalEntityId) &&
                     command.AccountId.Equals(ExpectedAccountId) &&
                     command.StartDate.Equals(_expectedStartDate) &&
                     command.Id.Equals(_expectedReservationId) &&
