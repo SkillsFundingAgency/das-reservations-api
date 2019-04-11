@@ -6,7 +6,7 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Rules.Services
 {
-    public class GlobalRulesService
+    public class GlobalRulesService : IGlobalRulesService
     {
         private readonly IGlobalRuleRepository _repository;
 
