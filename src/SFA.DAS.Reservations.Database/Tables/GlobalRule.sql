@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[GlobalRule]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[Id] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[ActiveFrom] DATETIME NULL,
 	[ActiveTo] DATETIME NULL, 
 	[Restriction] TINYINT NOT NULL,
