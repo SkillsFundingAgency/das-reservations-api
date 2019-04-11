@@ -16,5 +16,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
         public DateTime? ActiveFrom { get; }
         public GlobalRuleType RuleType { get; }
         public AccountRestriction Restriction { get; }
+        public string RuleTypeText => Enum.GetName(typeof(GlobalRuleType), RuleType);
+        public string RestrictionText => Enum.GetName(typeof(AccountRestriction), Restriction);
     }
 }
