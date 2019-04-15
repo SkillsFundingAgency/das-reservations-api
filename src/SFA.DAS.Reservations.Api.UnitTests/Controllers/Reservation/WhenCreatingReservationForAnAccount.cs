@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
@@ -13,6 +16,7 @@ using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
@@ -116,6 +120,29 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             Assert.IsNotNull(actualError);
             Assert.AreEqual($"{expectedValidationMessage}\r\nParameter name: {expectedParam}", actualError.Message);
             Assert.AreEqual(expectedParam, actualError.Params);
+        }
+
+        [Test]
+        public async Task Then_If_There_Are_Global_Rules_Failures_A_Unprocessable_Entity_Response_Is_Returned()
+        {
+            //Arrange
+            _mediator.Setup(x => x.Send(It.IsAny<CreateAccountReservationCommand>(),It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new CreateAccountReservationResult
+                {
+                    Reservation = null,
+                    Rule = new Domain.Rules.GlobalRule(new Domain.Entities.GlobalRule())
+                });
+
+
+            //Act
+            var actual = await _reservationsController.Create(new Models.Reservation());
+
+            //Assert
+            var result = actual as UnprocessableEntityObjectResult;
+            Assert.IsNotNull(result?.StatusCode);
+            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, (HttpStatusCode)result.StatusCode);
+            var errors = result.Value as SerializableError;
+            Assert.IsNotNull(errors?.FirstOrDefault());
         }
     }
 }
