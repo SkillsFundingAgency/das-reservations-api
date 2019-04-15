@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         int? ProviderId { get; }
         long? AccountLegalEntityId { get; }
         string AccountLegalEntityName { get; }
+        bool IsLevyAccount { get; }
     }
 }

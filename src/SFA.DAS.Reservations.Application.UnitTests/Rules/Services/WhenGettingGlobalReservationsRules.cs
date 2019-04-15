@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Rules;
 using GlobalRule = SFA.DAS.Reservations.Domain.Entities.GlobalRule;
 
@@ -30,7 +32,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>()))
                 .ReturnsAsync(new List<GlobalRule>{_globalRule});
 
-            _globalRulesService = new GlobalRulesService(_repository.Object);
+            _globalRulesService = new GlobalRulesService(_repository.Object, Mock.Of<IOptions<ReservationsConfiguration>>());
         }
 
         [Test]
