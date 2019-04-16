@@ -95,10 +95,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
 
             //Assert
             _globalRuleService.Verify(x=>x.GetRules(),Times.Once);
-            Assert.IsNotNull(actual.GlobalRule);
+            Assert.IsNotNull(actual.GlobalRules);
             _service.Verify(x=>x.GetRules(),Times.Never);
             Assert.IsNull(actual.Rules);
-            Assert.AreEqual(ExpectedReservationGlobalRuleId, actual.GlobalRule[0].Id);
+            Assert.AreEqual(ExpectedReservationGlobalRuleId, actual.GlobalRules[0].Id);
         }
     }
 }

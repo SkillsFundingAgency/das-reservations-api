@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
             {
                 return new GetRulesResult
                 {
-                    GlobalRule = globalRules
+                    GlobalRules = globalRules
                 };
             }
 

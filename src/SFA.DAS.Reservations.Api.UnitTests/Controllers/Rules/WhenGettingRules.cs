@@ -61,7 +61,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
             Assert.IsNotNull(result.Value);
             var actualRules = result.Value as GetRulesResult;
-            Assert.AreEqual(_rulesResult.GlobalRule, actualRules.GlobalRule);
+            Assert.AreEqual(_rulesResult.GlobalRules, actualRules.GlobalRules);
         }
     }
 }
