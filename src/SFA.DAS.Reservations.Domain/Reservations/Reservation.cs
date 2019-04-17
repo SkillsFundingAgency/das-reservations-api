@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class Reservation : IReservationRequest
     {
-        public Reservation(Guid id, long accountId, DateTime startDate, int expiryPeriodInMonths, string accountLegalEntityName, string courseId = null, int? providerId = null, long? legalEntityAccountId = null)
+        public Reservation(Guid id, long accountId, DateTime startDate, int expiryPeriodInMonths, string accountLegalEntityName, string courseId = null, int? providerId = null, long? accountLegalEntityId = null, bool isLevyAccount = false)
         {
             Id = id;
             AccountId = accountId;
@@ -20,8 +20,9 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             ExpiryDate = GetExpiryDateFromStartDate(expiryPeriodInMonths);
             CourseId = courseId;
             ProviderId = providerId;
-            LegalEntityAccountId = legalEntityAccountId;
+            AccountLegalEntityId = accountLegalEntityId;
             AccountLegalEntityName = accountLegalEntityName;
+            IsLevyAccount = isLevyAccount;
         }
 
         public Reservation(Func<DateTime, Task<IList<Rule>>> rules,
@@ -34,7 +35,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             ReservationStatus status,
             Course reservationCourse,
             int? providerId,
-            long? legalEntityAccountId, string accountLegalEntityName)
+            long? accountLegalEntityId, string accountLegalEntityName)
         {
             Id = id;
             AccountId = accountId;
@@ -46,7 +47,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             Rules = rules != null ? GetRulesForAccountType(GetRules(rules)) : null;
             Course = MapCourse(reservationCourse);
             ProviderId = providerId;
-            LegalEntityAccountId = legalEntityAccountId;
+            AccountLegalEntityId = accountLegalEntityId;
             AccountLegalEntityName = accountLegalEntityName;
         }
 
@@ -73,7 +74,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         public ReservationStatus Status { get; }
         public int? ProviderId { get; }
-        public long? LegalEntityAccountId { get; }
+        public long? AccountLegalEntityId { get; }
         public string AccountLegalEntityName { get; }
 
         private IList<Rule> GetRules(Func<DateTime, Task<IList<Rule>>> getRules)

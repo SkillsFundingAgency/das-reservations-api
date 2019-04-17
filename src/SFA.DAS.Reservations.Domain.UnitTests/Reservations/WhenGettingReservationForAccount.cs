@@ -138,7 +138,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             Assert.AreEqual(expectedStartDate, _reservation.StartDate);
             Assert.AreEqual(expectedCourseId, _reservation.CourseId);
             Assert.AreEqual(expectedProviderId, _reservation.ProviderId);
-            Assert.AreEqual(expectedLegalEntityAccountId, _reservation.LegalEntityAccountId);
+            Assert.AreEqual(expectedLegalEntityAccountId, _reservation.AccountLegalEntityId);
             Assert.AreEqual(expectedLegalEntityAccountName, _reservation.AccountLegalEntityName);
 
         }
@@ -163,7 +163,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             Assert.AreEqual(expecteLegalEntityAccountName, _reservation.AccountLegalEntityName);
             Assert.IsNull(_reservation.CourseId);
             Assert.IsNull(_reservation.ProviderId);
-            Assert.IsNull(_reservation.LegalEntityAccountId);
+            Assert.IsNull(_reservation.AccountLegalEntityId);
         }
 
         private Reservation CreateReservation()

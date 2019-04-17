@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
@@ -53,10 +54,17 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     StartDate = reservation.StartDate,
                     CourseId = reservation.CourseId,
                     ProviderId = reservation.ProviderId,
-                    LegalEntityAccountId = reservation.LegalEntityAccountId,
+                    AccountLegalEntityId = reservation.AccountLegalEntityId,
                     AccountLegalEntityName = reservation.AccountLegalEntityName
                     
                 });
+
+                if (response.Rule != null)
+                {
+                    var modelStateDictionary = new ModelStateDictionary();
+                    modelStateDictionary.AddModelError(response.Rule.Id.ToString(),$"{response.Rule.RuleTypeText} for {response.Rule.RestrictionText}");
+                    return UnprocessableEntity(modelStateDictionary);
+                }
 
                 return Created($"api/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
             }

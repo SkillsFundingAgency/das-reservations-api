@@ -7,7 +7,9 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
+using GlobalRule = SFA.DAS.Reservations.Domain.Rules.GlobalRule;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
@@ -23,6 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         private Mock<IAccountReservationService> _accountReservationsService;
         private Mock<IValidator<CreateAccountReservationCommand>> _validator;
         private Reservation _reservationCreated;
+        private Mock<IGlobalRulesService> _globalRulesService;
 
         [SetUp]
         public void Arrange()
@@ -37,6 +40,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _validator.Setup(x=>x.ValidateAsync(It.Is<CreateAccountReservationCommand>(c=>c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new ValidationResult());
 
+            _globalRulesService = new Mock<IGlobalRulesService>();
+            _globalRulesService.Setup(x => x.GetRules()).ReturnsAsync(new List<GlobalRule>());
+
             _command = new CreateAccountReservationCommand {Id = _expectedReservationId, AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
 
             _accountReservationsService = new Mock<IAccountReservationService>();
@@ -45,7 +51,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 .ReturnsAsync(_reservationCreated);
 
 
-            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object);
+            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object);
         }
 
         [Test]
@@ -72,6 +78,30 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _accountReservationsService.Verify(x=>x.CreateAccountReservation(_command),Times.Once);
         }
 
+        [Test]
+        public async Task Then_The_Request_Is_Validated_Against_The_Global_Rules()
+        {
+            //Act 
+            await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _globalRulesService.Verify(x=>x.CheckReservationAgainstRules(_command),Times.Once);
+        }
+
+        [Test]
+        public async Task Then_If_There_Are_Global_Restrictions_In_Place_The_Reservation_Is_Not_Created_And_Global_Rules_Returned()
+        {
+            //Arrange
+            _globalRulesService.Setup(x => x.CheckReservationAgainstRules(_command))
+                .ReturnsAsync(new GlobalRule(new Domain.Entities.GlobalRule {Id = 1, Restriction = 1, RuleType = 1}));
+
+            //Act
+            var actual = await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(_command), Times.Never);
+            Assert.IsNotNull(actual.Rule);
+        }
 
         [Test]
         public async Task Then_The_Reservation_Is_Returned_In_The_Response()
