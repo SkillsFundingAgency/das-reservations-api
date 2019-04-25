@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -8,7 +7,6 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
@@ -16,7 +14,6 @@ using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
@@ -27,7 +24,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private CreateAccountReservationResult _accountReservationsResult;
         private const long ExpectedAccountId = 123234;
         private const string ExpectedAccountLegalEntityName= "TestName";
-        private readonly long? _expectedAccountLegalEntityId = 18723918;
+        private readonly long _expectedAccountLegalEntityId = 18723918;
         private readonly int? _expectedProviderId = 18723918;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);

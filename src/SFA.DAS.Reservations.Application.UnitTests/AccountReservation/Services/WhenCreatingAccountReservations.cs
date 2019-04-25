@@ -142,8 +142,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _reservationRepository.Verify(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(
                 c => c.CourseId == null &&
                      c.Course == null &&
-                     c.ProviderId == null &&
-                     c.AccountLegalEntityId == null
+                     c.ProviderId == null
             )));
         }
 

@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class Reservation : IReservationRequest
     {
-        public Reservation(Guid id, long accountId, DateTime startDate, int expiryPeriodInMonths, string accountLegalEntityName, string courseId = null, int? providerId = null, long? accountLegalEntityId = null, bool isLevyAccount = false)
+        public Reservation(Guid id, long accountId, DateTime startDate, int expiryPeriodInMonths, string accountLegalEntityName, string courseId = null, int? providerId = null, long accountLegalEntityId = 0, bool isLevyAccount = false)
         {
             Id = id;
             AccountId = accountId;
@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             ReservationStatus status,
             Course reservationCourse,
             int? providerId,
-            long? accountLegalEntityId, string accountLegalEntityName)
+            long accountLegalEntityId, string accountLegalEntityName)
         {
             Id = id;
             AccountId = accountId;
@@ -74,7 +74,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         public ReservationStatus Status { get; }
         public int? ProviderId { get; }
-        public long? AccountLegalEntityId { get; }
+        public long AccountLegalEntityId { get; }
         public string AccountLegalEntityName { get; }
 
         private IList<Rule> GetRules(Func<DateTime, Task<IList<Rule>>> getRules)
