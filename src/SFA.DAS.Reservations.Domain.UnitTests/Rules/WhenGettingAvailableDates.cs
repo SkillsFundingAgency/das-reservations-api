@@ -1,0 +1,93 @@
+﻿using System;
+using System.Linq;
+using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Rules;
+
+namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
+{
+    public class WhenGettingAvailableDates
+    {
+        private DateTime _expectedMinStartDate;
+        private DateTime _expectedMaxStartDate;
+
+        private const int ExpectedExpiryPeriod = 10;
+
+        [SetUp]
+        public void Arrange()
+        {
+            _expectedMinStartDate = new DateTime(2018, 10, 01);
+            _expectedMaxStartDate = DateTime.UtcNow.AddMonths(3);
+        }
+
+        [Test]
+        public void Then_The_Available_Dates_Are_Returned_Based_On_The_Configurable_Months_Allowed()
+        {
+            //Act
+            var actual = new AvailableDates(ExpectedExpiryPeriod);
+
+            //Assert
+            Assert.AreEqual(ExpectedExpiryPeriod, actual.Dates.Count);
+            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.AddMonths(ExpectedExpiryPeriod - 1).ToString("MMyyyy"), actual.Dates.Last().ToString("MMyyyy"));
+
+        }
+
+        [Test]
+        public void Then_If_The_Min_Date_Is_Set_The_First_Month_Starts_From_There()
+        {
+            //Act
+            var actual = new AvailableDates(minStartDate: _expectedMinStartDate);
+
+            //Assert
+            Assert.AreEqual(_expectedMinStartDate.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
+        }
+
+        [Test]
+        public void Then_If_The_Max_Date_Is_Set_The_Available_Date_Does_Not_Exceed_This_Value_From_The_Configurable_Number_Of_Months()
+        {
+            //Act
+            var actual = new AvailableDates(maxStartDate:_expectedMaxStartDate);
+
+            //Assert
+            Assert.AreEqual(4, actual.Dates.Count);
+            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
+            Assert.AreEqual(_expectedMaxStartDate.ToString("MMyyyy"), actual.Dates.Last().ToString("MMyyyy"));
+
+        }
+
+        [Test]
+        public void Then_If_No_Values_Have_Been_Supplied_Then_The_Default_Of_Six_Months_Are_Shown_From_Today()
+        {
+            //Arrange
+            const int expiryDefault = 6;
+            
+            //Act
+            var actual = new AvailableDates();
+
+            //Assert
+            Assert.AreEqual(expiryDefault, actual.Dates.Count);
+            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.AddMonths(expiryDefault - 1).ToString("MMyyyy"), actual.Dates.Last().ToString("MMyyyy"));
+        }
+
+        [Test]
+        public void Then_The_Dates_Are_Set_To_The_First_Of_The_Month()
+        { 
+            //Act
+            var actual = new AvailableDates();
+
+            //Assert
+            Assert.IsTrue(actual.Dates.All(c=>c.Day.Equals(1)));
+        }
+
+        [Test]
+        public void Then_Only_A_Maximum_Of_Twelve_Available_Dates_Will_Be_Returned()
+        {
+            //Act
+            var actual = new AvailableDates(20);
+
+            //Actual
+            Assert.AreEqual(12,actual.Dates.Count);
+        }
+    }
+}
