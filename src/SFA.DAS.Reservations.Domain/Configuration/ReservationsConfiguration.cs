@@ -8,5 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Configuration
     {
         public virtual int ExpiryPeriodInMonths { get; set; }
         public virtual string ConnectionString { get; set; }
+        public virtual DateTime? ExpiryPeriodMinDate { get; set; }
+        public virtual DateTime? ExpiryPeriodMaxDate { get; set; }
     }
 }

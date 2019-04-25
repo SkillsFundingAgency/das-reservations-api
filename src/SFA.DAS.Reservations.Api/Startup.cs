@@ -105,6 +105,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddTransient<IRulesService, RulesService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IGlobalRulesService, GlobalRulesService>();
+            services.AddTransient<IAvailableDatesService, AvailableDatesService>();
             
             services.AddMvc(o =>
             {
