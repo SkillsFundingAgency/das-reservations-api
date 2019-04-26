@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
 
 
         [Test]
-        public async Task Then_The_Rules_Are_Returned()
+        public async Task Then_The_AvailableDates_Are_Returned()
         {
             //Act
             var actual = await _rulesController.GetAvailableDates();
