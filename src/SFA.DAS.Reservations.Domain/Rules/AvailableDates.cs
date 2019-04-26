@@ -7,10 +7,10 @@ namespace SFA.DAS.Reservations.Domain.Rules
     {
         private const int DefaultExpiryMonths = 6;
 
-        public AvailableDates(int expiryPeriodInMonths =6, DateTime? minStartDate = null, DateTime? maxStartDate = null)
+        public AvailableDates(int expiryPeriodInMonths = 6, DateTime? minStartDate = null,
+            DateTime? maxStartDate = null)
         {
-            var expiryMonths = expiryPeriodInMonths == 0 ?
-                DefaultExpiryMonths : expiryPeriodInMonths;
+            var expiryMonths = expiryPeriodInMonths == 0 ? DefaultExpiryMonths : expiryPeriodInMonths;
 
             if (expiryMonths > 12)
             {
@@ -18,16 +18,28 @@ namespace SFA.DAS.Reservations.Domain.Rules
             }
 
             var startDate = minStartDate ?? DateTime.UtcNow;
+            var twoMonthsFromNow = startDate.AddMonths(2);
+            var lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
 
-            var availableDates = new List<DateTime>
+            var availableDates = new List<AvailableDateStartWindow>
             {
-                new DateTime(startDate.Year, startDate.Month, 1)
+                new AvailableDateStartWindow
+                {
+                    StartDate = new DateTime(startDate.Year, startDate.Month, 1),
+                    EndDate = new DateTime(twoMonthsFromNow.Year, twoMonthsFromNow.Month, lastDayOfTheMonth)
+                }
             };
 
             for (var i = 1; i < expiryMonths; i++)
             {
                 var monthToAdd = startDate.AddMonths(i);
-                availableDates.Add(new DateTime(monthToAdd.Year, monthToAdd.Month, 1));
+                twoMonthsFromNow = monthToAdd.AddMonths(2);
+                lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
+                availableDates.Add(new AvailableDateStartWindow
+                {
+                    StartDate = new DateTime(monthToAdd.Year, monthToAdd.Month, 1),
+                    EndDate = new DateTime(twoMonthsFromNow.Year, twoMonthsFromNow.Month, lastDayOfTheMonth)
+                });
 
                 if (maxStartDate.HasValue &&
                     monthToAdd >= maxStartDate)
@@ -39,6 +51,6 @@ namespace SFA.DAS.Reservations.Domain.Rules
             Dates = availableDates;
         }
 
-        public IList<DateTime> Dates { get; }
+        public IList<AvailableDateStartWindow> Dates { get; }
     }
 }

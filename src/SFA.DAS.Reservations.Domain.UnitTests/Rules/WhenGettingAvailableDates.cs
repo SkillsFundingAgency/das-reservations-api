@@ -27,8 +27,9 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
 
             //Assert
             Assert.AreEqual(ExpectedExpiryPeriod, actual.Dates.Count);
-            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
-            Assert.AreEqual(DateTime.UtcNow.AddMonths(ExpectedExpiryPeriod - 1).ToString("MMyyyy"), actual.Dates.Last().ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.AddMonths(ExpectedExpiryPeriod - 1).ToString("MMyyyy"), actual.Dates.Last().StartDate.ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.AddMonths(2).ToString("MMyyyy"), actual.Dates.First().EndDate.ToString("MMyyyy"));
 
         }
 
@@ -39,7 +40,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(minStartDate: _expectedMinStartDate);
 
             //Assert
-            Assert.AreEqual(_expectedMinStartDate.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
+            Assert.AreEqual(_expectedMinStartDate.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
         }
 
         [Test]
@@ -50,8 +51,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
 
             //Assert
             Assert.AreEqual(4, actual.Dates.Count);
-            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
-            Assert.AreEqual(_expectedMaxStartDate.ToString("MMyyyy"), actual.Dates.Last().ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
+            Assert.AreEqual(_expectedMaxStartDate.ToString("MMyyyy"), actual.Dates.Last().StartDate.ToString("MMyyyy"));
 
         }
 
@@ -66,18 +67,29 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
 
             //Assert
             Assert.AreEqual(expiryDefault, actual.Dates.Count);
-            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().ToString("MMyyyy"));
-            Assert.AreEqual(DateTime.UtcNow.AddMonths(expiryDefault - 1).ToString("MMyyyy"), actual.Dates.Last().ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
+            Assert.AreEqual(DateTime.UtcNow.AddMonths(expiryDefault - 1).ToString("MMyyyy"), actual.Dates.Last().StartDate.ToString("MMyyyy"));
         }
 
         [Test]
-        public void Then_The_Dates_Are_Set_To_The_First_Of_The_Month()
+        public void Then_The_Start_And_End_Window_Is_Set_To_Three_Months()
+        {
+            //Act
+            var actual = new AvailableDates();
+
+            //Assert
+            Assert.IsTrue(actual.Dates.All(c => (c.EndDate.Year - c.StartDate.Year) * 12 + c.EndDate.Month - c.StartDate.Month == 2));
+        }
+
+        [Test]
+        public void Then_The_Dates_Are_Set_To_The_First_Of_The_Month_And_The_EndDate_To_The_Liast()
         { 
             //Act
             var actual = new AvailableDates();
 
             //Assert
-            Assert.IsTrue(actual.Dates.All(c=>c.Day.Equals(1)));
+            Assert.IsTrue(actual.Dates.All(c=>c.StartDate.Day.Equals(1)));
+            Assert.IsTrue(actual.Dates.All(c=>c.EndDate.Day.Equals(DateTime.DaysInMonth(c.EndDate.Year,c.EndDate.Month))));
         }
 
         [Test]

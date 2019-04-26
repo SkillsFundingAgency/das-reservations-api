@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
         public async Task Then_The_Available_Dates_Service_Is_Called_And_Dates_Returned()
         {
             //Arrange
-            _availableDatesService.Setup(x => x.GetAvailableDates()).Returns(new List<DateTime>{new DateTime()});
+            _availableDatesService.Setup(x => x.GetAvailableDates()).Returns(new List<AvailableDateStartWindow> {new AvailableDateStartWindow()});
 
             //Act
             var actual = await _handler.Handle(new GetAvailableDatesQuery(), _cancellationToken);

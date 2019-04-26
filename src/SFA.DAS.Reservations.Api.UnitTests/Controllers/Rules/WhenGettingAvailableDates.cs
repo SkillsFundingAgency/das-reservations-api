@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
         public void Arrange()
         {
             _mediator = new Mock<IMediator>();
-            _datesResult = new GetAvailableDatesResult { AvailableDates = new List<DateTime>() };
+            _datesResult = new GetAvailableDatesResult { AvailableDates = new List<AvailableDateStartWindow>() };
             _mediator.Setup(x => x.Send(It.IsAny<GetAvailableDatesQuery>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_datesResult);
