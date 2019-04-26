@@ -18,9 +18,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         {
             //Arrange
             _options = new Mock<IOptions<ReservationsConfiguration>>();
-            _options.Setup(x => x.Value.ExpiryPeriodInMonths).Returns(8);
-            _options.Setup(x => x.Value.ExpiryPeriodMinDate).Returns(new DateTime(2018,10,01));
-            _options.Setup(x => x.Value.ExpiryPeriodMaxDate).Returns(new DateTime(2019,02,01));
+            _options.Setup(x => x.Value.NumberOfAvailableDates).Returns(8);
+            _options.Setup(x => x.Value.AvailableDatesMinDate).Returns(new DateTime(2018,10,01));
+            _options.Setup(x => x.Value.AvailableDatesMaxDate).Returns(new DateTime(2019,02,01));
             var service = new AvailableDatesService(_options.Object);
 
             //Act

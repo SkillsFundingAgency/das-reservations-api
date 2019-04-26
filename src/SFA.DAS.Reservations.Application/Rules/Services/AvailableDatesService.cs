@@ -17,8 +17,8 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         public IList<AvailableDateStartWindow> GetAvailableDates()
         {
-            var availableDates = new AvailableDates(_configuration.ExpiryPeriodInMonths,
-                _configuration.ExpiryPeriodMinDate, _configuration.ExpiryPeriodMaxDate);
+            var availableDates = new AvailableDates(_configuration.NumberOfAvailableDates,
+                _configuration.AvailableDatesMinDate, _configuration.AvailableDatesMaxDate);
             return availableDates.Dates;
         }
     }
