@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 
         private readonly DateTime _dateFrom = new DateTime(2019, 02, 10);
         private Mock<IOptions<ReservationsConfiguration>> _options;
+        private Mock<IReservationRepository> _reservationRepository;
 
         [SetUp]
         public void Arrange()
@@ -36,11 +37,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                         Id = 123
                     }
                 });
+            _reservationRepository = new Mock<IReservationRepository>();
+            _reservationRepository.Setup(x => x.GetAccountReservations(It.IsAny<long>()))
+                .ReturnsAsync(new List<Domain.Entities.Reservation>());
 
             _options = new Mock<IOptions<ReservationsConfiguration>>();
             _options.Setup(x => x.Value.ExpiryPeriodInMonths).Returns(1);
+            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(3);
 
-            _globalRulesService = new GlobalRulesService(_repository.Object, _options.Object);
+            _globalRulesService = new GlobalRulesService(_repository.Object, _options.Object, _reservationRepository.Object);
         }
 
         [Test]
@@ -119,6 +124,91 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 
             //Assert
             Assert.IsNotNull(actual);
+        }
+
+        [Test]
+        public async Task Then_The_Number_Of_Reservations_Limit_Is_Checked_For_The_Request()
+        {
+            //Arrange
+            var expectedAccountId = 123;
+            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+
+            //Act
+            await _globalRulesService.CheckReservationAgainstRules(reservation);
+
+            //Assert
+            _reservationRepository.Verify(x => x.GetAccountReservations(expectedAccountId), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_If_The_Max_Number_Of_Reservations_Has_Been_Met_Then_The_Rule_Is_Returned()
+        {
+            //Arrange
+            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            var expectedAccountId = 123;
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(1);
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation>{new Domain.Entities.Reservation()});
+
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
+
+            //Assert
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(AccountRestriction.Account,actual.Restriction);
+            Assert.AreEqual(GlobalRuleType.ReservationLimit, actual.RuleType);
+        }
+
+
+        [Test]
+        public async Task Then_If_The_Max_Number_Of_Reservations_Has_Not_Been_Met_Then_Null_Is_Returned()
+        {
+            //Arrange
+            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            var expectedAccountId = 123;
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(2);
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation> { new Domain.Entities.Reservation() });
+
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
+
+            //Assert
+            Assert.IsNull(actual);
+        }
+
+        [TestCase(1,true)]
+        [TestCase(2,true)]
+        [TestCase(3,false)]
+        [TestCase(4,false)]
+        public async Task Then_If_No_Maximum_Has_Been_Set_It_Defaults_To_Three_Reservations(int numberOfReservations, bool isNull)
+        {
+            //Arrange
+            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(0);
+            var expectedAccountId = 123;
+            var existingReservations = new List<Domain.Entities.Reservation>();
+            for (var i = 0; i<numberOfReservations;i++)
+            {
+                existingReservations.Add(new Domain.Entities.Reservation());
+            }
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId))
+                .ReturnsAsync(existingReservations);
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
+
+            //Assert
+            if (isNull)
+            {
+                Assert.IsNull(actual);
+            }
+            else
+            {
+                Assert.IsNotNull(actual);
+            }
         }
     }
 }
