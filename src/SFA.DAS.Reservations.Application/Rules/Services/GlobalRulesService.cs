@@ -69,6 +69,12 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             return null;
         }
 
+        public async Task<IList<GlobalRule>> GetAccountRules(long accountId)
+        {
+            var accountRules = await CheckAccountReservationLimit(accountId);
+            return new List<GlobalRule>{accountRules};
+        }
+
         private async Task<GlobalRule> CheckAccountReservationLimit(long accountId)
         {
             var reservations = await _reservationRepository.GetAccountReservations(accountId);
