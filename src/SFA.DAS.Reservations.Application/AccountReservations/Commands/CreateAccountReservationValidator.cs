@@ -34,11 +34,15 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
             {
                 validationResult.AddError(nameof(item.AccountLegalEntityName));
             }
+            if (item.AccountLegalEntityId == 0)
+            {
+                validationResult.AddError(nameof(item.AccountLegalEntityId));
+            }
             if (string.IsNullOrEmpty(item.CourseId))
             {
                 return validationResult;
             }
-                
+    
             if (await _courseService.GetCourseById(item.CourseId) == null)
             {
                 validationResult.AddError(nameof(item.CourseId), "Course with CourseId cannot be found");

@@ -22,5 +22,13 @@ namespace SFA.DAS.Reservations.Api.Controllers
 
             return Ok(response);
         }
+
+        [Route("available-dates")]
+        public async Task<IActionResult> GetAvailableDates()
+        {
+            var response = await _mediator.Send(new GetAvailableDatesQuery());
+
+            return Ok(response);
+        }
     }
 }

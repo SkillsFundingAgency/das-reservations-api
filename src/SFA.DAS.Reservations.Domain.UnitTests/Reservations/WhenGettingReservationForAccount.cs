@@ -151,19 +151,20 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var expectedAccountId = 123;
             var expectedStartDate = DateTime.UtcNow;
             var expiryPeriodInMonths = 2;
+            var expectedAccountLegalEntityId = 2524;
             var expecteLegalEntityAccountName = "TestName";
 
             //Act
-            _reservation = new Reservation(expectedId, expectedAccountId, expectedStartDate, expiryPeriodInMonths,expecteLegalEntityAccountName);
+            _reservation = new Reservation(expectedId, expectedAccountId, expectedStartDate, expiryPeriodInMonths,expecteLegalEntityAccountName,accountLegalEntityId: expectedAccountLegalEntityId);
 
             //Assert
             Assert.AreEqual(expectedId, _reservation.Id);
             Assert.AreEqual(expectedAccountId, _reservation.AccountId);
             Assert.AreEqual(expectedStartDate, _reservation.StartDate);
             Assert.AreEqual(expecteLegalEntityAccountName, _reservation.AccountLegalEntityName);
+            Assert.AreEqual(expectedAccountLegalEntityId, _reservation.AccountLegalEntityId);
             Assert.IsNull(_reservation.CourseId);
             Assert.IsNull(_reservation.ProviderId);
-            Assert.IsNull(_reservation.AccountLegalEntityId);
         }
 
         private Reservation CreateReservation()
