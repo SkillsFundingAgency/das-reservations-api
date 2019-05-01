@@ -11,7 +11,6 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 {
     public class GlobalRulesService : IGlobalRulesService
     {
-        protected internal const int DefaultMaxNumberOfReservations = 3;
         private readonly IGlobalRuleRepository _repository;
         private readonly IReservationRepository _reservationRepository;
         private readonly ReservationsConfiguration _options;
@@ -77,10 +76,15 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         private async Task<GlobalRule> CheckAccountReservationLimit(long accountId)
         {
+
+            if (_options.MaxNumberOfReservations == 0)
+            {
+                return null;
+            }
+
             var reservations = await _reservationRepository.GetAccountReservations(accountId);
 
-            var maxNumberOfReservations = _options.MaxNumberOfReservations == 0 ? DefaultMaxNumberOfReservations : _options.MaxNumberOfReservations;
-            if (reservations.Count >= maxNumberOfReservations)
+            if (reservations.Count >= _options.MaxNumberOfReservations)
             {
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {

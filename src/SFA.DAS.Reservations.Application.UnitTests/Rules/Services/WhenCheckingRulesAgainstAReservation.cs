@@ -178,18 +178,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Assert.IsNull(actual);
         }
 
-        [TestCase(1,true)]
-        [TestCase(2,true)]
-        [TestCase(3,false)]
-        [TestCase(4,false)]
-        public async Task Then_If_No_Maximum_Has_Been_Set_It_Defaults_To_Three_Reservations(int numberOfReservations, bool isNull)
+        [Test]
+        public async Task Then_If_No_Maximum_Has_Been_Set_It_Returns_Null()
         {
             //Arrange
             _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(0);
             var expectedAccountId = 123;
             var existingReservations = new List<Domain.Entities.Reservation>();
-            for (var i = 0; i<numberOfReservations;i++)
+            for (var i = 0; i<5;i++)
             {
                 existingReservations.Add(new Domain.Entities.Reservation());
             }
@@ -201,14 +198,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            if (isNull)
-            {
-                Assert.IsNull(actual);
-            }
-            else
-            {
-                Assert.IsNotNull(actual);
-            }
+            Assert.IsNull(actual);
+            
         }
     }
 }
