@@ -15,7 +15,6 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
-using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Courses.Services;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data;
@@ -26,6 +25,9 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+using SFA.DAS.UnitOfWork.EntityFrameworkCore;
+using SFA.DAS.UnitOfWork;
+using SFA.DAS.UnitOfWork.Mvc;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -124,7 +126,10 @@ namespace SFA.DAS.Reservations.Api
             {
                 services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
             }
-            
+
+            services.AddEntityFrameworkCoreUnitOfWork<ReservationsDataContext>();
+            services.AddUnitOfWork();
+
             services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
 
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
@@ -143,7 +148,7 @@ namespace SFA.DAS.Reservations.Api
             }
 
             app.UseHttpsRedirection();
-            
+            app.UseUnitOfWork();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
