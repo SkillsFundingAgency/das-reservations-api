@@ -12,11 +12,14 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
     public class GlobalRulesService : IGlobalRulesService
     {
         private readonly IGlobalRuleRepository _repository;
+        private readonly IReservationRepository _reservationRepository;
         private readonly ReservationsConfiguration _options;
 
-        public GlobalRulesService(IGlobalRuleRepository repository, IOptions<ReservationsConfiguration> options)
+        public GlobalRulesService(IGlobalRuleRepository repository, IOptions<ReservationsConfiguration> options,
+            IReservationRepository reservationRepository)
         {
             _repository = repository;
+            _reservationRepository = reservationRepository;
             _options = options.Value;
         }
 
@@ -34,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
             if (resultsList == null || !resultsList.Any())
             {
-                return null;
+                return await CheckAccountReservationLimit(request.AccountId);
             }
 
             foreach (var result in resultsList)
@@ -60,6 +63,35 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                     case AccountRestriction.Levy when reservation.IsLevyAccount:
                         return globalRule;
                 }
+            }
+
+            return null;
+        }
+
+        public async Task<IList<GlobalRule>> GetAccountRules(long accountId)
+        {
+            var accountRules = await CheckAccountReservationLimit(accountId);
+            return new List<GlobalRule>{accountRules};
+        }
+
+        private async Task<GlobalRule> CheckAccountReservationLimit(long accountId)
+        {
+
+            if (_options.MaxNumberOfReservations == 0)
+            {
+                return null;
+            }
+
+            var reservations = await _reservationRepository.GetAccountReservations(accountId);
+
+            if (reservations.Count >= _options.MaxNumberOfReservations)
+            {
+                return new GlobalRule(new Domain.Entities.GlobalRule
+                {
+                    Id = 0,
+                    Restriction = (byte)AccountRestriction.Account,
+                    RuleType = (byte)GlobalRuleType.ReservationLimit
+                });
             }
 
             return null;

@@ -17,6 +17,7 @@ using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Courses.Services;
+using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Data.Repository;
@@ -97,6 +98,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>), typeof(GetAccountReservationsValidator));
             services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>), typeof(CreateAccountReservationValidator));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
+            services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));
             services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
