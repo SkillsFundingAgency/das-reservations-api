@@ -9,6 +9,8 @@ using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
+using SFA.DAS.Reservations.Messages;
+using SFA.DAS.UnitOfWork;
 using GlobalRule = SFA.DAS.Reservations.Domain.Rules.GlobalRule;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
@@ -26,14 +28,21 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         private Mock<IValidator<CreateAccountReservationCommand>> _validator;
         private Reservation _reservationCreated;
         private Mock<IGlobalRulesService> _globalRulesService;
+        private Mock<IUnitOfWorkContext> _unitOfWork;
 
         [SetUp]
         public void Arrange()
         {
             _cancellationToken = new CancellationToken();
               
-            _reservationCreated = new Reservation(_expectedReservationId,ExpectedAccountId,DateTime.UtcNow, 1, "TestName");
-            
+            _reservationCreated = new Reservation(null, _expectedReservationId, ExpectedAccountId,false,DateTime.UtcNow, 
+                DateTime.UtcNow.AddMonths(1), DateTime.UtcNow.AddMonths(3), ReservationStatus.Pending,new Course
+            {
+                CourseId = "1",
+                Level = 1,
+                Title = "Test Course"
+            },null,198,"TestName" );
+
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
                 .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>{{"",""}}});
@@ -43,15 +52,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _globalRulesService = new Mock<IGlobalRulesService>();
             _globalRulesService.Setup(x => x.GetRules()).ReturnsAsync(new List<GlobalRule>());
 
-            _command = new CreateAccountReservationCommand {Id = _expectedReservationId, AccountId = ExpectedAccountId, StartDate = _expectedDateTime};
+            _command = new CreateAccountReservationCommand {Id = _expectedReservationId, AccountId = ExpectedAccountId, StartDate = _expectedDateTime,AccountLegalEntityId = 198,AccountLegalEntityName = "TestName"};
 
             _accountReservationsService = new Mock<IAccountReservationService>();
             _accountReservationsService
                 .Setup(x => x.CreateAccountReservation(_command))
                 .ReturnsAsync(_reservationCreated);
 
+            _unitOfWork = new Mock<IUnitOfWorkContext>();
 
-            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object);
+            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object, _unitOfWork.Object);
         }
 
         [Test]
@@ -66,6 +76,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 await _handler.Handle(expectedCommand, _cancellationToken);
             });
             _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<CreateAccountReservationCommand>()), Times.Never);
+            _unitOfWork.Verify(x => x.AddEvent(It.IsAny<ReservationCreatedEvent>()), Times.Never);
         }
 
         [Test]
@@ -101,6 +112,25 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Assert
             _accountReservationsService.Verify(x => x.CreateAccountReservation(_command), Times.Never);
             Assert.IsNotNull(actual.Rule);
+        }
+
+        [Test]
+        public async Task Then_A_ReservationCreated_Message_Is_Added_When_Successful()
+        {
+            //Act
+            await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _unitOfWork.Verify(x=>x.AddEvent(It.Is<ReservationCreatedEvent>(c=>
+                c.Id.Equals(_command.Id)
+                && c.AccountLegalEntityId.Equals(_command.AccountLegalEntityId)
+                && c.AccountLegalEntityName.Equals(_command.AccountLegalEntityName)
+                && c.CourseId.Equals(_reservationCreated.Course.CourseId)
+                && c.CourseName.Equals(_reservationCreated.Course.Title)
+                && c.StartDate.Equals(_reservationCreated.StartDate)
+                && c.EndDate.Equals(_reservationCreated.ExpiryDate)
+                && c.CreatedDate.Equals(_reservationCreated.CreatedDate)
+                )),Times.Once);
         }
 
         [Test]
