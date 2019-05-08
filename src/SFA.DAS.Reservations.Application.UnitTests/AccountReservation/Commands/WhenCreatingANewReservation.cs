@@ -121,15 +121,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            _unitOfWork.Verify(x=>x.AddEvent(It.Is<ReservationCreatedEvent>(c=>
-                c.Id.Equals(_command.Id)
-                && c.AccountLegalEntityId.Equals(_command.AccountLegalEntityId)
-                && c.AccountLegalEntityName.Equals(_command.AccountLegalEntityName)
-                && c.CourseId.Equals(_reservationCreated.Course.CourseId)
-                && c.CourseName.Equals(_reservationCreated.Course.Title)
-                && c.StartDate.Equals(_reservationCreated.StartDate)
-                && c.EndDate.Equals(_reservationCreated.ExpiryDate)
-                && c.CreatedDate.Equals(_reservationCreated.CreatedDate)
+            _unitOfWork.Verify(x=>x.AddEvent(It.Is<Func<ReservationCreatedEvent>>(c => 
+                c.Invoke().Id.Equals(_command.Id)
+                && c.Invoke().AccountLegalEntityId.Equals(_command.AccountLegalEntityId)
+                && c.Invoke().AccountLegalEntityName.Equals(_command.AccountLegalEntityName)
+                && c.Invoke().CourseId.Equals(_reservationCreated.Course.CourseId)
+                && c.Invoke().CourseName.Equals(_reservationCreated.Course.Title)
+                && c.Invoke().StartDate.Equals(_reservationCreated.StartDate)
+                && c.Invoke().EndDate.Equals(_reservationCreated.ExpiryDate)
+                && c.Invoke().CreatedDate.Equals(_reservationCreated.CreatedDate)
                 )),Times.Once);
         }
 
