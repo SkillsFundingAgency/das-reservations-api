@@ -49,6 +49,8 @@ namespace SFA.DAS.Reservations.NServiceBusListener
                 .UseConsoleLifetime()
                 .Build();
 
+            var nServiceBusConsole = new NServiceBusConsole();
+
             Console.WriteLine("Running host...");
 
             await host.RunAsync();
