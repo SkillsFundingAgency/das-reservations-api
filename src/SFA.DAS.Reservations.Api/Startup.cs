@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Api.StartupConfig;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
-using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Courses.Services;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Application.Rules.Services;
@@ -27,6 +27,7 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
+
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -64,6 +65,10 @@ namespace SFA.DAS.Reservations.Api
 
             var serviceProvider = services.BuildServiceProvider();
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
+            
+
+            services.AddHealthChecks()
+                    .AddSqlServer(config.Value.ConnectionString);
 
             if (!ConfigurationIsLocalOrDev())
             {
@@ -145,6 +150,8 @@ namespace SFA.DAS.Reservations.Api
             }
 
             app.UseHttpsRedirection();
+            
+            app.UseHealthChecks();
             
             app.UseMvc(routes =>
             {
