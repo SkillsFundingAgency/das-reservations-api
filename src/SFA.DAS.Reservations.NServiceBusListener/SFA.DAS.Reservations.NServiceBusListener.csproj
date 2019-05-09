@@ -41,13 +41,4 @@
     <ProjectReference Include="..\SFA.DAS.Reservations.Messages\SFA.DAS.Reservations.Messages.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Hosting">
-      <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.hosting\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Hosting.dll</HintPath>
-    </Reference>
-    <Reference Include="SFA.DAS.NServiceBus">
-      <HintPath>..\..\..\..\Users\danielashton\.nuget\packages\sfa.das.nservicebus\11.0.2\lib\netstandard2.0\SFA.DAS.NServiceBus.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
