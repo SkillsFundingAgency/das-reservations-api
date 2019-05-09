@@ -124,7 +124,7 @@ namespace SFA.DAS.Reservations.Api
 
             services
                 .AddEntityFramework()
-                //.AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
+                .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
                 .AddNServiceBusClientUnitOfWork()
                 .AddMvc(o =>
                 {
