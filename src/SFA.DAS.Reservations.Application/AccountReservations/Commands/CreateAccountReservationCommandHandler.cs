@@ -49,7 +49,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
 
             var reservation = await _accountReservationService.CreateAccountReservation(request);
 
-            _context.AddEvent(() => new ReservationCreatedEvent(reservation));
+            _context.AddEvent(() => new ReservationCreatedEvent(reservation.Id,
+                reservation.AccountLegalEntityId, 
+                reservation.AccountLegalEntityName,
+                reservation.Course?.CourseId, 
+                reservation.StartDate, 
+                reservation.Course?.Title, 
+                reservation.ExpiryDate, 
+                reservation.CreatedDate));
 
             return new CreateAccountReservationResult
             {

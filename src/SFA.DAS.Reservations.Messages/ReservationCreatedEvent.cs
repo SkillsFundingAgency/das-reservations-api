@@ -1,26 +1,21 @@
 ﻿using System;
-using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Messages
 {
     public class ReservationCreatedEvent
     {
-
-        public ReservationCreatedEvent(Reservation reservation)
+     
+        public ReservationCreatedEvent(Guid id, long accountLegalEntityId, string accountLegalEntityName,
+            string courseId, DateTime startDate, string courseName, DateTime endDate, DateTime createdDate)
         {
-            if (reservation == null)
-            {
-                return;
-            }
-
-            Id = reservation.Id;
-            AccountLegalEntityId = reservation.AccountLegalEntityId;
-            AccountLegalEntityName = reservation.AccountLegalEntityName;
-            CourseId = reservation.Course?.CourseId;
-            StartDate = reservation.StartDate;
-            CourseName = reservation.Course?.Title;
-            EndDate = reservation.ExpiryDate;
-            CreatedDate = reservation.CreatedDate;
+            Id = id;
+            AccountLegalEntityId = accountLegalEntityId;
+            AccountLegalEntityName = accountLegalEntityName;
+            CourseId = courseId;
+            StartDate = startDate;
+            CourseName = courseName;
+            EndDate = endDate;
+            CreatedDate = createdDate;
         }
 
         public Guid Id { get; set; }
