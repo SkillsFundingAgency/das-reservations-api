@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 
 namespace SFA.DAS.Reservations.Api.Controllers
@@ -29,6 +31,26 @@ namespace SFA.DAS.Reservations.Api.Controllers
             var response = await _mediator.Send(new GetAvailableDatesQuery());
 
             return Ok(response);
+        }
+
+        [Route("account/{accountId}")]
+        public async Task<IActionResult> Account(long accountId)
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
+
+                return Ok(response);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
+            }
+            
         }
     }
 }
