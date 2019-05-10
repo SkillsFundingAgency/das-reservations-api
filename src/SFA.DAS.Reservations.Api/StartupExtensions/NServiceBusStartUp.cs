@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
@@ -31,6 +25,12 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
+
+            if (!string.IsNullOrEmpty(configuration["Reservations:NServiceBusLicense"]))
+            {
+                endpointConfiguration.License(configuration["Reservations:NServiceBusLicense"]);
+            }
+            
 
             var endpoint = Endpoint.Start(endpointConfiguration).GetAwaiter().GetResult();
 
