@@ -27,7 +27,6 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             var reservationResult = await _reservationsDataContext.Reservations.AddAsync(reservation);
 
-            //_context.AddEvent(() => new ReservationCreatedEvent(reservation));
             _reservationsDataContext.SaveChanges();
 
             return reservationResult.Entity;
