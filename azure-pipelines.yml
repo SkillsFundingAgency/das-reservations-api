@@ -53,14 +53,12 @@ steps:
     projects: 'src/SFA.DAS.Reservations.Api/SFA.DAS.Reservations.Api.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
 
- - task: DotNetCoreCLI@2
+- task: DotNetCoreCLI@2
   displayName: 'Create Package'
   inputs:
     command: pack
     publishWebProjects: false
     projects: 'src/SFA.DAS.Reservations.Api/SFA.DAS.Reservations.Messages.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
-
     
 - task: VSBuild@1
   displayName: 'Build DACPAC'
