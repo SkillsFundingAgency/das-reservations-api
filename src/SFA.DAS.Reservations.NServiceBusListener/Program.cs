@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.NServiceBusListener
                 {
                     services.Configure<ReservationsConfiguration>(hostContext.Configuration.GetSection("Reservations"));
                     services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
-                    services.AddTransient<NServiceBusListener.NServiceBusConsole>();
+                    services.AddTransient<NServiceBusConsole>();
                     services.AddHostedService<LifetimeEventsHostedService>();
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
@@ -48,8 +48,6 @@ namespace SFA.DAS.Reservations.NServiceBusListener
                 })
                 .UseConsoleLifetime()
                 .Build();
-
-            var nServiceBusConsole = new NServiceBusConsole();
 
             Console.WriteLine("Running host...");
 

@@ -9,12 +9,12 @@ namespace SFA.DAS.Reservations.NServiceBusListener
     {
         private readonly ILogger _logger;
         private readonly IApplicationLifetime _appLifetime;
-        private readonly NServiceBusListener.NServiceBusConsole _console;
+        private readonly NServiceBusConsole _console;
 
         public LifetimeEventsHostedService(
             ILogger<LifetimeEventsHostedService> logger, 
             IApplicationLifetime appLifetime,
-            NServiceBusListener.NServiceBusConsole console)
+            NServiceBusConsole console)
         {
             _logger = logger;
             _appLifetime = appLifetime;
