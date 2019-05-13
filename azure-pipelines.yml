@@ -58,8 +58,8 @@ steps:
   inputs:
     command: pack
     packagesToPack: src/SFA.DAS.Reservations.Messages/SFA.DAS.Reservations.Messages.csproj
-    versioningScheme: byEnvVar
-    versionEnvVar: GitVersion.NuGetVersionV2
+    versioningScheme: byBuildNumber
+    buildProperties: 'Version="$(Build.BuildNumber)"'
     
 - task: VSBuild@1
   displayName: 'Build DACPAC'
