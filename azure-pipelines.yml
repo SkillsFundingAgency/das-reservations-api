@@ -58,7 +58,6 @@ steps:
   inputs:
     command: pack
     packagesToPack: src/SFA.DAS.Reservations.Messages/SFA.DAS.Reservations.Messages.csproj
-    arguments: '--output $(build.artifactstagingdirectory)/publish'
     versioningScheme: byEnvVar
     versionEnvVar: GitVersion.NuGetVersionV2
     
@@ -74,7 +73,6 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
     Contents: |
-     '$(build.artifactstagingdirectory)\**\*.nupkg'
      azure\**
      src\**\*.dacpac
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
@@ -82,4 +80,4 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)/publish'
+    PathtoPublish: '$(build.artifactstagingdirectory)'
