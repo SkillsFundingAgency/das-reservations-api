@@ -8,6 +8,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Validation;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 
@@ -20,6 +21,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
         private ValidateReservationQueryHandler _handler;
         private Mock<IAccountReservationService> _reservationService;
+        private Mock<IValidator<ValidateReservationQuery>> _validator;
         private Reservation _reservation;
         
         private IList<Rule> _courseRules;
@@ -48,7 +50,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             _reservationService.Setup(r => r.GetReservation(It.IsAny<Guid>()))
                 .ReturnsAsync(_reservation);
 
-            _handler = new ValidateReservationQueryHandler(_reservationService.Object);
+            _validator = new Mock<IValidator<ValidateReservationQuery>>();
+
+            _validator.Setup(v => v.ValidateAsync(It.IsAny<ValidateReservationQuery>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _handler = new ValidateReservationQueryHandler(_reservationService.Object, _validator.Object);
         }
 
         [Test]
@@ -68,6 +75,44 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(result);
             Assert.IsEmpty(result.Errors);
+        }
+
+        [Test]
+        public async Task Then_The_Query_Is_Validated()
+        {
+            //Assert
+            var request = new ValidateReservationQuery
+            {
+                CourseId = CourseId,
+                ReservationId = ReservationId,
+                TrainingStartDate = _reservation.StartDate.AddDays(-1)
+            };
+
+            //Act
+            await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            _validator.Verify(x => x.ValidateAsync(request), Times.Once);
+
+        }
+
+        [Test]
+        public void Then_If_The_Query_Fails_Validation_Then_An_Argument_Exception_Is_Thrown()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseId = CourseId,
+                ReservationId = ReservationId,
+                TrainingStartDate = _reservation.StartDate.AddDays(-1)
+            };
+
+            //Arrange
+            _validator.Setup(x => x.ValidateAsync(It.IsAny<ValidateReservationQuery>()))
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string> { { "", "" } } });
+
+            //Act Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await _handler.Handle(request, CancellationToken.None));
         }
 
         [Test]
