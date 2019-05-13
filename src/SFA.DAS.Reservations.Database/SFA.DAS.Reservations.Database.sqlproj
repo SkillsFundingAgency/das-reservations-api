@@ -66,5 +66,6 @@
     <Build Include="Tables\Reservation.sql" />
     <Build Include="Tables\Rule.sql" />
     <Build Include="Tables\GlobalRule.sql" />
+    <Build Include="Tables\AccountLegalEntity.sql" />
   </ItemGroup>
 </Project>
