@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using SFA.DAS.Reservations.Domain.Entities;
 
 namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
 {
@@ -10,6 +12,7 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             CourseId = entity.CourseId;
             Title = entity.Title;
             Level = entity.Level.ToString();
+            Rules = entity.ReservationRule;
         }
 
         public Course(string courseId, string title, string level)
@@ -17,6 +20,7 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             CourseId = courseId;
             Title = title;
             Level = level;
+            Rules = new List<Rule>();
         }
         public string CourseId { get; }
         public string Title { get;}
@@ -25,5 +29,7 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             CourseId.IndexOf("-", StringComparison.CurrentCultureIgnoreCase) != -1
             ? ApprenticeshipType.Framework
             : ApprenticeshipType.Standard;
+
+        public ICollection<Rule> Rules { get; }
     }
 }

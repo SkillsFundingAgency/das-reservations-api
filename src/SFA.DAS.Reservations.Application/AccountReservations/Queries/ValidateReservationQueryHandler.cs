@@ -1,0 +1,47 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
+using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Validation;
+
+namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
+{
+    public class ValidateReservationQueryHandler : IRequestHandler<ValidateReservationQuery, ValidateReservationResponse>
+    {
+        private readonly IAccountReservationService _reservationService;
+
+        public ValidateReservationQueryHandler(IAccountReservationService reservationService)
+        {
+            _reservationService = reservationService;
+        }
+
+        public async Task<ValidateReservationResponse> Handle(ValidateReservationQuery request, CancellationToken cancellationToken)
+        {
+            var errors = new List<ReservationValidationError>();
+
+            var reservation = await _reservationService.GetReservation(request.ReservationId);
+
+            if (reservation.StartDate > request.TrainingStartDate)
+            {
+                errors.Add(new ReservationValidationError(nameof(request.TrainingStartDate), "Training start date must be after reservation start date"));
+            }
+
+            if (reservation.ExpiryDate < request.TrainingStartDate)
+            {
+                errors.Add(new ReservationValidationError(nameof(request.TrainingStartDate), "Training start date must be before reservation expiry date"));
+            }
+
+            if (reservation.Course.Rules.Any())
+            {
+                errors.Add(new ReservationValidationError(nameof(request.CourseId),"Selected course has restriction rules associated with it"));
+            }
+
+            return new ValidateReservationResponse
+            {
+                Errors = errors
+            };
+        }
+    }
+}
