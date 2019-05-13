@@ -53,7 +53,6 @@ steps:
     projects: 'src/SFA.DAS.Reservations.Api/SFA.DAS.Reservations.Api.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
 
-
 - task: DotNetCoreCLI@2
   displayName: 'dotnet pack'
   inputs:
@@ -74,7 +73,7 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
     Contents: |
-     $(build.artifactstagingdirectory)\*.nupkg
+     '$(build.artifactstagingdirectory)\**\*.nupkg'
      azure\**
      src\**\*.dacpac
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
