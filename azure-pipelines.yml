@@ -74,7 +74,7 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
     Contents: |
-     src\**\*.nupkg
+     $(build.artifactstagingdirectory)\*.nupkg
      azure\**
      src\**\*.dacpac
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
