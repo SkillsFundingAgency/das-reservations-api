@@ -78,7 +78,6 @@ steps:
      azure\**
      src\**\*.dacpac
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
-    OverWrite: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
