@@ -58,7 +58,7 @@ steps:
   displayName: 'dotnet pack'
   inputs:
     command: pack
-    packagesToPack: src/SFA.DAS.Reservations.Api/SFA.DAS.Reservations.Messages.csproj
+    packagesToPack: src/SFA.DAS.Reservations.Messages/SFA.DAS.Reservations.Messages.csproj
     versioningScheme: byEnvVar
     versionEnvVar: GitVersion.NuGetVersionV2
     
