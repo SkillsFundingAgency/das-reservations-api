@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Messages
     {
      
         public ReservationCreatedEvent(Guid id, long accountLegalEntityId, string accountLegalEntityName,
-            string courseId, DateTime startDate, string courseName, DateTime endDate, DateTime createdDate)
+            string courseId, DateTime startDate, string courseName, DateTime endDate, DateTime createdDate, long accountId)
         {
             Id = id;
             AccountLegalEntityId = accountLegalEntityId;
@@ -16,6 +16,7 @@ namespace SFA.DAS.Reservations.Messages
             CourseName = courseName;
             EndDate = endDate;
             CreatedDate = createdDate;
+            AccountId = accountId;
         }
 
         public Guid Id { get; set; }
@@ -26,5 +27,6 @@ namespace SFA.DAS.Reservations.Messages
         public string CourseName { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime CreatedDate { get; set; }
+        public long AccountId { get; set; }
     }
 }

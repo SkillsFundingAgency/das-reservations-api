@@ -56,7 +56,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
                 reservation.StartDate, 
                 reservation.Course?.Title, 
                 reservation.ExpiryDate, 
-                reservation.CreatedDate));
+                reservation.CreatedDate,
+                reservation.AccountId));
 
             return new CreateAccountReservationResult
             {

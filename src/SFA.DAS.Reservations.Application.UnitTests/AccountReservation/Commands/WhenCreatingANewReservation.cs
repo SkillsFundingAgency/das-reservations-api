@@ -130,6 +130,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 && c.Invoke().StartDate.Equals(_reservationCreated.StartDate)
                 && c.Invoke().EndDate.Equals(_reservationCreated.ExpiryDate)
                 && c.Invoke().CreatedDate.Equals(_reservationCreated.CreatedDate)
+                && c.Invoke().AccountId.Equals(_reservationCreated.AccountId)
                 )),Times.Once);
         }
 
