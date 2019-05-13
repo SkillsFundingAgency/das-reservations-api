@@ -58,6 +58,7 @@ steps:
   inputs:
     command: pack
     packagesToPack: src/SFA.DAS.Reservations.Messages/SFA.DAS.Reservations.Messages.csproj
+    arguments: '--output $(build.artifactstagingdirectory)'
     versioningScheme: byEnvVar
     versionEnvVar: GitVersion.NuGetVersionV2
     
