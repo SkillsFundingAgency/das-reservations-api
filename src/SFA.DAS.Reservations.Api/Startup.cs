@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.StartupConfig;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
@@ -27,7 +28,10 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
-
+using SFA.DAS.Reservations.Api.StartupExtensions;
+using SFA.DAS.UnitOfWork.EntityFrameworkCore;
+using SFA.DAS.UnitOfWork.Mvc;
+using SFA.DAS.UnitOfWork.NServiceBus;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -42,7 +46,8 @@ namespace SFA.DAS.Reservations.Api
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true)
-                .AddJsonFile("appsettings.development.json", !Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+                .AddJsonFile("appsettings.development.json",
+                    !Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
@@ -72,56 +77,45 @@ namespace SFA.DAS.Reservations.Api
 
             if (!ConfigurationIsLocalOrDev())
             {
-                var azureActiveDirectoryConfiguration = serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
+                var azureActiveDirectoryConfiguration =
+                    serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
                 services.AddAuthorization(o =>
                 {
-                    o.AddPolicy("default", policy =>
-                    {
-                        policy.RequireAuthenticatedUser();
-                    });
+                    o.AddPolicy("default", policy => { policy.RequireAuthenticatedUser(); });
                 });
-                services.AddAuthentication(auth =>
-                {
-                    auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-
-                }).AddJwtBearer(auth =>
-                {
-                    auth.Authority = $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
-                    auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                services.AddAuthentication(auth => { auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
+                    .AddJwtBearer(auth =>
                     {
-                        ValidAudiences = new List<string>
+                        auth.Authority =
+                            $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
+                        auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                         {
-                            azureActiveDirectoryConfiguration.Value.Identifier,
-                            azureActiveDirectoryConfiguration.Value.Id
-                        }
-                    };
-                });
+                            ValidAudiences = new List<string>
+                            {
+                                azureActiveDirectoryConfiguration.Value.Identifier,
+                                azureActiveDirectoryConfiguration.Value.Id
+                            }
+                        };
+                    });
                 services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
             }
-            
+
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
-            services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>), typeof(GetAccountReservationsValidator));
-            services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>), typeof(CreateAccountReservationValidator));
+            services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>),
+                typeof(GetAccountReservationsValidator));
+            services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>),
+                typeof(CreateAccountReservationValidator));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
             services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));
-            services.AddTransient<IReservationRepository,ReservationRepository>();
-            services.AddTransient<IRuleRepository,RuleRepository>();
+            services.AddTransient<IReservationRepository, ReservationRepository>();
+            services.AddTransient<IRuleRepository, RuleRepository>();
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
-            services.AddTransient<ICourseRepository,CourseRepository>();
+            services.AddTransient<ICourseRepository, CourseRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();
             services.AddTransient<IRulesService, RulesService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IGlobalRulesService, GlobalRulesService>();
             services.AddTransient<IAvailableDatesService, AvailableDatesService>();
-            
-            services.AddMvc(o =>
-            {
-                if (!ConfigurationIsLocalOrDev())
-                {
-                    o.Filters.Add(new AuthorizeFilter("default"));
-                }
-                
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -131,12 +125,32 @@ namespace SFA.DAS.Reservations.Api
             {
                 services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
             }
-            
+
             services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
+            services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
+
+            services
+                .AddEntityFramework()
+                .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
+                .AddNServiceBusClientUnitOfWork()
+                .AddMvc(o =>
+                {
+                    if (!ConfigurationIsLocalOrDev())
+                    {
+                        o.Filters.Add(new AuthorizeFilter("default"));
+                    }
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
-        
+
+        public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
+        {
+            
+            serviceProvider.StartNServiceBus(Configuration);
+        }
+
+
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (ConfigurationIsLocalOrDev())
@@ -150,7 +164,7 @@ namespace SFA.DAS.Reservations.Api
             }
 
             app.UseHttpsRedirection();
-            
+            app.UseUnitOfWork();
             app.UseHealthChecks();
             
             app.UseMvc(routes =>
@@ -160,6 +174,7 @@ namespace SFA.DAS.Reservations.Api
                     template: "api/{controller=Reservation}/{action=Index}/{id?}");
             });
         }
+
         private bool ConfigurationIsLocalOrDev()
         {
             return Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
