@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
-using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Services
 {
@@ -16,7 +17,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
         private AccountLegalEntitiesService _service;
         private Mock<IAccountLegalEntitiesRepository> _repository;
         private List<Domain.Entities.AccountLegalEntity> _legalEntities;
-        private Mock<IGlobalRulesService> _globalRulesService;
+        private Mock<IOptions<ReservationsConfiguration>> _options;
 
         private const long ExpectedAccountId = 5465478;
         private const int ExpectedReservationLimit = 50;
@@ -49,10 +50,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             _repository = new Mock<IAccountLegalEntitiesRepository>();
             _repository.Setup(x => x.GetByAccountId(ExpectedAccountId)).ReturnsAsync(_legalEntities);
 
-            _globalRulesService = new Mock<IGlobalRulesService>();
-            _globalRulesService.Setup(x => x.GetReservationLimit()).Returns(ExpectedReservationLimit);
+            _options = new Mock<IOptions<ReservationsConfiguration>>();
+            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(ExpectedReservationLimit);
 
-            _service = new AccountLegalEntitiesService(_repository.Object, _globalRulesService.Object);
+            _service = new AccountLegalEntitiesService(_repository.Object, _options.Object);
         }
 
         [Test]
