@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
+using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Services
 {
@@ -15,8 +16,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
         private AccountLegalEntitiesService _service;
         private Mock<IAccountLegalEntitiesRepository> _repository;
         private List<Domain.Entities.AccountLegalEntity> _legalEntities;
+        private Mock<IGlobalRulesService> _globalRulesService;
 
         private const long ExpectedAccountId = 5465478;
+        private const int ExpectedReservationLimit = 50;
 
         [SetUp]
         public void Arrange()
@@ -29,7 +32,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountId = 1,
                     AccountLegalEntityId = 2,
                     AccountLegalEntityName = "Test",
-                    LegalEntityId = 43
+                    LegalEntityId = 43,
+                    ReservationLimit = 4
                 },
                 new Domain.Entities.AccountLegalEntity
                 {
@@ -37,14 +41,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountId = 1,
                     AccountLegalEntityId = 3,
                     AccountLegalEntityName = "Test 2",
-                    LegalEntityId = 54
+                    LegalEntityId = 54,
+                    ReservationLimit = 4
                 }
             };
             
             _repository = new Mock<IAccountLegalEntitiesRepository>();
             _repository.Setup(x => x.GetByAccountId(ExpectedAccountId)).ReturnsAsync(_legalEntities);
 
-            _service = new AccountLegalEntitiesService(_repository.Object);
+            _globalRulesService = new Mock<IGlobalRulesService>();
+            _globalRulesService.Setup(x => x.GetReservationLimit()).Returns(ExpectedReservationLimit);
+
+            _service = new AccountLegalEntitiesService(_repository.Object, _globalRulesService.Object);
         }
 
         [Test]
@@ -69,6 +77,30 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             Assert.IsAssignableFrom<List<AccountLegalEntity>>(actual);
             Assert.AreEqual(2,actual.Count);
             actual.Should().BeEquivalentTo(_legalEntities);
+        }
+
+        [Test]
+        public async Task Then_If_No_Limit_Has_Been_Set_On_The_Number_Of_Reservations_Then_The_Default_Limit_Is_Used()
+        {
+            //Arrange
+            _repository.Setup(x => x.GetByAccountId(ExpectedAccountId)).ReturnsAsync(new List<Domain.Entities.AccountLegalEntity>
+            {
+                new Domain.Entities.AccountLegalEntity
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = 1,
+                    AccountLegalEntityId = 1,
+                    AccountLegalEntityName = "Test",
+                    LegalEntityId = 4,
+                    ReservationLimit = null
+                }
+            });
+
+            //Act
+            var actual = await _service.GetAccountLegalEntities(ExpectedAccountId);
+
+            //Assert
+            Assert.AreEqual(ExpectedReservationLimit,actual.First().ReservationLimit);
         }
     }
 }
