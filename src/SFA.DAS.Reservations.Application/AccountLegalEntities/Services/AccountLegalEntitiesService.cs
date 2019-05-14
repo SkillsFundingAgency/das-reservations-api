@@ -23,10 +23,10 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Services
         {
             var results = await _repository.GetByAccountId(accountId);
 
-            return results.Select(MapReservation).ToList();
+            return results.Select(MapAccountLegalEntity).ToList();
         }
 
-        private AccountLegalEntity MapReservation(Domain.Entities.AccountLegalEntity accountLegalEntity)
+        private AccountLegalEntity MapAccountLegalEntity(Domain.Entities.AccountLegalEntity accountLegalEntity)
         {
             var reservationLimit = _configuration.MaxNumberOfReservations;
 
