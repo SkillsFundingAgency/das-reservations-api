@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -15,10 +14,15 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             _configuration = options.Value;
         }
 
-        public IList<AvailableDateStartWindow> GetAvailableDates()
+        public IList<AvailableDateStartWindow> GetAvailableDates(long accountLegalEntity)
         {
-            var availableDates = new AvailableDates(_configuration.NumberOfAvailableDates,
-                _configuration.AvailableDatesMinDate, _configuration.AvailableDatesMaxDate);
+            //todo: get account for this ale
+            //todo: check if account is eoi
+
+            var availableDates = new AvailableDates(
+                _configuration.NumberOfAvailableDates,
+                _configuration.AvailableDatesMinDate, 
+                _configuration.AvailableDatesMaxDate);
             return availableDates.Dates;
         }
     }

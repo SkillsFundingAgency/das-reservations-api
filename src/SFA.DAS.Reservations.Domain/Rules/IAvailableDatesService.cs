@@ -5,6 +5,6 @@ namespace SFA.DAS.Reservations.Domain.Rules
 {
     public interface IAvailableDatesService
     {
-        IList<AvailableDateStartWindow> GetAvailableDates();
+        IList<AvailableDateStartWindow> GetAvailableDates(long accountLegalEntity);
     }
 }

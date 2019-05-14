@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -16,28 +15,31 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
 {
     public class WhenGettingAvailableDates
     {
+        private Fixture _fixture;
         private Mock<IMediator> _mediator;
         private RulesController _rulesController;
         private GetAvailableDatesResult _datesResult;
-
+        private long _accountLegalEntityId;
+        
         [SetUp]
         public void Arrange()
         {
-            _mediator = new Mock<IMediator>();
+            _fixture = new Fixture();
+            _accountLegalEntityId = _fixture.Create<long>();
             _datesResult = new GetAvailableDatesResult { AvailableDates = new List<AvailableDateStartWindow>() };
-            _mediator.Setup(x => x.Send(It.IsAny<GetAvailableDatesQuery>(),
+            _mediator = new Mock<IMediator>();
+            _mediator.Setup(x => x.Send(It.Is<GetAvailableDatesQuery>(query => query.AccountLegalEntityId == _accountLegalEntityId),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_datesResult);
 
             _rulesController = new RulesController(_mediator.Object);
         }
 
-
         [Test]
         public async Task Then_The_AvailableDates_Are_Returned()
         {
             //Act
-            var actual = await _rulesController.GetAvailableDates();
+            var actual = await _rulesController.GetAvailableDates(_accountLegalEntityId);
 
             //Assert
             Assert.IsNotNull(actual);

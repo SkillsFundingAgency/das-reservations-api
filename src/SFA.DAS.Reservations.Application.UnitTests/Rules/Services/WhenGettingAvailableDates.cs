@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -13,8 +14,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
     {
         private Mock<IOptions<ReservationsConfiguration>> _options;
 
-        [Test]
-        public void Then_The_List_is_Built_From_The_Configuration_Values()
+        [Test, AutoData]
+        public void Then_The_List_is_Built_From_The_Configuration_Values(
+            long accountLegalEntityId)
         {
             //Arrange
             _options = new Mock<IOptions<ReservationsConfiguration>>();
@@ -24,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var service = new AvailableDatesService(_options.Object);
 
             //Act
-            var actual = service.GetAvailableDates();
+            var actual = service.GetAvailableDates(accountLegalEntityId);
             
             //Assert
             Assert.AreEqual(5, actual.Count);
