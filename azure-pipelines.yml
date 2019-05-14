@@ -58,6 +58,7 @@ steps:
   inputs:
     command: pack
     packagesToPack: src/SFA.DAS.Reservations.Messages/SFA.DAS.Reservations.Messages.csproj
+    packDirectory: '$(build.artifactstagingdirectory)/publish'
     versioningScheme: byBuildNumber
     buildProperties: 'Version="$(Build.BuildNumber)"'
     
@@ -80,4 +81,4 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
+    PathtoPublish: '$(build.artifactstagingdirectory)/publish'
