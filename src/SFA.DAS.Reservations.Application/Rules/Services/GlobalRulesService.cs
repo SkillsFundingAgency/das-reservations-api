@@ -74,17 +74,23 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             return new List<GlobalRule>{accountRules};
         }
 
+        public int GetReservationLimit()
+        {
+            return _options.MaxNumberOfReservations;
+        }
+
         private async Task<GlobalRule> CheckAccountReservationLimit(long accountId)
         {
+            var maxNumberOfReservations = GetReservationLimit();
 
-            if (_options.MaxNumberOfReservations == 0)
+            if (maxNumberOfReservations == 0)
             {
                 return null;
             }
 
             var reservations = await _reservationRepository.GetAccountReservations(accountId);
 
-            if (reservations.Count >= _options.MaxNumberOfReservations)
+            if (reservations.Count >= maxNumberOfReservations)
             {
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {

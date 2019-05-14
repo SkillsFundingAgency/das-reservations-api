@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public long LegalEntityId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
+        public int? ReservationLimit { get; set; }
     }
 }

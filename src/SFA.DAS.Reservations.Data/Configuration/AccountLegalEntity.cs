@@ -18,6 +18,7 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.LegalEntityId).HasColumnName(@"LegalEntityId").HasColumnType("bigint").IsRequired();
             builder.Property(x => x.AccountLegalEntityId).HasColumnName(@"AccountLegalEntityId").HasColumnType("bigint").IsRequired();
             builder.Property(x => x.AccountLegalEntityName).HasColumnName(@"AccountLegalEntityName").HasColumnType("varchar").HasMaxLength(100);
+            builder.Property(x => x.ReservationLimit).HasColumnName(@"ReservationLimit").HasColumnType("int");
         }
     }
 }

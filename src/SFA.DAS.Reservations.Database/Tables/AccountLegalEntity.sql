@@ -4,5 +4,6 @@
 	[AccountId] BIGINT NOT NULL,
 	[LegalEntityId] BIGINT NOT NULL,
 	[AccountLegalEntityId] BIGINT NOT NULL,
-	[AccountLegalEntityName] VARCHAR(100) not null,
+	[AccountLegalEntityName] VARCHAR(100) NOT NULL,
+	[ReservationLimit] INT NULL
 )
