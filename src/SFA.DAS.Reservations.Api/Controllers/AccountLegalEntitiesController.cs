@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             _mediator = mediator;
         }
 
-        [Route("{accountId")]
+        [Route("{accountId}")]
         public async Task<IActionResult> GetByAccountId(long accountId)
         {
             try
