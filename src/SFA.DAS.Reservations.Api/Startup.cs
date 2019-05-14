@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.StartupConfig;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
@@ -21,6 +23,7 @@ using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Data.Repository;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -104,15 +107,18 @@ namespace SFA.DAS.Reservations.Api
             services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>), typeof(CreateAccountReservationValidator));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
             services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));
+            services.AddScoped(typeof(IValidator<GetAccountLegalEntitiesQuery>), typeof(GetAccountLegalEntitiesQueryValidator));
             services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
             services.AddTransient<ICourseRepository,CourseRepository>();
+            services.AddTransient<IAccountLegalEntitiesRepository,AccountLegalEntityRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();
             services.AddTransient<IRulesService, RulesService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IGlobalRulesService, GlobalRulesService>();
             services.AddTransient<IAvailableDatesService, AvailableDatesService>();
+            services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
             
             services.AddMvc(o =>
             {
