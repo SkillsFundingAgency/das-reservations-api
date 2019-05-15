@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _repository.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{new Reservation()});
             _accountLegalEntitiesService = new Mock<IAccountLegalEntitiesService>();
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(It.IsAny<long>()))
-                .ReturnsAsync(new List<AccountLegalEntity>{new AccountLegalEntity(Guid.NewGuid(),ExpectedAccountId,"test",1,1,1)});
+                .ReturnsAsync(new List<AccountLegalEntity>{new AccountLegalEntity(Guid.NewGuid(),ExpectedAccountId,"test",1,1,1, true)});
 
             _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), Mock.Of<IOptions<ReservationsConfiguration>>(), _repository.Object, _accountLegalEntitiesService.Object);
         }

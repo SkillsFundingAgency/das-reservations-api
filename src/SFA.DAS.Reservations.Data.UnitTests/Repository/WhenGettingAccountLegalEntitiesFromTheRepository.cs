@@ -25,19 +25,29 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 {
                     Id = Guid.NewGuid(),
                     AccountId = 1,
-                    AccountLegalEntityName = "Test"
+                    AccountLegalEntityName = "Test",
+                    AgreementSigned = true
                 },
                 new AccountLegalEntity
                 {
                     Id = Guid.NewGuid(),
                     AccountId = 1,
-                    AccountLegalEntityName = "Test 1"
+                    AccountLegalEntityName = "Test 1",
+                    AgreementSigned = true
+                },
+                new AccountLegalEntity
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = 1,
+                    AccountLegalEntityName = "Test 3",
+                    AgreementSigned = false
                 },
                 new AccountLegalEntity
                 {
                     Id = Guid.NewGuid(),
                     AccountId = 2,
-                    AccountLegalEntityName = "Test 2"
+                    AccountLegalEntityName = "Test 2",
+                    AgreementSigned = true
                 }
             };
 
@@ -48,7 +58,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         }
 
         [Test]
-        public async Task Then_The_LegalEntities_Are_Returned_By_AccountId()
+        public async Task Then_The_LegalEntities_That_Have_An_Agreement_Signed_Are_Returned_By_AccountId()
         {
             //Act
             var actual = await _legalEntityRepository.GetByAccountId(1);

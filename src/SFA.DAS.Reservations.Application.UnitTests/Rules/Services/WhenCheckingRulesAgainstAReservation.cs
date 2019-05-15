@@ -157,7 +157,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation>{new Domain.Entities.Reservation(), new Domain.Entities.Reservation() });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -180,7 +180,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation> { new Domain.Entities.Reservation() });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 4)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 4, true)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -198,7 +198,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var expectedAccountId = 123;
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 0)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 0, true)});
             var existingReservations = new List<Domain.Entities.Reservation>();
             for (var i = 0; i<5;i++)
             {

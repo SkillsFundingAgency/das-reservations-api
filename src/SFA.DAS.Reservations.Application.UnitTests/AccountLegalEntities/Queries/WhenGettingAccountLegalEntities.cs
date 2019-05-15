@@ -80,7 +80,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
         public async Task Then_The_Values_Are_Returned_In_The_Response()
         {
             //Arrange
-            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, ExpectedAccountId, "TestName", 123, 6543, 4);
+            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, ExpectedAccountId, "TestName", 123, 6543, 4, true);
             _service.Setup(x => x.GetAccountLegalEntities(ExpectedAccountId)).ReturnsAsync(new List<AccountLegalEntity> { accountLegalEntity });
 
             //Act

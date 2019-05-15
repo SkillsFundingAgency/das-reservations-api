@@ -34,7 +34,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountLegalEntityId = 2,
                     AccountLegalEntityName = "Test",
                     LegalEntityId = 43,
-                    ReservationLimit = 4
+                    ReservationLimit = 4,
+                    AgreementSigned = false
                 },
                 new Domain.Entities.AccountLegalEntity
                 {
@@ -43,7 +44,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountLegalEntityId = 3,
                     AccountLegalEntityName = "Test 2",
                     LegalEntityId = 54,
-                    ReservationLimit = 4
+                    ReservationLimit = 4,
+                    AgreementSigned = true
                 }
             };
             

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SFA.DAS.Reservations.Domain.Entities
 {
@@ -12,5 +10,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
         public int? ReservationLimit { get; set; }
+        public bool AgreementSigned { get; set; }
     }
 }
