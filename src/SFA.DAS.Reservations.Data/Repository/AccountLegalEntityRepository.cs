@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             _reservationsDataContext = reservationsDataContext;
         }
 
-        public async Task<IList<AccountLegalEntity>> GetByAccountId(long accountId)
+        public async Task<IList<AccountLegalEntity>> GetByAccountIdWithAgreementSigned(long accountId)
         {
             var legalEntities = await _reservationsDataContext
                 .AccountLegalEntities

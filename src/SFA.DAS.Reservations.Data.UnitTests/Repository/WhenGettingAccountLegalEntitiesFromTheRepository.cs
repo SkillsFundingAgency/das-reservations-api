@@ -61,7 +61,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task Then_The_LegalEntities_That_Have_An_Agreement_Signed_Are_Returned_By_AccountId()
         {
             //Act
-            var actual = await _legalEntityRepository.GetByAccountId(1);
+            var actual = await _legalEntityRepository.GetByAccountIdWithAgreementSigned(1);
 
             //Assert
             Assert.IsAssignableFrom<List<AccountLegalEntity>>(actual);
@@ -73,7 +73,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task Then_If_There_Are_No_Results_An_Empty_List_Is_Returned()
         {
             //Act
-            var actual = await _legalEntityRepository.GetByAccountId(3);
+            var actual = await _legalEntityRepository.GetByAccountIdWithAgreementSigned(3);
 
             //Assert
             Assert.IsEmpty(actual);

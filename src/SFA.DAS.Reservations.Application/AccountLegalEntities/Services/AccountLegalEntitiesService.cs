@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Services
 
         public async Task<IList<AccountLegalEntity>> GetAccountLegalEntities(long accountId)
         {
-            var results = await _repository.GetByAccountId(accountId);
+            var results = await _repository.GetByAccountIdWithAgreementSigned(accountId);
 
             return results.Select(MapAccountLegalEntity).ToList();
         }
