@@ -16,9 +16,12 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
 
         public async Task<GetAvailableDatesResult> Handle(GetAvailableDatesQuery request, CancellationToken cancellationToken)
         {
-            var availableDates = _availableDatesService.GetAvailableDates(request.AccountLegalEntityId);
-
             await Task.CompletedTask;//todo: remove once _availableDatesService is awaitable
+            // todo: get account id
+            // todo: check if account is eoi
+
+            var availableDates = _availableDatesService.GetAvailableDates(request.AccountLegalEntityId);
+            
             return new GetAvailableDatesResult
             {
                 AvailableDates = availableDates

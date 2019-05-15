@@ -16,9 +16,6 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         public IList<AvailableDateStartWindow> GetAvailableDates(long accountLegalEntity)
         {
-            //todo: get account for this ale
-            //todo: check if account is eoi
-
             var availableDates = new AvailableDates(
                 _configuration.NumberOfAvailableDates,
                 _configuration.AvailableDatesMinDate, 
