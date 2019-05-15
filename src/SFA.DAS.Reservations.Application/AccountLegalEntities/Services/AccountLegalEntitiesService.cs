@@ -26,6 +26,12 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Services
             return results.Select(MapAccountLegalEntity).ToList();
         }
 
+        public async Task<AccountLegalEntity> GetAccountLegalEntity(long accountLegalEntityId)
+        {
+            var entity = await _repository.Get(accountLegalEntityId);
+            return MapAccountLegalEntity(entity);
+        }
+
         private AccountLegalEntity MapAccountLegalEntity(Domain.Entities.AccountLegalEntity accountLegalEntity)
         {
             var reservationLimit = _configuration.MaxNumberOfReservations;
