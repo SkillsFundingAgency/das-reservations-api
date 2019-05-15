@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Data.Repository
     public class ReservationRepository : IReservationRepository
     {
         private readonly IReservationsDataContext _reservationsDataContext;
-
+        
         public ReservationRepository(IReservationsDataContext reservationsDataContext)
         {
             _reservationsDataContext = reservationsDataContext;
@@ -26,6 +26,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         public async Task<Reservation> CreateAccountReservation(Reservation reservation)
         {
             var reservationResult = await _reservationsDataContext.Reservations.AddAsync(reservation);
+
             _reservationsDataContext.SaveChanges();
 
             return reservationResult.Entity;

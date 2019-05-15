@@ -6,6 +6,8 @@ using MediatR;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
+using SFA.DAS.Reservations.Messages;
+using SFA.DAS.UnitOfWork;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
 {
@@ -14,13 +16,15 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
         private readonly IAccountReservationService _accountReservationService;
         private readonly IValidator<CreateAccountReservationCommand> _validator;
         private readonly IGlobalRulesService _globalRulesService;
+        private readonly IUnitOfWorkContext _context;
 
         public CreateAccountReservationCommandHandler(IAccountReservationService accountReservationService,
-            IValidator<CreateAccountReservationCommand> validator, IGlobalRulesService globalRulesService)
+            IValidator<CreateAccountReservationCommand> validator, IGlobalRulesService globalRulesService, IUnitOfWorkContext context)
         {
             _accountReservationService = accountReservationService;
             _validator = validator;
             _globalRulesService = globalRulesService;
+            _context = context;
         }
 
         public async Task<CreateAccountReservationResult> Handle(CreateAccountReservationCommand request, CancellationToken cancellationToken)
@@ -44,6 +48,16 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
             }
 
             var reservation = await _accountReservationService.CreateAccountReservation(request);
+
+            _context.AddEvent(() => new ReservationCreatedEvent(reservation.Id,
+                reservation.AccountLegalEntityId, 
+                reservation.AccountLegalEntityName,
+                reservation.Course?.CourseId, 
+                reservation.StartDate, 
+                reservation.Course?.Title, 
+                reservation.ExpiryDate, 
+                reservation.CreatedDate,
+                reservation.AccountId));
 
             return new CreateAccountReservationResult
             {
