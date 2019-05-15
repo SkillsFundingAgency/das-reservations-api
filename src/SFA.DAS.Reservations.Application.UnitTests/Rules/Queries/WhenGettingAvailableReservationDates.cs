@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -11,7 +10,6 @@ using SFA.DAS.Reservations.Domain.Rules;
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute")]
     public class WhenGettingAvailableReservationDates
     {
         private GetAvailableDatesQueryHandler _handler;

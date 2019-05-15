@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -16,7 +15,6 @@ using SFA.DAS.Testing.AutoFixture;
 namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 {
     [TestFixture]
-    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute")]
     public class WhenGettingAccountLegalEntity
     {
         [Test, MoqAutoData]
