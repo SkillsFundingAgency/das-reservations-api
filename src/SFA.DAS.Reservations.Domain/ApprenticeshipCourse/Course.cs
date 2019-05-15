@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SFA.DAS.Reservations.Domain.Entities;
 
 namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
@@ -31,5 +32,10 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             : ApprenticeshipType.Standard;
 
         public ICollection<Rule> Rules { get; }
+
+        public IEnumerable<Rule> GetActiveRules()
+        {
+            return Rules.Where(r => r.ActiveFrom <= DateTime.Now && r.ActiveTo >= DateTime.Now);
+        }
     }
 }

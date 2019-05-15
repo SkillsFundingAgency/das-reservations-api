@@ -12,17 +12,17 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             
             if(query.ReservationId.Equals(Guid.Empty))
             {
-                validationResult.AddError(nameof(query.ReservationId), "Reservation Id date must be set");
+                validationResult.AddError(nameof(query.ReservationId));
             }
 
             if(string.IsNullOrEmpty(query.CourseId))
             {
-                validationResult.AddError(nameof(query.CourseId), "Course Id date must be set");
+                validationResult.AddError(nameof(query.CourseId));
             }
 
             if(query.TrainingStartDate.Equals(DateTime.MinValue))
             {
-                validationResult.AddError(nameof(query.TrainingStartDate), "Training start date must be set");
+                validationResult.AddError(nameof(query.TrainingStartDate));
             }
 
             return Task.FromResult(validationResult);

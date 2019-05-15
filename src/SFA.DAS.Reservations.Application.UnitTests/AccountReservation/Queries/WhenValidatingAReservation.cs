@@ -194,7 +194,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.IsNotNull(error);
             Assert.AreEqual(nameof(ValidateReservationQuery.TrainingStartDate), error.PropertyName);
         }
-
+        
         [Test]
         public async Task Then_Will_Return_Error_If_Course_Has_Active_Rules()
         {
@@ -205,27 +205,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 ReservationId = ReservationId,
                 TrainingStartDate = _reservation.StartDate.AddDays(1)
             };
-            _courseRules.Add(new Rule());
-
-            //Act
-            var result = await _handler.Handle(request, CancellationToken.None);
-
-            //Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Errors.Count);
-        }
-
-        [Test]
-        public async Task Then_Will_Return_Error_Message_If_Course_Has_Active_Rules()
-        {
-            //Arrange
-            var request = new ValidateReservationQuery
+            _courseRules.Add(new Rule
             {
-                CourseId = CourseId,
-                ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(1)
-            };
-            _courseRules.Add(new Rule());
+                ActiveFrom = DateTime.Now.AddDays(-2), 
+                ActiveTo = DateTime.Now.AddDays(2)
+            });
 
             //Act
             var result = await _handler.Handle(request, CancellationToken.None);
@@ -235,6 +219,30 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
             Assert.IsNotNull(error);
             Assert.AreEqual(nameof(ValidateReservationQuery.CourseId), error.PropertyName);
+        }
+
+        [Test]
+        public async Task Then_Will_Return_No_Error_Messages_If_Course_Has_No_Active_Rules()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseId = CourseId,
+                ReservationId = ReservationId,
+                TrainingStartDate = _reservation.StartDate.AddDays(1)
+            };
+            _courseRules.Add(new Rule
+            {
+                ActiveFrom = DateTime.Now.AddDays(2), 
+                ActiveTo = DateTime.Now.AddDays(4)
+            });
+
+            //Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
         }
     }
 }

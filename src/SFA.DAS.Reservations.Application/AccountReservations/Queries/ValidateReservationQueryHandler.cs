@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 errors.Add(new ReservationValidationError(nameof(request.TrainingStartDate), "Training start date must be before reservation expiry date"));
             }
 
-            if (reservation.Course.Rules.Any())
+            if (reservation.Course.GetActiveRules().Any())
             {
                 errors.Add(new ReservationValidationError(nameof(request.CourseId),"Selected course has restriction rules associated with it"));
             }
