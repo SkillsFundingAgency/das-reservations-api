@@ -5,38 +5,47 @@ using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
 {
     [TestFixture]
     public class WhenGettingAvailableReservationDates
     {
-        private GetAvailableDatesQueryHandler _handler;
-        private Mock<IAvailableDatesService> _availableDatesService;
-        private CancellationToken _cancellationToken;
-        
-        [SetUp]
-        public void Arrange()
+        [Test, MoqAutoData]
+        public async Task Then_Gets_Account_Id(
+            GetAvailableDatesQuery query,
+            List<AvailableDateStartWindow> availableDateStartWindows,
+            [Frozen] Mock<IAccountLegalEntitiesService> mockAleService,
+            [Frozen] Mock<IAvailableDatesService> mockDatesService,
+            GetAvailableDatesQueryHandler handler)
         {
-            _cancellationToken = new CancellationToken();
-            _availableDatesService = new Mock<IAvailableDatesService>();
+            await handler.Handle(query, CancellationToken.None);
 
-            _handler = new GetAvailableDatesQueryHandler(_availableDatesService.Object);
+            mockAleService.Verify(service => service.GetAccountLegalEntity(query.AccountLegalEntityId), Times.Once);
         }
 
-        [Test, AutoData]
+        [Test, MoqAutoData]
         public async Task Then_The_Available_Dates_Service_Is_Called_And_Dates_Returned(
-            long accountLegalEntityId,
-            List<AvailableDateStartWindow> availableDateStartWindows)
+            GetAvailableDatesQuery query,
+            AccountLegalEntity accountLegalEntity,
+            List<AvailableDateStartWindow> availableDateStartWindows,
+            [Frozen] Mock<IAccountLegalEntitiesService> mockAleService,
+            [Frozen] Mock<IAvailableDatesService> mockDatesService,
+            GetAvailableDatesQueryHandler handler)
         {
             //Arrange
-            _availableDatesService
-                .Setup(x => x.GetAvailableDates(accountLegalEntityId))
+            mockAleService
+                .Setup(service => service.GetAccountLegalEntity(query.AccountLegalEntityId))
+                .ReturnsAsync(accountLegalEntity);
+            mockDatesService
+                .Setup(x => x.GetAvailableDates(accountLegalEntity.AccountId))
                 .Returns(availableDateStartWindows);
 
             //Act
-            var actual = await _handler.Handle(new GetAvailableDatesQuery{AccountLegalEntityId = accountLegalEntityId}, _cancellationToken);
+            var actual = await handler.Handle(query, CancellationToken.None);
 
             //Assert
             Assert.IsAssignableFrom<GetAvailableDatesResult>(actual);

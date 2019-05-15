@@ -1,26 +1,29 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Rules.Queries
 {
     public class GetAvailableDatesQueryHandler : IRequestHandler<GetAvailableDatesQuery, GetAvailableDatesResult>
     {
+        private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
         private readonly IAvailableDatesService _availableDatesService;
         
-        public GetAvailableDatesQueryHandler(IAvailableDatesService availableDatesService)
+        public GetAvailableDatesQueryHandler(
+            IAccountLegalEntitiesService accountLegalEntitiesService,
+            IAvailableDatesService availableDatesService)
         {
+            _accountLegalEntitiesService = accountLegalEntitiesService;
             _availableDatesService = availableDatesService;
         }
 
         public async Task<GetAvailableDatesResult> Handle(GetAvailableDatesQuery request, CancellationToken cancellationToken)
         {
-            await Task.CompletedTask;//todo: remove once _availableDatesService is awaitable
-            // todo: get account id
-            // todo: check if account is eoi
+            var accountLegalEntity = await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
 
-            var availableDates = _availableDatesService.GetAvailableDates(request.AccountLegalEntityId);
+            var availableDates = _availableDatesService.GetAvailableDates(accountLegalEntity.AccountId);
             
             return new GetAvailableDatesResult
             {

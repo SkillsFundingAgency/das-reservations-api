@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             _configuration = options.Value;
         }
 
-        public IList<AvailableDateStartWindow> GetAvailableDates(long accountLegalEntity)
+        public IList<AvailableDateStartWindow> GetAvailableDates(long accountId)
         {
             var availableDates = new AvailableDates(
                 _configuration.NumberOfAvailableDates,

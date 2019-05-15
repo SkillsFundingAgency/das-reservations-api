@@ -28,6 +28,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [Route("available-dates")]
         public async Task<IActionResult> GetAvailableDates(long accountLegalEntityId = 0)
         {
+            //todo: wrap in try catch for potential not found exception
             var response =
                 await _mediator.Send(new GetAvailableDatesQuery {AccountLegalEntityId = accountLegalEntityId});
 
