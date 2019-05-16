@@ -21,14 +21,18 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
             if (eoiAccounts.Contains(accountId.ToString()))
             {
-                return new EoiAvailableDates().Dates;
+                return new EoiAvailableDates(
+                    _configuration.EoiNumberOfAvailableDates,
+                    _configuration.EoiAvailableDatesMinDate,
+                    _configuration.EoiAvailableDatesMaxDate)
+                    .Dates;
             }
 
-            var availableDates = new AvailableDates(
+            return new AvailableDates(
                 _configuration.NumberOfAvailableDates,
                 _configuration.AvailableDatesMinDate, 
-                _configuration.AvailableDatesMaxDate);
-            return availableDates.Dates;
+                _configuration.AvailableDatesMaxDate)
+                .Dates;
         }
     }
 }

@@ -39,7 +39,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Mock<IOptions<ReservationsConfiguration>> mockOptions)
         {
             var config = mockOptions.Object.Value;
-            var expectedDates = new EoiAvailableDates()
+            var expectedDates = new EoiAvailableDates(
+                    config.EoiNumberOfAvailableDates,
+                    config.EoiAvailableDatesMinDate,
+                    config.EoiAvailableDatesMaxDate)
                 .Dates;
             config.EoiAccountIds += $",{accountId}";
 

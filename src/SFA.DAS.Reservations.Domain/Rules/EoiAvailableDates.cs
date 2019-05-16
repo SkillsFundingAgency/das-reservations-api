@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
     public class EoiAvailableDates
     {
         public EoiAvailableDates(
-            int numberOfAvailableDates = 6, 
+            int? numberOfAvailableDates = 6, 
             DateTime? availableDatesMinDate = null, 
             DateTime? availableDatesMaxDate = null)
         {

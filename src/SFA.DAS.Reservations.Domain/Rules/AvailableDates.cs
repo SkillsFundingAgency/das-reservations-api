@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
         private const int DefaultExpiryMonths = 6;
 
         public AvailableDates(
-            int expiryPeriodInMonths = 6, 
+            int? expiryPeriodInMonths = 6, 
             DateTime? minStartDate = null,
             DateTime? maxStartDate = null)
         {
