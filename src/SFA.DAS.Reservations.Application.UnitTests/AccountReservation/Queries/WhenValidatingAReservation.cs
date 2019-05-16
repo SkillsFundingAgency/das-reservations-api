@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
+using Course = SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course;
 
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
@@ -21,29 +23,23 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
         private ValidateReservationQueryHandler _handler;
         private Mock<IAccountReservationService> _reservationService;
+        private Mock<ICourseService> _courseService;
         private Mock<IValidator<ValidateReservationQuery>> _validator;
         private Reservation _reservation;
-        
-        private IList<Rule> _courseRules;
         private Course _course;
-
 
         [SetUp]
         public void Arrange()
         {
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            
+            _course = new Course(CourseId, "Test Course", "1");
 
-            _courseRules = new List<Rule>();
+            _courseService = new Mock<ICourseService>();
+            _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
+                .ReturnsAsync(_course);
 
-            _course = new Course
-            {
-                CourseId = CourseId,
-                Title = "Test Course",
-                Level = 1,
-                ReservationRule = _courseRules
-            };
-
-            _reservation = new Reservation(time => Task.FromResult(new List<Rule>() as IList<Rule>), ReservationId, 1, true, DateTime.Now, startDate, startDate.AddMonths(3), ReservationStatus.Pending, _course, 1, 1, "Legal Entity");
+            _reservation = new Reservation(time => Task.FromResult(new List<Rule>() as IList<Rule>), ReservationId, 1, true, DateTime.Now, startDate, startDate.AddMonths(3), ReservationStatus.Pending, new Domain.Entities.Course(), 1, 1, "Legal Entity");
 
             _reservationService = new Mock<IAccountReservationService>();
 
@@ -55,7 +51,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             _validator.Setup(v => v.ValidateAsync(It.IsAny<ValidateReservationQuery>()))
                 .ReturnsAsync(new ValidationResult());
 
-            _handler = new ValidateReservationQueryHandler(_reservationService.Object, _validator.Object);
+            _handler = new ValidateReservationQueryHandler(_reservationService.Object, _courseService.Object, _validator.Object);
         }
 
         [Test]
@@ -94,6 +90,24 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             _validator.Verify(x => x.ValidateAsync(request), Times.Once);
 
+        }
+
+        [Test]
+        public async Task Then_Validates_Given_Course()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseId = CourseId,
+                ReservationId = ReservationId,
+                TrainingStartDate = _reservation.StartDate.AddDays(1)
+            };
+
+            //Act
+            await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            _courseService.Verify(s => s.GetCourseById(CourseId), Times.Once);
         }
 
         [Test]
@@ -205,7 +219,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 ReservationId = ReservationId,
                 TrainingStartDate = _reservation.StartDate.AddDays(1)
             };
-            _courseRules.Add(new Rule
+            
+            _course.Rules.Add(new Rule
             {
                 ActiveFrom = DateTime.Now.AddDays(-2), 
                 ActiveTo = DateTime.Now.AddDays(2)
@@ -231,7 +246,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 ReservationId = ReservationId,
                 TrainingStartDate = _reservation.StartDate.AddDays(1)
             };
-            _courseRules.Add(new Rule
+            
+            _course.Rules.Add(new Rule
             {
                 ActiveFrom = DateTime.Now.AddDays(2), 
                 ActiveTo = DateTime.Now.AddDays(4)
@@ -243,6 +259,29 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(result);
             Assert.IsEmpty(result.Errors);
+        }
+
+        [Test]
+        public async Task Then_Will_Return_Error_Messages_If_No_Course_Found()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseId = CourseId,
+                ReservationId = ReservationId,
+                TrainingStartDate = _reservation.StartDate.AddDays(1)
+            };
+
+            _courseService.Setup(s => s.GetCourseById(It.IsAny<string>())).ReturnsAsync((Course) null);
+
+            //Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            var error = result?.Errors.FirstOrDefault();
+
+            Assert.IsNotNull(error);
+            Assert.AreEqual(nameof(ValidateReservationQuery.CourseId), error.PropertyName);
         }
     }
 }
