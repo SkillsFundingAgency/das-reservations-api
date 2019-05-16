@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
             }
 
             var startDate = minStartDate ?? DateTime.UtcNow;
+            if (startDate < DateTime.UtcNow) startDate = DateTime.UtcNow;
             var twoMonthsFromNow = startDate.AddMonths(2);
             var lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
 

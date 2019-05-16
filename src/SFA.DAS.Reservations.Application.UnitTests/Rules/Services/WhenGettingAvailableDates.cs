@@ -15,8 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         [Test, MoqAutoData]
         public void And_Account_Not_Eoi_Then_Uses_AvailableDates(
             long accountId,
-            [Frozen] Mock<IOptions<ReservationsConfiguration>> mockOptions,
-            AvailableDatesService availableDatesService)
+            Mock<IOptions<ReservationsConfiguration>> mockOptions)
         {
             var config = mockOptions.Object.Value;
             var expectedDates = new AvailableDates(
@@ -24,6 +23,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                     config.AvailableDatesMinDate, 
                     config.AvailableDatesMaxDate)
                 .Dates;
+
+            var availableDatesService = new AvailableDatesService(mockOptions.Object);
             
             //Act
             var actualDates = availableDatesService.GetAvailableDates(accountId);
@@ -38,10 +39,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Mock<IOptions<ReservationsConfiguration>> mockOptions)
         {
             var config = mockOptions.Object.Value;
-            var expectedDates = new EoiAvailableDates(
-                    config.ExpiryPeriodInMonths, 
-                    config.AvailableDatesMinDate, 
-                    config.AvailableDatesMaxDate)
+            var expectedDates = new EoiAvailableDates()
                 .Dates;
             config.EoiAccountIds += $",{accountId}";
 

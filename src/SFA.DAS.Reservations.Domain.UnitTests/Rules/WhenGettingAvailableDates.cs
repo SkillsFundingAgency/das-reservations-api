@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         [SetUp]
         public void Arrange()
         {
-            _expectedMinStartDate = new DateTime(2018, 10, 01);
+            _expectedMinStartDate = DateTime.UtcNow;
             _expectedMaxStartDate = DateTime.UtcNow.AddMonths(3);
         }
 
@@ -41,6 +41,16 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
 
             //Assert
             Assert.AreEqual(_expectedMinStartDate.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
+        }
+
+        [Test]
+        public void And_MinDate_Is_Before_Now_Then_Uses_Now()
+        {
+            //Act
+            var actual = new AvailableDates(minStartDate: DateTime.UtcNow.AddMonths(-2));
+
+            //Assert
+            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
         }
 
         [Test]
@@ -82,7 +92,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         }
 
         [Test]
-        public void Then_The_Dates_Are_Set_To_The_First_Of_The_Month_And_The_EndDate_To_The_Liast()
+        public void Then_The_Dates_Are_Set_To_The_First_Of_The_Month_And_The_EndDate_To_The_Last()
         { 
             //Act
             var actual = new AvailableDates();

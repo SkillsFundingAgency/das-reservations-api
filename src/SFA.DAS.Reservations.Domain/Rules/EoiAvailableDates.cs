@@ -10,7 +10,12 @@ namespace SFA.DAS.Reservations.Domain.Rules
             DateTime? availableDatesMinDate = null, 
             DateTime? availableDatesMaxDate = null)
         {
-            Dates = new List<AvailableDateStartWindow>();
+            var defaultStartDate = availableDatesMinDate ?? new DateTime(2019, 8, 1);
+            var defaultEndDate = availableDatesMaxDate ?? new DateTime(2019, 12, 1);
+
+            var availableDates = new AvailableDates(numberOfAvailableDates, defaultStartDate, defaultEndDate);
+
+            Dates = availableDates.Dates;
         }
 
         public IEnumerable<AvailableDateStartWindow> Dates { get; }
