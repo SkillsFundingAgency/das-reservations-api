@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 return errors;
             }
 
-            if (course.GetActiveRules().Any())
+            if (course.GetActiveRules(request.TrainingStartDate).Any())
             {
                 errors.Add(new ReservationValidationError(nameof(request.CourseId),
                     "Selected course has restriction rules associated with it"));

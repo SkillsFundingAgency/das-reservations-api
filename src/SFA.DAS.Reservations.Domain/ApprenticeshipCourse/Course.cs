@@ -33,9 +33,9 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
 
         public ICollection<Rule> Rules { get; }
 
-        public IEnumerable<Rule> GetActiveRules()
+        public IEnumerable<Rule> GetActiveRules(DateTime trainingStartDate)
         {
-            return Rules.Where(r => r.ActiveFrom <= DateTime.Now && r.ActiveTo >= DateTime.Now);
+            return Rules.Where(r => r.ActiveFrom <= trainingStartDate && r.ActiveTo >= trainingStartDate);
         }
     }
 }

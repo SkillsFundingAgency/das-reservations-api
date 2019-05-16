@@ -12,23 +12,24 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
         public void ThenWillReturnActiveRules()
         {
             //Arrange
+            var trainingStartDate = DateTime.Now.AddDays(30);
             var course = new Course("1", "Test", "1");
             var activeRule = new Rule
             {
-                ActiveFrom = DateTime.Now.AddDays(-2),
-                ActiveTo = DateTime.Now.AddDays(2)
+                ActiveFrom = trainingStartDate.AddDays(-2),
+                ActiveTo = trainingStartDate.AddDays(2)
             };
             var unactiveRule = new Rule
             {
-                ActiveFrom = DateTime.Now.AddDays(2),
-                ActiveTo = DateTime.Now.AddDays(4)
+                ActiveFrom = trainingStartDate.AddDays(2),
+                ActiveTo = trainingStartDate.AddDays(4)
             };
 
             course.Rules.Add(activeRule);
             course.Rules.Add(unactiveRule);
 
             //Act
-            var result = course.GetActiveRules();
+            var result = course.GetActiveRules(trainingStartDate);
 
             //Assert
             Assert.IsNotNull(result);
@@ -43,18 +44,19 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
         public void ThenWillEmptyCollectionIfNotActiveRules()
         {
             //Arrange
+            var trainingStartDate = DateTime.Now.AddDays(30);
             var course = new Course("1", "Test", "1");
            
             var unactiveRule = new Rule
             {
-                ActiveFrom = DateTime.Now.AddDays(2),
-                ActiveTo = DateTime.Now.AddDays(4)
+                ActiveFrom = trainingStartDate.AddDays(2),
+                ActiveTo = trainingStartDate.AddDays(4)
             };
            
             course.Rules.Add(unactiveRule);
 
             //Act
-            var result = course.GetActiveRules();
+            var result = course.GetActiveRules(trainingStartDate);
 
             //Assert
             Assert.IsNotNull(result);
