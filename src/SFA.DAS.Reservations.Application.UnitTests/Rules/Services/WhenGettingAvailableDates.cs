@@ -1,35 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 {
     public class WhenGettingAvailableDates
     {
-        private Mock<IOptions<ReservationsConfiguration>> _options;
-
-        [Test, AutoData]
-        public void Then_The_List_is_Built_From_The_Configuration_Values(
-            long accountLegalEntityId)
+        [Test, MoqAutoData]
+        public void And_Account_Not_Eoi_Then_Uses_AvailableDates(
+            long accountId,
+            [Frozen] Mock<IOptions<ReservationsConfiguration>> mockOptions,
+            AvailableDatesService availableDatesService)
         {
-            //Arrange
-            _options = new Mock<IOptions<ReservationsConfiguration>>();
-            _options.Setup(x => x.Value.NumberOfAvailableDates).Returns(8);
-            _options.Setup(x => x.Value.AvailableDatesMinDate).Returns(new DateTime(2018,10,01));
-            _options.Setup(x => x.Value.AvailableDatesMaxDate).Returns(new DateTime(2019,02,01));
-            var service = new AvailableDatesService(_options.Object);
-
+            var config = mockOptions.Object.Value;
+            var expectedDates = new AvailableDates(
+                    config.ExpiryPeriodInMonths, 
+                    config.AvailableDatesMinDate, 
+                    config.AvailableDatesMaxDate)
+                .Dates;
+            
             //Act
-            var actual = service.GetAvailableDates(accountLegalEntityId);
+            var actualDates = availableDatesService.GetAvailableDates(accountId);
             
             //Assert
-            Assert.AreEqual(5, actual.Count);
+            actualDates.Should().BeEquivalentTo(expectedDates);
+        }
+
+        [Test, MoqAutoData]
+        public void And_Account_Is_Eoi_Then_Uses_EoiAvailableDates(
+            long accountId,
+            Mock<IOptions<ReservationsConfiguration>> mockOptions)
+        {
+            var config = mockOptions.Object.Value;
+            var expectedDates = new EoiAvailableDates(
+                    config.ExpiryPeriodInMonths, 
+                    config.AvailableDatesMinDate, 
+                    config.AvailableDatesMaxDate)
+                .Dates;
+            config.EoiAccountIds += $",{accountId}";
+
+            var availableDatesService = new AvailableDatesService(mockOptions.Object);
+            
+            //Act
+            var actualDates = availableDatesService.GetAvailableDates(accountId);
+            
+            //Assert
+            actualDates.Should().BeEquivalentTo(expectedDates);
         }
     }
 }
