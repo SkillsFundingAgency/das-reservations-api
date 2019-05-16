@@ -1,0 +1,42 @@
+﻿using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NServiceBus;
+using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using SFA.DAS.NServiceBus;
+using SFA.DAS.NServiceBus.AzureServiceBus;
+using SFA.DAS.NServiceBus.NewtonsoftJsonSerializer;
+using SFA.DAS.NServiceBus.SqlServer;
+using SFA.DAS.UnitOfWork.NServiceBus;
+
+namespace SFA.DAS.Reservations.Api.StartupExtensions
+{
+    public static class NServiceBusStartUp
+    {
+        public static void StartNServiceBus(this UpdateableServiceProvider serviceProvider, IConfiguration configuration)
+        {
+            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Reservations.Api")
+                .UseAzureServiceBusTransport(configuration["Reservations:NServiceBusConnectionString"], r => { })
+                .UseErrorQueue()
+                .UseInstallers()
+                .UseMessageConventions()
+                .UseNewtonsoftJsonSerializer()
+                .UseOutbox()
+                .UseServicesBuilder(serviceProvider)
+                .UseSqlServerPersistence(() => new SqlConnection(configuration["Reservations:ConnectionString"]))
+                .UseUnitOfWork();
+
+            if (!string.IsNullOrEmpty(configuration["Reservations:NServiceBusLicense"]))
+            {
+                endpointConfiguration.License(configuration["Reservations:NServiceBusLicense"]);
+            }
+            
+
+            var endpoint = Endpoint.Start(endpointConfiguration).GetAwaiter().GetResult();
+
+            serviceProvider.AddSingleton(p => endpoint)
+                .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
+                .AddHostedService<NServiceBusHostedService>();
+        }
+    }
+}
