@@ -3,12 +3,15 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
+using AutoFixture.NUnit3;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
+using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
@@ -49,6 +52,23 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             Assert.IsNotNull(result.Value);
             var actualRules = result.Value as GetAvailableDatesResult;
             Assert.AreEqual(_datesResult.AvailableDates, actualRules.AvailableDates);
+        }
+
+        [Test, AutoData]
+        public async Task And_Exception_Then_Returns_Error(
+            EntityNotFoundException notFoundException)
+        {
+            _mediator.Setup(x => x.Send(
+                    It.IsAny<GetAvailableDatesQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .Throws(notFoundException);
+
+            var actual = await _rulesController.GetAvailableDates(_accountLegalEntityId) as ObjectResult;
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)actual.StatusCode);
+            var actualError = actual.Value as ArgumentErrorViewModel;
+            Assert.AreEqual(notFoundException.Message, actualError.Message);
+            Assert.AreEqual("accountLegalEntityId", actualError.Params);
         }
     }
 }

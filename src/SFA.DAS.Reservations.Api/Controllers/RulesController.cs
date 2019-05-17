@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Domain.Exceptions;
 
 namespace SFA.DAS.Reservations.Api.Controllers
 {
@@ -28,11 +29,21 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [Route("available-dates")]
         public async Task<IActionResult> GetAvailableDates(long accountLegalEntityId = 0)
         {
-            //todo: wrap in try catch for potential not found exception
-            var response =
-                await _mediator.Send(new GetAvailableDatesQuery {AccountLegalEntityId = accountLegalEntityId});
+            try
+            {
+                var response =
+                    await _mediator.Send(new GetAvailableDatesQuery {AccountLegalEntityId = accountLegalEntityId});
 
-            return Ok(response);
+                return Ok(response);
+            }
+            catch (EntityNotFoundException e)
+            {
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = nameof(accountLegalEntityId)
+                });
+            }
         }
 
         [Route("account/{accountId}")]
