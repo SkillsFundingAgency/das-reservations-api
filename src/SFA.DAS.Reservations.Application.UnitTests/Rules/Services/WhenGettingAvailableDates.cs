@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         {
             var config = mockOptions.Object.Value;
             var expectedDates = new AvailableDates(
-                    config.ExpiryPeriodInMonths, 
+                    config.NumberOfAvailableDates, 
                     config.AvailableDatesMinDate, 
                     config.AvailableDatesMaxDate)
                 .Dates;
