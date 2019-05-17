@@ -36,7 +36,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
 
                 return Ok(response);
             }
-            catch (EntityNotFoundException e)
+            catch(Exception e) when(
+                e is ArgumentException || 
+                e is EntityNotFoundException)
             {
                 return BadRequest(new ArgumentErrorViewModel
                 {

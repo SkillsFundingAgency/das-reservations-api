@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +56,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
         }
 
         [Test, AutoData]
-        public async Task And_Exception_Then_Returns_Error(
+        public async Task And_EntityNotFoundException_Then_Returns_Error(
             EntityNotFoundException notFoundException)
         {
             _mediator.Setup(x => x.Send(
@@ -68,6 +69,23 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)actual.StatusCode);
             var actualError = actual.Value as ArgumentErrorViewModel;
             Assert.AreEqual(notFoundException.Message, actualError.Message);
+            Assert.AreEqual("accountLegalEntityId", actualError.Params);
+        }
+
+        [Test, AutoData]
+        public async Task And_ArgumentException_Then_Returns_Error(
+            ArgumentException argumentException)
+        {
+            _mediator.Setup(x => x.Send(
+                    It.IsAny<GetAvailableDatesQuery>(),
+                    It.IsAny<CancellationToken>()))
+                .Throws(argumentException);
+
+            var actual = await _rulesController.GetAvailableDates(_accountLegalEntityId) as ObjectResult;
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)actual.StatusCode);
+            var actualError = actual.Value as ArgumentErrorViewModel;
+            Assert.AreEqual(argumentException.Message, actualError.Message);
             Assert.AreEqual("accountLegalEntityId", actualError.Params);
         }
     }
