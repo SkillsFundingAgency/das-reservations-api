@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             return Ok(response);
         }
 
-        [Route("available-dates")]
+        [Route("available-dates/{accountLegalEntityId}")]
         public async Task<IActionResult> GetAvailableDates(long accountLegalEntityId = 0)
         {
             try
