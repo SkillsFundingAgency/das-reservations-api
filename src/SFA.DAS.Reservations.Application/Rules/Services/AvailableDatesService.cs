@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         public IEnumerable<AvailableDateStartWindow> GetAvailableDates(long accountId)
         {
-            var eoiAccounts = _configuration.EoiAccountIds.Split(',');
+            var eoiAccounts = _configuration.EoiAccountIds?.Split(',') ?? new string[0];
 
             if (eoiAccounts.Contains(accountId.ToString()))
             {

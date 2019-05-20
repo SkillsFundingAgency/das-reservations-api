@@ -10,6 +10,17 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
     public class WhenGettingEoiAvailableDates
     {
         [Test]
+        public void Then_Number_Defaults_To_6()
+        {
+            var expectedMaxDate = new DateTime(2019, 12, 1);
+
+            var actualDates = new EoiAvailableDates(null).Dates;
+
+            actualDates.OrderBy(window => window.StartDate).Last().StartDate
+                .Should().Be(expectedMaxDate);
+        }
+
+        [Test]
         public void Then_Min_Date_Defaults_To_Aug_2019()
         {
             var expectedMinDate = new DateTime(2019, 8, 1);
