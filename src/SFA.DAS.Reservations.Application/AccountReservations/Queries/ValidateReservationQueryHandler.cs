@@ -34,8 +34,10 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c=>c.Key).Aggregate((item1, item2)=> item1 + ", " + item2));
             }
             
-            var reservationErrors = await ValidateReservation(request);
-            var courseErrors = await ValidateCourse(request);
+            var reservation = await _reservationService.GetReservation(request.ReservationId);
+
+            var reservationErrors = ValidateReservation(request, reservation);
+            var courseErrors = await ValidateCourse(request, reservation);
 
             return new ValidateReservationResponse
             {
@@ -43,11 +45,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             };
         }
        
-        private async Task<ICollection<ReservationValidationError>> ValidateReservation(ValidateReservationQuery request)
+        private IEnumerable<ReservationValidationError> ValidateReservation(
+            ValidateReservationQuery request, 
+            Reservation reservation)
         {
             var errors = new List<ReservationValidationError>();
-
-            var reservation = await _reservationService.GetReservation(request.ReservationId);
 
             if (reservation.StartDate > request.TrainingStartDate)
             {
@@ -64,7 +66,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             return errors;
         }
 
-        private async Task<ICollection<ReservationValidationError>> ValidateCourse(ValidateReservationQuery request)
+        private async Task<ICollection<ReservationValidationError>> ValidateCourse(
+            ValidateReservationQuery request,
+            Reservation reservation)
         {
             var errors = new List<ReservationValidationError>();
 
@@ -78,7 +82,15 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 return errors;
             }
 
-            if (course.GetActiveRules(request.TrainingStartDate).Any())
+            var reservationDates = new ReservationDates
+            {
+                TrainingStartDate = request.TrainingStartDate,
+                ReservationStartDate = reservation.StartDate,
+                ReservationExpiryDate = reservation.ExpiryDate,
+                ReservationCreatedDate = reservation.CreatedDate
+            };
+
+            if (course.GetActiveRules(reservationDates).Any())
             {
                 errors.Add(new ReservationValidationError(nameof(request.CourseId),
                     "Selected course has restriction rules associated with it"));

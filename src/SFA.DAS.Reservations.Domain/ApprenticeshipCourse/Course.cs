@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
 {
     public class Course
     {
-
         public Course(Entities.Course entity)
         {
             CourseId = entity.CourseId;
@@ -32,10 +32,13 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             : ApprenticeshipType.Standard;
 
         public ICollection<Rule> Rules { get; }
-
-        public IEnumerable<Rule> GetActiveRules(DateTime trainingStartDate)
+      
+        public IEnumerable<Rule> GetActiveRules(ReservationDates dates)
         {
-            return Rules.Where(r => r.ActiveFrom <= trainingStartDate && r.ActiveTo >= trainingStartDate);
+            return Rules.Where(r => 
+                r.CreatedDate <= dates.ReservationCreatedDate &&
+                r.ActiveFrom <= dates.ReservationExpiryDate && 
+                r.ActiveTo >= dates.ReservationStartDate);
         }
     }
 }

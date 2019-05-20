@@ -249,8 +249,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             
             _course.Rules.Add(new Rule
             {
-                ActiveFrom = request.TrainingStartDate.AddDays(2), 
-                ActiveTo = request.TrainingStartDate.AddDays(4)
+                ActiveFrom = _reservation.StartDate.AddDays(-10), 
+                ActiveTo = _reservation.StartDate.AddDays(-5)
             });
 
             //Act
