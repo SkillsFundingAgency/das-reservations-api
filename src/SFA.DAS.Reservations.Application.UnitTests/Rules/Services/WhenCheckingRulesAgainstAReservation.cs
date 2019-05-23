@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         public void Arrange()
         {
             _repository = new Mock<IGlobalRuleRepository>();
-            _repository.Setup(x => x.GetGlobalRules(_dateFrom))
+            _repository.Setup(x => x.FindActive(_dateFrom))
                 .ReturnsAsync(new List<GlobalRule>
                 {
                     new GlobalRule
@@ -100,7 +100,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         {
             //Arrange
             var reservation = new Reservation(Guid.NewGuid(), 123, _dateFrom, 2, "test");
-            _repository.Setup(x => x.GetGlobalRules(_dateFrom))
+            _repository.Setup(x => x.FindActive(_dateFrom))
                 .ReturnsAsync(new List<GlobalRule>
                 {
                     new GlobalRule
@@ -131,7 +131,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         {
             //Arrange
             var expectedAccountId = 123;
-            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
 
             //Act
@@ -145,7 +145,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         public async Task Then_If_The_Max_Number_Of_Reservations_Has_Been_Met_Then_The_Rule_Is_Returned()
         {
             //Arrange
-            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             var expectedAccountId = 123;
             var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(1);
@@ -165,7 +165,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         public async Task Then_If_The_Max_Number_Of_Reservations_Has_Not_Been_Met_Then_Null_Is_Returned()
         {
             //Arrange
-            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             var expectedAccountId = 123;
             var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(2);
@@ -182,7 +182,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         public async Task Then_If_No_Maximum_Has_Been_Set_It_Returns_Null()
         {
             //Arrange
-            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(0);
             var expectedAccountId = 123;
             var existingReservations = new List<Domain.Entities.Reservation>();

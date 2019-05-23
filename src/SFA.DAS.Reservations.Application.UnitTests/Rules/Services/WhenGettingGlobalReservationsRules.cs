@@ -29,29 +29,64 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 RuleType = 1,
                 ActiveFrom = new DateTime(2010,02,15)
             };
+
             _repository = new Mock<IGlobalRuleRepository>();
-            _repository.Setup(x => x.GetGlobalRules(It.IsAny<DateTime>()))
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>()))
                 .ReturnsAsync(new List<GlobalRule>{_globalRule});
 
-            _globalRulesService = new GlobalRulesService(_repository.Object, Mock.Of<IOptions<ReservationsConfiguration>>(), Mock.Of<IReservationRepository>());
+            _repository.Setup(x => x.GetAll())
+                .ReturnsAsync(new List<GlobalRule>{_globalRule});
+
+            _globalRulesService = new GlobalRulesService(_repository.Object, 
+                Mock.Of<IOptions<ReservationsConfiguration>>(), 
+                Mock.Of<IReservationRepository>());
         }
 
         [Test]
-        public async Task Then_The_GlobalRules_Are_Taken_From_The_Repository_For_That_Account()
+        public async Task Then_The_Global_Rules_Are_Taken_From_The_Repository_For_That_Account()
         {
             //Act
-            var actual = await _globalRulesService.GetRules();
+            var actual = await _globalRulesService.GetAllRules();
 
             //Assert
-            _repository.Verify(x => x.GetGlobalRules(It.Is<DateTime>(c => c.ToShortDateString().Equals(DateTime.UtcNow.ToShortDateString()))));
+            _repository.Verify(x => x.GetAll());
             Assert.IsNotNull(actual);
         }
 
         [Test]
-        public async Task Then_The_Results_Are_Mapped_To_The_Domain_Model()
+        public async Task Then_The_Rule_Results_Are_Mapped_To_The_Domain_Model()
         {
             //Act
-            var actual = await _globalRulesService.GetRules();
+            var actual = await _globalRulesService.GetAllRules();
+
+            //Assert
+            Assert.IsAssignableFrom<List<Domain.Rules.GlobalRule>>(actual);
+            Assert.IsNotEmpty(actual);
+            var actualRule = actual.FirstOrDefault();
+            Assert.IsNotNull(actualRule);
+            Assert.AreEqual(_globalRule.Id, actualRule.Id);
+            Assert.AreEqual(_globalRule.ActiveFrom, actualRule.ActiveFrom);
+            Assert.AreEqual(_globalRule.RuleType, (byte)actualRule.RuleType);
+            Assert.AreEqual(_globalRule.Restriction, (byte)actualRule.Restriction);
+        }
+
+
+        [Test]
+        public async Task Then_The_Active_Global_Rules_Are_Taken_From_The_Repository_For_That_Account()
+        {
+            //Act
+            var actual = await _globalRulesService.GetActiveRules(DateTime.UtcNow);
+
+            //Assert
+            _repository.Verify(x => x.FindActive(It.Is<DateTime>(c => c.ToShortDateString().Equals(DateTime.UtcNow.ToShortDateString()))));
+            Assert.IsNotNull(actual);
+        }
+
+        [Test]
+        public async Task Then_The_Active_Rule_Results_Are_Mapped_To_The_Domain_Model()
+        {
+            //Act
+            var actual = await _globalRulesService.GetActiveRules(DateTime.UtcNow);
 
             //Assert
             Assert.IsAssignableFrom<List<Domain.Rules.GlobalRule>>(actual);
