@@ -51,15 +51,15 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         {
             var errors = new List<ReservationValidationError>();
 
-            if (reservation.StartDate > request.TrainingStartDate)
+            if (reservation.StartDate > request.StartDate)
             {
-                errors.Add(new ReservationValidationError(nameof(request.TrainingStartDate),
+                errors.Add(new ReservationValidationError(nameof(request.StartDate),
                     "Training start date must be after reservation start date"));
             }
 
-            if (reservation.ExpiryDate < request.TrainingStartDate)
+            if (reservation.ExpiryDate < request.StartDate)
             {
-                errors.Add(new ReservationValidationError(nameof(request.TrainingStartDate),
+                errors.Add(new ReservationValidationError(nameof(request.StartDate),
                     "Training start date must be before reservation expiry date"));
             }
 
@@ -72,11 +72,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         {
             var errors = new List<ReservationValidationError>();
 
-            var course = await _courseService.GetCourseById(request.CourseId);
+            var course = await _courseService.GetCourseById(request.CourseCode);
 
             if (course == null)
             {
-                errors.Add(new ReservationValidationError(nameof(request.CourseId),
+                errors.Add(new ReservationValidationError(nameof(request.CourseCode),
                     "Selected course cannot be found"));
 
                 return errors;
@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 
             var reservationDates = new ReservationDates
             {
-                TrainingStartDate = request.TrainingStartDate,
+                TrainingStartDate = request.StartDate,
                 ReservationStartDate = reservation.StartDate,
                 ReservationExpiryDate = reservation.ExpiryDate,
                 ReservationCreatedDate = reservation.CreatedDate
@@ -92,7 +92,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 
             if (course.GetActiveRules(reservationDates).Any())
             {
-                errors.Add(new ReservationValidationError(nameof(request.CourseId),
+                errors.Add(new ReservationValidationError(nameof(request.CourseCode),
                     "Selected course has restriction rules associated with it"));
             }
 

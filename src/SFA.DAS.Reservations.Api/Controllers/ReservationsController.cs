@@ -112,15 +112,15 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [Route("api/[controller]/validate/{id}")]
-        public async Task<IActionResult> Validate(Guid id, string courseId, DateTime trainingStartDate)
+        public async Task<IActionResult> Validate(Guid id, string courseCode, DateTime startDate)
         {
             try
             {
                 var request = new ValidateReservationQuery
                 {
                     ReservationId = id,
-                    CourseId = courseId,
-                    TrainingStartDate = trainingStartDate
+                    CourseCode = courseCode,
+                    StartDate = startDate
                 };
 
                 var response = await _mediator.Send(request);

@@ -15,14 +15,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 validationResult.AddError(nameof(query.ReservationId));
             }
 
-            if(string.IsNullOrEmpty(query.CourseId))
+            if(string.IsNullOrEmpty(query.CourseCode))
             {
-                validationResult.AddError(nameof(query.CourseId));
+                validationResult.AddError(nameof(query.CourseCode));
             }
 
-            if(query.TrainingStartDate.Equals(DateTime.MinValue))
+            if(query.StartDate.Equals(DateTime.MinValue))
             {
-                validationResult.AddError(nameof(query.TrainingStartDate));
+                validationResult.AddError(nameof(query.StartDate));
             }
 
             return Task.FromResult(validationResult);

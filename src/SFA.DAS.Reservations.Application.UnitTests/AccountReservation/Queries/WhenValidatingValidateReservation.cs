@@ -18,8 +18,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             _query = new ValidateReservationQuery
             {
                 ReservationId = Guid.NewGuid(),
-                CourseId = "1", 
-                TrainingStartDate = DateTime.Now
+                CourseCode = "1", 
+                StartDate = DateTime.Now
             };
         }
 
@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         public async Task ThenWillThrowErrorIfCourseIdIsInvalid()
         {
             //Arrange
-            _query.CourseId = "";
+            _query.CourseCode = "";
 
             //Act
             var result = await _validator.ValidateAsync(_query);
@@ -62,14 +62,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(result);
             Assert.IsFalse(result.IsValid());
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(_query.CourseId)));
+            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(_query.CourseCode)));
         }
 
         [Test]
         public async Task ThenWillThrowErrorIfTrainingStartDateIsInvalid()
         {
             //Arrange
-            _query.TrainingStartDate = default(DateTime);
+            _query.StartDate = default(DateTime);
 
             //Act
             var result = await _validator.ValidateAsync(_query);
@@ -77,7 +77,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(result);
             Assert.IsFalse(result.IsValid());
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(_query.TrainingStartDate)));
+            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(_query.StartDate)));
         }
     }
 }

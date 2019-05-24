@@ -60,9 +60,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.AddDays(1)
             };
 
             //Act
@@ -79,9 +79,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.AddDays(-1)
             };
 
             //Act
@@ -98,9 +98,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.AddDays(1)
             };
 
             //Act
@@ -116,9 +116,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.AddDays(-1)
             };
 
             //Arrange
@@ -135,9 +135,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.AddDays(-1)
             };
 
             //Act
@@ -154,9 +154,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.AddDays(-1)
             };
 
             //Act
@@ -166,7 +166,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var error = result?.Errors.FirstOrDefault();
 
             Assert.IsNotNull(error);
-            Assert.AreEqual(nameof(ValidateReservationQuery.TrainingStartDate), error.PropertyName);
+            Assert.AreEqual(nameof(ValidateReservationQuery.StartDate), error.PropertyName);
         }
 
         [Test]
@@ -175,9 +175,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.ExpiryDate.AddDays(1)
+                StartDate = _reservation.ExpiryDate.AddDays(1)
             };
 
             //Act
@@ -194,9 +194,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.ExpiryDate.AddDays(1)
+                StartDate = _reservation.ExpiryDate.AddDays(1)
             };
 
             //Act
@@ -206,7 +206,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var error = result?.Errors.FirstOrDefault();
 
             Assert.IsNotNull(error);
-            Assert.AreEqual(nameof(ValidateReservationQuery.TrainingStartDate), error.PropertyName);
+            Assert.AreEqual(nameof(ValidateReservationQuery.StartDate), error.PropertyName);
         }
         
         [Test]
@@ -215,15 +215,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.AddDays(1)
             };
             
             _course.Rules.Add(new Rule
             {
-                ActiveFrom = request.TrainingStartDate.AddDays(-2), 
-                ActiveTo = request.TrainingStartDate.AddDays(2)
+                ActiveFrom = request.StartDate.AddDays(-2), 
+                ActiveTo = request.StartDate.AddDays(2)
             });
 
             //Act
@@ -233,7 +233,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var error = result?.Errors.FirstOrDefault();
 
             Assert.IsNotNull(error);
-            Assert.AreEqual(nameof(ValidateReservationQuery.CourseId), error.PropertyName);
+            Assert.AreEqual(nameof(ValidateReservationQuery.CourseCode), error.PropertyName);
         }
 
         [Test]
@@ -242,9 +242,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.AddDays(1)
             };
             
             _course.Rules.Add(new Rule
@@ -267,9 +267,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Arrange
             var request = new ValidateReservationQuery
             {
-                CourseId = CourseId,
+                CourseCode = CourseId,
                 ReservationId = ReservationId,
-                TrainingStartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.AddDays(1)
             };
 
             _courseService.Setup(s => s.GetCourseById(It.IsAny<string>())).ReturnsAsync((Course) null);
@@ -281,7 +281,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var error = result?.Errors.FirstOrDefault();
 
             Assert.IsNotNull(error);
-            Assert.AreEqual(nameof(ValidateReservationQuery.CourseId), error.PropertyName);
+            Assert.AreEqual(nameof(ValidateReservationQuery.CourseCode), error.PropertyName);
         }
     }
 }
