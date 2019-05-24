@@ -13,10 +13,11 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
     public static class NServiceBusStartUp
     {
-        public static void StartNServiceBus(this UpdateableServiceProvider serviceProvider, IConfiguration configuration)
+        public static void StartNServiceBus(this UpdateableServiceProvider serviceProvider,
+            IConfiguration configuration, bool configurationIsLocalOrDev)
         {
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Reservations.Api")
-                .UseAzureServiceBusTransport(configuration["Reservations:NServiceBusConnectionString"], r => { })
+                
                 .UseErrorQueue()
                 .UseInstallers()
                 .UseMessageConventions()
@@ -25,6 +26,16 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
+
+            if (configurationIsLocalOrDev)
+            {
+                endpointConfiguration.UseLearningTransport();
+            }
+            else
+            {
+                endpointConfiguration.UseAzureServiceBusTransport(
+                    configuration["Reservations:NServiceBusConnectionString"], r => { });
+            }
 
             if (!string.IsNullOrEmpty(configuration["Reservations:NServiceBusLicense"]))
             {

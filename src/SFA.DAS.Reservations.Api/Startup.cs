@@ -147,7 +147,7 @@ namespace SFA.DAS.Reservations.Api
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
         {
             
-            serviceProvider.StartNServiceBus(Configuration);
+            serviceProvider.StartNServiceBus(Configuration, ConfigurationIsLocalOrDev());
         }
 
 
