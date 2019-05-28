@@ -6,6 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
 {
     public interface IGlobalRuleRepository
     {
-        Task<IList<Domain.Entities.GlobalRule>> GetGlobalRules(DateTime dateFrom);
+        Task<ICollection<Entities.GlobalRule>> GetAll();
+        Task<ICollection<Entities.GlobalRule>> FindActive(DateTime dateFrom);
     }
 }

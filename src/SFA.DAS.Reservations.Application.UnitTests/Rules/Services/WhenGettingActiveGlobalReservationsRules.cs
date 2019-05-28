@@ -13,7 +13,7 @@ using GlobalRule = SFA.DAS.Reservations.Domain.Entities.GlobalRule;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 {
-    public class WhenGettingGlobalReservationsRules
+    public class WhenGettingActiveGlobalReservationsRules
     {
         private Mock<IGlobalRuleRepository> _repository;
         private GlobalRulesService _globalRulesService;
@@ -43,21 +43,21 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         }
 
         [Test]
-        public async Task Then_The_Global_Rules_Are_Taken_From_The_Repository_For_That_Account()
+        public async Task Then_The_Active_Global_Rules_Are_Taken_From_The_Repository_For_That_Account()
         {
             //Act
-            var actual = await _globalRulesService.GetAllRules();
+            var actual = await _globalRulesService.GetActiveRules(DateTime.UtcNow);
 
             //Assert
-            _repository.Verify(x => x.GetAll());
+            _repository.Verify(x => x.FindActive(It.Is<DateTime>(c => c.ToShortDateString().Equals(DateTime.UtcNow.ToShortDateString()))));
             Assert.IsNotNull(actual);
         }
 
         [Test]
-        public async Task Then_The_Rule_Results_Are_Mapped_To_The_Domain_Model()
+        public async Task Then_The_Active_Rule_Results_Are_Mapped_To_The_Domain_Model()
         {
             //Act
-            var actual = await _globalRulesService.GetAllRules();
+            var actual = await _globalRulesService.GetActiveRules(DateTime.UtcNow);
 
             //Assert
             Assert.IsAssignableFrom<List<Domain.Rules.GlobalRule>>(actual);
