@@ -15,6 +15,10 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.ActiveTo).HasColumnName(@"ActiveTo").HasColumnType("datetime");
             builder.Property(x => x.Restriction).HasColumnName(@"Restriction").HasColumnType("tinyint").IsRequired();
             builder.Property(x => x.RuleType).HasColumnName(@"RuleType").HasColumnType("tinyint").IsRequired();
+
+            builder.HasMany(c => c.UserRuleNotifications).WithOne(c => c.GlobalRule)
+                .HasForeignKey(c => c.GlobalRuleId)
+                .IsRequired(false);
         }
     }
 }

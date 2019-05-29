@@ -21,6 +21,9 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.HasOne(c => c.Course).WithMany(c => c.ReservationRule)
                 .HasForeignKey(c => c.CourseId);
 
+            builder.HasMany(c => c.UserRuleNotifications).WithOne(c => c.CourseRule)
+                .HasForeignKey(c => c.CourseRuleId)
+                .IsRequired(false);
         }
     }
 }
