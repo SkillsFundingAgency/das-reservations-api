@@ -67,6 +67,26 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         }
 
         [Test]
+        public void And_Today_Is_Same_As_Start_And_End_Date()
+        {
+            //Act
+            var actual = new AvailableDates(DateTime.UtcNow, minStartDate: DateTime.UtcNow, maxStartDate: DateTime.UtcNow);
+
+            //Assert
+            Assert.AreEqual(1, actual.Dates.Count);
+        }
+
+        [Test]
+        public void And_Today_Is_Same_As_Start_And_One_Month_Expiry()
+        {
+            //Act
+            var actual = new AvailableDates(DateTime.UtcNow, minStartDate: DateTime.UtcNow, expiryPeriodInMonths:1);
+
+            //Assert
+            Assert.AreEqual(1, actual.Dates.Count);
+        }
+
+        [Test]
         public void Then_If_No_Values_Have_Been_Supplied_Then_The_Default_Of_Six_Months_Are_Shown_From_Today()
         {
             //Arrange

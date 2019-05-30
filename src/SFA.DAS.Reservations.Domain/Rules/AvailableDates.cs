@@ -41,6 +41,10 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
             for (var i = 1; i < expiryMonths; i++)
             {
+                if (maxStartDate.HasValue && 
+                    new DateTime(maxStartDate.Value.Year, maxStartDate.Value.Month, 1) <= dateTimeNow)
+                    break;
+
                 var monthToAdd = startDate.AddMonths(i);
                 twoMonthsFromNow = monthToAdd.AddMonths(2);
                 lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
