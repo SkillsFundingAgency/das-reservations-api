@@ -70,6 +70,5 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             Assert.AreEqual($"{expectedValidationMessage}\r\nParameter name: {expectedParam}", actualError.Message);
             Assert.AreEqual(expectedParam, actualError.Params);
         }
-
     }
 }

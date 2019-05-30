@@ -6,5 +6,6 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
     public interface IAccountLegalEntitiesService
     {
         Task<IList<AccountLegalEntity>> GetAccountLegalEntities(long accountId);
+        Task<AccountLegalEntity> GetAccountLegalEntity(long accountLegalEntityId);
     }
 }
