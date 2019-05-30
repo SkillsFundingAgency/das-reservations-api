@@ -97,6 +97,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             [Frozen]Mock<ICurrentDateTime> currentDateTime,
             Mock<IOptions<ReservationsConfiguration>> mockOptions)
         {
+            currentDateTime.Setup(x => x.GetDate()).Returns(DateTime.UtcNow);
             var config = mockOptions.Object.Value;
             var expectedDates = new EoiAvailableDates(
                     DateTime.UtcNow,
