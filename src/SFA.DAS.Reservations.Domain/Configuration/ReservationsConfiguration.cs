@@ -16,5 +16,6 @@ namespace SFA.DAS.Reservations.Domain.Configuration
         public virtual int? EoiNumberOfAvailableDates { get; set; }
         public virtual DateTime? EoiAvailableDatesMinDate { get; set; }
         public virtual DateTime? EoiAvailableDatesMaxDate { get; set; }
+        public virtual DateTime? CurrentDateTime { get; set; }
     }
 }

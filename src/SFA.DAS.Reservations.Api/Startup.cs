@@ -125,6 +125,10 @@ namespace SFA.DAS.Reservations.Api
             services.AddTransient<IAvailableDatesService, AvailableDatesService>();
             services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
 
+            services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
+                ? new CurrentDateTime(config.Value.CurrentDateTime)
+                : new CurrentDateTime());
+
             if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));

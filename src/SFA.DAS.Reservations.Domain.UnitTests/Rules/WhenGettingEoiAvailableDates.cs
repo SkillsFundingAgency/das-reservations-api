@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         {
             var expectedMaxDate = new DateTime(2019, 12, 1);
 
-            var actualDates = new EoiAvailableDates(null).Dates;
+            var actualDates = new EoiAvailableDates(DateTime.UtcNow, null).Dates;
 
             actualDates.OrderBy(window => window.StartDate).Last().StartDate
                 .Should().Be(expectedMaxDate);
@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         {
             var expectedMinDate = new DateTime(2019, 8, 1);
 
-            var actualDates = new EoiAvailableDates().Dates;
+            var actualDates = new EoiAvailableDates(DateTime.UtcNow).Dates;
 
             actualDates.OrderBy(window => window.StartDate).First().StartDate
                 .Should().Be(expectedMinDate);
@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         {
             var expectedMaxDate = new DateTime(2019, 12, 1);
 
-            var actualDates = new EoiAvailableDates().Dates;
+            var actualDates = new EoiAvailableDates(DateTime.UtcNow).Dates;
 
             actualDates.OrderBy(window => window.StartDate).Last().StartDate
                 .Should().Be(expectedMaxDate);

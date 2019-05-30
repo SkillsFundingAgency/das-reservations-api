@@ -8,10 +8,12 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 {
     public class AvailableDatesService : IAvailableDatesService
     {
+        private readonly ICurrentDateTime _currentDateTime;
         private readonly ReservationsConfiguration _configuration;
 
-        public AvailableDatesService(IOptions<ReservationsConfiguration> options)
+        public AvailableDatesService(IOptions<ReservationsConfiguration> options, ICurrentDateTime currentDateTime)
         {
+            _currentDateTime = currentDateTime;
             _configuration = options.Value;
         }
 
@@ -22,6 +24,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             if (eoiAccounts.Contains(accountId.ToString()))
             {
                 return new EoiAvailableDates(
+                    _currentDateTime.GetDate(),
                     _configuration.EoiNumberOfAvailableDates,
                     _configuration.EoiAvailableDatesMinDate,
                     _configuration.EoiAvailableDatesMaxDate)
@@ -29,6 +32,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             }
 
             return new AvailableDates(
+                _currentDateTime.GetDate(),
                 _configuration.NumberOfAvailableDates,
                 _configuration.AvailableDatesMinDate, 
                 _configuration.AvailableDatesMaxDate)
