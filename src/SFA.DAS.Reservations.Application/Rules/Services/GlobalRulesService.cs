@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -13,13 +14,15 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
     {
         private readonly IGlobalRuleRepository _repository;
         private readonly IReservationRepository _reservationRepository;
+        private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
         private readonly ReservationsConfiguration _options;
 
         public GlobalRulesService(IGlobalRuleRepository repository, IOptions<ReservationsConfiguration> options,
-            IReservationRepository reservationRepository)
+            IReservationRepository reservationRepository, IAccountLegalEntitiesService accountLegalEntitiesService)
         {
             _repository = repository;
             _reservationRepository = reservationRepository;
+            _accountLegalEntitiesService = accountLegalEntitiesService;
             _options = options.Value;
         }
 
@@ -74,17 +77,32 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             return new List<GlobalRule>{accountRules};
         }
 
+        private async Task<int> GetReservationLimit(long accountId)
+        {
+            var accountLimit = await _accountLegalEntitiesService.GetAccountLegalEntities(accountId);
+
+            if (!accountLimit.Any())
+            {
+                return 0;
+            }
+
+            var limit = accountLimit.Max(c => c.ReservationLimit);
+
+            return limit;
+        }
+
         private async Task<GlobalRule> CheckAccountReservationLimit(long accountId)
         {
+            var maxNumberOfReservations = await GetReservationLimit(accountId);
 
-            if (_options.MaxNumberOfReservations == 0)
+            if (maxNumberOfReservations == 0)
             {
                 return null;
             }
 
             var reservations = await _reservationRepository.GetAccountReservations(accountId);
 
-            if (reservations.Count >= _options.MaxNumberOfReservations)
+            if (reservations.Count >= maxNumberOfReservations)
             {
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {
