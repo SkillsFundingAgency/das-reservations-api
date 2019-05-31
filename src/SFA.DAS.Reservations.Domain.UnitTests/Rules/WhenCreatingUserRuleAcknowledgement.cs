@@ -4,7 +4,7 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
 {
-    public class WhenCreatingUserRuleNotification
+    public class WhenCreatingUserRuleAcknowledgement
     {
         [Test]
         public void Then_The_UkPrn_Is_Set_If_The_Id_Is_Numeric()
@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var expectedUkPrn = 45345;
 
             //Act
-            var actual = new UserRuleNotification(expectedUkPrn.ToString(), 1,RuleType.GlobalRule);
+            var actual = new UserRuleAcknowledgement(expectedUkPrn.ToString(), 1,RuleType.GlobalRule);
 
             //Assert
             Assert.AreEqual(expectedUkPrn, actual.UkPrn);
@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var expectedUserId = Guid.NewGuid();
 
             //Act
-            var actual = new UserRuleNotification(expectedUserId.ToString(), 1, RuleType.GlobalRule);
+            var actual = new UserRuleAcknowledgement(expectedUserId.ToString(), 1, RuleType.GlobalRule);
 
             //Assert
             Assert.AreEqual(expectedUserId,actual.UserId);
@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             const int expectedRuleId = 543;
 
             //Act
-            var actual = new UserRuleNotification("1", expectedRuleId, (RuleType)ruleType);
+            var actual = new UserRuleAcknowledgement("1", expectedRuleId, (RuleType)ruleType);
 
             //Assert
             if (((RuleType) ruleType).Equals(RuleType.GlobalRule))

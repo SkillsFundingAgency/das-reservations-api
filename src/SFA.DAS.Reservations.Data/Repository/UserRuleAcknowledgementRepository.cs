@@ -4,11 +4,11 @@ using UserRuleNotification = SFA.DAS.Reservations.Domain.Entities.UserRuleNotifi
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class UserRuleNotificationRepository : IUserRuleNotificationRepository
+    public class UserRuleAcknowledgementRepository : IUserRuleAcknowledgementRepository
     {
         private readonly IReservationsDataContext _reservationsDataContext;
 
-        public UserRuleNotificationRepository(IReservationsDataContext reservationsDataContext)
+        public UserRuleAcknowledgementRepository(IReservationsDataContext reservationsDataContext)
         {
             _reservationsDataContext = reservationsDataContext;
         }

@@ -2,9 +2,9 @@
 
 namespace SFA.DAS.Reservations.Domain.Rules
 {
-    public class UserRuleNotification : IUserRuleNotificationRequest
+    public class UserRuleAcknowledgement : IUserRuleAcknowledgementRequest
     {
-        public UserRuleNotification(string id, long ruleId, RuleType ruleType)
+        public UserRuleAcknowledgement(string id, long ruleId, RuleType ruleType)
         {
             switch (ruleType)
             {
@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
             }
         }
 
-        public UserRuleNotification(Entities.UserRuleNotification entity)
+        public UserRuleAcknowledgement(Entities.UserRuleNotification entity)
         {
             UserRuleNotificationId = entity.Id;
             CourseRuleId = entity.CourseRuleId;

@@ -6,8 +6,11 @@
 
   <ItemGroup>
     <Compile Remove="Courses\Commands\**" />
+    <Compile Remove="UserRuleNotification\**" />
     <EmbeddedResource Remove="Courses\Commands\**" />
+    <EmbeddedResource Remove="UserRuleNotification\**" />
     <None Remove="Courses\Commands\**" />
+    <None Remove="UserRuleNotification\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,10 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj" />
     <ProjectReference Include="..\SFA.DAS.Reservations.Messages\SFA.DAS.Reservations.Messages.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="UserRuleNotification\Services\" />
   </ItemGroup>
 
 

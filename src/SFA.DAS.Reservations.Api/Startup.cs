@@ -29,6 +29,7 @@ using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
+using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore;
 using SFA.DAS.UnitOfWork.Mvc;
 using SFA.DAS.UnitOfWork.NServiceBus;
@@ -105,10 +106,12 @@ namespace SFA.DAS.Reservations.Api
                 typeof(GetAccountReservationsValidator));
             services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>),
                 typeof(CreateAccountReservationValidator));
+            services.AddScoped(typeof(IValidator<CreateUserRuleAcknowledgementCommand>),
+                typeof(CreateUserRuleAcknowledgementCommand));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
             services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));
             services.AddTransient<IReservationRepository, ReservationRepository>();
-            services.AddTransient<IUserRuleNotificationRepository, UserRuleNotificationRepository>();
+            services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
             services.AddTransient<IRuleRepository, RuleRepository>();
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
             services.AddTransient<ICourseRepository, CourseRepository>();
