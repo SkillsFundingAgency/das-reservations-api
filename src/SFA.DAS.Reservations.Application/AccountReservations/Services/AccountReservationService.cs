@@ -59,6 +59,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return result;
         }
 
+        public async Task DeleteReservation(Guid reservationId)
+        {
+            await _reservationRepository.DeleteAccountReservation(reservationId);
+        }
+
         private Reservation MapReservation(Domain.Entities.Reservation reservation)
         {
             var mapReservation = new Reservation(_ruleRepository.GetReservationRules, 
