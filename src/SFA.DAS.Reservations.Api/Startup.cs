@@ -108,6 +108,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
             services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));
             services.AddTransient<IReservationRepository, ReservationRepository>();
+            services.AddTransient<IUserRuleNotificationRepository, UserRuleNotificationRepository>();
             services.AddTransient<IRuleRepository, RuleRepository>();
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
             services.AddTransient<ICourseRepository, CourseRepository>();

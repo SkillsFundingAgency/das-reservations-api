@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using SFA.DAS.Reservations.Domain.Entities;
+﻿using System.Threading.Tasks;
+using SFA.DAS.Reservations.Domain.Rules;
+using UserRuleNotification = SFA.DAS.Reservations.Domain.Entities.UserRuleNotification;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class UserRuleNotificationRepository
+    public class UserRuleNotificationRepository : IUserRuleNotificationRepository
     {
         private readonly IReservationsDataContext _reservationsDataContext;
 

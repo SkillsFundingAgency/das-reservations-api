@@ -21,5 +21,9 @@
     <ProjectReference Include="..\SFA.DAS.Reservations.Messages\SFA.DAS.Reservations.Messages.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UserRuleNotification\Services\" />
+  </ItemGroup>
+
 
 </Project>
