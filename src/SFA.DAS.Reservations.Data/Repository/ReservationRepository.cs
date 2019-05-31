@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using Reservation = SFA.DAS.Reservations.Domain.Entities.Reservation;
 
@@ -16,6 +17,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             _reservationsDataContext = reservationsDataContext;
         }
+
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
         {
             var result = await _reservationsDataContext.Reservations.Where(c=>c.AccountId.Equals(accountId)).ToListAsync();
@@ -37,6 +39,18 @@ namespace SFA.DAS.Reservations.Data.Repository
             var reservationResult = await _reservationsDataContext.Reservations.FindAsync(id);
 
             return reservationResult;
+        }
+
+        public async Task DeleteAccountReservation(Guid reservationId)
+        {
+            var reservationToDelete = await _reservationsDataContext.Reservations.FindAsync(reservationId);
+
+            if (reservationToDelete == null)
+                throw new EntityNotFoundException($"Entity not found [{nameof(Reservation)}], id: [{reservationId}]");
+
+            reservationToDelete.Status = (int) ReservationStatus.Deleted;
+
+            _reservationsDataContext.SaveChanges();
         }
     }
 }
