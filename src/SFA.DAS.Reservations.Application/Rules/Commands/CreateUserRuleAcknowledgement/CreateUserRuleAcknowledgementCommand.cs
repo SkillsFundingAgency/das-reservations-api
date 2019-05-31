@@ -7,6 +7,6 @@ namespace SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowle
     {
         public string Id { get; set; }
         public long RuleId { get; set; }
-        public RuleType RuleType { get; set; }
+        public RuleType TypeOfRule { get; set; }
     }
 }

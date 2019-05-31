@@ -29,9 +29,9 @@ namespace SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowle
                 validationResult.AddError(nameof(CreateUserRuleAcknowledgementCommand.RuleId), $"{nameof(CreateUserRuleAcknowledgementCommand.RuleId)} valid is not valid");
             }
 
-            if (command.RuleType == RuleType.None)
+            if (command.TypeOfRule == RuleType.None)
             {
-                validationResult.AddError(nameof(CreateUserRuleAcknowledgementCommand.RuleType), $"{nameof(CreateUserRuleAcknowledgementCommand.RuleType)} has not be set");
+                validationResult.AddError(nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule), $"{nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule)} has not be set");
             }
 
             return Task.FromResult(validationResult);

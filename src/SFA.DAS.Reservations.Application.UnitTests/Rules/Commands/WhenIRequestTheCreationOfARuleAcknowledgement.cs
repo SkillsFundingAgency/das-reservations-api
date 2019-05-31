@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             {
                 Id = "123",
                 RuleId = 1234,
-                RuleType = RuleType.GlobalRule
+                TypeOfRule = RuleType.GlobalRule
             };
 
             _validator = new Mock<IValidator<CreateUserRuleAcknowledgementCommand>>();
@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             _service.Verify(s => s.CreateUserRuleAcknowledgement(It.Is<IUserRuleAcknowledgementRequest>(
                 request => request.Id.Equals(_command.Id) &&
                            request.RuleId.Equals(_command.RuleId) &&
-                           request.RuleType.Equals(_command.RuleType))), Times.Once);
+                           request.TypeOfRule.Equals(_command.TypeOfRule))), Times.Once);
         }
 
         [Test] 

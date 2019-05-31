@@ -10,20 +10,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 {
     public class WhenCreatingAUserRuleNotification
     {
-        private Mock<IUserRuleAcknowledgementRepository> _userRuleNotificationRepository;
+        private Mock<IUserRuleAcknowledgementRepository> _userRuleAcknowledgementRepository;
         private readonly Guid _expectedUserId = Guid.NewGuid();
         private UserRuleAcknowledgementService _userRuleAcknowledgementService;
 
         [SetUp]
         public void Arrange()
         {
-           _userRuleNotificationRepository = new Mock<IUserRuleAcknowledgementRepository>();
+           _userRuleAcknowledgementRepository = new Mock<IUserRuleAcknowledgementRepository>();
 
-            _userRuleNotificationRepository
-                .Setup(x => x.Add(It.Is<Domain.Entities.UserRuleNotification>(c => c.UserId.Equals(_expectedUserId))))
+            _userRuleAcknowledgementRepository
+                .Setup(x => x.Add(It.IsAny<Domain.Entities.UserRuleNotification>()))
                 .ReturnsAsync(new Domain.Entities.UserRuleNotification { Id = 54353, UserId = _expectedUserId});
 
-            _userRuleAcknowledgementService = new UserRuleAcknowledgementService(_userRuleNotificationRepository.Object);
+            _userRuleAcknowledgementService = new UserRuleAcknowledgementService(_userRuleAcknowledgementRepository.Object);
         }
 
         [Test]
@@ -34,17 +34,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             {
                 Id = _expectedUserId.ToString(),
                 RuleId = 1,
-                RuleType = RuleType.GlobalRule
+                TypeOfRule = RuleType.GlobalRule
             };
 
             //Act
             await _userRuleAcknowledgementService.CreateUserRuleAcknowledgement(createUserRuleNotification);
 
-            //Assert
-            _userRuleNotificationRepository.Verify(x => x.Add(It.Is<Domain.Entities.UserRuleNotification>(c =>
-                                c.UserId.Equals(_expectedUserId) &&
-                                c.GlobalRuleId.Equals(1)
-                                )));
+            _userRuleAcknowledgementRepository.Verify(x => x.Add(It.Is<Domain.Entities.UserRuleNotification>(c =>
+                                c.UserId.Value.Equals(_expectedUserId) &&
+                                c.GlobalRuleId.Value.Equals(1))));
         }
 
         [Test]
@@ -55,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             {
                 Id = _expectedUserId.ToString(),
                 RuleId = 1,
-                RuleType = RuleType.GlobalRule
+                TypeOfRule = RuleType.GlobalRule
             };
 
             //Act

@@ -107,7 +107,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>),
                 typeof(CreateAccountReservationValidator));
             services.AddScoped(typeof(IValidator<CreateUserRuleAcknowledgementCommand>),
-                typeof(CreateUserRuleAcknowledgementCommand));
+                typeof(CreateUserRuleAcknowledgementCommandValidator));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
             services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));
             services.AddTransient<IReservationRepository, ReservationRepository>();
@@ -120,6 +120,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IGlobalRulesService, GlobalRulesService>();
             services.AddTransient<IAvailableDatesService, AvailableDatesService>();
+            services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
 
             if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {

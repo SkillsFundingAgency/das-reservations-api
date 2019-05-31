@@ -4,6 +4,6 @@
     {
         string Id { get; set; }
         long RuleId { get; set; }
-        RuleType RuleType { get; set; }
+        RuleType TypeOfRule { get; set; }
     }
 }

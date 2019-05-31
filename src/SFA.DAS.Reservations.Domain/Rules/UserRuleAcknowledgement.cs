@@ -39,11 +39,11 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
         public string Id { get; set; }
         public long RuleId { get; set; }
-        public RuleType RuleType { get; set; }
+        public RuleType TypeOfRule { get; set; }
 
-        public Guid UserId { get; }
-        public int UkPrn { get; }
-        public long CourseRuleId { get; }
-        public long GlobalRuleId { get; }
+        public Guid? UserId { get; }
+        public int? UkPrn { get; }
+        public long? CourseRuleId { get; }
+        public long? GlobalRuleId { get; }
     }
 }

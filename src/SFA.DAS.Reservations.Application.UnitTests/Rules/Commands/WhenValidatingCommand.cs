@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             {
                 Id = Guid.NewGuid().ToString(),
                 RuleId = 1234,
-                RuleType = RuleType.GlobalRule
+                TypeOfRule = RuleType.GlobalRule
             };
 
             //Act
@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             {
                 Id = "ABC",
                 RuleId = -1,
-                RuleType = RuleType.None
+                TypeOfRule = RuleType.None
             };
 
             //Act
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             Assert.AreEqual(3, result.ValidationDictionary.Count);
             Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.Id)));
             Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.RuleId)));
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.RuleType)));
+            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule)));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             Assert.AreEqual(3, result.ValidationDictionary.Count);
             Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.Id)));
             Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.RuleId)));
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.RuleType)));
+            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule)));
         }
     }
 }

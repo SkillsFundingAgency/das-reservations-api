@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[UserRuleNotification]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[Id] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[CourseRuleId] BIGINT NULL,
 	[GlobalRuleId] BIGINT NULL,
 	[UkPrn] INT NULL,
