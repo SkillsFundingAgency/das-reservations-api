@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
-using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -16,7 +15,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
     {
         private Mock<IMediator> _mediator;
         private RulesController _rulesController;
-        private UpcomingRule _rule;
+        private CreateUserRuleAcknowledgementCommand _command;
 
 
         [SetUp]
@@ -25,7 +24,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             _mediator = new Mock<IMediator>();
             _rulesController = new RulesController(_mediator.Object);
 
-            _rule = new UpcomingRule
+            _command = new CreateUserRuleAcknowledgementCommand
             {
                 Id = Guid.NewGuid().ToString(),
                 RuleId = 1234,
@@ -37,13 +36,13 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
         public async Task ThenAcknowledgementIsCreated()
         {
             //Act
-            var result = await _rulesController.AcknowledgeRuleAsRead(_rule) as OkResult;
+            var result = await _rulesController.AcknowledgeRuleAsRead(_command) as OkResult;
 
             //Assert
             _mediator.Verify(m => m.Send(It.Is<CreateUserRuleAcknowledgementCommand>(
-                c => c.Id.Equals(_rule.Id) &&
-                     c.RuleId.Equals(_rule.RuleId) &&
-                     c.TypeOfRule.Equals(_rule.TypeOfRule)), It.IsAny<CancellationToken>()), Times.Once);
+                c => c.Id.Equals(_command.Id) &&
+                     c.RuleId.Equals(_command.RuleId) &&
+                     c.TypeOfRule.Equals(_command.TypeOfRule)), It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.IsNotNull(result);
         }
@@ -60,7 +59,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
                 .Throws(expectedException);
 
             //Act
-            var actualException = Assert.ThrowsAsync<Exception>(() => _rulesController.AcknowledgeRuleAsRead(_rule));
+            var actualException = Assert.ThrowsAsync<Exception>(() => _rulesController.AcknowledgeRuleAsRead(_command));
 
             //Assert
             Assert.AreEqual(expectedException, actualException);

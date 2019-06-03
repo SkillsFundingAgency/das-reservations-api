@@ -33,6 +33,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
             GlobalRuleId = entity.GlobalRuleId;
             UkPrn = entity.UkPrn;
             UserId = entity.UserId;
+            TypeOfRule = entity.GlobalRuleId.HasValue ? RuleType.GlobalRule : RuleType.CourseRule;
         }
 
         public long UserRuleNotificationId { get; }
