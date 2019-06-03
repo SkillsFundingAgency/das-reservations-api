@@ -19,44 +19,33 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
     [TestFixture]
     public class WhenDeletingAReservation
     {
-        List<Reservation> _reservations;
-
-        [SetUp]
-        public void SetUp()
-        {
-            var fixture = new Fixture();
-            fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
-                .ForEach(b => fixture.Behaviors.Remove(b));
-            fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-
-            _reservations = fixture.Create<List<Reservation>>();
-        }
-
-        [Test, MoqAutoData]
+        [Test, RecursiveMoqAutoData]
         public async Task Then_Updates_Status_To_Deleted(
+            List<Reservation> reservations,
             [Frozen] Mock<IReservationsDataContext> mockContext,
             ReservationRepository repository)
         {
-            var reservationId = _reservations[0].Id;
+            var reservationId = reservations[0].Id;
             mockContext
                 .Setup(context => context.Reservations)
-                .ReturnsDbSet(_reservations);
+                .ReturnsDbSet(reservations);
             mockContext
                 .Setup(context => context.Reservations.FindAsync(reservationId))
-                .ReturnsAsync(_reservations[0]);
+                .ReturnsAsync(reservations[0]);
 
             await repository.DeleteAccountReservation(reservationId);
 
             mockContext.Verify(context => context.SaveChanges(), Times.Once);
-            _reservations[0].Status.Should().Be((int) ReservationStatus.Deleted);
+            reservations[0].Status.Should().Be((int) ReservationStatus.Deleted);
         }
 
-        [Test, MoqAutoData]
+        [Test, RecursiveMoqAutoData]
         public void And_No_Reservation_To_Delete_Then_Throws_EntityNotFoundException(
+            List<Reservation> reservations,
             [Frozen] Mock<IReservationsDataContext> mockContext,
             ReservationRepository repository)
         {
-            var reservationId = _reservations[0].Id;
+            var reservationId = reservations[0].Id;
             mockContext
                 .Setup(context => context.Reservations.FindAsync(reservationId))
                 .ReturnsAsync((Reservation)null);

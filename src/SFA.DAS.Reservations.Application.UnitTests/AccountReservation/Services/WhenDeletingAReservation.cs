@@ -18,7 +18,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             [Frozen] Mock<IReservationRepository> mockRepo,
             AccountReservationService service)
         {
-            service.DeleteReservation(reservationId);
+            await service.DeleteReservation(reservationId);
 
             mockRepo.Verify(repository => repository.DeleteAccountReservation(reservationId), 
                 Times.Once);
