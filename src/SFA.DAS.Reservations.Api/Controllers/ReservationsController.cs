@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Domain.Exceptions;
 
 
 namespace SFA.DAS.Reservations.Api.Controllers
@@ -139,6 +141,33 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Message = e.Message,
                     Params = e.ParamName
                 });
+            }
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(410)]
+        [Route("api/[controller]/{id}")]
+        public async Task<IActionResult> Delete(Guid reservationId)
+        {
+            try
+            {
+                await _mediator.Send(new DeleteReservationCommand {ReservationId = reservationId});
+                return NoContent();
+            }
+            catch (ArgumentException argumentException)
+            {
+                Console.WriteLine(argumentException);
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = argumentException.Message,
+                    Params = argumentException.ParamName
+                });
+            }
+            catch (EntityNotFoundException notFoundException)
+            {
+                Console.WriteLine(notFoundException);
+                return StatusCode(410);
             }
         }
     }
