@@ -12,8 +12,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public byte Restriction { get; set; }
         public string CourseId { get; set; }
         public virtual Course Course { get; set; }
-        public virtual UserRuleNotification UserRuleNotification { get; set; }
         public virtual IEnumerable<UserRuleNotification> UserRuleNotifications { get; set; }
-        
     }
 }
