@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -37,9 +38,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _repository.Setup(x => x.GetAll())
                 .ReturnsAsync(new List<GlobalRule>{_globalRule});
 
-            _globalRulesService = new GlobalRulesService(_repository.Object, 
-                Mock.Of<IOptions<ReservationsConfiguration>>(), 
-                Mock.Of<IReservationRepository>());
+            _globalRulesService = new GlobalRulesService(_repository.Object, Mock.Of<IOptions<ReservationsConfiguration>>(), Mock.Of<IReservationRepository>(), Mock.Of<IAccountLegalEntitiesService>());
         }
 
         [Test]

@@ -107,5 +107,39 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [Route("api/[controller]/validate/{id}")]
+        public async Task<IActionResult> Validate(Guid id, string courseCode, DateTime startDate)
+        {
+            try
+            {
+                var request = new ValidateReservationQuery
+                {
+                    ReservationId = id,
+                    CourseCode = courseCode,
+                    StartDate = startDate
+                };
+
+                var response = await _mediator.Send(request);
+
+                if (response == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(response.Errors);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
+            }
+        }
     }
 }
