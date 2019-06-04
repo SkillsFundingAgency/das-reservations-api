@@ -20,7 +20,10 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
         {
-            var result = await _reservationsDataContext.Reservations.Where(c=>c.AccountId.Equals(accountId)).ToListAsync();
+            var result = await _reservationsDataContext.Reservations
+                .Where(c=>c.AccountId.Equals(accountId) &&
+                          c.Status != (int)ReservationStatus.Deleted)
+                .ToListAsync();
             
             return result;
         }
