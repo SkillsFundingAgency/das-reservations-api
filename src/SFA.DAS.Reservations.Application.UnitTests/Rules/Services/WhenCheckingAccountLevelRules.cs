@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -19,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         private Mock<IReservationRepository> _repository;
         private GlobalRulesService _globalRulesService;
         private Domain.Entities.GlobalRule _globalRule;
-        private Mock<IOptions<ReservationsConfiguration>> _options;
+        private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
         private const long ExpectedAccountId = 534542143;
 
         [SetUp]
@@ -33,10 +34,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             };
             _repository = new Mock<IReservationRepository>();
             _repository.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{new Reservation()});
-            _options = new Mock<IOptions<ReservationsConfiguration>>();
-            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(1);
+            _accountLegalEntitiesService = new Mock<IAccountLegalEntitiesService>();
+            _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(It.IsAny<long>()))
+                .ReturnsAsync(new List<AccountLegalEntity>{new AccountLegalEntity(Guid.NewGuid(),ExpectedAccountId,"test",1,1,1, true)});
 
-            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), _options.Object , _repository.Object);
+            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), Mock.Of<IOptions<ReservationsConfiguration>>(), _repository.Object, _accountLegalEntitiesService.Object);
         }
 
         [Test]
@@ -57,7 +59,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.GetAccountRules(ExpectedAccountId);
 
             //Assert
-            Assert.IsAssignableFrom<List<Domain.Rules.GlobalRule>>(actual);
+            Assert.IsAssignableFrom<List<GlobalRule>>(actual);
             Assert.IsNotEmpty(actual);
             var actualRule = actual.FirstOrDefault();
             Assert.IsNotNull(actualRule);

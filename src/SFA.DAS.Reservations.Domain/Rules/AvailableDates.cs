@@ -7,8 +7,12 @@ namespace SFA.DAS.Reservations.Domain.Rules
     {
         private const int DefaultExpiryMonths = 6;
 
-        public AvailableDates(int expiryPeriodInMonths = 6, DateTime? minStartDate = null,
-            DateTime? maxStartDate = null)
+        public AvailableDates(
+            DateTime dateTimeNow,
+            int? expiryPeriodInMonths = 6, 
+            DateTime? minStartDate = null,
+            DateTime? maxStartDate = null
+            )
         {
             var expiryMonths = expiryPeriodInMonths == 0 ? DefaultExpiryMonths : expiryPeriodInMonths;
 
@@ -17,7 +21,12 @@ namespace SFA.DAS.Reservations.Domain.Rules
                 expiryMonths = 12;
             }
 
-            var startDate = minStartDate ?? DateTime.UtcNow;
+            var startDate = minStartDate ?? dateTimeNow;
+            if (startDate < dateTimeNow)
+            {
+                startDate = dateTimeNow;
+            }
+
             var twoMonthsFromNow = startDate.AddMonths(2);
             var lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
 
@@ -32,6 +41,10 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
             for (var i = 1; i < expiryMonths; i++)
             {
+                if (maxStartDate.HasValue && 
+                    new DateTime(maxStartDate.Value.Year, maxStartDate.Value.Month, 1) <= dateTimeNow)
+                    break;
+
                 var monthToAdd = startDate.AddMonths(i);
                 twoMonthsFromNow = monthToAdd.AddMonths(2);
                 lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);

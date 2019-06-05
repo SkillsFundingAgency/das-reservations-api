@@ -28,6 +28,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Messages", "SFA.DAS.Reservations.Messages\SFA.DAS.Reservations.Messages.csproj", "{AA3C7122-E6D9-461A-B1B8-F25F9DAE0200}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.NServiceBusListener", "SFA.DAS.Reservations.NServiceBusListener\SFA.DAS.Reservations.NServiceBusListener.csproj", "{D12CFDF1-38EE-467E-A373-52241E022437}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6C861ACB-6D78-4A43-AA4A-017A21221FB9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

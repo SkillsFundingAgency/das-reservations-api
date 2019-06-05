@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
