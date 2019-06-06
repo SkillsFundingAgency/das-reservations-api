@@ -6,5 +6,6 @@
 	[AccountLegalEntityId] BIGINT NOT NULL,
 	[AccountLegalEntityName] VARCHAR(100) NOT NULL,
 	[ReservationLimit] INT NULL,
-	[AgreementSigned] BIT NOT NULL DEFAULT 0
+	[AgreementSigned] BIT NOT NULL DEFAULT 0, 
+    [IsLevy] BIT NOT NULL DEFAULT 0
 )
