@@ -18,8 +18,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
     {
         private Mock<IGlobalRuleRepository> _repository;
         private GlobalRulesService _globalRulesService;
-
-        private readonly DateTime _dateFrom = new DateTime(2019, 02, 10);
+       
         private Mock<IOptions<ReservationsConfiguration>> _options;
         private Mock<IReservationRepository> _reservationRepository;
         private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
@@ -28,12 +27,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         public void Arrange()
         {
             _repository = new Mock<IGlobalRuleRepository>();
-            _repository.Setup(x => x.FindActive(_dateFrom))
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>()))
                 .ReturnsAsync(new List<GlobalRule>
                 {
                     new GlobalRule
                     {
-                        ActiveFrom = _dateFrom.AddDays(-1),
+                        ActiveFrom = DateTime.UtcNow.AddDays(-1),
                         Restriction = 1,
                         RuleType = 0,
                         Id = 123
@@ -57,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         public async Task Then_If_There_Is_A_Rule_Matching_The_Reservation_It_Is_Returned()
         {
             //Arrange
-            var reservation = new Reservation(Guid.NewGuid(), 123, _dateFrom, 2, "test");
+            var reservation = new Reservation(Guid.NewGuid(), 123, DateTime.UtcNow, 2, "test");
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -76,9 +75,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 AccountId = 1,
                 AccountLegalEntityId = 123,
                 AccountLegalEntityName = "Test",
-                StartDate = _dateFrom,
+                StartDate = DateTime.UtcNow,
                 CourseId = "13",
-                IsLevyAccount = true
+                IsLevyAccount = true,
+                CreatedDate = DateTime.UtcNow
             };
 
             //Act
@@ -91,7 +91,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         [Test]
         public async Task Then_If_There_Are_No_Matching_Rules_Null_Is_Returned()
         {
-            var reservation = new Reservation(Guid.NewGuid(), 123, _dateFrom.AddDays(-3), 2, "test");
+            //Arrange
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>()))
+                .ReturnsAsync(new List<GlobalRule>());
+
+            var reservation = new Reservation(Guid.NewGuid(), 123, DateTime.UtcNow, 2, "test");
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -104,22 +108,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         public async Task Then_Multiple_Rules_Are_Checked_And_First_Returned_That_Matches()
         {
             //Arrange
-            var reservation = new Reservation(Guid.NewGuid(), 123, _dateFrom, 2, "test");
-            _repository.Setup(x => x.FindActive(_dateFrom))
+            var reservation = new Reservation(Guid.NewGuid(), 123, DateTime.UtcNow, 2, "test");
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>()))
                 .ReturnsAsync(new List<GlobalRule>
                 {
                     new GlobalRule
                     {
-                        ActiveFrom = _dateFrom.AddDays(-1),
+                        ActiveFrom = DateTime.UtcNow.AddDays(-1),
                         Restriction = 1,
-                        RuleType = 0,
+                        RuleType = 1,
                         Id = 123
                     },
                     new GlobalRule
                     {
-                        ActiveFrom = _dateFrom.AddDays(-1),
-                        Restriction = 0,
-                        RuleType = 0,
+                        ActiveFrom = DateTime.UtcNow.AddDays(-1),
+                        Restriction = 1,
+                        RuleType = 1,
                         Id = 123
                     }
                 });
@@ -137,7 +141,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             //Arrange
             var expectedAccountId = 123;
             _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
-            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
 
             //Act
             await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -152,7 +156,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             //Arrange
             _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             var expectedAccountId = 123;
-            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(1);
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation>{new Domain.Entities.Reservation(), new Domain.Entities.Reservation() });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
@@ -175,7 +179,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             //Arrange
             _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             var expectedAccountId = 123;
-            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(2);
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation> { new Domain.Entities.Reservation() });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
@@ -206,7 +210,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             }
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId))
                 .ReturnsAsync(existingReservations);
-            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, _dateFrom, 2, "test");
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
