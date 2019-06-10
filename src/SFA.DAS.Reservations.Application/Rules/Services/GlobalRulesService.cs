@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         public async Task<GlobalRule> CheckReservationAgainstRules(IReservationRequest request)
         {
-            var resultsList = await _repository.FindActive(request.StartDate);
+            var resultsList = await _repository.FindActive(request.CreatedDate);
 
             if (resultsList == null || !resultsList.Any())
             {
