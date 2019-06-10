@@ -61,6 +61,9 @@
     },
     "keyVaultResourceGroup": {
       "type": "string"
+    },
+    "loggingRedisConnectionString": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -182,6 +185,10 @@
               {
                 "name": "ASPNETCORE_ENVIRONMENT",
                 "value": "[toUpper(parameters('environmentName'))]"
+              },
+              {
+                "name": "LoggingRedisConnectionString",
+                "value": "[parameters('loggingRedisConnectionString')]"
               }
             ]
           },
