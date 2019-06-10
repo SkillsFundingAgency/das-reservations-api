@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 
 namespace SFA.DAS.Reservations.Api.Controllers
@@ -38,7 +39,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch(Exception e) when(
                 e is ArgumentException || 
-                e is EntityNotFoundException)
+                e is EntityNotFoundException<AccountLegalEntity>)
             {
                 return BadRequest(new ArgumentErrorViewModel
                 {
