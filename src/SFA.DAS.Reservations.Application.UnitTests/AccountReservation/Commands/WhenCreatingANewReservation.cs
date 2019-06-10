@@ -46,13 +46,21 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
                 .ReturnsAsync(new ValidationResult{ValidationDictionary = new Dictionary<string, string>{{"",""}}});
-            _validator.Setup(x=>x.ValidateAsync(It.Is<CreateAccountReservationCommand>(c=>c.Id.Equals(_expectedReservationId))))
+            _validator.Setup(x=>x.ValidateAsync(
+                    It.Is<CreateAccountReservationCommand>(c=>c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new ValidationResult());
 
             _globalRulesService = new Mock<IGlobalRulesService>();
-            _globalRulesService.Setup(x => x.GetRules()).ReturnsAsync(new List<GlobalRule>());
+            _globalRulesService.Setup(x => x.GetActiveRules(It.IsAny<DateTime>()))
+                               .ReturnsAsync(new List<GlobalRule>());
 
-            _command = new CreateAccountReservationCommand {Id = _expectedReservationId, AccountId = ExpectedAccountId, StartDate = _expectedDateTime,AccountLegalEntityId = 198,AccountLegalEntityName = "TestName"};
+            _command = new CreateAccountReservationCommand
+            {
+                Id = _expectedReservationId, 
+                AccountId = ExpectedAccountId, 
+                StartDate = _expectedDateTime,AccountLegalEntityId = 198,
+                AccountLegalEntityName = "TestName"
+            };
 
             _accountReservationsService = new Mock<IAccountReservationService>();
             _accountReservationsService
@@ -75,7 +83,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 await _handler.Handle(expectedCommand, _cancellationToken);
             });
-            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<CreateAccountReservationCommand>()), Times.Never);
+            _accountReservationsService.Verify(x => 
+                x.CreateAccountReservation(It.IsAny<CreateAccountReservationCommand>()), Times.Never);
             _unitOfWork.Verify(x => x.AddEvent(It.IsAny<ReservationCreatedEvent>()), Times.Never);
         }
 

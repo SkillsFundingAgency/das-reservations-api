@@ -31,7 +31,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             _service = new Mock<IRulesService>();
             _globalRuleService = new Mock<IGlobalRulesService>();
             _globalRules = new List<GlobalRule>();
-            _globalRuleService.Setup(x => x.GetRules()).ReturnsAsync(_globalRules);
+            _globalRuleService.Setup(x => x.GetAllRules())
+                              .ReturnsAsync(_globalRules);
 
             _rules = new List<ReservationRule>
             {
@@ -40,6 +41,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
 
             _handler = new GetRulesQueryHandler(_service.Object, _globalRuleService.Object);
         }
+         
         [Test]
         public async Task Then_The_Return_Type_Is_Assigned_To_The_Response()
         {
@@ -88,13 +90,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
                     ActiveFrom = DateTime.UtcNow
                 })
             };
-            _globalRuleService.Setup(x => x.GetRules()).ReturnsAsync(_globalRules);
+            _globalRuleService.Setup(x => x.GetAllRules()).ReturnsAsync(_globalRules);
 
             //Act
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            _globalRuleService.Verify(x=>x.GetRules(),Times.Once);
+            _globalRuleService.Verify(x=>x.GetAllRules(), Times.Once);
+            
             Assert.IsNotNull(actual.GlobalRules);
             _service.Verify(x=>x.GetRules(),Times.Never);
             Assert.IsNull(actual.Rules);

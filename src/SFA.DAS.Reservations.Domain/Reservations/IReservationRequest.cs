@@ -12,5 +12,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         long AccountLegalEntityId { get; }
         string AccountLegalEntityName { get; }
         bool IsLevyAccount { get; }
+        DateTime CreatedDate { get; }
     }
 }
