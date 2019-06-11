@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
@@ -29,7 +30,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountLegalEntitiesResponse);
 
-            _accountLegalEntitiesController = new AccountLegalEntitiesController(_mediator.Object);
+            _accountLegalEntitiesController = new AccountLegalEntitiesController(_mediator.Object, Mock.Of<ILogger<AccountLegalEntitiesController>>());
         }
 
         [Test]

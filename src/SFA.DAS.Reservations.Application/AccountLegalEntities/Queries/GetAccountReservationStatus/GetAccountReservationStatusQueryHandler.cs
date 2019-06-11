@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
 
             return new GetAccountReservationStatusResponse
             {
-                CanCreateAutoReservations = accountLegalEntities[0].IsLevy
+                CanAutoCreateReservations = accountLegalEntities[0].IsLevy
             };
         }
     }

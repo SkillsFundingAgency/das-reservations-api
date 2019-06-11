@@ -2,6 +2,6 @@
 {
     public class GetAccountReservationStatusResponse
     {
-        public bool CanCreateAutoReservations { get; set; }
+        public bool CanAutoCreateReservations { get; set; }
     }
 }
