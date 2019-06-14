@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     var modelStateDictionary = new ModelStateDictionary();
                     var errorMessage = $"{response.Rule.RuleTypeText} for {response.Rule.RestrictionText}";
                     modelStateDictionary.AddModelError(response.Rule.Id.ToString(),errorMessage);
-                    _logger.LogWarning(errorMessage);
+                    _logger.LogWarning($"Rule Id: [{response.Rule.Id.ToString()}], error: [{errorMessage}]");
                     return UnprocessableEntity(modelStateDictionary);
                 }
 
