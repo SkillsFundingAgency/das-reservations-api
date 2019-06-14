@@ -26,17 +26,23 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             _options = options.Value;
         }
 
-        public async Task<IList<GlobalRule>> GetRules()
+        public async Task<IList<GlobalRule>> GetAllRules()
         {
-            var result = await _repository.GetGlobalRules(DateTime.UtcNow);
+            var result = await _repository.GetAll();
 
-            var globalRules = result.Select(globalRule => new GlobalRule(globalRule)).ToList();
-            return globalRules;
+            return result.Select(globalRule => new GlobalRule(globalRule)).ToList();
+        }
+
+        public async Task<IList<GlobalRule>> GetActiveRules(DateTime fromDate)
+        {
+            var result = await _repository.FindActive(fromDate);
+
+            return result.Select(globalRule => new GlobalRule(globalRule)).ToList();
         }
 
         public async Task<GlobalRule> CheckReservationAgainstRules(IReservationRequest request)
         {
-            var resultsList = await _repository.GetGlobalRules(request.StartDate);
+            var resultsList = await _repository.FindActive(request.CreatedDate);
 
             if (resultsList == null || !resultsList.Any())
             {

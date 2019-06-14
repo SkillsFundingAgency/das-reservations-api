@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.Reservations.Domain.Rules;
+using GlobalRule = SFA.DAS.Reservations.Domain.Entities.GlobalRule;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
@@ -16,11 +17,14 @@ namespace SFA.DAS.Reservations.Data.Repository
             _context = context;
         }
 
-        public async Task<IList<Domain.Entities.GlobalRule>> GetGlobalRules(DateTime dateFrom)
+        public async Task<ICollection<GlobalRule>> GetAll()
         {
-            var globalRules = await _context.GlobalRules.Where(c => dateFrom >= c.ActiveFrom).ToListAsync();
+            return await _context.GlobalRules.ToListAsync();
+        }
 
-            return globalRules;
+        public async Task<ICollection<GlobalRule>> FindActive(DateTime dateFrom)
+        {
+            return await _context.GlobalRules.Where(c => dateFrom >= c.ActiveFrom).ToListAsync();
         }
     }
 }

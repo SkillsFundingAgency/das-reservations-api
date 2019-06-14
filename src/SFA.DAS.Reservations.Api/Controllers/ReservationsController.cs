@@ -57,8 +57,8 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     CourseId = reservation.CourseId,
                     ProviderId = reservation.ProviderId,
                     AccountLegalEntityId = reservation.AccountLegalEntityId,
-                    AccountLegalEntityName = reservation.AccountLegalEntityName
-                    
+                    AccountLegalEntityName = reservation.AccountLegalEntityName,
+                    CreatedDate = DateTime.UtcNow
                 });
 
                 if (response.Rule != null)

@@ -19,7 +19,8 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
 
         public async Task<GetRulesResult> Handle(GetRulesQuery request, CancellationToken cancellationToken)
         {
-            var globalRules = await _globalRulesService.GetRules();
+            var globalRules = await _globalRulesService.GetAllRules();
+
             if (globalRules.Any())
             {
                 return new GetRulesResult
