@@ -26,6 +26,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             ReservationRepository repository)
         {
             var reservationId = reservations[0].Id;
+            reservations[0].Status = (int) ReservationStatus.Pending;
             mockContext
                 .Setup(context => context.Reservations)
                 .ReturnsDbSet(reservations);
@@ -54,6 +55,24 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             act.Should().Throw<EntityNotFoundException>()
                 .WithMessage($"Entity not found [{nameof(Reservation)}], id: [{reservationId}]");
+        }
+
+        [Test, RecursiveMoqAutoData]
+        public void And_ReservationStatus_Not_Pending_Then_Throws_InvalidOperation(
+            List<Reservation> reservations,
+            [Frozen] Mock<IReservationsDataContext> mockContext,
+            ReservationRepository repository)
+        {
+            var reservationId = reservations[0].Id;
+            reservations[0].Status = (int) ReservationStatus.Confirmed;
+            mockContext
+                .Setup(context => context.Reservations.FindAsync(reservationId))
+                .ReturnsAsync(reservations[0]);
+
+            var act = new Func<Task>(async () => await repository.DeleteAccountReservation(reservationId));
+
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage($"This reservation cannot be deleted");
         }
     }
 }

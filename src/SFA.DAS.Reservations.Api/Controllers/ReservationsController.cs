@@ -171,6 +171,11 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Params = argumentException.ParamName
                 });
             }
+            catch (InvalidOperationException exception)
+            {
+                _logger.LogWarning(exception, exception.Message);
+                return BadRequest();
+            }
             catch (EntityNotFoundException notFoundException)
             {
                 Console.WriteLine(notFoundException);

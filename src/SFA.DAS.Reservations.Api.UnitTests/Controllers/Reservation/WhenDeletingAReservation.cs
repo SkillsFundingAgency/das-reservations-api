@@ -61,6 +61,25 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test, MoqAutoData]
+        public async Task And_InvalidOperationException_Then_Returns_BadRequest(
+            Guid reservationId,
+            InvalidOperationException invalidOperationException,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<DeleteReservationCommand>(), 
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(invalidOperationException);
+
+            var result = await controller.Delete(reservationId) as BadRequestResult;
+
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be(400);
+        }
+
+        [Test, MoqAutoData]
         public async Task And_No_Error_Then_Returns_Ok(
             Guid reservationId,
             [Frozen] Mock<IMediator> mockMediator,

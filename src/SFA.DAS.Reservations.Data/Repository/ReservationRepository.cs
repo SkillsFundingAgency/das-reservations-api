@@ -51,6 +51,12 @@ namespace SFA.DAS.Reservations.Data.Repository
             if (reservationToDelete == null)
                 throw new EntityNotFoundException($"Entity not found [{nameof(Reservation)}], id: [{reservationId}]");
 
+            if (reservationToDelete.Status == (int) ReservationStatus.Confirmed ||
+                reservationToDelete.Status == (int) ReservationStatus.Completed)
+            {
+                throw new InvalidOperationException("This reservation cannot be deleted");
+            }
+            
             reservationToDelete.Status = (int) ReservationStatus.Deleted;
 
             _reservationsDataContext.SaveChanges();
