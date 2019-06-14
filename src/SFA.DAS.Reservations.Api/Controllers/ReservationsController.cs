@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
@@ -16,10 +17,14 @@ namespace SFA.DAS.Reservations.Api.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
+        private readonly ILogger<ReservationsController> _logger;
         private readonly IMediator _mediator;
 
-        public ReservationsController(IMediator mediator)
+        public ReservationsController(
+            ILogger<ReservationsController> logger,
+            IMediator mediator)
         {
+            _logger = logger;
             _mediator = mediator;
         }
 
@@ -64,7 +69,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 if (response.Rule != null)
                 {
                     var modelStateDictionary = new ModelStateDictionary();
-                    modelStateDictionary.AddModelError(response.Rule.Id.ToString(),$"{response.Rule.RuleTypeText} for {response.Rule.RestrictionText}");
+                    var errorMessage = $"{response.Rule.RuleTypeText} for {response.Rule.RestrictionText}";
+                    modelStateDictionary.AddModelError(response.Rule.Id.ToString(),errorMessage);
+                    _logger.LogWarning(errorMessage);
                     return UnprocessableEntity(modelStateDictionary);
                 }
 

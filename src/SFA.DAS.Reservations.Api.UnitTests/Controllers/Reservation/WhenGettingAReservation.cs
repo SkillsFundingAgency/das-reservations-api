@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
@@ -37,7 +38,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountReservationsResult);
             _httpContext = new Mock<HttpContext>();
-            _reservationsController = new ReservationsController(_mediator.Object)
+            _reservationsController = new ReservationsController(Mock.Of<ILogger<ReservationsController>>(), _mediator.Object)
             {
                 ControllerContext = {HttpContext = _httpContext.Object,
                     ActionDescriptor = new ControllerActionDescriptor
