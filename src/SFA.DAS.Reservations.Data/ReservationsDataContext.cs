@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SFA.DAS.Reservations.Data.Configuration;
 
 namespace SFA.DAS.Reservations.Data
@@ -31,11 +30,6 @@ namespace SFA.DAS.Reservations.Data
 
         public ReservationsDataContext(DbContextOptions options) :base(options)
         {
-        }
-
-        public override int SaveChanges()
-        {
-            return base.SaveChanges();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

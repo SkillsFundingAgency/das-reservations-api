@@ -3,9 +3,12 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Domain.Exceptions;
 
 
 namespace SFA.DAS.Reservations.Api.Controllers
@@ -14,10 +17,14 @@ namespace SFA.DAS.Reservations.Api.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
+        private readonly ILogger<ReservationsController> _logger;
         private readonly IMediator _mediator;
 
-        public ReservationsController(IMediator mediator)
+        public ReservationsController(
+            ILogger<ReservationsController> logger,
+            IMediator mediator)
         {
+            _logger = logger;
             _mediator = mediator;
         }
 
@@ -62,7 +69,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 if (response.Rule != null)
                 {
                     var modelStateDictionary = new ModelStateDictionary();
-                    modelStateDictionary.AddModelError(response.Rule.Id.ToString(),$"{response.Rule.RuleTypeText} for {response.Rule.RestrictionText}");
+                    var errorMessage = $"{response.Rule.RuleTypeText} for {response.Rule.RestrictionText}";
+                    modelStateDictionary.AddModelError(response.Rule.Id.ToString(),errorMessage);
+                    _logger.LogWarning($"Rule Id: [{response.Rule.Id.ToString()}], error: [{errorMessage}]");
                     return UnprocessableEntity(modelStateDictionary);
                 }
 
@@ -139,6 +148,38 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Message = e.Message,
                     Params = e.ParamName
                 });
+            }
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(410)]
+        [Route("api/[controller]/{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                await _mediator.Send(new DeleteReservationCommand {ReservationId = id});
+                return NoContent();
+            }
+            catch (ArgumentException argumentException)
+            {
+                Console.WriteLine(argumentException);
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = argumentException.Message,
+                    Params = argumentException.ParamName
+                });
+            }
+            catch (InvalidOperationException exception)
+            {
+                _logger.LogWarning(exception, exception.Message);
+                return BadRequest();
+            }
+            catch (EntityNotFoundException notFoundException)
+            {
+                Console.WriteLine(notFoundException);
+                return StatusCode(410);
             }
         }
     }
