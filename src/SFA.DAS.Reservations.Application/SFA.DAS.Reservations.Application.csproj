@@ -6,8 +6,11 @@
 
   <ItemGroup>
     <Compile Remove="Courses\Commands\**" />
+    <Compile Remove="UserRuleNotification\**" />
     <EmbeddedResource Remove="Courses\Commands\**" />
+    <EmbeddedResource Remove="UserRuleNotification\**" />
     <None Remove="Courses\Commands\**" />
+    <None Remove="UserRuleNotification\**" />
   </ItemGroup>
 
   <ItemGroup>

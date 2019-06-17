@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.ExpressionTranslators.Internal;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Data.UnitTests.DatabaseMock;
-using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Reservations;
+using Reservation = SFA.DAS.Reservations.Domain.Entities.Reservation;
 
 namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 {
@@ -34,6 +37,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 {
                     AccountId = 2,
                     CreatedDate = DateTime.UtcNow
+                },
+                new Reservation
+                {
+                    AccountId = 1,
+                    CreatedDate = DateTime.UtcNow,
+                    Status = (int)ReservationStatus.Deleted
                 }
             };
 
@@ -51,6 +60,15 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             //Assert
             Assert.AreEqual(2, actual.Count);
+        }
+
+        [Test]
+        public async Task Then_Deleted_Reservations_Are_Not_Returned()
+        {
+            var actual = await _reservationRepository.GetAccountReservations(1);
+
+            var deletedCount = actual.Count(reservation => reservation.Status == (int) ReservationStatus.Deleted);
+            Assert.AreEqual(0, deletedCount);
         }
 
         [Test]

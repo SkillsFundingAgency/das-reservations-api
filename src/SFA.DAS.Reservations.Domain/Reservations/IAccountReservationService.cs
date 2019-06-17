@@ -9,5 +9,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         Task<IList<Reservation>> GetAccountReservations(long accountId);
         Task<Reservation> GetReservation(Guid id);
         Task<Reservation> CreateAccountReservation(IReservationRequest command);
+        Task DeleteReservation(Guid reservationId);
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Api.Models;
+using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
@@ -66,7 +67,15 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Params = e.ParamName
                 });
             }
-            
+        }
+
+        [Route("upcoming")]
+        [HttpPost]
+        public async Task<IActionResult> AcknowledgeRuleAsRead(CreateUserRuleAcknowledgementCommand command)
+        {
+            await _mediator.Send(command);
+
+            return Ok();
         }
     }
 }
