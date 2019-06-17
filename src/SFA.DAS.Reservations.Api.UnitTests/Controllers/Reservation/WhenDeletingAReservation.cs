@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         [Test, MoqAutoData]
         public async Task And_EntityNotFoundException_Then_Returns_Gone(
             Guid reservationId,
-            EntityNotFoundException notFoundException,
+            EntityNotFoundException<Domain.Entities.Reservation> notFoundException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
