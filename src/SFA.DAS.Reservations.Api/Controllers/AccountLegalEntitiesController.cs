@@ -2,8 +2,12 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
+using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Exceptions;
 
 namespace SFA.DAS.Reservations.Api.Controllers
 {
@@ -12,10 +16,14 @@ namespace SFA.DAS.Reservations.Api.Controllers
     public class AccountLegalEntitiesController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<AccountLegalEntitiesController> _logger;
 
-        public AccountLegalEntitiesController(IMediator mediator)
+        public AccountLegalEntitiesController(
+            IMediator mediator,
+            ILogger<AccountLegalEntitiesController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [Route("{accountId}")]
@@ -28,11 +36,37 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException e)
             {
+                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = e.Message,
                     Params = e.ParamName
                 });
+            }
+        }
+
+        [Route("/api/accounts/{accountId}/status")]
+        public async Task<IActionResult> GetAccountReservationStatus(long accountId)
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetAccountReservationStatusQuery {AccountId = accountId});
+                var model = new AccountReservationStatus(response);
+                return Ok(model);
+            }
+            catch (ArgumentException e)
+            {
+                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
+            }
+            catch (EntityNotFoundException<AccountLegalEntity> e)
+            {
+                _logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
+                return NotFound();
             }
         }
     }

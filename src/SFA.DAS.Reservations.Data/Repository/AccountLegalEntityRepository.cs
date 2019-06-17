@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             return legalEntities;
         }
 
-        public async Task<Domain.Entities.AccountLegalEntity> Get(long accountLegalEntityId)
+        public async Task<AccountLegalEntity> Get(long accountLegalEntityId)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             }
             catch (InvalidOperationException e)
             {
-                throw new EntityNotFoundException($"{nameof(AccountLegalEntity)} was not found", e);
+                throw new EntityNotFoundException<AccountLegalEntity>(e);
             }
         }
     }
