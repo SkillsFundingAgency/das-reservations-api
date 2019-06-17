@@ -33,6 +33,7 @@ using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
+using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore;
 using SFA.DAS.UnitOfWork.Mvc;
 using SFA.DAS.UnitOfWork.NServiceBus;
@@ -109,15 +110,20 @@ namespace SFA.DAS.Reservations.Api
                 typeof(GetAccountReservationsValidator));
             services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>),
                 typeof(CreateAccountReservationValidator));
+            services.AddScoped(typeof(IValidator<CreateUserRuleAcknowledgementCommand>),
+                typeof(CreateUserRuleAcknowledgementCommandValidator));
             services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
-            services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));
+
+            services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));          
             services.AddScoped(typeof(IValidator<GetAccountLegalEntitiesQuery>), typeof(GetAccountLegalEntitiesQueryValidator));
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
             services.AddScoped(typeof(IValidator<ValidateReservationQuery>), typeof(ValidateReservationValidator));
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
+            services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
-            services.AddTransient<IReservationRepository,ReservationRepository>();
-            services.AddTransient<IRuleRepository,RuleRepository>();
+            services.AddTransient<IRuleRepository, RuleRepository>();
+            services.AddTransient<IReservationRepository,ReservationRepository>();           
+
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
             services.AddTransient<ICourseRepository, CourseRepository>();
             services.AddTransient<IAccountLegalEntitiesRepository,AccountLegalEntityRepository>();
@@ -128,10 +134,13 @@ namespace SFA.DAS.Reservations.Api
             services.AddTransient<IAvailableDatesService, AvailableDatesService>();
             services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
 
+            services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
+
+
             services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
                 ? new CurrentDateTime(config.Value.CurrentDateTime)
                 : new CurrentDateTime());
-
+            
             if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
