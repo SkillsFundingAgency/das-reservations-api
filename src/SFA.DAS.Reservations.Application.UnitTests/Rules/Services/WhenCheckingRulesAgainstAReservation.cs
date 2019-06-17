@@ -199,6 +199,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             //Arrange
             _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(0);
+
             var expectedAccountId = 123;
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>

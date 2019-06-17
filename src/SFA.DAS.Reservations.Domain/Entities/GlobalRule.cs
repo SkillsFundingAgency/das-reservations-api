@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Domain.Entities
 {
@@ -9,5 +10,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public DateTime? ActiveTo { get; set; }
         public byte Restriction { get; set; }
         public byte RuleType { get; set; }
+        public virtual IEnumerable<UserRuleNotification> UserRuleNotifications { get; set; }
     }
 }
