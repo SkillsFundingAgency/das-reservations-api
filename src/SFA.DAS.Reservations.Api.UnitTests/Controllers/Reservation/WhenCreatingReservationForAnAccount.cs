@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public async Task Then_The_Reservation_Is_Created_From_The_Request_And_Returned()
         {
             //Arrange
-            var reservation = new Models.Reservation
+            var reservation = new Api.Models.Reservation
             {
                 Id = _expectedReservationId,
                 AccountId = ExpectedAccountId, 
@@ -108,7 +108,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
 
             //Act
-            var actual = await _reservationsController.Create(new Models.Reservation());
+            var actual = await _reservationsController.Create(new Api.Models.Reservation());
 
             //Assert
             var result = actual as ObjectResult;
@@ -133,7 +133,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 
 
             //Act
-            var actual = await _reservationsController.Create(new Models.Reservation());
+            var actual = await _reservationsController.Create(new Api.Models.Reservation());
 
             //Assert
             var result = actual as UnprocessableEntityObjectResult;

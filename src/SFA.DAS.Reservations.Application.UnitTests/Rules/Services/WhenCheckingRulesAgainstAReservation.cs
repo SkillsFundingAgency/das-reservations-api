@@ -161,7 +161,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation>{new Domain.Entities.Reservation(), new Domain.Entities.Reservation() });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, true)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -171,8 +171,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Assert.AreEqual(AccountRestriction.Account,actual.Restriction);
             Assert.AreEqual(GlobalRuleType.ReservationLimit, actual.RuleType);
         }
-
-
+        
         [Test]
         public async Task Then_If_The_Max_Number_Of_Reservations_Has_Not_Been_Met_Then_Null_Is_Returned()
         {
@@ -184,7 +183,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation> { new Domain.Entities.Reservation() });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 4, true)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 4, true, true)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -203,7 +202,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var expectedAccountId = 123;
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 0, true)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 0, true, true)});
             var existingReservations = new List<Domain.Entities.Reservation>();
             for (var i = 0; i<5;i++)
             {

@@ -31,8 +31,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             var act = new Func<Task>(async () => await repository.Get(accountLegalEntityId));
 
-            act.Should().Throw<EntityNotFoundException>()
-                .WithMessage("AccountLegalEntity was not found")
+            act.Should().Throw<EntityNotFoundException<AccountLegalEntity>>()
                 .WithInnerException<InvalidOperationException>();
         }
 

@@ -53,8 +53,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             var act = new Func<Task>(async () => await repository.DeleteAccountReservation(reservationId));
 
-            act.Should().Throw<EntityNotFoundException>()
-                .WithMessage($"Entity not found [{nameof(Reservation)}], id: [{reservationId}]");
+            act.Should().Throw<EntityNotFoundException<Reservation>>();
         }
 
         [Test, RecursiveMoqAutoData]

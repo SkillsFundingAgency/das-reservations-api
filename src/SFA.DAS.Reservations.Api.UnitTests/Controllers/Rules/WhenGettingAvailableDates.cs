@@ -12,6 +12,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -57,7 +58,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
 
         [Test, AutoData]
         public async Task And_EntityNotFoundException_Then_Returns_Error(
-            EntityNotFoundException notFoundException)
+            EntityNotFoundException<AccountLegalEntity> notFoundException)
         {
             _mediator.Setup(x => x.Send(
                     It.IsAny<GetAvailableDatesQuery>(),
