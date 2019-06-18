@@ -124,8 +124,8 @@ namespace SFA.DAS.Reservations.Api
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
             services.AddScoped(typeof(IValidator<ValidateReservationQuery>), typeof(ValidateReservationValidator));
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
-            services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
             services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
+            services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
             services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
 

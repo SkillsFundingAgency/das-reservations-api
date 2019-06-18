@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             var reservationToDelete = await _reservationsDataContext.Reservations.FindAsync(reservationId);
 
             if (reservationToDelete == null)
-                throw new EntityNotFoundException($"Entity not found [{nameof(Reservation)}], id: [{reservationId}]");
+                throw new EntityNotFoundException<Reservation>();
 
             if (reservationToDelete.Status == (int) ReservationStatus.Confirmed ||
                 reservationToDelete.Status == (int) ReservationStatus.Completed)

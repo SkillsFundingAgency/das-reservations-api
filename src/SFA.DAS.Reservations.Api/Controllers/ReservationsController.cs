@@ -176,9 +176,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 _logger.LogWarning(exception, exception.Message);
                 return BadRequest();
             }
-            catch (EntityNotFoundException notFoundException)
+            catch (EntityNotFoundException<Domain.Entities.Reservation> notFoundException)
             {
-                Console.WriteLine(notFoundException);
+                _logger.LogWarning(notFoundException, notFoundException.Message);
                 return StatusCode(410);
             }
         }
