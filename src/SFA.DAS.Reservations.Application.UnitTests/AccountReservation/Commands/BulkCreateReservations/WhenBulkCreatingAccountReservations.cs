@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -101,7 +100,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test, MoqAutoData]
-        public void ThenWillThrowRepositoryExceptions(
+        public void ThenWillThrowServiceExceptions(
             [Frozen] BulkCreateAccountReservationsCommand command,
             [Frozen] BulkCreateAccountReservationsCommandValidator validator,
             [Frozen] Mock<IAccountReservationService> mockAccountReservationService)
