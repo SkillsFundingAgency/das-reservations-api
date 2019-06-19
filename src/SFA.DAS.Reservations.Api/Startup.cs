@@ -37,7 +37,8 @@ using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountRe
 
 using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
-
+using SFA.DAS.Reservations.Infrastructure.DevConfiguration;
+using SFA.DAS.UnitOfWork;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore;
 using SFA.DAS.UnitOfWork.Mvc;
 using SFA.DAS.UnitOfWork.NServiceBus;
@@ -159,9 +160,6 @@ namespace SFA.DAS.Reservations.Api
             services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
 
             services
-                .AddEntityFramework()
-                .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
-                .AddNServiceBusClientUnitOfWork()
                 .AddMvc(o =>
                 {
                     if (!ConfigurationIsLocalOrDev())
@@ -170,13 +168,28 @@ namespace SFA.DAS.Reservations.Api
                     }
                 }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                services
+                    .AddEntityFramework()
+                    .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
+                    .AddNServiceBusClientUnitOfWork();
+            }
+            else
+            {
+                services.AddTransient<IUnitOfWorkContext, DevUnitOfWorkContext>();
+                services.AddTransient<IUnitOfWorkManager, DevUnitOfWorkManager>();
+            }
+
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
         }
 
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
         {
-            
-            serviceProvider.StartNServiceBus(Configuration, ConfigurationIsLocalOrDev());
+            if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                serviceProvider.StartNServiceBus(Configuration, ConfigurationIsLocalOrDev());
+            }
         }
 
 
