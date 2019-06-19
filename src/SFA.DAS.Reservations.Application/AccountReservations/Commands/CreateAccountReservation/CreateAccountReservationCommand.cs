@@ -2,7 +2,7 @@
 using MediatR;
 using SFA.DAS.Reservations.Domain.Reservations;
 
-namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
+namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation
 {
     public class CreateAccountReservationCommand : IRequest<CreateAccountReservationResult>, IReservationRequest
     {

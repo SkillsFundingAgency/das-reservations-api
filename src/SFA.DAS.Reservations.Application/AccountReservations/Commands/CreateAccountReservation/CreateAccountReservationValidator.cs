@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Validation;
 
-namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
+namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation
 {
     public class CreateAccountReservationValidator : IValidator<CreateAccountReservationCommand>
     {

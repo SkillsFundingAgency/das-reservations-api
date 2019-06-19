@@ -64,6 +64,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             await _reservationRepository.DeleteAccountReservation(reservationId);
         }
 
+        public Task<IEnumerable<Guid>> BulkCreateAccountReservation(uint reservationCount)
+        {
+            throw new NotImplementedException();
+        }
+
         private Reservation MapReservation(Domain.Entities.Reservation reservation)
         {
             var mapReservation = new Reservation(_ruleRepository.GetReservationRules, 

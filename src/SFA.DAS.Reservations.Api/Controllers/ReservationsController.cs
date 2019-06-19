@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Exceptions;
@@ -181,6 +182,15 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 _logger.LogWarning(notFoundException, notFoundException.Message);
                 return StatusCode(410);
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ProducesResponseType(400)]
+        [Route("/api/accounts/{accountLegalEntityId}/bulk-create")]
+        public async Task<IActionResult> BulkCreate(int count)
+        {
+            throw new NotImplementedException();
         }
     }
 }

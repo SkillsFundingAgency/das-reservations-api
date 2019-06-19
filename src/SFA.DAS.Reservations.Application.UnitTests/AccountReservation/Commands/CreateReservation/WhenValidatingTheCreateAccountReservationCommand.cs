@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 using SFA.DAS.Reservations.Domain.Courses;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
+namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands.CreateReservation
 {
     public class WhenValidatingTheCreateAccountReservationCommand
     {

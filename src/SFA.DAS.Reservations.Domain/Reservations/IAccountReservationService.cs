@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         Task<Reservation> GetReservation(Guid id);
         Task<Reservation> CreateAccountReservation(IReservationRequest command);
         Task DeleteReservation(Guid reservationId);
+        Task<IEnumerable<Guid>> BulkCreateAccountReservation(uint reservationCount);
     }
 }
