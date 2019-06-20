@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             await handler.Handle(command, CancellationToken.None);
 
             //Assert
-            mockAccountReservationService.Verify(s => s.BulkCreateAccountReservation(command.ReservationCount), Times.Once);
+            mockAccountReservationService.Verify(s => s.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId, 0,""), Times.Once);
         }
 
         [Test, MoqAutoData]
@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             Assert.ThrowsAsync<ArgumentException>(() => handler.Handle(command, CancellationToken.None));
 
             //Assert
-            mockAccountReservationService.Verify(s => s.BulkCreateAccountReservation(It.IsAny<uint>()), Times.Never);
+            mockAccountReservationService.Verify(s => s.BulkCreateAccountReservation(It.IsAny<uint>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test, MoqAutoData]
@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             };
 
             var handler = new BulkCreateAccountReservationsCommandHandler(mockAccountReservationService.Object, validator);
-            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(It.IsAny<uint>()))
+            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId,0,""))
                 .ReturnsAsync(createdReservationIds);
 
             //Act
@@ -109,7 +109,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var expectedException = new Exception();
 
             var handler = new BulkCreateAccountReservationsCommandHandler(mockAccountReservationService.Object, validator);
-            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(It.IsAny<uint>()))
+            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(It.IsAny<uint>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
                 .Throws(expectedException);
 
             //Act 

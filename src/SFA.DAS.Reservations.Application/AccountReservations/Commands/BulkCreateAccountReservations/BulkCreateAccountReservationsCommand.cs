@@ -5,5 +5,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
     public class BulkCreateAccountReservationsCommand : IRequest<BulkCreateAccountReservationsResult>
     {
         public uint ReservationCount { get; set; }
+        public long AccountLegalEntityId { get; set; }
     }
 }
