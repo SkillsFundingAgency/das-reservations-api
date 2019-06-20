@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -11,7 +12,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
     {
         private ReservationsController _reservationsController;
         private Mock<IMediator> _mediator;
-  
+        private Mock<HttpContext> _httpContext;
 
 
         [SetUp]
