@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
                     validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var reservationIds = await _accountReservationService.BulkCreateAccountReservation(command.ReservationCount);
+            var reservationIds = await _accountReservationService.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId,0,"");
 
             return new BulkCreateAccountReservationsResult
             {

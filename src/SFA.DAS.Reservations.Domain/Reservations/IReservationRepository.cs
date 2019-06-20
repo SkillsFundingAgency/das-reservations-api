@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         Task<Entities.Reservation> CreateAccountReservation(Entities.Reservation reservation);
         Task<Entities.Reservation> GetById(Guid id);
         Task DeleteAccountReservation(Guid reservationId);
+        Task CreateAccountReservations(List<Entities.Reservation> reservations);
     }
 }
