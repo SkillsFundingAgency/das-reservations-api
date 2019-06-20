@@ -6,6 +6,7 @@ using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Testing.AutoFixture;
@@ -16,32 +17,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
     public class WhenBulkCreatingAccountReservations
     {
         [Test, MoqAutoData]
-        public async Task ThenWillCreateMultipleReservations(
-            [Frozen] BulkCreateAccountReservationsCommand command,
-            [Frozen] BulkCreateAccountReservationsCommandValidator validator,
-            [Frozen] Mock<IAccountReservationService> mockAccountReservationService)
-        {
-            //Arrange
-            var handler = new BulkCreateAccountReservationsCommandHandler(mockAccountReservationService.Object, validator);
-
-            //Act
-            await handler.Handle(command, CancellationToken.None);
-
-            //Assert
-            mockAccountReservationService.Verify(s => s.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId, 0,""), Times.Once);
-        }
-
-        [Test, MoqAutoData]
         public async Task ThenWillValidateTheCommand(
             [Frozen] BulkCreateAccountReservationsCommand command,
             [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> mockValidator,
-            [Frozen] IAccountReservationService mockAccountReservationService)
+            [Frozen] IAccountReservationService mockAccountReservationService,
+            BulkCreateAccountReservationsCommandHandler handler)
         {
             //Arrange
             mockValidator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>()))
                 .ReturnsAsync(() => new ValidationResult());
-
-            var handler = new BulkCreateAccountReservationsCommandHandler(mockAccountReservationService, mockValidator.Object);
 
             //Act
             await handler.Handle(command, CancellationToken.None);
@@ -51,10 +35,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test, MoqAutoData]
-        public async Task ThenThrowExceptionIfValidationFails(
+        public void ThenThrowExceptionIfValidationFails(
             [Frozen] BulkCreateAccountReservationsCommand command,
             [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> mockValidator,
-            [Frozen] Mock<IAccountReservationService> mockAccountReservationService)
+            [Frozen] Mock<IAccountReservationService> mockAccountReservationService,
+            BulkCreateAccountReservationsCommandHandler handler)
         {
             //Arrange
             mockValidator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>())).ReturnsAsync(
@@ -66,8 +51,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                     }
                 });
 
-            var handler = new BulkCreateAccountReservationsCommandHandler(mockAccountReservationService.Object, mockValidator.Object);
-
             //Act
             Assert.ThrowsAsync<ArgumentException>(() => handler.Handle(command, CancellationToken.None));
 
@@ -76,20 +59,38 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillReturnCreatedReservationIds(
-            [Frozen] BulkCreateAccountReservationsCommand command,
-            [Frozen] BulkCreateAccountReservationsCommandValidator validator,
-            [Frozen] Mock<IAccountReservationService> mockAccountReservationService)
+        public async Task Then_The_Account_Is_Retrieved_From_The_AccountLegalEntityId_And_Passed_To_The_Service(
+            BulkCreateAccountReservationsCommand command,
+            AccountLegalEntity accountLegalEntity,
+            [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> validator,
+            [Frozen] Mock<IAccountLegalEntitiesService> accountLegalEntitiesService,
+            [Frozen] Mock<IAccountReservationService> mockAccountReservationService,
+            BulkCreateAccountReservationsCommandHandler handler)
         {
             //Arrange
-            var createdReservationIds = new List<Guid>
-            {
-                Guid.NewGuid(),
-                Guid.NewGuid()
-            };
+            validator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>()))
+                .ReturnsAsync(new ValidationResult {ValidationDictionary = new Dictionary<string, string>()});
+            accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(command.AccountLegalEntityId)).ReturnsAsync(accountLegalEntity);
 
-            var handler = new BulkCreateAccountReservationsCommandHandler(mockAccountReservationService.Object, validator);
-            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId,0,""))
+            //Act
+            await handler.Handle(command, CancellationToken.None);
+
+            //Assert
+            mockAccountReservationService.Verify(x=>x.BulkCreateAccountReservation(command.ReservationCount,command.AccountLegalEntityId, accountLegalEntity.AccountId, accountLegalEntity.AccountLegalEntityName));
+        }
+
+        [Test, MoqAutoData]
+        public async Task ThenWillReturnCreatedReservationIds(
+            List<Guid> createdReservationIds,
+            [Frozen] BulkCreateAccountReservationsCommand command,
+            [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> validator,
+            [Frozen] Mock<IAccountReservationService> mockAccountReservationService,
+            BulkCreateAccountReservationsCommandHandler handler)
+        {
+            //Arrange
+            validator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>()))
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
+            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId, It.IsAny<long>(), It.IsAny<string>()))
                 .ReturnsAsync(createdReservationIds);
 
             //Act
@@ -102,13 +103,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         [Test, MoqAutoData]
         public void ThenWillThrowServiceExceptions(
             [Frozen] BulkCreateAccountReservationsCommand command,
-            [Frozen] BulkCreateAccountReservationsCommandValidator validator,
-            [Frozen] Mock<IAccountReservationService> mockAccountReservationService)
+            [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> validator,
+            [Frozen] Mock<IAccountReservationService> mockAccountReservationService,
+            BulkCreateAccountReservationsCommandHandler handler)
         {
             //Arrange
+            validator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>()))
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
             var expectedException = new Exception();
-
-            var handler = new BulkCreateAccountReservationsCommandHandler(mockAccountReservationService.Object, validator);
             mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(It.IsAny<uint>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
                 .Throws(expectedException);
 
