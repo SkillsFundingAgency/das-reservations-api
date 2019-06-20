@@ -2,7 +2,8 @@
 {
     public enum GlobalRuleType
     {
-        FundingPaused = 0,
-        ReservationLimit =1
+        None = 0,
+        FundingPaused = 1,
+        ReservationLimit = 2
     }
 }
