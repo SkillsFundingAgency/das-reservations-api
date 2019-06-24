@@ -13,8 +13,8 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.Id).HasColumnName(@"Id").HasColumnType("uniqueidentifier").IsRequired().ValueGeneratedOnAdd();
             builder.Property(x => x.AccountId).HasColumnName(@"AccountId").HasColumnType("bigint").IsRequired();
             builder.Property(x => x.CreatedDate).HasColumnName(@"CreatedDate").HasColumnType("datetime").IsRequired();
-            builder.Property(x => x.StartDate).HasColumnName(@"StartDate").HasColumnType("datetime").IsRequired();
-            builder.Property(x => x.ExpiryDate).HasColumnName(@"ExpiryDate").HasColumnType("datetime").IsRequired();
+            builder.Property(x => x.StartDate).HasColumnName(@"StartDate").HasColumnType("datetime");
+            builder.Property(x => x.ExpiryDate).HasColumnName(@"ExpiryDate").HasColumnType("datetime");
             builder.Property(x => x.IsLevyAccount).HasColumnName(@"IsLevyAccount").HasColumnType("tinyint").IsRequired();
             builder.Property(x => x.Status).HasColumnName(@"Status").HasColumnType("tinyint").IsRequired();
             builder.Property(x => x.CourseId).HasColumnName(@"CourseId").HasColumnType("varchar").HasMaxLength(20);

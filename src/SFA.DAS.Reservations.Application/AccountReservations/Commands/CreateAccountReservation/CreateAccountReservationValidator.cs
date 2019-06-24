@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
             {
                 validationResult.AddError(nameof(item.AccountId));
             }
-            if (item.StartDate == DateTime.MinValue)
+            if (!item.StartDate.HasValue || item.StartDate == DateTime.MinValue)
             {
                 validationResult.AddError(nameof(item.StartDate));
             }

@@ -54,7 +54,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             _reservationRepository
                 .Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.Id.Equals(_expectedReservationId))))
-                .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId, Course = _expectedCourse,ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedAccountLegalEntityId});
+                .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId, Course = _expectedCourse,
+                    ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedAccountLegalEntityId});
             
             _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object);
         }

@@ -85,8 +85,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             var reservationDates = new ReservationDates
             {
                 TrainingStartDate = request.StartDate,
-                ReservationStartDate = reservation.StartDate,
-                ReservationExpiryDate = reservation.ExpiryDate,
+                ReservationStartDate = reservation.StartDate.Value,
+                ReservationExpiryDate = reservation.ExpiryDate.Value,
                 ReservationCreatedDate = reservation.CreatedDate
             };
 

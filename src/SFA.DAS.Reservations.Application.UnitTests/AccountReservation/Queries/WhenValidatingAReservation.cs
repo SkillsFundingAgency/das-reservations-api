@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.Value.AddDays(1)
             };
 
             //Act
@@ -81,7 +81,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.Value.AddDays(-1)
             };
 
             //Act
@@ -100,7 +100,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.Value.AddDays(1)
             };
 
             //Act
@@ -118,7 +118,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.Value.AddDays(-1)
             };
 
             //Arrange
@@ -137,7 +137,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.Value.AddDays(-1)
             };
 
             //Act
@@ -156,7 +156,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(-1)
+                StartDate = _reservation.StartDate.Value.AddDays(-1)
             };
 
             //Act
@@ -177,7 +177,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.ExpiryDate.AddDays(1)
+                StartDate = _reservation.ExpiryDate.Value.AddDays(1)
             };
 
             //Act
@@ -196,7 +196,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.ExpiryDate.AddDays(1)
+                StartDate = _reservation.ExpiryDate.Value.AddDays(1)
             };
 
             //Act
@@ -217,7 +217,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.Value.AddDays(1)
             };
             
             _course.Rules.Add(new Rule
@@ -244,13 +244,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.Value.AddDays(1)
             };
             
             _course.Rules.Add(new Rule
             {
-                ActiveFrom = _reservation.StartDate.AddDays(-10), 
-                ActiveTo = _reservation.StartDate.AddDays(-5)
+                ActiveFrom = _reservation.StartDate.Value.AddDays(-10), 
+                ActiveTo = _reservation.StartDate.Value.AddDays(-5)
             });
 
             //Act
@@ -269,7 +269,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             {
                 CourseCode = CourseId,
                 ReservationId = ReservationId,
-                StartDate = _reservation.StartDate.AddDays(1)
+                StartDate = _reservation.StartDate.Value.AddDays(1)
             };
 
             _courseService.Setup(s => s.GetCourseById(It.IsAny<string>())).ReturnsAsync((Course) null);

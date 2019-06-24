@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     {
         Guid Id { get; }
         long AccountId { get; }
-        DateTime StartDate { get; }
+        DateTime? StartDate { get; }
         string CourseId { get;  }
         int? ProviderId { get; }
         long AccountLegalEntityId { get; }

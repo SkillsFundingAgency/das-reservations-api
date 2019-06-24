@@ -30,8 +30,8 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             long accountId,
             bool isLevyAccount,
             DateTime createdDate,
-            DateTime startDate,
-            DateTime expiryDate,
+            DateTime? startDate,
+            DateTime? expiryDate,
             ReservationStatus status,
             Course reservationCourse,
             int? providerId,
@@ -59,9 +59,9 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         public DateTime CreatedDate { get; }
 
-        public DateTime StartDate { get; }
+        public DateTime? StartDate { get; }
 
-        public DateTime ExpiryDate { get; }
+        public DateTime? ExpiryDate { get; }
 
         public bool IsActive => ExpiryDate >= DateTime.UtcNow;
 
@@ -79,8 +79,13 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         private IList<Rule> GetRules(Func<DateTime, Task<IList<Rule>>> getRules)
         {
-            var task = getRules(StartDate);
-            return task.Result;
+            if (StartDate.HasValue)
+            {
+                var task = getRules(StartDate.Value);
+                return task.Result;
+            }
+
+            return new List<Rule>();
         }
 
         private ICollection<ReservationRule> GetRulesForAccountType(IList<Rule> rules)
@@ -104,11 +109,16 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             return reservationCourse == null ? null : new ApprenticeshipCourse.Course(reservationCourse);
         }
 		
-		private DateTime GetExpiryDateFromStartDate(int expiryPeriodInMonths)
+		private DateTime? GetExpiryDateFromStartDate(int expiryPeriodInMonths)
         {
-            var expiryDate = StartDate.AddMonths(expiryPeriodInMonths);
-            var lastDayInMonth = DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month);
-            return new DateTime(expiryDate.Year, expiryDate.Month, lastDayInMonth);
+            if (StartDate.HasValue)
+            {
+                var expiryDate = StartDate.Value.AddMonths(expiryPeriodInMonths);
+                var lastDayInMonth = DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month);
+                return new DateTime(expiryDate.Year, expiryDate.Month, lastDayInMonth);
+            }
+
+            return null;
         }
     }
 }
