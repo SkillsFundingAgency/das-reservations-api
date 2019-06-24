@@ -26,10 +26,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
             {
                 validationResult.AddError(nameof(item.AccountId));
             }
-            if (string.IsNullOrEmpty(item.AccountLegalEntityName))
-            {
-                validationResult.AddError(nameof(item.AccountLegalEntityName));
-            }
+
             if (item.AccountLegalEntityId == 0)
             {
                 validationResult.AddError(nameof(item.AccountLegalEntityId));
@@ -37,6 +34,10 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
 
             if (!item.IsLevyAccount)
             {
+                if (string.IsNullOrEmpty(item.AccountLegalEntityName))
+                {
+                    validationResult.AddError(nameof(item.AccountLegalEntityName));
+                }
                 if (string.IsNullOrEmpty(item.CourseId))
                 {
                     validationResult.AddError(nameof(item.CourseId));

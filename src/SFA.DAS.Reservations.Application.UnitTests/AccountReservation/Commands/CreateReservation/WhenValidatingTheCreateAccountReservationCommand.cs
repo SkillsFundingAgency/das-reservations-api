@@ -153,7 +153,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 Id = Guid.NewGuid(),
                 AccountId = 5432,
-                AccountLegalEntityName = "TestName",
                 AccountLegalEntityId = 1,
                 IsLevyAccount = true
             });
