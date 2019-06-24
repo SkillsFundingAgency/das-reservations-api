@@ -34,6 +34,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
 
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
@@ -124,11 +125,12 @@ namespace SFA.DAS.Reservations.Api
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
             services.AddScoped(typeof(IValidator<ValidateReservationQuery>), typeof(ValidateReservationValidator));
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
-            services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
+            services.AddScoped(typeof(IValidator<BulkCreateAccountReservationsCommand>), typeof(BulkCreateAccountReservationsCommandValidator));
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
+
+            services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
             services.AddTransient<IReservationRepository,ReservationRepository>();
             services.AddTransient<IRuleRepository,RuleRepository>();
-
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
             services.AddTransient<ICourseRepository, CourseRepository>();
             services.AddTransient<IAccountLegalEntitiesRepository,AccountLegalEntityRepository>();

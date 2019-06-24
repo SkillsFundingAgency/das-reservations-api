@@ -5,6 +5,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
 {
     public class BulkCreateAccountReservationsResult
     {
-        public IEnumerable<Guid> CreatedReservationIds { get; set; }
+        public IEnumerable<Guid> ReservationIds { get; set; }
     }
 }

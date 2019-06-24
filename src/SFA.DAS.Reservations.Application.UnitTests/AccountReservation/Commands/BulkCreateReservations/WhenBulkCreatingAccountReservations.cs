@@ -97,7 +97,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var result = await handler.Handle(command, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(createdReservationIds, result.CreatedReservationIds);
+            Assert.AreEqual(createdReservationIds, result.ReservationIds);
         }
 
         [Test, MoqAutoData]

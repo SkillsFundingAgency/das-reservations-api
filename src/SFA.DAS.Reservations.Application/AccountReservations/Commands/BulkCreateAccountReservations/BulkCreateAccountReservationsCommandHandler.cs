@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
 
             return new BulkCreateAccountReservationsResult
             {
-                CreatedReservationIds = reservationIds
+                ReservationIds = reservationIds
             };
         }
     }

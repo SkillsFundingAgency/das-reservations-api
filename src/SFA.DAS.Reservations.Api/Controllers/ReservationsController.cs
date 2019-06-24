@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
+using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 
 namespace SFA.DAS.Reservations.Api.Controllers
@@ -185,12 +187,29 @@ namespace SFA.DAS.Reservations.Api.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [ProducesResponseType(400)]
-        [Route("/api/accounts/{accountLegalEntityId}/bulk-create")]
-        public async Task<IActionResult> BulkCreate(int count)
+        [Route("/api/[controller]/accounts/{accountLegalEntityId}/bulk-create/{count}")]
+        public async Task<IActionResult> BulkCreate(long accountLegalEntityId, uint count)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _mediator.Send(new BulkCreateAccountReservationsCommand { AccountLegalEntityId = accountLegalEntityId, ReservationCount = count});
+                return Created("", result);
+            }
+            catch (ArgumentException argumentException)
+            {
+                Console.WriteLine(argumentException);
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = argumentException.Message,
+                    Params = argumentException.ParamName
+                });
+            }
+            catch (EntityNotFoundException<Domain.Entities.AccountLegalEntity> e)
+            {
+                _logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
+                return NotFound();
+            }
         }
     }
 }
