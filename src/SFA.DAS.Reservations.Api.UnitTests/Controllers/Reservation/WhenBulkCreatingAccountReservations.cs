@@ -14,10 +14,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
-using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Exceptions;
-using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
