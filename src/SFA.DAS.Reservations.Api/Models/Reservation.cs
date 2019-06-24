@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Api.Models
         public int? ProviderId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
+        public bool IsLevyAccount { get; set; }
     }
 }

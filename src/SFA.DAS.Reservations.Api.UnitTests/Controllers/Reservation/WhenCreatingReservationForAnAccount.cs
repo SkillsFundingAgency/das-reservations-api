@@ -31,6 +31,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);
         private readonly string _expectedCourseId = "asdfopi";
+        private readonly bool ExpectedIsLevyAccount = true;
         private Mock<HttpContext> _httpContext;
 
         [SetUp]
@@ -69,7 +70,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 CourseId = _expectedCourseId,
                 ProviderId = _expectedProviderId,
                 AccountLegalEntityId = _expectedAccountLegalEntityId,
-                AccountLegalEntityName = ExpectedAccountLegalEntityName
+                AccountLegalEntityName = ExpectedAccountLegalEntityName,
+                IsLevyAccount =  ExpectedIsLevyAccount
             };
 
 
@@ -84,6 +86,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     command.AccountId.Equals(ExpectedAccountId) &&
                     command.StartDate.Equals(_expectedStartDate) &&
                     command.Id.Equals(_expectedReservationId) &&
+                    command.IsLevyAccount.Equals(ExpectedIsLevyAccount) &&
                     command.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName)
                     
                     ), 
