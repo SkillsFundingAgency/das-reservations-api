@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 CourseId = "1",
                 Level = 1,
                 Title = "Test Course"
-            },null,198,"TestName" );
+            },null,198,"TestName",0 );
 
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
@@ -178,7 +178,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                     CourseId = "1",
                     Level = 1,
                     Title = "Test Course"
-                }, null, 198, "TestName");
+                }, null, 198, "TestName",0);
             _accountReservationsService
                 .Setup(x => x.CreateAccountReservation(_command))
                 .ReturnsAsync(_reservationCreated);

@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         {
             _accountReservationsResult = new GetReservationResponse
             {
-                Reservation = new Domain.Reservations.Reservation(null, _expectedReservationId, ExpectedAccountId, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow, ReservationStatus.Pending, null,0,0,"")
+                Reservation = new Domain.Reservations.Reservation(null, _expectedReservationId, ExpectedAccountId, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow, ReservationStatus.Pending, null,0,0,"",0)
             };
             
             _mediator = new Mock<IMediator>();

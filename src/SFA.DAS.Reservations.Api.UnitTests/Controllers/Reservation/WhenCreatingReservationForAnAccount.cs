@@ -28,6 +28,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private const string ExpectedAccountLegalEntityName= "TestName";
         private readonly long _expectedAccountLegalEntityId = 18723918;
         private readonly int? _expectedProviderId = 18723918;
+        private readonly long ExpectedTransferSenderAccountId = 184513;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);
         private readonly string _expectedCourseId = "asdfopi";
@@ -38,7 +39,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public void Arrange()
         {
             _accountReservationsResult = new CreateAccountReservationResult
-                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course(),0,0,"")};
+                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course(),0,0,"",0)};
             ;
             _mediator = new Mock<IMediator>();
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
@@ -71,7 +72,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 ProviderId = _expectedProviderId,
                 AccountLegalEntityId = _expectedAccountLegalEntityId,
                 AccountLegalEntityName = ExpectedAccountLegalEntityName,
-                IsLevyAccount =  ExpectedIsLevyAccount
+                IsLevyAccount =  ExpectedIsLevyAccount,
+                TransferSenderAccountId = ExpectedTransferSenderAccountId
             };
 
 
@@ -87,8 +89,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     command.StartDate.Equals(_expectedStartDate) &&
                     command.Id.Equals(_expectedReservationId) &&
                     command.IsLevyAccount.Equals(ExpectedIsLevyAccount) &&
-                    command.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName)
-                    
+                    command.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName) &&
+                    command.TransferSenderAccountId.Equals(ExpectedTransferSenderAccountId)
                     ), 
                 It.IsAny<CancellationToken>()), Times.Once);
 

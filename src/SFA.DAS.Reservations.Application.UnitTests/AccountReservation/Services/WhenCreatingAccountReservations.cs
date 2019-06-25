@@ -25,6 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         private const long ExpectedAccountId = 12344;
         private const int ExpectedProviderId = 66552;
         private const long ExpectedAccountLegalEntityId = 549785;
+        private const long ExpectedTransferSenderAccountId = 852364;
         private const string ExpectedAccountLegalEntityName = "TestName";
         private Course _expectedCourse;
         private DateTime _expectedExpiryDate;
@@ -55,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _reservationRepository
                 .Setup(x => x.CreateAccountReservation(It.Is<Domain.Entities.Reservation>(c=>c.Id.Equals(_expectedReservationId))))
                 .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId, Course = _expectedCourse,
-                    ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedAccountLegalEntityId});
+                    ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedAccountLegalEntityId,TransferSenderAccountId = ExpectedTransferSenderAccountId});
             
             _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object);
         }
@@ -88,7 +89,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 StartDate = _expectedStartDate,
                 Id = _expectedReservationId,
                 AccountLegalEntityName = ExpectedAccountLegalEntityName,
-                IsLevyAccount = true
+                IsLevyAccount = true,
+                TransferSenderAccountId = ExpectedTransferSenderAccountId
             };
 
             //Act
@@ -103,6 +105,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 c.ExpiryDate.Equals(_expectedExpiryDate) &&
                 c.Status.Equals((short)ReservationStatus.Pending) &&
                 c.IsLevyAccount.Equals(true) &&
+                c.TransferSenderAccountId.Equals(ExpectedTransferSenderAccountId) &&
                 c.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName)
              )));
         }
@@ -192,7 +195,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 Id = _expectedReservationId,
                 CourseId = _expectedCourse.CourseId,
                 AccountLegalEntityId = ExpectedAccountLegalEntityId,
-                ProviderId = ExpectedProviderId
+                ProviderId = ExpectedProviderId,
+                TransferSenderAccountId = ExpectedTransferSenderAccountId
             };
 
             //Act
@@ -207,6 +211,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.AreEqual(ExpectedProviderId, actual.ProviderId);
             Assert.AreEqual(ExpectedAccountLegalEntityId, actual.AccountLegalEntityId);
             Assert.AreEqual(_expectedCourse.Level.ToString(), actual.Course.Level);
+            Assert.AreEqual(ExpectedTransferSenderAccountId, actual.TransferSenderAccountId);
             Assert.IsNotNull(actual.Rules);
         }
     }
