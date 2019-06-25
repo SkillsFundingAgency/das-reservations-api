@@ -7,7 +7,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
     public class WhenValidatingBulkCreateAccountReservations
     {
         [Test]
-        public async Task ThenAValidCommandShouldPass()
+        public async Task Then_A_Valid_Command_Should_Pass()
         {
             //Arrange
             var command = new BulkCreateAccountReservationsCommand {ReservationCount = 2};
@@ -21,26 +21,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test]
-        public async Task ThenIfValuesAreNotSetShouldFail()
+        public async Task Then_If_Values_Are_Not_Set_Should_Fail()
         {
             //Arrange
             var command = new BulkCreateAccountReservationsCommand();
-            var validator = new BulkCreateAccountReservationsCommandValidator();
-
-            //Act
-            var result = await validator.ValidateAsync(command);
-
-            //Assert
-            Assert.IsFalse(result.IsValid());
-            Assert.AreEqual(1, result.ValidationDictionary.Count);
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(command.ReservationCount)));
-        }
-
-        [Test]
-        public async Task ThenIfReservationCountIsSetToInvalidValuesShouldFail()
-        {
-            //Arrange
-            var command = new BulkCreateAccountReservationsCommand{ReservationCount = 0};
             var validator = new BulkCreateAccountReservationsCommandValidator();
 
             //Act

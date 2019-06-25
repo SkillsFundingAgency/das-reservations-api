@@ -169,6 +169,34 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             Assert.IsNull(_reservation.ProviderId);
         }
 
+        [Test]
+        public void Then_When_There_Is_No_StartDate_The_Expiry_Date_Is_Not_Set_And_No_Rules_Are_Retrieved()
+        {
+            //Arrange
+            var expectedId = Guid.NewGuid();
+            var expectedAccountId = 123;
+            var expiryPeriodInMonths = 2;
+            var expectedAccountLegalEntityId = 2524;
+            var expecteLegalEntityAccountName = "TestName";
+
+            //Act
+            _reservation = new Reservation(expectedId, expectedAccountId, null, expiryPeriodInMonths, expecteLegalEntityAccountName, accountLegalEntityId: expectedAccountLegalEntityId);
+
+            //Assert
+            Assert.IsNull(_reservation.ExpiryDate);
+            Assert.IsNull(_reservation.StartDate);
+        }
+
+        [Test]
+        public void Then_When_There_Is_No_Start_Date_The_Rules_Are_Not_Returned()
+        {
+            //Act
+            var reservation = new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, null, null, ReservationStatus.Pending, new Course(), 0, 0, "TestName",32);
+
+            //Act
+            Assert.IsEmpty(reservation.Rules);
+        }
+
         private Reservation CreateReservation()
         {
             return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0, "TestName",0);
