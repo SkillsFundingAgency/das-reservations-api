@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -14,7 +14,7 @@ using SFA.DAS.UnitOfWork;
 using GlobalRule = SFA.DAS.Reservations.Domain.Rules.GlobalRule;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
+namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands.CreateReservation
 {
     public class WhenCreatingANewReservation
     {

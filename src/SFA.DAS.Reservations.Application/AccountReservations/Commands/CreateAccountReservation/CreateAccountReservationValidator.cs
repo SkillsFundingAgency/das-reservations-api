@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Validation;
 
-namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
+namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation
 {
     public class CreateAccountReservationValidator : IValidator<CreateAccountReservationCommand>
     {
@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands
             {
                 validationResult.AddError(nameof(item.AccountId));
             }
-            if (item.StartDate == DateTime.MinValue)
+            if (!item.StartDate.HasValue || item.StartDate == DateTime.MinValue)
             {
                 validationResult.AddError(nameof(item.StartDate));
             }

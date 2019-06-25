@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
+using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 
 namespace SFA.DAS.Reservations.Api.Controllers
@@ -164,7 +167,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException argumentException)
             {
-                Console.WriteLine(argumentException);
+                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = argumentException.Message,
@@ -180,6 +183,32 @@ namespace SFA.DAS.Reservations.Api.Controllers
             {
                 _logger.LogWarning(notFoundException, notFoundException.Message);
                 return StatusCode(410);
+            }
+        }
+
+        [HttpPost]
+        [ProducesResponseType(400)]
+        [Route("/api/[controller]/accounts/{accountLegalEntityId}/bulk-create/{count}")]
+        public async Task<IActionResult> BulkCreate(long accountLegalEntityId, uint count)
+        {
+            try
+            {
+                var result = await _mediator.Send(new BulkCreateAccountReservationsCommand { AccountLegalEntityId = accountLegalEntityId, ReservationCount = count});
+                return Created("", result);
+            }
+            catch (ArgumentException argumentException)
+            {
+                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = argumentException.Message,
+                    Params = argumentException.ParamName
+                });
+            }
+            catch (EntityNotFoundException<Domain.Entities.AccountLegalEntity> e)
+            {
+                _logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
+                return NotFound();
             }
         }
     }

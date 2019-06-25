@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             var reservation = new Reservation(
                 command.Id,
                 command.AccountId, 
-                command.StartDate,
+                command.StartDate.Value,
                 _options.Value.ExpiryPeriodInMonths,
                 command.AccountLegalEntityName,
                 command.CourseId,
@@ -62,6 +62,34 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         public async Task DeleteReservation(Guid reservationId)
         {
             await _reservationRepository.DeleteAccountReservation(reservationId);
+        }
+
+        public async Task<IList<Guid>> BulkCreateAccountReservation(uint reservationCount, long accountLegalEntityId,
+            long accountId, string accountLegalEntityName)
+        {
+            var reservations = new List<Domain.Entities.Reservation>();
+
+            for (var i = 0; i < reservationCount; i++)
+            {
+                reservations.Add(CreateReservation(accountId,accountLegalEntityId, accountLegalEntityName));
+            }
+
+            await _reservationRepository.CreateAccountReservations(reservations);
+
+            return reservations.Select(c=>c.Id).ToList();
+        }
+
+        private Domain.Entities.Reservation CreateReservation(long accountId, long accountLegalEntityId, string accountLegalEntityName)
+        {
+            return new Domain.Entities.Reservation
+            {
+                Id = Guid.NewGuid(),
+                CreatedDate = DateTime.UtcNow,
+                AccountId = accountId,
+                AccountLegalEntityId = accountLegalEntityId,
+                AccountLegalEntityName = accountLegalEntityName,
+                IsLevyAccount = true
+            };
         }
 
         private Reservation MapReservation(Domain.Entities.Reservation reservation)

@@ -61,5 +61,10 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             _reservationsDataContext.SaveChanges();
         }
+
+        public async Task CreateAccountReservations(List<Reservation> reservations)
+        {
+            await _reservationsDataContext.Reservations.AddRangeAsync(reservations);
+        }
     }
 }
