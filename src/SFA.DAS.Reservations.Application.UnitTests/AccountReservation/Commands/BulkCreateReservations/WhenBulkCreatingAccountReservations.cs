@@ -17,25 +17,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
     public class WhenBulkCreatingAccountReservations
     {
         [Test, MoqAutoData]
-        public async Task ThenWillValidateTheCommand(
-            [Frozen] BulkCreateAccountReservationsCommand command,
-            [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> mockValidator,
-            [Frozen] IAccountReservationService mockAccountReservationService,
-            BulkCreateAccountReservationsCommandHandler handler)
-        {
-            //Arrange
-            mockValidator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>()))
-                .ReturnsAsync(() => new ValidationResult());
-
-            //Act
-            await handler.Handle(command, CancellationToken.None);
-
-            //Assert
-            mockValidator.Verify(s => s.ValidateAsync(command), Times.Once);
-        }
-
-        [Test, MoqAutoData]
-        public void ThenThrowExceptionIfValidationFails(
+        public void Then_Throws_An_Exception_If_ValidationFails(
             [Frozen] BulkCreateAccountReservationsCommand command,
             [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> mockValidator,
             [Frozen] Mock<IAccountReservationService> mockAccountReservationService,
@@ -80,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test, MoqAutoData]
-        public async Task ThenWillReturnCreatedReservationIds(
+        public async Task Then_Will_Return_Created_Reservation_Ids(
             List<Guid> createdReservationIds,
             [Frozen] BulkCreateAccountReservationsCommand command,
             [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> validator,
@@ -101,7 +83,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test, MoqAutoData]
-        public void ThenWillThrowServiceExceptions(
+        public void Then_Will_Throw_Service_Exceptions(
             [Frozen] BulkCreateAccountReservationsCommand command,
             [Frozen] Mock<IValidator<BulkCreateAccountReservationsCommand>> validator,
             [Frozen] Mock<IAccountReservationService> mockAccountReservationService,

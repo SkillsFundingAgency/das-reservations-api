@@ -167,7 +167,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException argumentException)
             {
-                Console.WriteLine(argumentException);
+                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = argumentException.Message,
@@ -198,7 +198,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException argumentException)
             {
-                Console.WriteLine(argumentException);
+                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = argumentException.Message,
