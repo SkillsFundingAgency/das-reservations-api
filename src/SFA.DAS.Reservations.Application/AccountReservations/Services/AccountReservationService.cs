@@ -46,12 +46,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             var reservation = new Reservation(
                 command.Id,
                 command.AccountId, 
-                command.StartDate.Value,
+                command.StartDate,
                 _options.Value.ExpiryPeriodInMonths,
                 command.AccountLegalEntityName,
                 command.CourseId,
                 command.ProviderId, 
-                command.AccountLegalEntityId);
+                command.AccountLegalEntityId,
+                command.IsLevyAccount);
 
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);

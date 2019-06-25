@@ -31,6 +31,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet]
         [ProducesResponseType(400)]
         [Route("api/accounts/{accountId}/[controller]/")]
         public async Task<IActionResult> GetAll(long accountId)

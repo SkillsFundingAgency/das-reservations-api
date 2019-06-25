@@ -87,7 +87,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 AccountId = ExpectedAccountId,
                 StartDate = _expectedStartDate,
                 Id = _expectedReservationId,
-                AccountLegalEntityName = ExpectedAccountLegalEntityName
+                AccountLegalEntityName = ExpectedAccountLegalEntityName,
+                IsLevyAccount = true
             };
 
             //Act
@@ -101,6 +102,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 !c.CreatedDate.Equals(DateTime.MinValue) &&
                 c.ExpiryDate.Equals(_expectedExpiryDate) &&
                 c.Status.Equals((short)ReservationStatus.Pending) &&
+                c.IsLevyAccount.Equals(true) &&
                 c.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName)
              )));
         }
