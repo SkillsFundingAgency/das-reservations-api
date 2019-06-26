@@ -29,6 +29,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
             var reservations = result
                 .Select(MapReservation)
+                .Where(c=>!c.IsLevyAccount)
                 .ToList();
 
             return reservations;

@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         private Mock<IReservationRepository> _reservationRepository;
         private Mock<IRuleRepository> _ruleRepository;
         private Reservation _expectedReservation;
+        private Reservation _secondReservation;
 
         private const long ExpectedAccountId = 66532;
 
@@ -36,6 +37,23 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 StartDate = DateTime.Today.AddDays(15),
                 CreatedDate= DateTime.Today,
                 Id = Guid.NewGuid(),
+                IsLevyAccount = false,
+                Status = 2,
+                CourseId = "123-1",
+                Course = new Course
+                {
+                    CourseId = "123-1",
+                    Level = 1,
+                    Title = "Course 123-1"
+                }
+            };
+            _secondReservation = new Reservation
+            {
+                AccountId = ExpectedAccountId,
+                ExpiryDate = DateTime.Today.AddDays(45),
+                StartDate = DateTime.Today.AddDays(15),
+                CreatedDate = DateTime.Today,
+                Id = Guid.NewGuid(),
                 IsLevyAccount = true,
                 Status = 2,
                 CourseId = "123-1",
@@ -47,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 }
             };
             _reservationRepository.Setup(x => x.GetAccountReservations(ExpectedAccountId))
-                .ReturnsAsync(new List<Reservation> {_expectedReservation});
+                .ReturnsAsync(new List<Reservation> {_expectedReservation, _secondReservation });
             _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, Mock.Of<IOptions<ReservationsConfiguration>>());
         }
 
@@ -60,6 +78,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             //Assert
             _reservationRepository.Verify(x=>x.GetAccountReservations(ExpectedAccountId));
             Assert.IsNotNull(actual);
+        }
+
+        [Test]
+        public async Task Then_The_Reservations_Marked_As_Being_From_A_Levy_Account_Are_Not_Returned()
+        {
+            //Act
+            var actual = await _service.GetAccountReservations(ExpectedAccountId);
+
+            //Assert
+            Assert.AreEqual(1, actual.Count);
         }
 
         [Test]
