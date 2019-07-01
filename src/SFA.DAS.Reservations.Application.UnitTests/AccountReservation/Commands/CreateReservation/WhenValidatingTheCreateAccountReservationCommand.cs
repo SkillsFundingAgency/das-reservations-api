@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 
             _validator = new CreateAccountReservationValidator(_courseService.Object);
 
-            _courseService.Setup(s => s.GetCourseById(It.Is<string>(c=>c.Equals("1"))))
+            _courseService.Setup(s => s.GetCourseById("1"))
                 .ReturnsAsync(new Course(new Domain.Entities.Course()));
         }
 
@@ -146,7 +146,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test]
-        public async Task Then_If_The_Command_Is_For_A_Non_Levy_Reservation_The_Course_And_Start_Date_are_Not_Required()
+        public async Task Then_If_The_Command_Is_For_A_Levy_Reservation_The_Course_And_Start_Date_are_Not_Required()
         {
             //Act
             var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand
