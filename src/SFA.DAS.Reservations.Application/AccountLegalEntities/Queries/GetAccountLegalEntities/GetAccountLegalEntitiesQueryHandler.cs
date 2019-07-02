@@ -6,7 +6,7 @@ using MediatR;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Validation;
 
-namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries
+namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities
 {
     public class GetAccountLegalEntitiesQueryHandler : IRequestHandler<GetAccountLegalEntitiesQuery, GetAccountLegalEntitiesResponse>
     {

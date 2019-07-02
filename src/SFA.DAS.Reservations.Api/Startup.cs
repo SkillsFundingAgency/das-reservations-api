@@ -32,7 +32,7 @@ using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
-
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
