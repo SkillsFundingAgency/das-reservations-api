@@ -13,10 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.StartupConfig;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Application.Courses.Services;
@@ -33,6 +31,7 @@ using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntity;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
@@ -42,7 +41,6 @@ using SFA.DAS.Reservations.Infrastructure.DevConfiguration;
 using SFA.DAS.UnitOfWork;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore;
 using SFA.DAS.UnitOfWork.Mvc;
-using SFA.DAS.UnitOfWork.NServiceBus;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -122,6 +120,7 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));          
             services.AddScoped(typeof(IValidator<GetAccountLegalEntitiesQuery>), typeof(GetAccountLegalEntitiesQueryValidator));
+            services.AddScoped(typeof(IValidator<GetAccountLegalEntityQuery>), typeof(GetAccountLegalEntityQueryValidator));
             services.AddScoped(typeof(IValidator<GetAccountReservationStatusQuery>), typeof(GetAccountReservationStatusQueryValidator));
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
             services.AddScoped(typeof(IValidator<ValidateReservationQuery>), typeof(ValidateReservationValidator));
