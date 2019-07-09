@@ -31,6 +31,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet]
         [ProducesResponseType(400)]
         [Route("api/accounts/{accountId}/[controller]/")]
         public async Task<IActionResult> GetAll(long accountId)
@@ -66,7 +67,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     ProviderId = reservation.ProviderId,
                     AccountLegalEntityId = reservation.AccountLegalEntityId,
                     AccountLegalEntityName = reservation.AccountLegalEntityName,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow,
+                    IsLevyAccount = reservation.IsLevyAccount,
+                    TransferSenderAccountId = reservation.TransferSenderAccountId
                 });
 
                 if (response.Rule != null)

@@ -15,5 +15,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
         public string AccountLegalEntityName { get; set; }
         public bool IsLevyAccount { get; set; }
         public DateTime CreatedDate { get; set; }
+        public long? TransferSenderAccountId { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,26 +9,39 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntity;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
 {
-    public class WhenGettingAccountLegalEntitiesForAnAccount
+    public class WhenGettingAccountLegalEntityById
     {
+        private const long ExpectedLegalEntityId = 123234;
+
         private AccountLegalEntitiesController _accountLegalEntitiesController;
         private Mock<IMediator> _mediator;
-        private GetAccountLegalEntitiesResponse _accountLegalEntitiesResponse;
-        private const long ExpectedAccountId = 123234;
+        private GetAccountLegalEntityResult _accountLegalEntityResult;
+        private AccountLegalEntity _expectedLegalEntity;
+        
         [SetUp]
         public void Arrange()
         {
-            _mediator = new Mock<IMediator>();
-            _accountLegalEntitiesResponse = new GetAccountLegalEntitiesResponse { AccountLegalEntities = new List<Domain.AccountLegalEntities.AccountLegalEntity>() };
+            _expectedLegalEntity = new AccountLegalEntity(
+                Guid.NewGuid(), 
+                1, 
+                "Test", 
+                2,
+                3, 
+                4, 
+                true, 
+                true);
 
-            _mediator.Setup(x => x.Send(It.Is<GetAccountLegalEntitiesQuery>(c => c.AccountId.Equals(ExpectedAccountId)),
+            _mediator = new Mock<IMediator>();
+            _accountLegalEntityResult = new GetAccountLegalEntityResult { LegalEntity  = _expectedLegalEntity};
+
+            _mediator.Setup(x => x.Send(It.Is<GetAccountLegalEntityQuery>(q => q.Id.Equals(ExpectedLegalEntityId)),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(_accountLegalEntitiesResponse);
+                .ReturnsAsync(_accountLegalEntityResult);
 
             _accountLegalEntitiesController = new AccountLegalEntitiesController(_mediator.Object, Mock.Of<ILogger<AccountLegalEntitiesController>>());
         }
@@ -38,7 +50,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
         public async Task Then_The_AccountLegalEntities_Are_Returned()
         {
             //Act
-            var actual = await _accountLegalEntitiesController.GetByAccountId(ExpectedAccountId);
+            var actual = await _accountLegalEntitiesController.GetByAccountLegalEntityId(ExpectedLegalEntityId);
 
             //Assert
             Assert.IsNotNull(actual);
@@ -46,8 +58,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             Assert.IsNotNull(result?.StatusCode);
             Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
             Assert.IsNotNull(result.Value);
-            var actualAccountLegalEntities = result.Value as List<Domain.AccountLegalEntities.AccountLegalEntity>;
-            Assert.AreEqual(_accountLegalEntitiesResponse.AccountLegalEntities, actualAccountLegalEntities);
+            var actualAccountLegalEntity = result.Value as AccountLegalEntity;
+            Assert.AreEqual(_accountLegalEntityResult.LegalEntity, actualAccountLegalEntity);
         }
 
         [Test]
@@ -55,12 +67,12 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
         {
             //Arrange
             var expectedValidationMessage = "The following parameters have failed validation";
-            var expectedParam = "AccountId";
-            _mediator.Setup(x => x.Send(It.IsAny<GetAccountLegalEntitiesQuery>(), It.IsAny<CancellationToken>()))
+            var expectedParam = "Id";
+            _mediator.Setup(x => x.Send(It.IsAny<GetAccountLegalEntityQuery>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
 
             //Act
-            var actual = await _accountLegalEntitiesController.GetByAccountId(0);
+            var actual = await _accountLegalEntitiesController.GetByAccountLegalEntityId(0);
 
             //Assert
             var result = actual as ObjectResult;

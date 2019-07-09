@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Validation;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Queries.GetAccountLegalEntities
 {
     public class WhenGettingAccountLegalEntities
     {

@@ -29,6 +29,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
             var reservations = result
                 .Select(MapReservation)
+                .Where(c=>!c.IsLevyAccount)
                 .ToList();
 
             return reservations;
@@ -46,12 +47,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             var reservation = new Reservation(
                 command.Id,
                 command.AccountId, 
-                command.StartDate.Value,
+                command.StartDate,
                 _options.Value.ExpiryPeriodInMonths,
                 command.AccountLegalEntityName,
                 command.CourseId,
                 command.ProviderId, 
-                command.AccountLegalEntityId);
+                command.AccountLegalEntityId,
+                command.IsLevyAccount,
+                command.TransferSenderAccountId);
 
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);
@@ -105,7 +108,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 reservation.Course,
                 reservation.ProviderId,
                 reservation.AccountLegalEntityId,
-                reservation.AccountLegalEntityName
+                reservation.AccountLegalEntityName,
+                reservation.TransferSenderAccountId
             );
             return mapReservation;
         }
@@ -124,7 +128,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 CourseId = reservation.CourseId,
                 AccountLegalEntityId = reservation.AccountLegalEntityId,
                 ProviderId = reservation.ProviderId,
-                AccountLegalEntityName = reservation.AccountLegalEntityName
+                AccountLegalEntityName = reservation.AccountLegalEntityName,
+                TransferSenderAccountId = reservation.TransferSenderAccountId
             };
         }
     }

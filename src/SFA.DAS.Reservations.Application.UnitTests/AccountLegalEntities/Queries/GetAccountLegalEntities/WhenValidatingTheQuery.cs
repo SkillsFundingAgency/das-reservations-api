@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
 
-namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Queries
+namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Queries.GetAccountLegalEntities
 {
     public class WhenValidatingTheQuery
     {

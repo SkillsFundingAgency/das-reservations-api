@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
@@ -17,14 +18,17 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
         private readonly IValidator<CreateAccountReservationCommand> _validator;
         private readonly IGlobalRulesService _globalRulesService;
         private readonly IUnitOfWorkContext _context;
+        private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
 
         public CreateAccountReservationCommandHandler(IAccountReservationService accountReservationService,
-            IValidator<CreateAccountReservationCommand> validator, IGlobalRulesService globalRulesService, IUnitOfWorkContext context)
+            IValidator<CreateAccountReservationCommand> validator, IGlobalRulesService globalRulesService,
+            IUnitOfWorkContext context, IAccountLegalEntitiesService accountLegalEntitiesService)
         {
             _accountReservationService = accountReservationService;
             _validator = validator;
             _globalRulesService = globalRulesService;
             _context = context;
+            _accountLegalEntitiesService = accountLegalEntitiesService;
         }
 
         public async Task<CreateAccountReservationResult> Handle(CreateAccountReservationCommand request, CancellationToken cancellationToken)
@@ -49,17 +53,41 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                 };
             }
 
-            var reservation = await _accountReservationService.CreateAccountReservation(request);
+            if (request.IsLevyAccount)
+            {
+                var accountLegalEntity =
+                    await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
 
-            _context.AddEvent(() => new ReservationCreatedEvent(reservation.Id,
-                reservation.AccountLegalEntityId, 
-                reservation.AccountLegalEntityName,
-                reservation.Course?.CourseId, 
-                reservation.StartDate.Value, 
-                reservation.Course?.Title, 
-                reservation.ExpiryDate.Value, 
-                reservation.CreatedDate,
-                reservation.AccountId));
+                request.AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName;
+            }
+
+            var reservation = await _accountReservationService.CreateAccountReservation(request);
+            
+            _context.AddEvent(() =>
+            {
+                var startDate = DateTime.MinValue;
+                if (reservation.StartDate.HasValue)
+                {
+                    startDate = reservation.StartDate.Value;
+                }
+                var expiryDate = DateTime.MinValue;
+                if (reservation.ExpiryDate.HasValue)
+                {
+                    expiryDate = reservation.ExpiryDate.Value;
+                }
+
+                return new ReservationCreatedEvent(reservation.Id,
+                    reservation.AccountLegalEntityId,
+                    reservation.AccountLegalEntityName,
+                    reservation.Course?.CourseId,
+                    startDate,
+                    reservation.Course?.Title,
+                    expiryDate,
+                    reservation.CreatedDate,
+                    reservation.AccountId);
+            });
+        
+            
 
             return new CreateAccountReservationResult
             {

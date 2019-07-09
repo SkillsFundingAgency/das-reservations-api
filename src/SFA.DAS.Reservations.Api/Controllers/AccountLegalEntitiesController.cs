@@ -4,7 +4,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntity;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
@@ -26,13 +27,33 @@ namespace SFA.DAS.Reservations.Api.Controllers
             _logger = logger;
         }
 
-        [Route("{accountId}")]
+        [Route("/api/{accountId}/[controller]")]
         public async Task<IActionResult> GetByAccountId(long accountId)
         {
             try
             {
                 var response = await _mediator.Send(new GetAccountLegalEntitiesQuery { AccountId = accountId });
                 return Ok(response.AccountLegalEntities);
+            }
+            catch (ArgumentException e)
+            {
+                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
+            }
+        }
+
+        [Route("{legalEntityId}")]
+        public async Task<IActionResult> GetByAccountLegalEntityId(long legalEntityId)
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetAccountLegalEntityQuery { Id = legalEntityId });
+                
+                return Ok(response.LegalEntity);
             }
             catch (ArgumentException e)
             {

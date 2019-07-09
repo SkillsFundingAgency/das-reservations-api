@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_The_Reservation_Is_Valid_If_It_Is_Within_The_Expiry_Period()
         {
             //Act
-            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"");
+            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"",0);
 
             //Assert
             Assert.IsTrue(_reservation.IsActive);
@@ -128,9 +128,10 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var expectedProviderId = 443322;
             var expectedLegalEntityAccountId = 339988;
             var expectedLegalEntityAccountName = "TestName";
+            var expectedTransferSenderId = 48752;
 
             //Act
-            _reservation = new Reservation(expectedId,expectedAccountId, expectedStartDate,expiryPeriodInMonths, expectedLegalEntityAccountName, expectedCourseId, expectedProviderId, expectedLegalEntityAccountId);
+            _reservation = new Reservation(expectedId,expectedAccountId, expectedStartDate,expiryPeriodInMonths, expectedLegalEntityAccountName, expectedCourseId, expectedProviderId, expectedLegalEntityAccountId,transferSenderAccountId:expectedTransferSenderId);
 
             //Assert
             Assert.AreEqual(expectedId, _reservation.Id);
@@ -140,6 +141,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             Assert.AreEqual(expectedProviderId, _reservation.ProviderId);
             Assert.AreEqual(expectedLegalEntityAccountId, _reservation.AccountLegalEntityId);
             Assert.AreEqual(expectedLegalEntityAccountName, _reservation.AccountLegalEntityName);
+            Assert.AreEqual(expectedTransferSenderId, _reservation.TransferSenderAccountId);
 
         }
 
@@ -189,7 +191,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_When_There_Is_No_Start_Date_The_Rules_Are_Not_Returned()
         {
             //Act
-            var reservation = new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, null, null, ReservationStatus.Pending, new Course(), 0, 0, "TestName");
+            var reservation = new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, null, null, ReservationStatus.Pending, new Course(), 0, 0, "TestName",32);
 
             //Act
             Assert.IsEmpty(reservation.Rules);
@@ -197,7 +199,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
 
         private Reservation CreateReservation()
         {
-            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0, "TestName");
+            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0, "TestName",0);
         }
     }
 }

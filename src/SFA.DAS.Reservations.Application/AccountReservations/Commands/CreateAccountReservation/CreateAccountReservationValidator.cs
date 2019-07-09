@@ -26,26 +26,30 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
             {
                 validationResult.AddError(nameof(item.AccountId));
             }
-            if (!item.StartDate.HasValue || item.StartDate == DateTime.MinValue)
-            {
-                validationResult.AddError(nameof(item.StartDate));
-            }
-            if (string.IsNullOrEmpty(item.AccountLegalEntityName))
-            {
-                validationResult.AddError(nameof(item.AccountLegalEntityName));
-            }
+
             if (item.AccountLegalEntityId == 0)
             {
                 validationResult.AddError(nameof(item.AccountLegalEntityId));
             }
-            if (string.IsNullOrEmpty(item.CourseId))
+
+            if (!item.IsLevyAccount)
             {
-                return validationResult;
-            }
-    
-            if (await _courseService.GetCourseById(item.CourseId) == null)
-            {
-                validationResult.AddError(nameof(item.CourseId), "Course with CourseId cannot be found");
+                if (string.IsNullOrEmpty(item.AccountLegalEntityName))
+                {
+                    validationResult.AddError(nameof(item.AccountLegalEntityName));
+                }
+                if (string.IsNullOrEmpty(item.CourseId))
+                {
+                    validationResult.AddError(nameof(item.CourseId));
+                }
+                if (!item.StartDate.HasValue || item.StartDate == DateTime.MinValue)
+                {
+                    validationResult.AddError(nameof(item.StartDate));
+                }
+                if (validationResult.IsValid() && await _courseService.GetCourseById(item.CourseId) == null)
+                {
+                    validationResult.AddError(nameof(item.CourseId), "Course with CourseId cannot be found");
+                }
             }
 
             return validationResult;

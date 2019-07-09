@@ -61,7 +61,8 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                     request.CourseId,
                     request.ProviderId,
                     request.AccountLegalEntityId,
-                    request.IsLevyAccount);
+                    request.IsLevyAccount,
+                    request.TransferSenderAccountId);
 
                 switch (globalRule.Restriction)
                 {
