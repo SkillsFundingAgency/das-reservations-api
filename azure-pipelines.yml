@@ -13,72 +13,82 @@ variables:
   buildConfiguration: 'release'
   buildPlatform: 'anycpu'
 
-pool:
-  name: 'Continuous Integration 02 - SSD - 160ACU'
-  demands: 
-  - msbuild
-  - visualstudio
+jobs:
+  - job: 'Code Build'
+    pool:
+      name: 'DAS - Continuous Integration'
+    steps:
+      - task: gittools.gitversion-preview.gitversion-task.GitVersion@5
+        displayName: GitVersion
+        inputs:
+          updateAssemblyInfo: true
 
-steps:
-- task: gittools.gitversion.gitversion-task.GitVersion@3
-  displayName: GitVersion
-  inputs:
-    updateAssemblyInfo: true
+      - task: DotNetCoreCLI@2
+        displayName: Restore
+        inputs:
+          command: restore
+          projects: 'src/**/*.csproj'
 
-- task: DotNetCoreCLI@2
-  displayName: Restore
-  inputs:
-    command: restore
-    projects: 'src/**/*.csproj'
-    noCache: true
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        inputs:
+          projects: 'src/**/*.csproj'
+          arguments: '--configuration $(buildConfiguration) --no-restore'
+          
+      - task: DotNetCoreCLI@2
+        displayName: Test
+        inputs:
+          command: test
+          projects: '**/*.UnitTests.csproj'
+          arguments: '--configuration $(buildConfiguration) --no-build'
 
-- task: DotNetCoreCLI@2
-  displayName: Build
-  inputs:
-    projects: 'src/**/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-restore'
-    
-- task: DotNetCoreCLI@2
-  displayName: Test
-  inputs:
-    command: test
-    projects: '**/*.UnitTests.csproj'
-    arguments: '--configuration $(buildConfiguration) --no-build'
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish Website'
+        inputs:
+          command: publish
+          publishWebProjects: false
+          projects: 'src/SFA.DAS.Reservations.Api/SFA.DAS.Reservations.Api.csproj'
+          arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Publish Website'
-  inputs:
-    command: publish
-    publishWebProjects: false
-    projects: 'src/SFA.DAS.Reservations.Api/SFA.DAS.Reservations.Api.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet pack'
+        inputs:
+          command: pack
+          packagesToPack: src/SFA.DAS.Reservations.Messages/SFA.DAS.Reservations.Messages.csproj
+          packDirectory: '$(build.artifactstagingdirectory)/publish'
+          versioningScheme: byBuildNumber
+          buildProperties: 'Version="$(Build.BuildNumber)"'
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet pack'
-  inputs:
-    command: pack
-    packagesToPack: src/SFA.DAS.Reservations.Messages/SFA.DAS.Reservations.Messages.csproj
-    packDirectory: '$(build.artifactstagingdirectory)/publish'
-    versioningScheme: byBuildNumber
-    buildProperties: 'Version="$(Build.BuildNumber)"'
-    
-- task: VSBuild@1
-  displayName: 'Build DACPAC'
-  inputs:
-    solution: 'src/SFA.DAS.Reservations.Database/SFA.DAS.Reservations.Database.sqlproj'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
-    
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
-  inputs:
-    Contents: |
-     azure\**
-     src\**\*.dacpac
-    TargetFolder: '$(build.artifactstagingdirectory)/publish'
+      - task: CopyFiles@2
+        displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+        inputs:
+          contents: |
+            azure/**
+          targetFolder: '$(build.artifactstagingdirectory)/publish'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)/publish'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          pathtoPublish: '$(build.artifactstagingdirectory)/publish'
+
+  - job: 'DACPAC Build'
+    pool: 
+      name: 'Hosted VS2019'
+    steps:
+      - task: VSBuild@1
+        displayName: 'Build DACPAC'
+        inputs:
+          solution: 'src/SFA.DAS.Reservations.Database/SFA.DAS.Reservations.Database.sqlproj'
+          platform: '$(buildPlatform)'
+          configuration: '$(buildConfiguration)'
+          msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/publish"'
+      - task: CopyFiles@2
+        displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+        inputs:
+          contents: |
+            src/**/*.dacpac
+          targetFolder: '$(build.artifactstagingdirectory)/publish'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact'
+        inputs:
+          pathtoPublish: '$(build.artifactstagingdirectory)/publish'
