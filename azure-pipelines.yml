@@ -72,7 +72,7 @@ jobs:
 
 - job: 'DACPACBuild'
   pool: 
-    name: 'Hosted VS2019'
+    vmImage: 'windows-2019'
   workspace:
     clean: all
   steps:
