@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
                 .Setup(service => service.GetAccountLegalEntity(query.AccountLegalEntityId))
                 .ReturnsAsync(accountLegalEntity);
             mockDatesService
-                .Setup(x => x.GetAvailableDates(accountLegalEntity.AgreementType == AgreementType.NoneLevyExpressionOfInterest))
+                .Setup(x => x.GetAvailableDates(accountLegalEntity.AgreementType == AgreementType.NonLevyExpressionOfInterest))
                 .Returns(availableDateStartWindows);
 
             //Act

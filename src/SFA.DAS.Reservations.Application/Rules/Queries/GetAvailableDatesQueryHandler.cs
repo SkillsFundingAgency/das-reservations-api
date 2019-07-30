@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
 
             var accountLegalEntity = await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
 
-            var availableDates = _availableDatesService.GetAvailableDates(accountLegalEntity.AgreementType == AgreementType.NoneLevyExpressionOfInterest);
+            var availableDates = _availableDatesService.GetAvailableDates(accountLegalEntity.AgreementType == AgreementType.NonLevyExpressionOfInterest);
             
             return new GetAvailableDatesResult
             {
