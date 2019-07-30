@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Entities;
@@ -72,7 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 .ReturnsAsync(_reservationCreated);
 
             _accountLegalEntitiesService = new Mock<IAccountLegalEntitiesService>();
-            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(),_command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId,2,true,true);
+            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId,2,true,true, AgreementType.Levy);
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
                 .ReturnsAsync(_expectedAccountLegalEntity);
 
