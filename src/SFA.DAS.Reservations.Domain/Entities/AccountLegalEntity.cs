@@ -1,4 +1,5 @@
 ﻿using System;
+using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.Reservations.Domain.Entities
 {
@@ -12,5 +13,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public int? ReservationLimit { get; set; }
         public bool AgreementSigned { get; set; }
         public bool IsLevy { get; set; }
+        public AgreementType AgreementType { get; set; }
     }
 }

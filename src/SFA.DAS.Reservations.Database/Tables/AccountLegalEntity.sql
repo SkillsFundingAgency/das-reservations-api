@@ -7,5 +7,6 @@
 	[AccountLegalEntityName] VARCHAR(100) NOT NULL,
 	[ReservationLimit] INT NULL,
 	[AgreementSigned] BIT NOT NULL DEFAULT 0, 
-    [IsLevy] BIT NOT NULL DEFAULT 0
+    [IsLevy] BIT NOT NULL DEFAULT 0, 
+    [AgreementType] TINYINT NOT NULL DEFAULT 0
 )

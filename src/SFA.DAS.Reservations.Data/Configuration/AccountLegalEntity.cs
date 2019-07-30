@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace SFA.DAS.Reservations.Data.Configuration
@@ -21,6 +18,7 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.ReservationLimit).HasColumnName(@"ReservationLimit").HasColumnType("int");
             builder.Property(x => x.AgreementSigned).HasColumnName(@"AgreementSigned").HasColumnType("bit").IsRequired();
             builder.Property(x => x.IsLevy).HasColumnName(@"IsLevy").HasColumnType("bit").IsRequired();
+            builder.Property(x => x.AgreementType).HasColumnName(@"AgreementType").HasColumnType("tinyint").IsRequired().HasDefaultValue(0);
         }
     }
 }
