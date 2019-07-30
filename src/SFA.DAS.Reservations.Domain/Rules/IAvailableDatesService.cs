@@ -4,6 +4,6 @@ namespace SFA.DAS.Reservations.Domain.Rules
 {
     public interface IAvailableDatesService
     {
-        IEnumerable<AvailableDateStartWindow> GetAvailableDates(long accountId);
+        IEnumerable<AvailableDateStartWindow> GetAvailableDates(bool isEoi);
     }
 }

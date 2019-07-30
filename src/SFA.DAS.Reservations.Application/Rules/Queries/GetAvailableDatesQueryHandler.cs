@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
 
             var accountLegalEntity = await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
 
-            var availableDates = _availableDatesService.GetAvailableDates(accountLegalEntity.AccountId);
+            var availableDates = _availableDatesService.GetAvailableDates(accountLegalEntity.AgreementType == AgreementType.NoneLevyExpressionOfInterest);
             
             return new GetAvailableDatesResult
             {
