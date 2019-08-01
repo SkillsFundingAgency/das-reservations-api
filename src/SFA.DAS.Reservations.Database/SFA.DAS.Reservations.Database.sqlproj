@@ -71,7 +71,4 @@
     <Build Include="Tables\ClientOutboxData.sql" />
     <Build Include="Tables\UserRuleNotification.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="SFA.DAS.Reservations.Database.refactorlog" />
-  </ItemGroup>
 </Project>
