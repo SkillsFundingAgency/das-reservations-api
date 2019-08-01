@@ -7,5 +7,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
     {
         public Reservation Reservation { get; set; }
         public GlobalRule Rule { get; set; }
+        public bool NonLevyNonEoiAgreementSigned { get; set; }
     }
 }

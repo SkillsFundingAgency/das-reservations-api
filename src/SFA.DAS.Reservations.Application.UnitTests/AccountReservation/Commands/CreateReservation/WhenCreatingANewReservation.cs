@@ -134,6 +134,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test]
+        public async Task Then_If_The_Request_Is_For_A_NonLevy_And_Has_No_Eoi_Agreement_Then_The_Reservation_Is_Not_Created()
+        {
+            //Arrange
+            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId, 2, true, false, AgreementType.Levy);
+            _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
+                .ReturnsAsync(_expectedAccountLegalEntity);
+
+            //Act
+            var actual = await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(_command), Times.Never);
+            Assert.IsTrue(actual.NonLevyNonEoiAgreementSigned);
+        }
+
+        [Test]
         public async Task Then_A_ReservationCreated_Message_Is_Added_When_Successful()
         {
             //Act
