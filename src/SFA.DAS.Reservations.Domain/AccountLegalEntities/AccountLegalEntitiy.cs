@@ -1,4 +1,5 @@
 ﻿using System;
+using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
 {
@@ -12,6 +13,7 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
         public int ReservationLimit { get; }
         public bool AgreementSigned { get; }
         public bool IsLevy { get; }
+        public AgreementType AgreementType { get; set; }
 
         public AccountLegalEntity(
             Guid id, 
@@ -21,7 +23,8 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
             long accountLegalEntityId, 
             int reservationLimit, 
             bool agreementSigned,
-            bool isLevy)
+            bool isLevy,
+            AgreementType agreementType)
         {
             Id = id;
             AccountId = accountId;
@@ -31,6 +34,7 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
             ReservationLimit = reservationLimit;
             AgreementSigned = agreementSigned;
             IsLevy = isLevy;
+            AgreementType = agreementType;
         }
     }
 }

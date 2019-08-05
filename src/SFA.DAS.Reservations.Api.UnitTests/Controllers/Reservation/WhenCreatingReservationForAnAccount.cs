@@ -148,5 +148,29 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var errors = result.Value as SerializableError;
             Assert.IsNotNull(errors?.FirstOrDefault());
         }
+
+        [Test]
+        public async Task Then_If_There_Is_A_NonLevy_With_No_Eoi_Agreement_And_Unprocessable_Entity_Response_Is_Returned()
+        {
+            //Arrange
+            _mediator.Setup(x => x.Send(It.IsAny<CreateAccountReservationCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new CreateAccountReservationResult
+                {
+                    Reservation = null,
+                    Rule = null,
+                    NonLevyNonEoiAgreementSigned = true
+                });
+
+
+            //Act
+            var actual = await _reservationsController.Create(new Api.Models.Reservation());
+
+            //Assert
+            var result = actual as UnprocessableEntityObjectResult;
+            Assert.IsNotNull(result?.StatusCode);
+            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, (HttpStatusCode)result.StatusCode);
+            var errors = result.Value as SerializableError;
+            Assert.IsNotNull(errors?.FirstOrDefault());
+        }
     }
 }

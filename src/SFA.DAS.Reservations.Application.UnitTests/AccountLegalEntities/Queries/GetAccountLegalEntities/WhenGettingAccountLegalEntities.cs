@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Validation;
@@ -84,7 +85,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var reservationLimit = 4;
             var agreementSigned = true;
             var isLevy = false;
-            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, ExpectedAccountId, ExpectedAccountLegalEntityName, legalEntityId, accountLegalEntityId, reservationLimit, agreementSigned, isLevy);
+            var agreementType = AgreementType.Levy;
+            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, ExpectedAccountId, ExpectedAccountLegalEntityName, legalEntityId, accountLegalEntityId, reservationLimit, agreementSigned, isLevy, agreementType);
             _service.Setup(x => x.GetAccountLegalEntities(ExpectedAccountId)).ReturnsAsync(new List<AccountLegalEntity> { accountLegalEntity });
 
             //Act
@@ -99,6 +101,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             Assert.AreEqual(reservationLimit, actual.AccountLegalEntities[0].ReservationLimit);
             Assert.AreEqual(agreementSigned, actual.AccountLegalEntities[0].AgreementSigned);
             Assert.AreEqual(isLevy, actual.AccountLegalEntities[0].IsLevy);
+            Assert.AreEqual(agreementType, actual.AccountLegalEntities[0].AgreementType);
         }
     }
 }

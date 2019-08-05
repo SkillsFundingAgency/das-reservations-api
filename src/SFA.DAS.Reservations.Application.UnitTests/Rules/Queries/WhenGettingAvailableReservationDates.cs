@@ -6,6 +6,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -70,7 +71,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
                 .Setup(service => service.GetAccountLegalEntity(query.AccountLegalEntityId))
                 .ReturnsAsync(accountLegalEntity);
             mockDatesService
-                .Setup(x => x.GetAvailableDates(accountLegalEntity.AccountId))
+                .Setup(x => x.GetAvailableDates(accountLegalEntity.AgreementType == AgreementType.NonLevyExpressionOfInterest))
                 .Returns(availableDateStartWindows);
 
             //Act

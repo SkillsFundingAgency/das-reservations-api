@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntity;
@@ -34,7 +35,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                 3, 
                 4, 
                 true, 
-                true);
+                true,
+                AgreementType.Levy);
 
             _mediator = new Mock<IMediator>();
             _accountLegalEntityResult = new GetAccountLegalEntityResult { LegalEntity  = _expectedLegalEntity};

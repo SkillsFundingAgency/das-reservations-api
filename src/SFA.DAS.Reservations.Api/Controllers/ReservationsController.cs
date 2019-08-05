@@ -81,6 +81,15 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     return UnprocessableEntity(modelStateDictionary);
                 }
 
+                if (response.NonLevyNonEoiAgreementSigned)
+                {
+                    var modelStateDictionary = new ModelStateDictionary();
+                    var errorMessage = $"None levy Account Id: {reservation.AccountId} has tried to make reservation with no EOI agreement signed";
+                    modelStateDictionary.AddModelError("ReservationFailure", errorMessage);
+                    _logger.LogWarning($"None levy no EOI agreement reservation creation failure, error: [{errorMessage}]");
+                    return UnprocessableEntity(modelStateDictionary);
+                }
+
                 return Created($"api/{ControllerContext.ActionDescriptor.ControllerName}/{response.Reservation.Id}",response.Reservation);
             }
             catch (ArgumentException e)

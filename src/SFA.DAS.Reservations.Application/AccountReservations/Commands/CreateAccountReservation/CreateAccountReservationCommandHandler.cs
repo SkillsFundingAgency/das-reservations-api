@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -52,13 +53,20 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                     Rule = globalRule
                 };
             }
+            var accountLegalEntity =
+                await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
 
             if (request.IsLevyAccount)
             {
-                var accountLegalEntity =
-                    await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
-
                 request.AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName;
+            } else if (!accountLegalEntity.IsLevy && accountLegalEntity.AgreementType != AgreementType.NonLevyExpressionOfInterest)
+            {
+                return new CreateAccountReservationResult
+                {
+                    NonLevyNonEoiAgreementSigned = true,
+                    Reservation = null,
+                    Rule = null
+                };
             }
 
             var reservation = await _accountReservationService.CreateAccountReservation(request);
