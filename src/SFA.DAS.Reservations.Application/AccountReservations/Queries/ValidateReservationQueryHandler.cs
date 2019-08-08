@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
 
@@ -38,13 +39,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 
             if (reservation == null)
             {
-                return new ValidateReservationResponse
-                {
-                    Errors = new List<ReservationValidationError>
-                    {
-                        new ReservationValidationError("ReservationId", "Reservation not found")
-                    }
-                };
+                throw new EntityNotFoundException<Reservation>();
             }
 
             if (reservation.IsLevyAccount)

@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Testing.AutoFixture;
@@ -76,7 +77,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         }
 
         [Test]
-        public async Task And_No_Reservation_Found_Then_Invalid()
+        public void And_No_Reservation_Found_Then_Throws_EntityNotFoundException()
         {
             //Arrange
             var request = new ValidateReservationQuery
@@ -90,12 +91,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 .ReturnsAsync((Reservation)null);
 
             //Act
-            var result = await _handler.Handle(request, CancellationToken.None);
+            Func<Task> act = async () => await _handler.Handle(request, CancellationToken.None);
 
             //Assert
-            result.Errors.Count.Should().Be(1);
-            result.Errors.Should().ContainEquivalentOf(
-                new ReservationValidationError("ReservationId", "Reservation not found"));
+            act.Should().Throw<EntityNotFoundException<Reservation>>();
         }
 
         [Test]

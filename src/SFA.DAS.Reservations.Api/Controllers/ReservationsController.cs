@@ -168,11 +168,17 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException e)
             {
+                _logger.LogWarning(e, e.Message);
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = e.Message,
                     Params = e.ParamName
                 });
+            }
+            catch (EntityNotFoundException<Domain.Reservations.Reservation> e)
+            {
+                _logger.LogError(e, e.Message);
+                return NotFound();
             }
         }
 
