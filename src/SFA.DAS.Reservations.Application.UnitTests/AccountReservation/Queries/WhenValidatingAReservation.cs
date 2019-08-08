@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
                 .ReturnsAsync(_course);
 
-            _reservation = new Reservation(time => Task.FromResult(new List<Rule>() as IList<Rule>), ReservationId, 1, true, DateTime.Now, startDate, startDate.AddMonths(3), ReservationStatus.Pending, new Domain.Entities.Course(), 1, 1, "Legal Entity", 0);
+            _reservation = new Reservation(time => Task.FromResult(new List<Rule>() as IList<Rule>), ReservationId, 1, false, DateTime.Now, startDate, startDate.AddMonths(3), ReservationStatus.Pending, new Domain.Entities.Course(), 1, 1, "Legal Entity", 0);
 
             _reservationService = new Mock<IAccountReservationService>();
             _reservationService
@@ -96,6 +96,42 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             result.Errors.Count.Should().Be(1);
             result.Errors.Should().ContainEquivalentOf(
                 new ReservationValidationError("ReservationId", "Reservation not found"));
+        }
+
+        [Test]
+        public async Task And_Reservation_Is_Levy_Then_Valid()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseCode = CourseId,
+                ReservationId = ReservationId,
+                StartDate = _reservation.StartDate.Value.AddDays(1)
+            };
+            _reservation = new Reservation(
+                time => Task.FromResult(new List<Rule>() as IList<Rule>), 
+                ReservationId, 
+                1, 
+                true, 
+                DateTime.Now, 
+                null, 
+                null, 
+                ReservationStatus.Pending, 
+                null, 
+                null, 
+                1, 
+                "Legal Entity", 
+                null);
+            _reservationService
+                .Setup(r => r.GetReservation(It.IsAny<Guid>()))
+                .ReturnsAsync(_reservation);
+            
+            //Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
         }
         
         [Test]

@@ -47,6 +47,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 };
             }
 
+            if (reservation.IsLevyAccount)
+            {
+                return new ValidateReservationResponse
+                {
+                    Errors = new List<ReservationValidationError>()
+                };
+            }
+
             var reservationErrors = ValidateReservation(request, reservation);
             var courseErrors = await ValidateCourse(request, reservation);
 
