@@ -36,6 +36,17 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             
             var reservation = await _reservationService.GetReservation(request.ReservationId);
 
+            if (reservation == null)
+            {
+                return new ValidateReservationResponse
+                {
+                    Errors = new List<ReservationValidationError>
+                    {
+                        new ReservationValidationError("ReservationId", "Reservation not found")
+                    }
+                };
+            }
+
             var reservationErrors = ValidateReservation(request, reservation);
             var courseErrors = await ValidateCourse(request, reservation);
 
