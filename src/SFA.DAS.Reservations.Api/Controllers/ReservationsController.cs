@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -154,7 +155,16 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     return NotFound();
                 }
 
-                return Ok(response.Errors);
+                return Ok(new ValidateReservationViewModel
+                {
+                    ValidationErrors = response.Errors
+                        .Select(e => new ReservationValidationErrorViewModel
+                        {
+                            PropertyName = e.PropertyName,
+                            Reason = e.Reason
+                        })
+                        .ToList()
+                });
             }
             catch (ArgumentException e)
             {
