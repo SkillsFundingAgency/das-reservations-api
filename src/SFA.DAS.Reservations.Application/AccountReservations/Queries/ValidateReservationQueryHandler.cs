@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
 
@@ -35,6 +36,19 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             }
             
             var reservation = await _reservationService.GetReservation(request.ReservationId);
+
+            if (reservation == null)
+            {
+                throw new EntityNotFoundException<Reservation>();
+            }
+
+            if (reservation.IsLevyAccount)
+            {
+                return new ValidateReservationResponse
+                {
+                    Errors = new List<ReservationValidationError>()
+                };
+            }
 
             var reservationErrors = ValidateReservation(request, reservation);
             var courseErrors = await ValidateCourse(request, reservation);

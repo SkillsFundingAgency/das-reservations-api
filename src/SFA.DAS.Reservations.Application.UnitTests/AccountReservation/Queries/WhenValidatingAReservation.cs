@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
+using SFA.DAS.Testing.AutoFixture;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 using Course = SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course;
 
@@ -39,11 +42,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
                 .ReturnsAsync(_course);
 
-            _reservation = new Reservation(time => Task.FromResult(new List<Rule>() as IList<Rule>), ReservationId, 1, true, DateTime.Now, startDate, startDate.AddMonths(3), ReservationStatus.Pending, new Domain.Entities.Course(), 1, 1, "Legal Entity", 0);
+            _reservation = new Reservation(time => Task.FromResult(new List<Rule>() as IList<Rule>), ReservationId, 1, false, DateTime.Now, startDate, startDate.AddMonths(3), ReservationStatus.Pending, new Domain.Entities.Course(), 1, 1, "Legal Entity", 0);
 
             _reservationService = new Mock<IAccountReservationService>();
-
-            _reservationService.Setup(r => r.GetReservation(It.IsAny<Guid>()))
+            _reservationService
+                .Setup(r => r.GetReservation(It.IsAny<Guid>()))
                 .ReturnsAsync(_reservation);
 
             _validator = new Mock<IValidator<ValidateReservationQuery>>();
@@ -73,6 +76,63 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.IsEmpty(result.Errors);
         }
 
+        [Test]
+        public void And_No_Reservation_Found_Then_Throws_EntityNotFoundException()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseCode = CourseId,
+                ReservationId = ReservationId,
+                StartDate = _reservation.StartDate.Value.AddDays(1)
+            };
+            _reservationService
+                .Setup(r => r.GetReservation(It.IsAny<Guid>()))
+                .ReturnsAsync((Reservation)null);
+
+            //Act
+            Func<Task> act = async () => await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            act.Should().Throw<EntityNotFoundException<Reservation>>();
+        }
+
+        [Test]
+        public async Task And_Reservation_Is_Levy_Then_Valid()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseCode = CourseId,
+                ReservationId = ReservationId,
+                StartDate = _reservation.StartDate.Value.AddDays(1)
+            };
+            _reservation = new Reservation(
+                time => Task.FromResult(new List<Rule>() as IList<Rule>), 
+                ReservationId, 
+                1, 
+                true, 
+                DateTime.Now, 
+                null, 
+                null, 
+                ReservationStatus.Pending, 
+                null, 
+                null, 
+                1, 
+                "Legal Entity", 
+                null);
+            _reservationService
+                .Setup(r => r.GetReservation(It.IsAny<Guid>()))
+                .ReturnsAsync(_reservation);
+            
+            //Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+        }
+        
         [Test]
         public async Task Then_The_Query_Is_Validated()
         {
