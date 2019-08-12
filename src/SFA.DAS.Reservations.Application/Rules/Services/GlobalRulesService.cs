@@ -109,7 +109,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
             var reservations = await _reservationRepository.GetAccountReservations(accountId);
 
-            if (reservations.Count >= maxNumberOfReservations)
+            if (reservations.Count(c => !c.IsLevyAccount) >= maxNumberOfReservations)
             {
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {
