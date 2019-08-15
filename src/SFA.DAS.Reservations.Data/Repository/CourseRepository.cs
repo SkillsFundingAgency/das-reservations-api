@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.Reservations.Domain.Courses;
@@ -18,7 +20,8 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<IEnumerable<Course>> GetCourses()
         {
-            return  await _reservationsDataContext.Courses.ToArrayAsync();
+
+            return  await _reservationsDataContext.Courses.Where(x => x.EffectiveTo > DateTime.Now).ToListAsync();
         }
 
         public async Task<Course> GetCourseById(string id)
