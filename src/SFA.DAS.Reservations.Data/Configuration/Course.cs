@@ -13,6 +13,7 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.CourseId).HasColumnName(@"CourseId").HasColumnType("varchar").HasMaxLength(20).IsRequired();
             builder.Property(x => x.Title).HasColumnName(@"Title").HasColumnType("varchar").HasMaxLength(500).IsRequired();
             builder.Property(x => x.Level).HasColumnName(@"Level").HasColumnType("tinyint").IsRequired();
+            builder.Property(x => x.EffectiveTo).HasColumnName(@"EffectiveTo").HasColumnType("datetime");
 
         }
     }

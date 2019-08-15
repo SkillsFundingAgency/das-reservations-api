@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
             Id = rule.Id;
             Restriction = (AccountRestriction) rule.Restriction;
             CourseId = rule.CourseId;
-            Course = new Course(rule.Course.CourseId, rule.Course.Title, rule.Course.Level.ToString());
+            Course = new Course(rule.Course.CourseId, rule.Course.Title, rule.Course.Level.ToString(), rule.Course.EffectiveTo);
         }
 
         public long Id { get;  }
