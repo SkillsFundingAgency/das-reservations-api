@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         private Course _expiredCourse2;
         private Mock<IReservationsDataContext> _reservationsDataContext;
         private CourseRepository _courseRepository;
-        private List<Course> _expectedCourses;
+        private List<Course> _courses;
 
         [SetUp]
         public void Arrange()
@@ -56,9 +56,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 EffectiveTo = DateTime.UtcNow.AddHours(-3)
             };
 
-            _expectedCourses = new List<Course>{ _activeCourse1, _expiredCourse2, _activeCourse2, _expiredCourse1};
+            _courses = new List<Course>{ _activeCourse1, _expiredCourse2, _activeCourse2, _expiredCourse1};
             _reservationsDataContext = new Mock<IReservationsDataContext>();
-            _reservationsDataContext.Setup(x => x.Courses).ReturnsDbSet(_expectedCourses);
+            _reservationsDataContext.Setup(x => x.Courses).ReturnsDbSet(_courses);
             _courseRepository = new CourseRepository(_reservationsDataContext.Object);
         }
 
@@ -72,6 +72,29 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             Assert.True(result.Contains(_activeCourse2));
             Assert.False(result.Contains(_expiredCourse1));
             Assert.False(result.Contains(_expiredCourse2));
+        }
+
+        [Test]
+        public async Task AndEffectiveToDateIsNull_ThenCoursesAreReturnedWithoutNullCourses()
+        {
+            var nullDatedCourse = new Course
+            {
+                CourseId = "5",
+                Level = 4,
+                Title = "3",
+                EffectiveTo = null
+            };
+
+            _courses.Add(nullDatedCourse);
+
+            var result = await _courseRepository.GetCourses();
+
+            Assert.True(result.Count() == 2);
+            Assert.True(result.Contains(_activeCourse1));
+            Assert.True(result.Contains(_activeCourse2));
+            Assert.False(result.Contains(_expiredCourse1));
+            Assert.False(result.Contains(_expiredCourse2));
+            Assert.False(result.Contains(nullDatedCourse));
         }
     }
 }
