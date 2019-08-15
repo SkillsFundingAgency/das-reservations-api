@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 CourseId = "1",
                 Title = "Course 1",
                 Level = 1,
-                EffectiveTo = DateTime.Now.AddHours(4)
+                EffectiveTo = DateTime.UtcNow.AddHours(4)
             };
 
             _activeCourse2 = new Course
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 CourseId = "2",
                 Title = "Course 2",
                 Level = 2,
-                EffectiveTo = DateTime.Now.AddHours(1)
+                EffectiveTo = DateTime.UtcNow.AddHours(1)
             };
 
             _expiredCourse1 = new Course
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 CourseId = "3",
                 Title = "Course 3",
                 Level = 3,
-                EffectiveTo = DateTime.Now.AddHours(-1)
+                EffectiveTo = DateTime.UtcNow.AddHours(-1)
             };
 
             _expiredCourse2 = new Course
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 CourseId = "4",
                 Title = "Course 4",
                 Level = 3,
-                EffectiveTo = DateTime.Now.AddHours(-3)
+                EffectiveTo = DateTime.UtcNow.AddHours(-3)
             };
 
             _expectedCourses = new List<Course>{ _activeCourse1, _expiredCourse2, _activeCourse2, _expiredCourse1};
