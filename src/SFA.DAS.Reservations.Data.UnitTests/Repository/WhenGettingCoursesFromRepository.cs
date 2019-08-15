@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         }
 
         [Test]
-        public async Task AndEffectiveToDateIsNull_ThenCoursesAreReturnedWithoutNullCourses()
+        public async Task ThenDoesNotReturnCoursesWithNullEffectiveToDates()
         {
             var nullDatedCourse = new Course
             {
