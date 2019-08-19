@@ -71,19 +71,41 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Create a reservation as an employer")]
-        public virtual void CreateAReservationAsAnEmployer()
+        [NUnit.Framework.DescriptionAttribute("Create a reservation as an non levy employer")]
+        public virtual void CreateAReservationAsAnNonLevyEmployer()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a reservation as an employer", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a reservation as an non levy employer", null, ((string[])(null)));
 #line 8
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line 9
-testRunner.Given("a course name baker level 2 has been added to the course list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 10
-testRunner.When("I create a reservation for the baker level 2 course with a start date of August", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+testRunner.And("a course name baker level 2 has been added to the course list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11
-testRunner.Then("a reservation with course baker level 2 and start date August is created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+testRunner.When("I create a reservation for the baker level 2 course with a start month of August", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 12
+testRunner.Then("a reservation with course baker level 2 and start month August is created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Create a reservation as an levy employer")]
+        public virtual void CreateAReservationAsAnLevyEmployer()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Create a reservation as an levy employer", null, ((string[])(null)));
+#line 14
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 15
+testRunner.Given("I have a levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 16
+testRunner.And("a course name baker level 2 has been added to the course list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 17
+testRunner.When("I create a reservation for the baker level 2 course with a start month of August", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 18
+testRunner.Then("a reservation with course baker level 2 and start month August is created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

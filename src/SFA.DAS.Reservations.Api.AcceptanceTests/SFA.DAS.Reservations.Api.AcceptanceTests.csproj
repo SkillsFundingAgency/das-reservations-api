@@ -58,6 +58,7 @@
   <ItemGroup>
     <SpecFlowFeatureFiles Update="CreateReservation.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>CreateReservation.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
   </ItemGroup>
 
