@@ -53,10 +53,10 @@ namespace SFA.DAS.Reservations.Api
             Configuration = configuration;
 
             var config = new ConfigurationBuilder()
+                .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true)
-                .AddJsonFile("appsettings.development.json",
-                    !Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+                .AddJsonFile("appsettings.development.json",true)
                 .AddEnvironmentVariables()
                 .AddAzureTableStorageConfiguration(
                     configuration["ConfigurationStorageConnectionString"],
@@ -65,6 +65,7 @@ namespace SFA.DAS.Reservations.Api
                     configuration["Version"]
                 )
                 .Build();
+            
             Configuration = config;
         }
 
