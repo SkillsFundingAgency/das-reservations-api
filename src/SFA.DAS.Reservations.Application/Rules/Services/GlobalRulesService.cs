@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
         {
             var accountLimit = await _accountLegalEntitiesService.GetAccountLegalEntities(accountId);
 
-            if (!accountLimit.Any())
+            if (!accountLimit.Any() || accountLimit.Any(a => a.IsLevy))
             {
                 return 0;
             }
