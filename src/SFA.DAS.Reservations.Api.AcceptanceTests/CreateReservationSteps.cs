@@ -24,6 +24,33 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
             _services = serviceProvider;
         }
 
+        [BeforeScenario]
+        public void InitialiseTestDatabaseData()
+        {
+            var dbContext = _services.GetService<ReservationsDataContext>();
+
+            _testData.Course = new Course
+            {
+                CourseId = "234",
+                Level = 1,
+                Title = "Tester"
+            };
+
+            dbContext.Courses.Add(_testData.Course);
+
+            _testData.AccountLegalEntity = new AccountLegalEntity
+            {
+                AccountLegalEntityId = 1,
+                AccountLegalEntityName = "Test Corp",
+                AgreementType = AgreementType.NonLevyExpressionOfInterest,
+                AgreementSigned = true
+            };
+
+            dbContext.AccountLegalEntities.Add(_testData.AccountLegalEntity);
+
+            dbContext.SaveChanges();
+        }
+
         [Given(@"I have a non levy account")]
         public void GivenIHaveANonLevyAccount()
         {
@@ -35,39 +62,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         {
             _testData.IsLevyAccount = true;
         }
-
-        [Given(@"a course name (.*) has been added to the course list")]
-        public void GivenACourseNameHasBeenAddedToTheCourseList(string courseName)
-        {
-            var dbContext = _services.GetService<ReservationsDataContext>();
-
-            var course = new Course
-            {
-                CourseId = "234",
-                Level = 1,
-                Title = courseName
-            };
-
-            dbContext.Courses.Add(course);
-
-            _testData.Courses.Add(courseName, course);
-
-            dbContext.AccountLegalEntities.Add(new AccountLegalEntity
-            {
-                AccountLegalEntityId = 1,
-                AgreementType = AgreementType.NonLevyExpressionOfInterest,
-                AgreementSigned = true
-            });
-
-            dbContext.SaveChanges();
-        }
         
-        [When(@"I create a reservation for the (.*) course with a start month of (.*)")]
-        public void WhenICreateAReservationForTheCourseWithAStartMonth(string courseName, string startMonth)
+        [When(@"I create a reservation for a course with a start month of (.*)")]
+        public void WhenICreateAReservationForACourseWithAStartMonth(string startMonth)
         {
             var month = (int) Enum.Parse<Month>(startMonth);
            
-            var expectedCourse = _testData.Courses[courseName];
+            var expectedCourse = _testData.Course;
 
             var controller = _services.GetService<ReservationsController>();
 
@@ -75,8 +76,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
             {
                 AccountId = 123,
                 CourseId = expectedCourse.CourseId,
-                AccountLegalEntityId = 1,
-                AccountLegalEntityName = "Test Corp",
+                AccountLegalEntityId = _testData.AccountLegalEntity.AccountLegalEntityId,
+                AccountLegalEntityName = _testData.AccountLegalEntity.AccountLegalEntityName,
                 Id = Guid.NewGuid(),
                 IsLevyAccount = _testData.IsLevyAccount,
                 ProviderId = 12345,
@@ -87,20 +88,22 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
             controller.Create(reservation).Wait();
         }
         
-        [Then(@"a reservation with course (.*) and start month (.*) is created")]
-        public void ThenAReservationWithCourseAndStartMonthIsCreated(string courseName, string startMonth)
+        [Then(@"a reservation with course and start month (.*) is created")]
+        public void ThenAReservationWithCourseAndStartMonthIsCreated(string startMonth)
         {
             var month = (int) Enum.Parse<Month>(startMonth);
 
-            var expectedCourse = _testData.Courses[courseName];
+            var expectedCourse = _testData.Course;
 
             var dbContext = _services.GetService<ReservationsDataContext>();
 
-            var reservation = dbContext.Reservations.SingleOrDefault(r => r.CourseId == expectedCourse.CourseId);
+            var reservation = dbContext.Reservations.SingleOrDefault(r => r.CourseId == expectedCourse.CourseId && 
+                                                                          r.AccountLegalEntityId.Equals(_testData.AccountLegalEntity.AccountLegalEntityId));
 
             Assert.IsNotNull(reservation);
             Assert.IsTrue(reservation.StartDate.HasValue);
             Assert.AreEqual(month, reservation.StartDate.Value.Month);
+            Assert.AreEqual(_testData.IsLevyAccount, reservation.IsLevyAccount);
         }
     }
 }

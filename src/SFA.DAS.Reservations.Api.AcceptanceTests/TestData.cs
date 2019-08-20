@@ -5,12 +5,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
 {
     public class TestData
     {
-        public Dictionary<string, Course> Courses { get; set; }
+        public Course Course { get; set; }
+        public AccountLegalEntity AccountLegalEntity { get; set; }
         public bool IsLevyAccount { get; set; }
-
-        public TestData()
-        {
-            Courses = new Dictionary<string, Course>();
-        }
     }
 }
