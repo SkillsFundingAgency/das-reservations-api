@@ -15,6 +15,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
     {
         private Course _activeCourse1;
         private Course _activeCourse2;
+        private Course _activeCourse3;
         private Course _expiredCourse1;
         private Course _expiredCourse2;
         private Mock<IReservationsDataContext> _reservationsDataContext;
@@ -40,6 +41,15 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 EffectiveTo = DateTime.UtcNow.AddHours(1)
             };
 
+
+            _activeCourse3 = new Course
+            {
+                CourseId = "2",
+                Title = "Course 2",
+                Level = 2,
+                EffectiveTo = null
+            };
+
             _expiredCourse1 = new Course
             {
                 CourseId = "3",
@@ -56,45 +66,24 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 EffectiveTo = DateTime.UtcNow.AddHours(-3)
             };
 
-            _courses = new List<Course>{ _activeCourse1, _expiredCourse2, _activeCourse2, _expiredCourse1};
+            _courses = new List<Course>{ _activeCourse1, _expiredCourse2, _activeCourse3, _activeCourse2, _expiredCourse1};
             _reservationsDataContext = new Mock<IReservationsDataContext>();
             _reservationsDataContext.Setup(x => x.Courses).ReturnsDbSet(_courses);
             _courseRepository = new CourseRepository(_reservationsDataContext.Object);
         }
 
-        [Test, MoqAutoData]
+        [Test]
         public async Task ThenNonExpiredCoursesAreReturned() { 
 
-            var result = await _courseRepository.GetCourses();
+            var result = (await _courseRepository.GetCourses()).ToList();
 
-            Assert.True(result.Count() == 2);
-            Assert.True(result.Contains(_activeCourse1));
-            Assert.True(result.Contains(_activeCourse2));
-            Assert.False(result.Contains(_expiredCourse1));
-            Assert.False(result.Contains(_expiredCourse2));
+            Assert.IsTrue(result.Count == 3);
+            Assert.IsTrue(result.Contains(_activeCourse1));
+            Assert.IsTrue(result.Contains(_activeCourse2));
+            Assert.IsTrue(result.Contains(_activeCourse3));
+            Assert.IsFalse(result.Contains(_expiredCourse1));
+            Assert.IsFalse(result.Contains(_expiredCourse2));
         }
 
-        [Test]
-        public async Task ThenDoesNotReturnCoursesWithNullEffectiveToDates()
-        {
-            var nullDatedCourse = new Course
-            {
-                CourseId = "5",
-                Level = 4,
-                Title = "3",
-                EffectiveTo = null
-            };
-
-            _courses.Add(nullDatedCourse);
-
-            var result = await _courseRepository.GetCourses();
-
-            Assert.True(result.Count() == 2);
-            Assert.True(result.Contains(_activeCourse1));
-            Assert.True(result.Contains(_activeCourse2));
-            Assert.False(result.Contains(_expiredCourse1));
-            Assert.False(result.Contains(_expiredCourse2));
-            Assert.False(result.Contains(nullDatedCourse));
-        }
     }
 }
