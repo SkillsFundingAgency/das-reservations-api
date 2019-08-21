@@ -34,7 +34,8 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
                         .Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var accountLegalEntities = await _accountLegalEntitiesService.GetAccountLegalEntities(request.AccountId);
+            var accountLegalEntities = await _accountLegalEntitiesService.GetAccountLegalEntities(
+                request.TransferSenderAccountId ?? request.AccountId);
 
             if (accountLegalEntities == null || accountLegalEntities.Count == 0)
             {
