@@ -67,11 +67,15 @@ namespace SFA.DAS.Reservations.Api.Controllers
         }
 
         [Route("/api/accounts/{accountId}/status")]
-        public async Task<IActionResult> GetAccountReservationStatus(long accountId)
+        public async Task<IActionResult> GetAccountReservationStatus(long accountId, [FromQuery]long? transferSenderId)
         {
             try
             {
-                var response = await _mediator.Send(new GetAccountReservationStatusQuery {AccountId = accountId});
+                var response = await _mediator.Send(new GetAccountReservationStatusQuery
+                {
+                    AccountId = accountId,
+                    TransferSenderAccountId = transferSenderId
+                });
                 var model = new AccountReservationStatus(response);
                 return Ok(model);
             }
