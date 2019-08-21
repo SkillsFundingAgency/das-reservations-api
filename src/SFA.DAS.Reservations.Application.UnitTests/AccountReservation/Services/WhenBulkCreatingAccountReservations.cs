@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         {
             
             //Act
-            await service.BulkCreateAccountReservation(numberOfReservations, accountLegalEntityId, accountId, accountLegalEntityName);
+            await service.BulkCreateAccountReservation(numberOfReservations, accountLegalEntityId, accountId, accountLegalEntityName, null);
 
             //Assert
             repository.Verify(x => x.CreateAccountReservations(
@@ -43,6 +43,35 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
 
         [Test, MoqAutoData]
+        public async Task Then_The_TransferSenderAccountId_Is_Added_To_The_Reservation_If_Provided(
+            [Frozen]Mock<IReservationRepository> repository,
+            uint numberOfReservations,
+            long accountLegalEntityId,
+            long accountId,
+            long? transferSenderAccountId,
+            string accountLegalEntityName,
+            AccountReservationService service
+        )
+        {
+
+            //Act
+            await service.BulkCreateAccountReservation(numberOfReservations, accountLegalEntityId, accountId, accountLegalEntityName, transferSenderAccountId);
+
+            //Assert
+            repository.Verify(x => x.CreateAccountReservations(
+                    It.Is<List<Domain.Entities.Reservation>>(c => c.Count.Equals((int)numberOfReservations)
+                                                                  && c.All(y => y.IsLevyAccount)
+                                                                  && c.All(y => y.Status.Equals(0))
+                                                                  && c.All(y => y.AccountLegalEntityId.Equals(accountLegalEntityId))
+                                                                  && c.All(y => y.AccountLegalEntityName.Equals(accountLegalEntityName))
+                                                                  && c.All(y => y.TransferSenderAccountId.Equals(transferSenderAccountId))
+                                                                  && c.All(y => y.AccountId.Equals(accountId)))),
+                Times.Once);
+
+        }
+
+
+        [Test, MoqAutoData]
         public async Task Then_The_List_Of_Created_Reservation_Ids_Are_Returned(
             [Frozen]Mock<IReservationRepository> repository,
             uint numberOfReservations,
@@ -53,7 +82,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         )
         {
             //Act
-            var actual = await service.BulkCreateAccountReservation(numberOfReservations, accountLegalEntityId, accountId, accountLegalEntityName);
+            var actual = await service.BulkCreateAccountReservation(numberOfReservations, accountLegalEntityId, accountId, accountLegalEntityName, null);
 
             //Assert
             Assert.AreEqual(numberOfReservations, actual.Count);

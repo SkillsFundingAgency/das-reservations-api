@@ -35,7 +35,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
 
             var accountLegalEntity = await _accountLegalEntitiesService.GetAccountLegalEntity(command.AccountLegalEntityId);
 
-            var reservationIds = await _accountReservationService.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId, accountLegalEntity.AccountId, accountLegalEntity.AccountLegalEntityName);
+            var reservationIds = await _accountReservationService.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId, accountLegalEntity.AccountId, accountLegalEntity.AccountLegalEntityName, command.TransferSenderAccountId);
 
             return new BulkCreateAccountReservationsResult
             {
