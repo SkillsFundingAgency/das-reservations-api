@@ -216,12 +216,17 @@ namespace SFA.DAS.Reservations.Api.Controllers
 
         [HttpPost]
         [ProducesResponseType(400)]
-        [Route("/api/[controller]/accounts/{accountLegalEntityId}/bulk-create/{count}")]
-        public async Task<IActionResult> BulkCreate(long accountLegalEntityId, uint count)
+        [Route("/api/[controller]/accounts/{accountLegalEntityId}/bulk-create")]
+        public async Task<IActionResult> BulkCreate([FromRoute]long accountLegalEntityId, [FromBody]BulkReservation bulkReservation)
         {
             try
             {
-                var result = await _mediator.Send(new BulkCreateAccountReservationsCommand { AccountLegalEntityId = accountLegalEntityId, ReservationCount = count});
+                var result = await _mediator.Send(new BulkCreateAccountReservationsCommand
+                {
+                    AccountLegalEntityId = accountLegalEntityId,
+                    ReservationCount = bulkReservation.Count,
+                    TransferSenderAccountId = bulkReservation.TransferSenderId
+                });
                 return Created("", result);
             }
             catch (ArgumentException argumentException)

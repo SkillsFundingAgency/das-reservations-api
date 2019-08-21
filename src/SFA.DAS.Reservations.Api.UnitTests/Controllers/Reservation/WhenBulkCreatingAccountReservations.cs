@@ -24,19 +24,27 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private Mock<IMediator> _mediator;
         private Mock<HttpContext> _httpContext;
         private BulkCreateAccountReservationsResult _bulkCreateAccountReservationsResult;
+        private BulkReservation _bulkReservation;
         private const long ExpectedAccountLegalEntityId = 13124;
+        private const long ExpectedTransferSenderId = 3245;
         private const int ExpectedReservationCount = 3;
 
         [SetUp]
         public void Arrange()
         {
+            _bulkReservation = new BulkReservation
+            {
+                Count = ExpectedReservationCount,
+                TransferSenderId = ExpectedTransferSenderId
+            };
             _bulkCreateAccountReservationsResult = new BulkCreateAccountReservationsResult
                 { ReservationIds = new List<Guid>{Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()}};
             
             _mediator = new Mock<IMediator>();
             _mediator.Setup(x => x.Send(It.Is<BulkCreateAccountReservationsCommand>(c =>
                         c.ReservationCount.Equals(ExpectedReservationCount) &&
-                        c.AccountLegalEntityId.Equals(ExpectedAccountLegalEntityId)),
+                        c.AccountLegalEntityId.Equals(ExpectedAccountLegalEntityId) &&
+                        c.TransferSenderAccountId.Equals(ExpectedTransferSenderId)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_bulkCreateAccountReservationsResult);
             _httpContext = new Mock<HttpContext>();
@@ -53,13 +61,14 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         [Test]
         public async Task Then_The_New_ReservationIds_Are_Returned_When_Created()
         {
-           //Act
-            var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, ExpectedReservationCount);
+            //Act
+            var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, _bulkReservation);
 
             //Assert
             _mediator.Verify(m => m.Send(It.Is<BulkCreateAccountReservationsCommand>(command =>
                     command.ReservationCount.Equals(ExpectedReservationCount) &&
-                    command.AccountLegalEntityId.Equals(ExpectedAccountLegalEntityId)),
+                    command.AccountLegalEntityId.Equals(ExpectedAccountLegalEntityId) &&
+                    command.TransferSenderAccountId.Equals(ExpectedTransferSenderId)),
                 It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.IsNotNull(actual);
@@ -82,7 +91,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
 
             //Act
-            var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, ExpectedReservationCount);
+            var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, _bulkReservation);
 
             //Assert
             var result = actual as ObjectResult;
@@ -103,7 +112,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ThrowsAsync(new EntityNotFoundException<Domain.Entities.AccountLegalEntity>(expectedValidationMessage));
 
             //Act
-            var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, ExpectedReservationCount);
+            var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, _bulkReservation);
 
             //Assert
             var result = actual as NotFoundResult;
