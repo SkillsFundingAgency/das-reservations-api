@@ -58,6 +58,24 @@ jobs:
       versioningScheme: byBuildNumber
       buildProperties: 'Version="$(Build.BuildNumber)"'
 
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet pack'
+    inputs:
+      command: pack
+      packagesToPack: src/SFA.DAS.Qna.Api.Types/SFA.DAS.Qna.Api.Types.csproj
+      packDirectory: '$(build.artifactstagingdirectory)/publish'
+      versioningScheme: byBuildNumber
+      buildProperties: 'Version="$(Build.BuildNumber)"'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet pack'
+    inputs:
+      command: pack
+      packagesToPack: src/SFA.DAS.QnA.Api.Client/SFA.DAS.QnA.Api.Client.csproj
+      packDirectory: '$(build.artifactstagingdirectory)/publish'
+      versioningScheme: byBuildNumber
+      buildProperties: 'Version="$(Build.BuildNumber)"'
+
   - task: CopyFiles@2
     displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
     inputs:
