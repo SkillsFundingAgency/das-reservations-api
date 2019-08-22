@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
@@ -13,7 +14,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
         public void Then_The_ApprenticeshipType_Is_Correctly_Worked_Out_From_The_Course_Id(string courseId, bool isStandard)
         {
             //Arrange Act
-            var actualApprenticeship = new Course(courseId, "", "");
+            var actualApprenticeship = new Course(courseId, "", "", DateTime.Today);
             
             //Assert
             var expectedType = isStandard ? ApprenticeshipType.Standard : ApprenticeshipType.Framework;
