@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
                 ReservationCreatedDate = new DateTime(2019, 1, 18)
             };
 
-            var course = new Course("1", "Test", "1");
+            var course = new Course("1", "Test", "1", DateTime.Today);
 
             var activeRule = new Rule
             {
@@ -59,7 +59,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
                 ReservationCreatedDate = DateTime.Now.AddDays(18)
             };
             
-            var course = new Course("1", "Test", "1");
+            var course = new Course("1", "Test", "1", DateTime.Today);
 
             var unactiveRule = new Rule
             {
@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
                 ReservationCreatedDate = DateTime.Now.AddDays(-5)
             };
            
-            var course = new Course("1", "Test", "1");
+            var course = new Course("1", "Test", "1", DateTime.Today);
 
             var unactiveRule = new Rule
             {

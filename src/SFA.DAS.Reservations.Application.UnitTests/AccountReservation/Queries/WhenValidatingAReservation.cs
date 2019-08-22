@@ -36,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         {
             var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             
-            _course = new Course(CourseId, "Test Course", "1");
+            _course = new Course(CourseId, "Test Course", "1", DateTime.Today);
 
             _courseService = new Mock<ICourseService>();
             _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
