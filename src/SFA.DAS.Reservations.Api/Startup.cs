@@ -206,7 +206,6 @@ namespace SFA.DAS.Reservations.Api
                 app.UseAuthentication();
             }
 
-            app.UseHttpsRedirection();
             app.UseUnitOfWork();
             app.UseHealthChecks();
             
