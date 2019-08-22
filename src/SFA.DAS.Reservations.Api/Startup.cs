@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.StartupConfig;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using SFA.DAS.Reservations.Api.AppStart;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
@@ -110,43 +111,9 @@ namespace SFA.DAS.Reservations.Api
             }
 
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
-            services.AddScoped(typeof(IValidator<GetAccountReservationsQuery>),
-                typeof(GetAccountReservationsValidator));
-            services.AddScoped(typeof(IValidator<CreateAccountReservationCommand>),
-                typeof(CreateAccountReservationValidator));
-            services.AddScoped(typeof(IValidator<CreateUserRuleAcknowledgementCommand>),
-                typeof(CreateUserRuleAcknowledgementCommandValidator));
-            services.AddScoped(typeof(IValidator<GetReservationQuery>), typeof(GetReservationValidator));
+            services.AddMediatRValidators();
 
-            services.AddScoped(typeof(IValidator<GetAccountRulesQuery>), typeof(GetAccountRulesValidator));          
-            services.AddScoped(typeof(IValidator<GetAccountLegalEntitiesQuery>), typeof(GetAccountLegalEntitiesQueryValidator));
-            services.AddScoped(typeof(IValidator<GetAccountLegalEntityQuery>), typeof(GetAccountLegalEntityQueryValidator));
-            services.AddScoped(typeof(IValidator<GetAccountReservationStatusQuery>), typeof(GetAccountReservationStatusQueryValidator));
-            services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
-            services.AddScoped(typeof(IValidator<ValidateReservationQuery>), typeof(ValidateReservationValidator));
-            services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
-            services.AddScoped(typeof(IValidator<BulkCreateAccountReservationsCommand>), typeof(BulkCreateAccountReservationsCommandValidator));
-            services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
-
-            services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
-            services.AddTransient<IReservationRepository,ReservationRepository>();
-            services.AddTransient<IRuleRepository,RuleRepository>();
-            services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
-            services.AddTransient<ICourseRepository, CourseRepository>();
-            services.AddTransient<IAccountLegalEntitiesRepository,AccountLegalEntityRepository>();
-            services.AddTransient<IAccountReservationService, AccountReservationService>();
-            services.AddTransient<IRulesService, RulesService>();
-            services.AddTransient<ICourseService, CourseService>();
-            services.AddTransient<IGlobalRulesService, GlobalRulesService>();
-            services.AddTransient<IAvailableDatesService, AvailableDatesService>();
-            services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
-
-            services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
-
-
-            services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
-                ? new CurrentDateTime(config.Value.CurrentDateTime)
-                : new CurrentDateTime());
+            services.AddServices(config);
             
             if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
