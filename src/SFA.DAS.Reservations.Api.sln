@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.62
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Api", "SFA.DAS.Reservations.Api\SFA.DAS.Reservations.Api.csproj", "{C01D2727-A694-4F08-A136-2A344211AFED}"
 EndProject
@@ -28,10 +28,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.Messages", "SFA.DAS.Reservations.Messages\SFA.DAS.Reservations.Messages.csproj", "{AA3C7122-E6D9-461A-B1B8-F25F9DAE0200}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Reservations.NServiceBusListener", "SFA.DAS.Reservations.NServiceBusListener\SFA.DAS.Reservations.NServiceBusListener.csproj", "{D12CFDF1-38EE-467E-A373-52241E022437}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6C861ACB-6D78-4A43-AA4A-017A21221FB9}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Acceptance Tests", "Acceptance Tests", "{BCAAF149-94D6-449B-B335-62B22D4215BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Reservations.Api.AcceptanceTests", "SFA.DAS.Reservations.Api.AcceptanceTests\SFA.DAS.Reservations.Api.AcceptanceTests.csproj", "{8D921620-1FFB-4AD3-8E94-B17E259AEE66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +94,10 @@ Global
 		{D12CFDF1-38EE-467E-A373-52241E022437}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D12CFDF1-38EE-467E-A373-52241E022437}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D12CFDF1-38EE-467E-A373-52241E022437}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D921620-1FFB-4AD3-8E94-B17E259AEE66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D921620-1FFB-4AD3-8E94-B17E259AEE66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D921620-1FFB-4AD3-8E94-B17E259AEE66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D921620-1FFB-4AD3-8E94-B17E259AEE66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +108,7 @@ Global
 		{E54A40B7-0103-46AB-8D8C-E4725EE722A4} = {E180DA61-5A94-442F-930D-F01342D586DD}
 		{3454ACAF-DE01-452B-B3A5-19AB1B0F77D3} = {E180DA61-5A94-442F-930D-F01342D586DD}
 		{D12CFDF1-38EE-467E-A373-52241E022437} = {E180DA61-5A94-442F-930D-F01342D586DD}
+		{8D921620-1FFB-4AD3-8E94-B17E259AEE66} = {BCAAF149-94D6-449B-B335-62B22D4215BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D5B4A5AB-1434-411A-BBD1-A7F1F2E74021}
