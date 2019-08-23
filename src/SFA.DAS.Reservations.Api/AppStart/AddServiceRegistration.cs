@@ -14,7 +14,7 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Api.AppStart
 {
-    public static class AddServiceRegistration
+    public static class AddServiceExtension
     {
         public static void AddServiceRegistration(this IServiceCollection services, IOptions<ReservationsConfiguration> config)
         {

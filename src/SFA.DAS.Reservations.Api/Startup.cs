@@ -113,7 +113,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
             services.AddMediatRValidators();
 
-            services.AddServices(config);
+            services.AddServiceRegistration(config);
             
             if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {

@@ -48,27 +48,4 @@ namespace SFA.DAS.Reservations.Api.AppStart
         }
     }
 
-    public static class AddServiceRegistration
-    {
-        public static void AddServiceRegistration(this IServiceCollection services, IOptions<ReservationsConfiguration> config)
-        {
-            services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
-            services.AddTransient<IReservationRepository, ReservationRepository>();
-            services.AddTransient<IRuleRepository, RuleRepository>();
-            services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
-            services.AddTransient<ICourseRepository, CourseRepository>();
-            services.AddTransient<IAccountLegalEntitiesRepository, AccountLegalEntityRepository>();
-            services.AddTransient<IAccountReservationService, AccountReservationService>();
-            services.AddTransient<IRulesService, RulesService>();
-            services.AddTransient<ICourseService, CourseService>();
-            services.AddTransient<IGlobalRulesService, GlobalRulesService>();
-            services.AddTransient<IAvailableDatesService, AvailableDatesService>();
-            services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
-            services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
-
-            services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
-                ? new CurrentDateTime(config.Value.CurrentDateTime)
-                : new CurrentDateTime());
-        }
-    }
 }
