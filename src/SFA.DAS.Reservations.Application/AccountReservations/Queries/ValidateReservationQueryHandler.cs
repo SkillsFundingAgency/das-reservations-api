@@ -65,16 +65,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         {
             var errors = new List<ReservationValidationError>();
 
-            if (reservation.StartDate > request.StartDate)
+            if( reservation.StartDate.HasValue && reservation.ExpiryDate.HasValue && 
+                (reservation.StartDate > request.StartDate || reservation.ExpiryDate < request.StartDate))
             {
-                errors.Add(new ReservationValidationError(nameof(request.StartDate),
-                    "Training start date must be after reservation start date"));
-            }
+                var errorMessage = "Training start date must be between the funding reservation dates " +
+                                   $"{reservation.StartDate.Value:MM yyyy} to " +
+                                   $"{reservation.ExpiryDate.Value:MM yyyy}";
 
-            if (reservation.ExpiryDate < request.StartDate)
-            {
-                errors.Add(new ReservationValidationError(nameof(request.StartDate),
-                    "Training start date must be before reservation expiry date"));
+                errors.Add(new ReservationValidationError(nameof(request.StartDate), errorMessage));
             }
 
             return errors;
