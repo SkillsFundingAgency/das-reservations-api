@@ -68,13 +68,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         }
 
         public async Task<IList<Guid>> BulkCreateAccountReservation(uint reservationCount, long accountLegalEntityId,
-            long accountId, string accountLegalEntityName)
+            long accountId, string accountLegalEntityName, long? transferSenderAccountId)
         {
             var reservations = new List<Domain.Entities.Reservation>();
 
             for (var i = 0; i < reservationCount; i++)
             {
-                reservations.Add(CreateReservation(accountId,accountLegalEntityId, accountLegalEntityName));
+                reservations.Add(CreateReservation(accountId,accountLegalEntityId, accountLegalEntityName, transferSenderAccountId));
             }
 
             await _reservationRepository.CreateAccountReservations(reservations);
@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservations.Select(c=>c.Id).ToList();
         }
 
-        private Domain.Entities.Reservation CreateReservation(long accountId, long accountLegalEntityId, string accountLegalEntityName)
+        private Domain.Entities.Reservation CreateReservation(long accountId, long accountLegalEntityId, string accountLegalEntityName, long? transferSenderAccountId)
         {
             return new Domain.Entities.Reservation
             {
@@ -91,7 +91,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 AccountId = accountId,
                 AccountLegalEntityId = accountLegalEntityId,
                 AccountLegalEntityName = accountLegalEntityName,
-                IsLevyAccount = true
+                IsLevyAccount = true,
+                TransferSenderAccountId = transferSenderAccountId
             };
         }
 

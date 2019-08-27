@@ -47,6 +47,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             GetAccountReservationStatusQueryHandler handler)
         {
             validationResult.ValidationDictionary.Clear();
+            query.TransferSenderAccountId = null;
             mockService
                 .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
                 .ReturnsAsync(new List<AccountLegalEntity>());
@@ -54,6 +55,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var act = new Func<Task>(async () => await handler.Handle(query, CancellationToken.None));
 
             act.Should().Throw<EntityNotFoundException<Entities.AccountLegalEntity>>();
+        }
+
+        [Test, MoqAutoData]
+        public async Task And_There_Is_A_TransferSenderAccountId_Then_That_Is_Checked_To_See_If_Levy(
+            GetAccountReservationStatusQuery query,
+            long transferSenderAccountId,
+            List<AccountLegalEntity> accountLegalEntities,
+            [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IAccountLegalEntitiesService> mockService,
+            GetAccountReservationStatusQueryHandler handler)
+        {
+            validationResult.ValidationDictionary.Clear();
+            query.TransferSenderAccountId = transferSenderAccountId;
+            mockService
+                .Setup(service => service.GetAccountLegalEntities(transferSenderAccountId))
+                .ReturnsAsync(accountLegalEntities);
+
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            result.CanAutoCreateReservations.Should().Be(accountLegalEntities[0].IsLevy);
+
         }
 
         [Test, MoqAutoData]
@@ -65,6 +87,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             GetAccountReservationStatusQueryHandler handler)
         {
             validationResult.ValidationDictionary.Clear();
+            query.TransferSenderAccountId = null;
             mockService
                 .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
                 .ReturnsAsync(accountLegalEntities);

@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             Assert.ThrowsAsync<ArgumentException>(() => handler.Handle(command, CancellationToken.None));
 
             //Assert
-            mockAccountReservationService.Verify(s => s.BulkCreateAccountReservation(It.IsAny<uint>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()), Times.Never);
+            mockAccountReservationService.Verify(s => s.BulkCreateAccountReservation(It.IsAny<uint>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<long?>()), Times.Never);
         }
 
         [Test, MoqAutoData]
@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             await handler.Handle(command, CancellationToken.None);
 
             //Assert
-            mockAccountReservationService.Verify(x=>x.BulkCreateAccountReservation(command.ReservationCount,command.AccountLegalEntityId, accountLegalEntity.AccountId, accountLegalEntity.AccountLegalEntityName));
+            mockAccountReservationService.Verify(x=>x.BulkCreateAccountReservation(command.ReservationCount,command.AccountLegalEntityId, accountLegalEntity.AccountId, accountLegalEntity.AccountLegalEntityName, command.TransferSenderAccountId));
         }
 
         [Test, MoqAutoData]
@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Arrange
             validator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>()))
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
-            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId, It.IsAny<long>(), It.IsAny<string>()))
+            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(command.ReservationCount, command.AccountLegalEntityId, It.IsAny<long>(), It.IsAny<string>(), command.TransferSenderAccountId))
                 .ReturnsAsync(createdReservationIds);
 
             //Act
@@ -93,7 +93,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             validator.Setup(x => x.ValidateAsync(It.IsAny<BulkCreateAccountReservationsCommand>()))
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
             var expectedException = new Exception();
-            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(It.IsAny<uint>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>()))
+            mockAccountReservationService.Setup(s => s.BulkCreateAccountReservation(It.IsAny<uint>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<string>(), It.IsAny<long?>()))
                 .Throws(expectedException);
 
             //Act 
