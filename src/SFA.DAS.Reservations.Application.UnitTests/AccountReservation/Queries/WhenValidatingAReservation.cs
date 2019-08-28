@@ -12,7 +12,6 @@ using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
-using SFA.DAS.Testing.AutoFixture;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 using Course = SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course;
 

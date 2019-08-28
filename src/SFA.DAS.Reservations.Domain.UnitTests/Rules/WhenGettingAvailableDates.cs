@@ -44,16 +44,6 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         }
 
         [Test]
-        public void And_MinDate_Is_Before_Now_Then_Uses_Now()
-        {
-            //Act
-            var actual = new AvailableDates(DateTime.UtcNow, minStartDate: DateTime.UtcNow.AddMonths(-2));
-
-            //Assert
-            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
-        }
-
-        [Test]
         public void Then_If_The_Max_Date_Is_Set_The_Available_Date_Does_Not_Exceed_This_Value_From_The_Configurable_Number_Of_Months()
         {
             //Act
