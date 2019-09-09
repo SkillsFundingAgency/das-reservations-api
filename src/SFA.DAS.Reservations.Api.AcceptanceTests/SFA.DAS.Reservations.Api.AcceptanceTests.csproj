@@ -30,7 +30,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="CreateReservation.feature.cs">
+    <Compile Update="Features\AvailableDates.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AvailableDates.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\CreateReservation.feature.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>CreateReservation.feature</DependentUpon>
@@ -45,7 +50,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="CreateReservation.feature">
+    <SpecFlowFeatureFiles Update="Features\AvailableDates.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>AvailableDates.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\CreateReservation.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>CreateReservation.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
