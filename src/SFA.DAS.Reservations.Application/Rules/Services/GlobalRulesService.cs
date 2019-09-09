@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
             if (resultsList == null || !resultsList.Any())
             {
-                return await CheckAccountReservationLimit(request.AccountId);
+                return await CheckAccountReservationLimit(request.AccountId, request.IsLevyAccount);
             }
 
             foreach (var result in resultsList)
@@ -98,11 +98,11 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             return limit;
         }
 
-        private async Task<GlobalRule> CheckAccountReservationLimit(long accountId)
+        private async Task<GlobalRule> CheckAccountReservationLimit(long accountId, bool isLevyReservation = false)
         {
             var maxNumberOfReservations = await GetReservationLimit(accountId);
 
-            if (maxNumberOfReservations == 0)
+            if (maxNumberOfReservations == 0 || isLevyReservation)
             {
                 return null;
             }
