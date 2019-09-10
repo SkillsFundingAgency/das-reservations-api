@@ -2,12 +2,10 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Data;
-using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Reservations;
 using TechTalk.SpecFlow;
-using Course = SFA.DAS.Reservations.Domain.Entities.Course;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
@@ -16,9 +14,9 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     
 
     [Binding]
-    public class Steps : StepsBase
+    public class CreateReservationSteps : StepsBase
     {
-        public Steps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public CreateReservationSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
         {
         }
 
@@ -44,24 +42,30 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             dbContext.SaveChanges();
         }
 
-        [Given(@"I have an existing reservation")]
-        public void GivenIHaveAnExistingReservation()
+        [Given(@"I have an existing reservation with status (.*)")]
+        public void GivenIHaveAnExistingReservation(string requiredStatus)
         {
+            TestData.ReservationId = Guid.NewGuid();
+
+            Enum.TryParse(requiredStatus, true, out ReservationStatus status);
+
             var dbContext = Services.GetService<ReservationsDataContext>();
 
-            dbContext.Reservations.Add(new Domain.Entities.Reservation
+            var reservation = new Domain.Entities.Reservation
             {
                 AccountId = 1,
-                AccountLegalEntityId = 1,
-                AccountLegalEntityName = "Test",
-                CourseId = "234",
+                AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
+                AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
+                CourseId = TestData.Course.CourseId,
                 CreatedDate = DateTime.UtcNow,
                 ExpiryDate = DateTime.UtcNow.AddMonths(2),
                 IsLevyAccount = false,
-                Status = 1,
+                Status = (short) status,
                 StartDate = DateTime.UtcNow.AddMonths(1),
-                Id = Guid.NewGuid()
-            });
+                Id = TestData.ReservationId
+            };
+
+            dbContext.Reservations.Add(reservation);
             dbContext.SaveChanges();
         }
 
@@ -70,15 +74,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         public void WhenICreateAReservationForACourseWithAStartMonth(string startMonth)
         {
             var month = (int) Enum.Parse<Month>(startMonth);
-           
-            var expectedCourse = TestData.Course;
 
             var controller = Services.GetService<ReservationsController>();
 
             var reservation = new Reservation
             {
                 AccountId = 1,
-                CourseId = expectedCourse.CourseId,
+                CourseId = TestData.Course.CourseId,
                 AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
                 AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
                 Id = Guid.NewGuid(),
@@ -96,14 +98,12 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             var month = (int)Enum.Parse<Month>(startMonth);
 
-            var expectedCourse = TestData.Course;
-
             var controller = Services.GetService<ReservationsController>();
 
             var reservation = new Reservation
             {
                 AccountId = 1,
-                CourseId = expectedCourse.CourseId,
+                CourseId = TestData.Course.CourseId,
                 AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
                 AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
                 Id = Guid.NewGuid(),
@@ -121,12 +121,10 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         public void ThenAReservationWithCourseAndStartMonthIsCreated(string startMonth)
         {
             var month = (int) Enum.Parse<Month>(startMonth);
-
-            var expectedCourse = TestData.Course;
-
+           
             var dbContext = Services.GetService<ReservationsDataContext>();
 
-            var reservation = dbContext.Reservations.SingleOrDefault(r => r.CourseId == expectedCourse.CourseId && 
+            var reservation = dbContext.Reservations.SingleOrDefault(r => r.CourseId == TestData.Course.CourseId && 
                                                                           r.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
 
             Assert.IsNotNull(reservation);

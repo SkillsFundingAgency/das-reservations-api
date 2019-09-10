@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Data;
@@ -22,16 +23,12 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [BeforeScenario]
         public void InitialiseTestDatabaseData()
         {
-            var dbContext = Services.GetService<ReservationsDataContext>();
-
             TestData.Course = new Course
             {
-                CourseId = "234",
+                CourseId = "1",
                 Level = 1,
                 Title = "Tester"
             };
-
-            dbContext.Courses.Add(TestData.Course);
 
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
@@ -42,9 +39,23 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 AgreementSigned = true
             };
 
-            dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
+            var dbContext = Services.GetService<ReservationsDataContext>();
 
-            dbContext.SaveChanges();
+            var course = dbContext.Courses.SingleOrDefault(c => c.CourseId.Equals(TestData.Course.CourseId));
+
+            if (course == null)
+            {
+                dbContext.Courses.Add(TestData.Course);
+            }
+
+            var legalEntity = dbContext.AccountLegalEntities.SingleOrDefault(e => e.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
+            
+            if (legalEntity == null)
+            {
+                dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
+
+                dbContext.SaveChanges();
+            }
         }
     }
 }
