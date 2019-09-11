@@ -8,8 +8,12 @@ using TechTalk.SpecFlow;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
+    
     public class StepsBase
     {
+        protected const long AccountId = 1;
+        protected const uint ProviderId = 15214;
+        protected Guid UserId;
         protected readonly TestData TestData;
         protected readonly IServiceProvider Services;
 
@@ -17,10 +21,11 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             TestData = testData;
             Services = serviceProvider;
+            UserId = Guid.NewGuid();
         }
 
 
-        [BeforeScenario]
+        [BeforeScenario()]
         public void InitialiseTestDatabaseData()
         {
             TestData.Course = new Course
@@ -28,11 +33,11 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 CourseId = "1",
                 Level = 1,
                 Title = "Tester"
-            };
+            };           
 
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
-                AccountId = 1,
+                AccountId = AccountId,
                 AccountLegalEntityId = 1,
                 AccountLegalEntityName = "Test Corp",
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
@@ -41,9 +46,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
             var dbContext = Services.GetService<ReservationsDataContext>();
 
-            var course = dbContext.Courses.SingleOrDefault(c => c.CourseId.Equals(TestData.Course.CourseId));
-
-            if (course == null)
+            if (dbContext.Courses.Find(TestData.Course.CourseId) == null)
             {
                 dbContext.Courses.Add(TestData.Course);
             }
@@ -57,5 +60,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 dbContext.SaveChanges();
             }
         }
+
     }
 }
