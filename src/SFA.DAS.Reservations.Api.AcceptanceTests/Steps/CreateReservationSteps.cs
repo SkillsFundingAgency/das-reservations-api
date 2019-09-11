@@ -2,12 +2,9 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Data;
-using SFA.DAS.Reservations.Domain.Entities;
 using TechTalk.SpecFlow;
-using Course = SFA.DAS.Reservations.Domain.Entities.Course;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
