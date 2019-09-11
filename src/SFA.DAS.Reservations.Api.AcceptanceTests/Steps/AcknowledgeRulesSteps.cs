@@ -74,18 +74,18 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             var controller = Services.GetService<RulesController>();
             var result = (OkObjectResult) Task.FromResult(controller.All().Result).Result;
             var rules = (GetRulesResult) result.Value;
-            var ruleId = rules.GlobalRules.FirstOrDefault();
+            var globalRule = rules.GlobalRules.FirstOrDefault();
 
-            var ack = ruleId.UserRuleAcknowledgements.FirstOrDefault();
+            var userRuleAcknowledgement = globalRule.UserRuleAcknowledgements.FirstOrDefault();
 
             if (type.Equals("provider", StringComparison.CurrentCultureIgnoreCase))
             {
-                Assert.AreEqual(ProviderId, ack.UkPrn);
+                Assert.AreEqual(ProviderId, userRuleAcknowledgement.UkPrn);
             }
 
             if (type.Equals("employer", StringComparison.CurrentCultureIgnoreCase))
             {
-                Assert.AreEqual(UserId, ack.UserId);
+                Assert.AreEqual(UserId, userRuleAcknowledgement.UserId);
             }
         }
     }
