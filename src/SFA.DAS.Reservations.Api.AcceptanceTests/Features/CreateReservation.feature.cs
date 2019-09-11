@@ -119,7 +119,7 @@ testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecF
 #line 18
 testRunner.And("it has a reservation limit of 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 19
-testRunner.And("I have an existing reservation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+testRunner.And("I have an existing reservation with status Completed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 20
 testRunner.When("I create a reservation for a course with a start month of July", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 21
@@ -141,7 +141,7 @@ testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecF
 #line 25
 testRunner.And("it has a reservation limit of 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 26
-testRunner.And("I have an existing reservation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+testRunner.And("I have an existing reservation with status Completed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 27
 testRunner.When("I create a levy reservation for a course with a start month of July", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line 28
