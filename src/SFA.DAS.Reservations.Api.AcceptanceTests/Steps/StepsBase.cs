@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Data;
@@ -7,8 +8,12 @@ using TechTalk.SpecFlow;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
+    
     public class StepsBase
     {
+        protected const long AccountId = 1;
+        protected const uint ProviderId = 15214;
+        protected Guid UserId;
         protected readonly TestData TestData;
         protected readonly IServiceProvider Services;
 
@@ -16,10 +21,11 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             TestData = testData;
             Services = serviceProvider;
+            UserId = Guid.NewGuid();
         }
 
 
-        [BeforeScenario]
+        [BeforeScenario()]
         public void InitialiseTestDatabaseData()
         {
             var dbContext = Services.GetService<ReservationsDataContext>();
@@ -30,21 +36,30 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 Level = 1,
                 Title = "Tester"
             };
+            if (dbContext.Courses.Find("234") == null)
+            {
 
-            dbContext.Courses.Add(TestData.Course);
+                dbContext.Courses.Add(TestData.Course);
+            }
 
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
-                AccountId = 1,
+                AccountId = AccountId,
                 AccountLegalEntityId = 1,
                 AccountLegalEntityName = "Test Corp",
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
                 AgreementSigned = true
             };
 
-            dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
+            if (dbContext.AccountLegalEntities.FirstOrDefault(c => c.AccountLegalEntityId.Equals(1)) == null)
+            {
+                dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
+            }
+            
+
 
             dbContext.SaveChanges();
         }
+
     }
 }
