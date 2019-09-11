@@ -65,23 +65,34 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         }
 
         [Test]
-        public void Then_The_Reservation_Is_Valid_If_It_Is_Within_The_Expiry_Period()
-        {
-            //Act
-            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"",0);
-
-            //Assert
-            Assert.IsTrue(_reservation.IsActive);
-        }
-
-        [Test]
-        public void Then_The_Reservation_Is_Not_Valid_If_It_Has_Fallen_Out_Of_The_Expiry_Period()
+        public void Then_The_Reservation_Is_Expired_If_It_Is_Within_The_Expiry_Period_And_Is_Pending()
         {
             //Act
             _reservation = CreateReservation();
 
             //Assert
-            Assert.IsFalse(_reservation.IsActive);
+            Assert.IsTrue(_reservation.IsExpired);
+        }
+
+        [Test]
+        public void Then_The_Reservation_Is_Not_Expiring_If_It_Is_Within_The_Expiry_Period_But_Not_Pending()
+        {
+            //Act
+            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Confirmed, new Course(),0,0,"",0);
+
+
+            //Assert
+            Assert.IsFalse(_reservation.IsExpired);
+        }
+
+        [Test]
+        public void Then_The_Reservation_Is_Expired_If_It_Is_Not_Within_The_Expiry_Period_And_Is_Pending()
+        {
+            //Act
+            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"",0);
+
+            //Assert
+            Assert.IsFalse(_reservation.IsExpired);
         }
 
         [Test]
