@@ -29,19 +29,12 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [BeforeScenario()]
         public void InitialiseTestDatabaseData()
         {
-            var dbContext = Services.GetService<ReservationsDataContext>();
-
             TestData.Course = new Course
             {
-                CourseId = "234",
+                CourseId = "1",
                 Level = 1,
                 Title = "Tester"
-            };
-            if (dbContext.Courses.Find("234") == null)
-            {
-
-                dbContext.Courses.Add(TestData.Course);
-            }
+            };           
 
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
@@ -52,14 +45,21 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 AgreementSigned = true
             };
 
-            if (dbContext.AccountLegalEntities.FirstOrDefault(c => c.AccountLegalEntityId.Equals(AccountLegalEntityId)) == null)
+            var dbContext = Services.GetService<ReservationsDataContext>();
+
+            if (dbContext.Courses.Find(TestData.Course.CourseId) == null)
+            {
+                dbContext.Courses.Add(TestData.Course);
+            }
+
+            var legalEntity = dbContext.AccountLegalEntities.SingleOrDefault(e => e.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
+            
+            if (legalEntity == null)
             {
                 dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
+
+                dbContext.SaveChanges();
             }
-            
-
-
-            dbContext.SaveChanges();
         }
 
     }
