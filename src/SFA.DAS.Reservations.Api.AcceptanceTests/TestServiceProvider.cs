@@ -67,7 +67,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
             serviceCollection.AddTransient(sp =>
                 new RulesController(sp.GetService<IMediator>())
                 {
-                    ControllerContext = GetControllerContext<ReservationsController>()
+                    ControllerContext = GetControllerContext<RulesController>()
+                });
+
+            serviceCollection.AddTransient(sp =>
+                new CoursesController(sp.GetService<IMediator>())
+                {
+                    ControllerContext = GetControllerContext<CoursesController>()
                 });
         }
 
