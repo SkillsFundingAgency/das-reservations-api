@@ -12,6 +12,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     public class StepsBase
     {
         protected const long AccountId = 1;
+        protected const long AccountLegalEntityId = 1;
         protected const uint ProviderId = 15214;
         protected Guid UserId;
         protected readonly TestData TestData;
@@ -38,7 +39,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
                 AccountId = AccountId,
-                AccountLegalEntityId = 1,
+                AccountLegalEntityId = AccountLegalEntityId,
                 AccountLegalEntityName = "Test Corp",
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
                 AgreementSigned = true
