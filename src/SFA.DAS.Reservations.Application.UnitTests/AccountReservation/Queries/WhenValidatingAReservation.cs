@@ -218,6 +218,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 StartDate = _reservation.StartDate.Value.AddDays(-1)
             };
 
+            var expectedErrorMessage = "Training start date must be between the funding reservation dates " +
+                                       $"{_reservation.StartDate.Value:MM yyyy} to " +
+                                       $"{_reservation.ExpiryDate.Value:MM yyyy}";
+
             //Act
             var result = await _handler.Handle(request, CancellationToken.None);
 
@@ -226,6 +230,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
             Assert.IsNotNull(error);
             Assert.AreEqual(nameof(ValidateReservationQuery.StartDate), error.PropertyName);
+            Assert.AreEqual(expectedErrorMessage, error.Reason);
         }
 
         [Test]
@@ -258,6 +263,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 StartDate = _reservation.ExpiryDate.Value.AddDays(1)
             };
 
+            var expectedErrorMessage = "Training start date must be between the funding reservation dates " +
+                                       $"{_reservation.StartDate.Value:MM yyyy} to " +
+                                       $"{_reservation.ExpiryDate.Value:MM yyyy}";
+
             //Act
             var result = await _handler.Handle(request, CancellationToken.None);
 
@@ -266,6 +275,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
             Assert.IsNotNull(error);
             Assert.AreEqual(nameof(ValidateReservationQuery.StartDate), error.PropertyName);
+            Assert.AreEqual(expectedErrorMessage, error.Reason);
         }
         
         [Test]
