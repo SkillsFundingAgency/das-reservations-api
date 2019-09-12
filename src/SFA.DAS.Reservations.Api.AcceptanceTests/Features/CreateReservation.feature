@@ -26,3 +26,17 @@ And it has a reservation limit of 1
 And I have an existing reservation with status Completed
 When I create a levy reservation for a course with a start month of July
 Then I have 2 reservation 
+
+Scenario: Reservation deleted for non levy employers
+Given I have a non levy account
+And it has a reservation limit of 1
+And I have an existing reservation with status Deleted
+When I create a reservation for a course with a start month of July
+Then I have 2 reservation 
+
+Scenario: Reservation expired for non levy employers
+Given I have a non levy account
+And it has a reservation limit of 1
+And I have an existing reservation with status Expired
+When I create a reservation for a course with a start month of July
+Then I have 2 reservation 

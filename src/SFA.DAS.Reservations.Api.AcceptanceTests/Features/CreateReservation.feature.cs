@@ -149,6 +149,28 @@ testRunner.Then("I have 2 reservation", ((string)(null)), ((TechTalk.SpecFlow.Ta
 #line hidden
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Reservation deleted for non levy employers")]
+        public virtual void ReservationDeletedForNonLevyEmployers()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Reservation deleted for non levy employers", null, ((string[])(null)));
+#line 30
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 31
+testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 32
+testRunner.And("it has a reservation limit of 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 33
+testRunner.And("I have an existing reservation with status Deleted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 34
+testRunner.When("I create a reservation for a course with a start month of July", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 35
+testRunner.Then("I have 2 reservation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore
