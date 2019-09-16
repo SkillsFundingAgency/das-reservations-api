@@ -11,34 +11,18 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.StartupConfig;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Reservations.Api.AppStart;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
-using SFA.DAS.Reservations.Application.AccountReservations.Services;
-using SFA.DAS.Reservations.Application.Courses.Services;
-using SFA.DAS.Reservations.Application.Rules.Queries;
-using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data;
-using SFA.DAS.Reservations.Data.Repository;
-using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
-using SFA.DAS.Reservations.Domain.Courses;
-using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntity;
-using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
-using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Infrastructure.DevConfiguration;
+using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.UnitOfWork;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore;
 using SFA.DAS.UnitOfWork.Mvc;
@@ -78,13 +62,17 @@ namespace SFA.DAS.Reservations.Api
             services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
             services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
-
+            services.AddSingleton(new ApiEnvironment(Configuration["EnvironmentName"]));
+            
             var serviceProvider = services.BuildServiceProvider();
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
             
-
             services.AddHealthChecks()
-                    .AddSqlServer(config.Value.ConnectionString);
+                    .AddSqlServer(config.Value.ConnectionString)
+                    .AddCheck<QueueHealthCheck>(
+                        "ServiceBus Queue Health",
+                        HealthStatus.Unhealthy,
+                        new []{"ready"});
 
             if (!ConfigurationIsLocalOrDev())
             {
