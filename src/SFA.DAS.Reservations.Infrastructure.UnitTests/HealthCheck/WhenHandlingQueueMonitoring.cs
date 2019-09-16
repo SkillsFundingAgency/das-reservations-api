@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             //Arrange
             azureQueueService.Setup(x => x.GetQueuesToMonitor()).Returns(new List<QueueMonitor>
             {
-                new QueueMonitor("test.queue", false, "LOCAL")
+                new QueueMonitor("test.queue", false)
             });
 
             //Act
@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             var expectedQueueName = "test.queue";
             azureQueueService.Setup(x => x.GetQueuesToMonitor()).Returns(new List<QueueMonitor>
             {
-                new QueueMonitor(expectedQueueName, false, "LOCAL")
+                new QueueMonitor(expectedQueueName, false)
             });
 
             //Act
@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
         {
             //Arrange
             var expectedQueueName = "test.queue";
-            var queueMonitor = new QueueMonitor(expectedQueueName, false, "LOCAL");
+            var queueMonitor = new QueueMonitor(expectedQueueName, false);
             azureQueueService.Setup(x => x.GetQueuesToMonitor()).Returns(new List<QueueMonitor>
             {
                 queueMonitor
@@ -90,9 +90,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             var expectedQueueName = "test.queue";
             var expectedQueueName2 = "test.queue2";
             var expectedQueueName3 = "test.queue3";
-            var queueMonitor = new QueueMonitor(expectedQueueName, true, "LOCAL");
-            var queueMonitor2 = new QueueMonitor(expectedQueueName2, true, "LOCAL");
-            var queueMonitor3 = new QueueMonitor(expectedQueueName3, true, "LOCAL");
+            var queueMonitor = new QueueMonitor(expectedQueueName, true) ;
+            var queueMonitor2 = new QueueMonitor(expectedQueueName2, true );
+            var queueMonitor3 = new QueueMonitor(expectedQueueName3, true);
             azureQueueService.Setup(x => x.GetQueuesToMonitor()).Returns(new List<QueueMonitor>
             {
                 queueMonitor,
@@ -123,9 +123,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             var expectedQueueName = "test.queue";
             var expectedQueueName2 = "test.queue2";
             var expectedQueueName3 = "test.queue3";
-            var queueMonitor = new QueueMonitor(expectedQueueName, true, "LOCAL");
-            var queueMonitor2 = new QueueMonitor(expectedQueueName2, true, "LOCAL");
-            var queueMonitor3 = new QueueMonitor(expectedQueueName3, true, "LOCAL");
+            var queueMonitor = new QueueMonitor(expectedQueueName, true);
+            var queueMonitor2 = new QueueMonitor(expectedQueueName2, true);
+            var queueMonitor3 = new QueueMonitor(expectedQueueName3, true);
             azureQueueService.Setup(x => x.GetQueuesToMonitor()).Returns(new List<QueueMonitor>
             {
                 queueMonitor,
@@ -154,7 +154,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
         {
             //Arrange
             var expectedQueueName = "test.queue";
-            var queueMonitor = new QueueMonitor(expectedQueueName, false, "LOCAL");
+            var queueMonitor = new QueueMonitor(expectedQueueName, false);
             azureQueueService.Setup(x => x.GetQueuesToMonitor()).Returns(new List<QueueMonitor>
             {
                 queueMonitor
@@ -179,7 +179,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
         {
             //Arrange
             var expectedQueueName = "test.queue";
-            var queueMonitor = new QueueMonitor(expectedQueueName, null, "LOCAL");
+            var queueMonitor = new QueueMonitor(expectedQueueName, null);
             azureQueueService.Setup(x => x.GetQueuesToMonitor()).Returns(new List<QueueMonitor>
             {
                 queueMonitor

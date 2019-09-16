@@ -10,12 +10,10 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureServiceBus
 {
     public class AzureQueueService : IAzureQueueService
     {
-        private readonly ApiEnvironment _apiEnvironment;
         private readonly ReservationsConfiguration _configuration;
 
-        public AzureQueueService(IOptions<ReservationsConfiguration> options, ApiEnvironment apiEnvironment)
+        public AzureQueueService(IOptions<ReservationsConfiguration> options)
         {
-            _apiEnvironment = apiEnvironment;
             _configuration = options.Value;
         }
 
@@ -23,7 +21,7 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureServiceBus
         {
             var queuesToMonitor = _configuration
                     .QueueMonitorItems.Split(',')
-                    .Select(c => new QueueMonitor(c, null, _apiEnvironment.EnvironmentName))
+                    .Select(c => new QueueMonitor(c, null))
                     .ToList();
             
             return queuesToMonitor;
