@@ -6,6 +6,7 @@ using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.Reservations;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
@@ -16,11 +17,11 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class CreateReservationSteps : StepsBase
     {
-        public CreateReservationSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public CreateReservationSteps(TestData testData, TestServiceProvider serviceProvider) 
+            : base(testData, serviceProvider)
         {
         }
-
-
+        
         [Given(@"I have a non levy account")]
         public void GivenIHaveANonLevyAccount()
         {
@@ -43,7 +44,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         }
 
         [Given(@"I have an existing reservation with status (.*)")]
-        public void GivenIHaveAnExistingReservation(string requiredStatus)
+        public void GivenIHaveAnExistingReservationWithStatus(string requiredStatus)
         {
             TestData.ReservationId = Guid.NewGuid();
 
@@ -69,7 +70,32 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             dbContext.SaveChanges();
         }
 
+        [Given(@"I have the following existing reservation:")]
+        public void GivenIHaveTheFollowingExistingReservation(Table table)
+        {
+            TestData.ReservationId = Guid.NewGuid();
+            var dbContext = Services.GetService<ReservationsDataContext>();
 
+            var reservation = new Domain.Entities.Reservation
+            {
+                Id = TestData.ReservationId,
+                AccountId = 1,
+                AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
+                AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
+                CourseId = TestData.Course.CourseId,
+                CreatedDate = DateTime.UtcNow,
+                StartDate = DateTime.UtcNow.Date.AddMonths(-1),
+                ExpiryDate = DateTime.UtcNow.Date.AddMonths(2),
+                IsLevyAccount = false,
+                Status = (short) ReservationStatus.Pending
+            };
+
+            table.FillInstance(reservation);
+
+            dbContext.Reservations.Add(reservation);
+            dbContext.SaveChanges();
+        }
+        
         [When(@"I create a reservation for a course with a start month of (.*)")]
         public void WhenICreateAReservationForACourseWithAStartMonth(string startMonth)
         {

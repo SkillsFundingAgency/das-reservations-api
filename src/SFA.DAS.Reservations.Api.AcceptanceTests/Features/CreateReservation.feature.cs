@@ -171,6 +171,28 @@ testRunner.Then("I have 2 reservation", ((string)(null)), ((TechTalk.SpecFlow.Ta
 #line hidden
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Reservation expired for non levy employers")]
+        public virtual void ReservationExpiredForNonLevyEmployers()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Reservation expired for non levy employers", null, ((string[])(null)));
+#line 37
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 38
+testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 39
+testRunner.And("it has a reservation limit of 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 40
+testRunner.And("I have an existing reservation with status Expired", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 41
+testRunner.When("I create a reservation for a course with a start month of July", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 42
+testRunner.Then("I have 2 reservation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore
