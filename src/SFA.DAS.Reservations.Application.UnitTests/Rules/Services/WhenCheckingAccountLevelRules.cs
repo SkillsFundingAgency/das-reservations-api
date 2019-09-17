@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -12,13 +11,12 @@ using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
-using Reservation = SFA.DAS.Reservations.Domain.Entities.Reservation;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 {
     public class WhenCheckingAccountLevelRules
     {
-        private Mock<IReservationRepository> _repository;
+        private Mock<IAccountReservationService> _repository;
         private GlobalRulesService _globalRulesService;
         private Domain.Entities.GlobalRule _globalRule;
         private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
@@ -33,8 +31,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 Restriction = (byte)AccountRestriction.Account,
                 RuleType = (byte)GlobalRuleType.ReservationLimit
             };
-            _repository = new Mock<IReservationRepository>();
-            _repository.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{new Reservation()});
+            _repository = new Mock<IAccountReservationService>();
+            _repository.Setup(x => x.GetAccountReservations(ExpectedAccountId)).ReturnsAsync(new List<Reservation>{new Reservation(
+                Guid.NewGuid(), 
+                ExpectedAccountId,
+                DateTime.UtcNow.Date, 
+                2,
+                "Name")});
             _accountLegalEntitiesService = new Mock<IAccountLegalEntitiesService>();
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(It.IsAny<long>()))
                 .ReturnsAsync(new List<AccountLegalEntity>{new AccountLegalEntity(Guid.NewGuid(),ExpectedAccountId,"test",1,1,1, true, false, AgreementType.Levy)});

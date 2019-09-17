@@ -82,23 +82,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 7
 testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-            TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
-                        "StartDate",
-                        "CourseId"});
-            table1.AddRow(new string[] {
-                        "2019-07-01",
-                        "1"});
-#line 8
-testRunner.And("I have the following existing reservation:", ((string)(null)), table1, "And ");
-#line hidden
             TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                         "StartDate",
                         "CourseId"});
             table2.AddRow(new string[] {
                         "2019-07-01",
                         "1"});
+#line 8
+testRunner.And("I have the following existing reservation:", ((string)(null)), table2, "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                        "StartDate",
+                        "CourseId"});
+            table3.AddRow(new string[] {
+                        "2019-07-01",
+                        "1"});
 #line 11
-testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table2, "When ");
+testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table3, "When ");
 #line 14
 testRunner.Then("no validation errors are returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -116,25 +116,25 @@ this.ScenarioInitialize(scenarioInfo);
 #line 17
 testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-            TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
                         "StartDate",
                         "ExpiryDate",
                         "CourseId"});
-            table3.AddRow(new string[] {
+            table4.AddRow(new string[] {
                         "2019-07-01",
                         "2019-09-30",
                         "1"});
 #line 18
-testRunner.And("I have the following existing reservation:", ((string)(null)), table3, "And ");
+testRunner.And("I have the following existing reservation:", ((string)(null)), table4, "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                         "StartDate",
                         "CourseId"});
-            table4.AddRow(new string[] {
+            table5.AddRow(new string[] {
                         "2019-06-01",
                         "1"});
 #line 21
-testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table4, "When ");
+testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table5, "When ");
 #line 24
 testRunner.Then("validation errors are returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -152,25 +152,25 @@ this.ScenarioInitialize(scenarioInfo);
 #line 27
 testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-            TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                         "StartDate",
                         "ExpiryDate",
                         "CourseId"});
-            table5.AddRow(new string[] {
+            table6.AddRow(new string[] {
                         "2019-07-01",
                         "2019-09-30",
                         "1"});
 #line 28
-testRunner.And("I have the following existing reservation:", ((string)(null)), table5, "And ");
+testRunner.And("I have the following existing reservation:", ((string)(null)), table6, "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                         "StartDate",
                         "CourseId"});
-            table6.AddRow(new string[] {
+            table7.AddRow(new string[] {
                         "2019-10-01",
                         "1"});
 #line 31
-testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table6, "When ");
+testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table7, "When ");
 #line 34
 testRunner.Then("validation errors are returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -188,38 +188,38 @@ this.ScenarioInitialize(scenarioInfo);
 #line 37
 testRunner.Given("I have a non levy account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-            TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
                         "CreatedDate",
                         "ActiveFrom",
                         "ActiveTo",
                         "CourseId"});
-            table7.AddRow(new string[] {
+            table8.AddRow(new string[] {
                         "2019-07-01",
                         "2019-07-01",
                         "2019-09-30",
                         "1"});
 #line 38
-testRunner.And("the following rule exists:", ((string)(null)), table7, "And ");
+testRunner.And("the following rule exists:", ((string)(null)), table8, "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                         "StartDate",
                         "ExpiryDate",
                         "CourseId"});
-            table8.AddRow(new string[] {
+            table9.AddRow(new string[] {
                         "2019-07-01",
                         "2019-09-30",
                         "1"});
 #line 41
-testRunner.And("I have the following existing reservation:", ((string)(null)), table8, "And ");
+testRunner.And("I have the following existing reservation:", ((string)(null)), table9, "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
                         "StartDate",
                         "CourseId"});
-            table9.AddRow(new string[] {
+            table10.AddRow(new string[] {
                         "2019-07-01",
                         "1"});
 #line 44
-testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table9, "When ");
+testRunner.When("I validate the reservation against the following commitment data:", ((string)(null)), table10, "When ");
 #line 47
 testRunner.Then("validation errors are returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

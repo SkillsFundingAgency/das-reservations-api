@@ -40,7 +40,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 
             _globalRulesService = new GlobalRulesService(_repository.Object, 
                 Mock.Of<IOptions<ReservationsConfiguration>>(), 
-                Mock.Of<IReservationRepository>(),
+                Mock.Of<IAccountReservationService>(),
                 Mock.Of<IAccountLegalEntitiesService>());
         }
 
