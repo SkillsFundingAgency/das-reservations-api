@@ -25,6 +25,7 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             EffectiveTo = effectiveTo;
             Rules = new List<Rule>();
         }
+
         public string CourseId { get; }
         public string Title { get;}
         public string Level { get; }

@@ -13,15 +13,18 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
     public class GlobalRulesService : IGlobalRulesService
     {
         private readonly IGlobalRuleRepository _repository;
-        private readonly IReservationRepository _reservationRepository;
+        private readonly IAccountReservationService _reservationService;
         private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
         private readonly ReservationsConfiguration _options;
 
-        public GlobalRulesService(IGlobalRuleRepository repository, IOptions<ReservationsConfiguration> options,
-            IReservationRepository reservationRepository, IAccountLegalEntitiesService accountLegalEntitiesService)
+        public GlobalRulesService(
+            IGlobalRuleRepository repository, 
+            IOptions<ReservationsConfiguration> options,
+            IAccountReservationService reservationService, 
+            IAccountLegalEntitiesService accountLegalEntitiesService)
         {
             _repository = repository;
-            _reservationRepository = reservationRepository;
+            _reservationService = reservationService;
             _accountLegalEntitiesService = accountLegalEntitiesService;
             _options = options.Value;
         }
@@ -107,9 +110,9 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                 return null;
             }
 
-            var reservations = await _reservationRepository.GetAccountReservations(accountId);
+            var reservations = await _reservationService.GetAccountReservations(accountId);
 
-            if (reservations.Count(c => !c.IsLevyAccount) >= maxNumberOfReservations)
+            if (reservations.Count(c => !c.IsLevyAccount && !c.IsExpired) >= maxNumberOfReservations)
             {
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {

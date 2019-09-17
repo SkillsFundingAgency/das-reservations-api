@@ -9,6 +9,7 @@ using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
@@ -21,6 +22,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             
         }
+
+        // Given
 
         [Given(@"there is an active course available")]
         public void GivenThereIsAnActiveCourseAvailable()
@@ -54,6 +57,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             dbContext.SaveChanges();
         }
 
+        // When
 
         [When(@"I get courses")]
         public void WhenIGetCourses()
@@ -67,6 +71,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             _collectedCourses = new List<Course>(viewModel?.Courses);
         }
         
+        // Then
+
         [Then(@"the active course is returned")]
         public void ThenTheActiveCourseIsReturned()
         {

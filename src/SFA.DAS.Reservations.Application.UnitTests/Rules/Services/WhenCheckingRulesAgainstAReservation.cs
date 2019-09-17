@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
@@ -22,7 +21,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         private GlobalRulesService _globalRulesService;
        
         private Mock<IOptions<ReservationsConfiguration>> _options;
-        private Mock<IReservationRepository> _reservationRepository;
+        private Mock<IAccountReservationService> _reservationRepository;
         private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
 
         [SetUp]
@@ -40,9 +39,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                         Id = 123
                     }
                 });
-            _reservationRepository = new Mock<IReservationRepository>();
+            _reservationRepository = new Mock<IAccountReservationService>();
             _reservationRepository.Setup(x => x.GetAccountReservations(It.IsAny<long>()))
-                .ReturnsAsync(new List<Domain.Entities.Reservation>());
+                .ReturnsAsync(new List<Reservation>());
 
             _options = new Mock<IOptions<ReservationsConfiguration>>();
             _options.Setup(x => x.Value.ExpiryPeriodInMonths).Returns(1);
@@ -160,7 +159,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var expectedAccountId = 123;
             var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(1);
-            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation>{new Domain.Entities.Reservation{IsLevyAccount = true}, new Domain.Entities.Reservation{IsLevyAccount = false}, new Domain.Entities.Reservation { IsLevyAccount = false } });
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Reservation>
+            {
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", isLevyAccount: true), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name"), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name")
+            });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
                     {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false, AgreementType.NonLevyExpressionOfInterest)});
@@ -182,7 +186,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var expectedAccountId = 123;
             var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(2);
-            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation> { new Domain.Entities.Reservation(), new Domain.Entities.Reservation{IsLevyAccount = true}, new Domain.Entities.Reservation{IsLevyAccount = true} });
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Reservation>
+            {
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name"), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", isLevyAccount: true), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", isLevyAccount: true)
+            });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
                     {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false, AgreementType.NonLevyExpressionOfInterest)});
@@ -205,10 +214,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
                     {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 0, true, true, AgreementType.Levy)});
-            var existingReservations = new List<Domain.Entities.Reservation>();
+            var existingReservations = new List<Reservation>();
             for (var i = 0; i<5;i++)
             {
-                existingReservations.Add(new Domain.Entities.Reservation());
+                existingReservations.Add(new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name"));
             }
             _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId))
                 .ReturnsAsync(existingReservations);
@@ -230,7 +239,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var expectedAccountId = 123;
             var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test", isLevyAccount:true);
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(1);
-            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation>{new Domain.Entities.Reservation{IsLevyAccount = true}, new Domain.Entities.Reservation{IsLevyAccount = false}, new Domain.Entities.Reservation { IsLevyAccount = false } });
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Reservation>
+            {
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", isLevyAccount: true), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name"), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name")
+            });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
                     {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, true, AgreementType.Levy)});
@@ -250,7 +264,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var expectedAccountId = 123;
             var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test", isLevyAccount: true);
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(1);
-            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Domain.Entities.Reservation> { new Domain.Entities.Reservation { IsLevyAccount = true }, new Domain.Entities.Reservation { IsLevyAccount = false }, new Domain.Entities.Reservation { IsLevyAccount = false } });
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Reservation>
+            {
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", isLevyAccount: true), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name"), 
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name")
+            });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
                     {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false, AgreementType.Levy)});
@@ -262,5 +281,31 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Assert.IsNull(actual);
         }
 
+        [Test]
+        public async Task And_Reservation_Limit_Reached_And_Reservation_Expired_Then_Null_Returned()
+        {
+            //Arrange
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            var expectedAccountId = 123;
+            var request = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow.Date, 2, "test");
+            _reservationRepository
+                .Setup(x => x.GetAccountReservations(expectedAccountId))
+                .ReturnsAsync(new List<Reservation>
+                {
+                    new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow.Date.AddMonths(-3), 2, "Name")
+                });
+            _accountLegalEntitiesService
+                .Setup(x => x.GetAccountLegalEntities(expectedAccountId))
+                .ReturnsAsync(new List<AccountLegalEntity>
+                {
+                    new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 1, true, false, AgreementType.Levy)
+                });
+
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(request);
+
+            //Assert
+            Assert.IsNull(actual);
+        }
     }
 }

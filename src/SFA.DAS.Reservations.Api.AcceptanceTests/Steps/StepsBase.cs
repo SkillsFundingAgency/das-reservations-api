@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Common.Domain.Types;
@@ -33,7 +34,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             {
                 CourseId = "1",
                 Level = 1,
-                Title = "Tester"
+                Title = "Tester",
+                ReservationRule = new List<Rule>()
             };           
 
             TestData.AccountLegalEntity = new AccountLegalEntity
