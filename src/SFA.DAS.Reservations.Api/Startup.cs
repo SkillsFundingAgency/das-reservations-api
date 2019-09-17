@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.StartupConfig;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
@@ -21,6 +22,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
 using SFA.DAS.Reservations.Infrastructure.DevConfiguration;
+using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.UnitOfWork;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore;
 using SFA.DAS.UnitOfWork.Mvc;
@@ -60,13 +62,16 @@ namespace SFA.DAS.Reservations.Api
             services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
             services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
-
+            
             var serviceProvider = services.BuildServiceProvider();
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
             
-
             services.AddHealthChecks()
-                    .AddSqlServer(config.Value.ConnectionString);
+                    .AddSqlServer(config.Value.ConnectionString)
+                    .AddCheck<QueueHealthCheck>(
+                        "ServiceBus Queue Health",
+                        HealthStatus.Unhealthy,
+                        new []{"ready"});
 
             if (!ConfigurationIsLocalOrDev())
             {
