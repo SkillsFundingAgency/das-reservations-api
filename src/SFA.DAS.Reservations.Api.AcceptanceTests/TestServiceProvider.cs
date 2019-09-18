@@ -75,6 +75,14 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
                 {
                     ControllerContext = GetControllerContext<CoursesController>()
                 });
+
+            serviceCollection.AddTransient(sp => 
+                new AccountLegalEntitiesController(
+                    sp.GetService<IMediator>(),
+                    sp.GetService<ILogger<AccountLegalEntitiesController>>())
+            {
+                ControllerContext = GetControllerContext<AccountLegalEntitiesController>()
+            });
         }
 
         private static ControllerContext GetControllerContext<T>() where T : ControllerBase
