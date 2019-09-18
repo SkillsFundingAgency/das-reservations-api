@@ -3,11 +3,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
-using SFA.DAS.NServiceBus;
-using SFA.DAS.NServiceBus.AzureServiceBus;
-using SFA.DAS.NServiceBus.NewtonsoftJsonSerializer;
-using SFA.DAS.NServiceBus.SqlServer;
-using SFA.DAS.UnitOfWork.NServiceBus;
+using SFA.DAS.NServiceBus.Configuration;
+using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
+using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
+using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
+using SFA.DAS.NServiceBus.Hosting;
+using SFA.DAS.NServiceBus.SqlServer.Configuration;
+using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 
 namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
@@ -17,12 +19,11 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             IConfiguration configuration, bool configurationIsLocalOrDev)
         {
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Reservations.Api")
-                
                 .UseErrorQueue()
                 .UseInstallers()
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
-                .UseOutbox()
+                .UseOutbox(true)
                 .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => new SqlConnection(configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
