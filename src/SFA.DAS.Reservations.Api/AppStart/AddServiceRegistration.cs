@@ -8,8 +8,10 @@ using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Courses;
+using SFA.DAS.Reservations.Domain.Infrastructure;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Infrastructure.AzureServiceBus;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Api.AppStart
@@ -31,6 +33,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             services.AddTransient<IAvailableDatesService, AvailableDatesService>();
             services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
             services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
+            services.AddTransient<IAzureQueueService, AzureQueueService>();
 
             services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
                 ? new CurrentDateTime(config.Value.CurrentDateTime)

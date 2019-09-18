@@ -3,7 +3,6 @@
 	As a employer or provider
 	I would like to create a reservation
 
-
 Scenario: Create a reservation as an non levy employer
 Given I have a non levy account
 When I create a reservation for a course with a start month of August
@@ -14,5 +13,16 @@ Given I have a levy account
 When I create a reservation for a course with a start month of August
 Then a reservation with course and start month August is created
 
+Scenario: Reservation limit for non levy employers
+Given I have a non levy account
+And it has a reservation limit of 1
+And I have an existing reservation
+When I create a reservation for a course with a start month of July
+Then I have 1 reservation 
 
-
+Scenario: Reservation limit only applies to non levy
+Given I have a non levy account
+And it has a reservation limit of 1
+And I have an existing reservation
+When I create a levy reservation for a course with a start month of July
+Then I have 2 reservation 

@@ -69,7 +69,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 
         public DateTime? ExpiryDate { get; }
 
-        public bool IsActive => ExpiryDate >= DateTime.UtcNow;
+        public bool IsExpired => Status == ReservationStatus.Pending && ExpiryDate < DateTime.UtcNow;
 
         [JsonIgnore]
         public string CourseId { get; }
