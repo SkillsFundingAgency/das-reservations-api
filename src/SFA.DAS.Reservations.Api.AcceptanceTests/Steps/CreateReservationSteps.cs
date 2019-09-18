@@ -25,13 +25,28 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Given(@"I have a non levy account")]
         public void GivenIHaveANonLevyAccount()
         {
-            TestData.IsLevyAccount = false;
+            var context = Services.GetService<ReservationsDataContext>();
+
+            foreach (var entity in context.AccountLegalEntities)
+            {
+                entity.IsLevy = false;
+            }
+
+            context.SaveChanges();
         }
 
         [Given(@"I have a levy account")]
         public void GivenIHaveALevyAccount()
         {
-            TestData.IsLevyAccount = true;
+            var context = Services.GetService<ReservationsDataContext>();
+
+            foreach (var entity in context.AccountLegalEntities)
+            {
+                    entity.IsLevy = true;
+            }
+
+            context.SaveChanges();
+            
         }
 
         [Given(@"it has a reservation limit of (.*)")]
