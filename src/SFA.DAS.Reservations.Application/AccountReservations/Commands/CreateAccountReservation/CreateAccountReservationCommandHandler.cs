@@ -9,7 +9,7 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Messages;
-using SFA.DAS.UnitOfWork;
+using SFA.DAS.UnitOfWork.Context;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation
 {

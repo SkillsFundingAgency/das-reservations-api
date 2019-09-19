@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus.Persistence;
-using SFA.DAS.NServiceBus.SqlServer;
+using SFA.DAS.NServiceBus.SqlServer.Data;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.UnitOfWork;
+using SFA.DAS.UnitOfWork.Context;
 
 namespace SFA.DAS.Reservations.Api.StartupExtensions
 {

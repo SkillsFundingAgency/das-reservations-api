@@ -12,7 +12,7 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Messages;
-using SFA.DAS.UnitOfWork;
+using SFA.DAS.UnitOfWork.Context;
 using AccountLegalEntity = SFA.DAS.Reservations.Domain.AccountLegalEntities.AccountLegalEntity;
 using GlobalRule = SFA.DAS.Reservations.Domain.Rules.GlobalRule;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;

@@ -23,9 +23,10 @@ using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Api.StartupExtensions;
 using SFA.DAS.Reservations.Infrastructure.DevConfiguration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
-using SFA.DAS.UnitOfWork;
-using SFA.DAS.UnitOfWork.EntityFrameworkCore;
-using SFA.DAS.UnitOfWork.Mvc;
+using SFA.DAS.UnitOfWork.Context;
+using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
+using SFA.DAS.UnitOfWork.Managers;
+using SFA.DAS.UnitOfWork.Mvc.Extensions;
 
 namespace SFA.DAS.Reservations.Api
 {

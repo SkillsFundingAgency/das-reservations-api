@@ -4,7 +4,7 @@
     [Dispatched] BIT NOT NULL DEFAULT(0),
     [DispatchedAt] DATETIME NULL,
     [PersistenceVersion] VARCHAR(23) NOT NULL,
-    [Operations] NVARCHAR(MAX) NOT NULL,
+    [Operations] NVARCHAR(MAX) NOT NULL
 )
 GO
 
