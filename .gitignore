@@ -270,3 +270,6 @@ src/Tools/PhantomJS/tools/phantomjs/ChangeLog
 desktop.ini
 App.Debug.config
 /src/SFA.DAS.Reservations.Api/appsettings.Development.json
+/src/.learningtransport/error/**/*.*
+/src/.learningtransport/SFA.DAS.Reservations.Api/.bodies/*.*
+/src/.learningtransport/SFA.DAS.Reservations.Api/.delayed/**/*.*
