@@ -162,6 +162,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 && c.Invoke().AccountLegalEntityName.Equals(_command.AccountLegalEntityName)
                 && c.Invoke().CourseId.Equals(_reservationCreated.Course.CourseId)
                 && c.Invoke().CourseName.Equals(_reservationCreated.Course.Title)
+                && c.Invoke().CourseLevel.Equals(_reservationCreated.Course.Level)
                 && c.Invoke().StartDate.Equals(_reservationCreated.StartDate)
                 && c.Invoke().EndDate.Equals(_reservationCreated.ExpiryDate)
                 && c.Invoke().CreatedDate.Equals(_reservationCreated.CreatedDate)
