@@ -25,7 +25,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         private CreateAccountReservationCommandHandler _handler;
         private const long ExpectedAccountId = 43532;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
-        private readonly DateTime _expectedDateTime = DateTime.UtcNow;
+        private readonly DateTime _expectedStartDate = DateTime.UtcNow;
+        private readonly DateTime _expectedExpiryDate = DateTime.UtcNow;
+        private const uint ExpectedProviderId = 1333333337;
         private CancellationToken _cancellationToken;
         private Mock<IAccountReservationService> _accountReservationsService;
         private Mock<IValidator<CreateAccountReservationCommand>> _validator;
@@ -46,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 CourseId = "1",
                 Level = 1,
                 Title = "Test Course"
-            },null,198,"TestName",0 );
+            },ExpectedProviderId,198,"TestName",0 );
 
             _validator = new Mock<IValidator<CreateAccountReservationCommand>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<CreateAccountReservationCommand>()))
@@ -63,8 +65,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 Id = _expectedReservationId, 
                 AccountId = ExpectedAccountId, 
-                StartDate = _expectedDateTime,AccountLegalEntityId = 198,
-                AccountLegalEntityName = "TestName"
+                AccountLegalEntityId = 198,
+                AccountLegalEntityName = "TestName",
+                StartDate = _expectedStartDate,
+                CreatedDate = _expectedExpiryDate,
+                ProviderId = ExpectedProviderId
             };
 
             _accountReservationsService = new Mock<IAccountReservationService>();
@@ -158,16 +163,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Assert
             _unitOfWork.Verify(x=>x.AddEvent(It.Is<Func<ReservationCreatedEvent>>(c => 
                 c.Invoke().Id.Equals(_command.Id)
+                && c.Invoke().AccountId.Equals(_reservationCreated.AccountId)
                 && c.Invoke().AccountLegalEntityId.Equals(_command.AccountLegalEntityId)
                 && c.Invoke().AccountLegalEntityName.Equals(_command.AccountLegalEntityName)
+                //&& c.Invoke().ProviderId.Equals(_reservationCreated.ProviderId)
                 && c.Invoke().CourseId.Equals(_reservationCreated.Course.CourseId)
                 && c.Invoke().CourseName.Equals(_reservationCreated.Course.Title)
                 && c.Invoke().CourseLevel.Equals(_reservationCreated.Course.Level)
                 && c.Invoke().StartDate.Equals(_reservationCreated.StartDate)
                 && c.Invoke().EndDate.Equals(_reservationCreated.ExpiryDate)
                 && c.Invoke().CreatedDate.Equals(_reservationCreated.CreatedDate)
-                && c.Invoke().AccountId.Equals(_reservationCreated.AccountId)
-                )),Times.Once);
+            )),Times.Once);
         }
 
         [Test]

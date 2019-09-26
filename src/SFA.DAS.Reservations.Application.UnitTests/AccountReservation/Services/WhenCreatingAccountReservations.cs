@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Domain.Configuration;
@@ -23,7 +22,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
         private const int ExpiryPeriodInMonths = 5;
         private const long ExpectedAccountId = 12344;
-        private const int ExpectedProviderId = 66552;
+        private const uint ExpectedProviderId = 66552;
         private const long ExpectedAccountLegalEntityId = 549785;
         private const long ExpectedTransferSenderAccountId = 852364;
         private const string ExpectedAccountLegalEntityName = "TestName";

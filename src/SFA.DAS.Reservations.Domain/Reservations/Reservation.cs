@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     public class Reservation : IReservationRequest
     {
         public Reservation(Guid id, long accountId, DateTime? startDate, int expiryPeriodInMonths,
-            string accountLegalEntityName, string courseId = null, int? providerId = null,
+            string accountLegalEntityName, string courseId = null, uint? providerId = null,
             long accountLegalEntityId = 0, bool isLevyAccount = false, long? transferSenderAccountId = null)
         {
             Id = id;
@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             DateTime? expiryDate,
             ReservationStatus status,
             Course reservationCourse,
-            int? providerId,
+            uint? providerId,
             long accountLegalEntityId, string accountLegalEntityName, long? transferSenderAccountId)
         {
             Id = id;
@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public ICollection<ReservationRule> Rules { get; }
 
         public ReservationStatus Status { get; }
-        public int? ProviderId { get; }
+        public uint? ProviderId { get; }
         public long AccountLegalEntityId { get; }
         public string AccountLegalEntityName { get; }
 

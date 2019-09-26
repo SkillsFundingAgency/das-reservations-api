@@ -136,7 +136,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var expectedStartDate = DateTime.UtcNow;
             var expectedCourseId = "1-345-1";
             var expiryPeriodInMonths = 2;
-            var expectedProviderId = 443322;
+            var expectedProviderId = 443322u;
             var expectedLegalEntityAccountId = 339988;
             var expectedLegalEntityAccountName = "TestName";
             var expectedTransferSenderId = 48752;

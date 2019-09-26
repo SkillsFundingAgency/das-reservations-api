@@ -30,5 +30,6 @@ namespace SFA.DAS.Reservations.Messages
         public string CourseId { get; set; }
         public string CourseName { get; set; }
         public string CourseLevel { get; set; }
+        public uint? ProviderId { get; set; }
     }
 }
