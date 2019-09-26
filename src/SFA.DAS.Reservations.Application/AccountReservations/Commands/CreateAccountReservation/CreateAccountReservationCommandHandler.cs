@@ -93,7 +93,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                     reservation.CreatedDate,
                     reservation.Course?.CourseId,
                     reservation.Course?.Title,
-                    reservation.Course?.Level
+                    reservation.Course?.Level,
+                    reservation.ProviderId
                     );
             });
 

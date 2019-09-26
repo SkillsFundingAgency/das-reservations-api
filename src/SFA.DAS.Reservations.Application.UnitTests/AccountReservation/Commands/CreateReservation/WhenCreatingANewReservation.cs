@@ -166,7 +166,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 && c.Invoke().AccountId.Equals(_reservationCreated.AccountId)
                 && c.Invoke().AccountLegalEntityId.Equals(_command.AccountLegalEntityId)
                 && c.Invoke().AccountLegalEntityName.Equals(_command.AccountLegalEntityName)
-                //&& c.Invoke().ProviderId.Equals(_reservationCreated.ProviderId)
+                && c.Invoke().ProviderId.Equals(_reservationCreated.ProviderId)
                 && c.Invoke().CourseId.Equals(_reservationCreated.Course.CourseId)
                 && c.Invoke().CourseName.Equals(_reservationCreated.Course.Title)
                 && c.Invoke().CourseLevel.Equals(_reservationCreated.Course.Level)
