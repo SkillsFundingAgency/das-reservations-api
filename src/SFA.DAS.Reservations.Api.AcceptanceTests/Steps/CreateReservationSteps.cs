@@ -78,7 +78,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 IsLevyAccount = false,
                 Status = (short) status,
                 StartDate = DateTime.UtcNow.AddMonths(1),
-                Id = TestData.ReservationId
+                Id = TestData.ReservationId,
+                UserId = TestData.UserId
             };
 
             dbContext.Reservations.Add(reservation);
@@ -102,7 +103,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 StartDate = DateTime.UtcNow.Date.AddMonths(-1),
                 ExpiryDate = DateTime.UtcNow.Date.AddMonths(2),
                 IsLevyAccount = false,
-                Status = (short) ReservationStatus.Pending
+                Status = (short) ReservationStatus.Pending,
+                UserId = TestData.UserId
             };
 
             table.FillInstance(reservation);
@@ -128,7 +130,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 IsLevyAccount = TestData.IsLevyAccount,
                 ProviderId = 12345,
                 StartDate = new DateTime(DateTime.Now.Year, month, 1),
-                TransferSenderAccountId = null
+                TransferSenderAccountId = null,
+                UserId = TestData.UserId
             };
 
             controller.Create(reservation).Wait();
@@ -151,7 +154,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 IsLevyAccount = true,
                 ProviderId = 12345,
                 StartDate = new DateTime(DateTime.Now.Year, month, 1),
-                TransferSenderAccountId = null
+                TransferSenderAccountId = null,
+                UserId = TestData.UserId
             };
 
             controller.Create(reservation).Wait();
@@ -172,6 +176,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             Assert.IsTrue(reservation.StartDate.HasValue);
             Assert.AreEqual(month, reservation.StartDate.Value.Month);
             Assert.AreEqual(TestData.IsLevyAccount, reservation.IsLevyAccount);
+            Assert.AreEqual(TestData.UserId, reservation.UserId);
         }
 
         [Then(@"I have (.*) reservation")]
