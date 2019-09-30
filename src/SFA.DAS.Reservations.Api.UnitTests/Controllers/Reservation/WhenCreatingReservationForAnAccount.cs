@@ -12,7 +12,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -27,7 +26,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private const long ExpectedAccountId = 123234;
         private const string ExpectedAccountLegalEntityName= "TestName";
         private readonly long _expectedAccountLegalEntityId = 18723918;
-        private readonly int? _expectedProviderId = 18723918;
+        private readonly uint? _expectedProviderId = 18723918;
         private readonly long ExpectedTransferSenderAccountId = 184513;
         private readonly Guid _expectedReservationId = Guid.NewGuid();
         private readonly DateTime _expectedStartDate = new DateTime(2018,5,24);

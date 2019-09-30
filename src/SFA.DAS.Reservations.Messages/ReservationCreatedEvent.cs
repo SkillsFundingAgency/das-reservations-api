@@ -5,28 +5,35 @@ namespace SFA.DAS.Reservations.Messages
     public class ReservationCreatedEvent
     {
      
-        public ReservationCreatedEvent(Guid id, long accountLegalEntityId, string accountLegalEntityName,
-            string courseId, DateTime startDate, string courseName, DateTime endDate, DateTime createdDate, long accountId)
+        public ReservationCreatedEvent(Guid id, 
+            long accountId, long accountLegalEntityId, string accountLegalEntityName,
+            DateTime startDate, DateTime endDate, DateTime createdDate, 
+            string courseId, string courseName, string courseLevel,
+            uint? providerId)
         {
             Id = id;
+            AccountId = accountId;
             AccountLegalEntityId = accountLegalEntityId;
             AccountLegalEntityName = accountLegalEntityName;
-            CourseId = courseId;
             StartDate = startDate;
-            CourseName = courseName;
             EndDate = endDate;
             CreatedDate = createdDate;
-            AccountId = accountId;
+            CourseId = courseId;
+            CourseName = courseName;
+            CourseLevel = courseLevel;
+            ProviderId = providerId;
         }
 
         public Guid Id { get; set; }
+        public long AccountId { get; set; }
         public long AccountLegalEntityId { get; set; }
         public string AccountLegalEntityName { get; set; }
-        public string CourseId { get; set; }
         public DateTime StartDate { get; set; }
-        public string CourseName { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime CreatedDate { get; set; }
-        public long AccountId { get; set; }
+        public string CourseId { get; set; }
+        public string CourseName { get; set; }
+        public string CourseLevel { get; set; }
+        public uint? ProviderId { get; set; }
     }
 }

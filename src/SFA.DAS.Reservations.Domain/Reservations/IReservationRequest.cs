@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         long AccountId { get; }
         DateTime? StartDate { get; }
         string CourseId { get;  }
-        int? ProviderId { get; }
+        uint? ProviderId { get; }
         long AccountLegalEntityId { get; }
         string AccountLegalEntityName { get; }
         bool IsLevyAccount { get; }

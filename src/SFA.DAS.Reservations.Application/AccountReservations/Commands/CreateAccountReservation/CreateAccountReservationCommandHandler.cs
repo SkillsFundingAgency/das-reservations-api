@@ -85,17 +85,18 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                 }
 
                 return new ReservationCreatedEvent(reservation.Id,
+                    reservation.AccountId,
                     reservation.AccountLegalEntityId,
                     reservation.AccountLegalEntityName,
-                    reservation.Course?.CourseId,
                     startDate,
-                    reservation.Course?.Title,
                     expiryDate,
                     reservation.CreatedDate,
-                    reservation.AccountId);
+                    reservation.Course?.CourseId,
+                    reservation.Course?.Title,
+                    reservation.Course?.Level,
+                    reservation.ProviderId
+                    );
             });
-        
-            
 
             return new CreateAccountReservationResult
             {
