@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     {
         public Reservation(Guid id, long accountId, DateTime? startDate, int expiryPeriodInMonths,
             string accountLegalEntityName, string courseId = null, uint? providerId = null,
-            long accountLegalEntityId = 0, bool isLevyAccount = false, long? transferSenderAccountId = null)
+            long accountLegalEntityId = 0, bool isLevyAccount = false, long? transferSenderAccountId = null, Guid? userId = null)
         {
             Id = id;
             AccountId = accountId;
@@ -26,6 +26,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             AccountLegalEntityName = accountLegalEntityName;
             IsLevyAccount = isLevyAccount;
             TransferSenderAccountId = transferSenderAccountId;
+            UserId = userId;
         }
 
         public Reservation(Func<DateTime, Task<IList<Rule>>> rules,
@@ -38,7 +39,10 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             ReservationStatus status,
             Course reservationCourse,
             uint? providerId,
-            long accountLegalEntityId, string accountLegalEntityName, long? transferSenderAccountId)
+            long accountLegalEntityId, 
+            string accountLegalEntityName, 
+            long? transferSenderAccountId,
+            Guid? userId)
         {
             Id = id;
             AccountId = accountId;
@@ -53,35 +57,27 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             AccountLegalEntityId = accountLegalEntityId;
             AccountLegalEntityName = accountLegalEntityName;
             TransferSenderAccountId = transferSenderAccountId;
+            UserId = userId;
         }
 
+
         public long? TransferSenderAccountId { get; }
-
         public Guid Id { get; }
-
         public long AccountId { get; }
-
         public bool IsLevyAccount { get; }
-
         public DateTime CreatedDate { get; }
-
         public DateTime? StartDate { get; }
-
         public DateTime? ExpiryDate { get; }
-
         public bool IsExpired => Status == ReservationStatus.Pending && ExpiryDate < DateTime.UtcNow;
-
         [JsonIgnore]
         public string CourseId { get; }
-
         public ApprenticeshipCourse.Course Course { get; }
-
         public ICollection<ReservationRule> Rules { get; }
-
         public ReservationStatus Status { get; }
         public uint? ProviderId { get; }
         public long AccountLegalEntityId { get; }
         public string AccountLegalEntityName { get; }
+        public Guid? UserId { get; }
 
         private IList<Rule> GetRules(Func<DateTime, Task<IList<Rule>>> getRules)
         {

@@ -82,6 +82,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public async Task Then_The_Repository_Is_Called_To_Create_A_Reservation_Mapping_To_The_Entity()
         {
             //Arrange
+            var expectedUserId = Guid.NewGuid();
             var createReservation = new CreateAccountReservationCommand
             {
                 AccountId = ExpectedAccountId,
@@ -89,7 +90,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 Id = _expectedReservationId,
                 AccountLegalEntityName = ExpectedAccountLegalEntityName,
                 IsLevyAccount = true,
-                TransferSenderAccountId = ExpectedTransferSenderAccountId
+                TransferSenderAccountId = ExpectedTransferSenderAccountId,
+                UserId = expectedUserId
             };
 
             //Act
@@ -105,6 +107,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 c.Status.Equals((short)ReservationStatus.Pending) &&
                 c.IsLevyAccount.Equals(true) &&
                 c.TransferSenderAccountId.Equals(ExpectedTransferSenderAccountId) &&
+                c.UserId.Equals(expectedUserId) &&
                 c.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName)
              )));
         }

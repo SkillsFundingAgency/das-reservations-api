@@ -37,7 +37,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 IsLevyAccount = true,
                 Status = 2,
                 AccountLegalEntityName = "TestName",
-                TransferSenderAccountId = 786876
+                TransferSenderAccountId = 786876,
+                UserId = Guid.NewGuid()
             };
             _reservationRepository.Setup(x => x.GetById(_expectedReservationId))
                 .ReturnsAsync(_expectedReservation);
@@ -72,6 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             Assert.AreEqual(_expectedReservation.Status, (short)actual.Status);
             Assert.AreEqual(_expectedReservation.AccountLegalEntityName, actual.AccountLegalEntityName);
             Assert.AreEqual(_expectedReservation.TransferSenderAccountId, actual.TransferSenderAccountId);
+            Assert.AreEqual(_expectedReservation.UserId, actual.UserId);
             
         }
 

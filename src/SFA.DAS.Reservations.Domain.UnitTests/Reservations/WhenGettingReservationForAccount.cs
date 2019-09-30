@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_The_Reservation_Is_Not_Expiring_If_It_Is_Within_The_Expiry_Period_But_Not_Pending()
         {
             //Act
-            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Confirmed, new Course(),0,0,"",0);
+            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Confirmed, new Course(),0,0,"",0,null);
 
 
             //Assert
@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_The_Reservation_Is_Expired_If_It_Is_Not_Within_The_Expiry_Period_And_Is_Pending()
         {
             //Act
-            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"",0);
+            _reservation = new Reservation(null, Guid.NewGuid(), 1, false, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(1), ReservationStatus.Pending, new Course(),0,0,"",0, null);
 
             //Assert
             Assert.IsFalse(_reservation.IsExpired);
@@ -202,7 +202,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void Then_When_There_Is_No_Start_Date_The_Rules_Are_Not_Returned()
         {
             //Act
-            var reservation = new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, null, null, ReservationStatus.Pending, new Course(), 0, 0, "TestName",32);
+            var reservation = new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, null, null, ReservationStatus.Pending, new Course(), 0, 0, "TestName",32, null);
 
             //Act
             Assert.IsEmpty(reservation.Rules);
@@ -210,7 +210,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
 
         private Reservation CreateReservation()
         {
-            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0, "TestName",0);
+            return new Reservation(_rules, Guid.NewGuid(), 1, true, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow.AddDays(-1), ReservationStatus.Pending, new Course(),0,0, "TestName",0, null);
         }
     }
 }
