@@ -17,5 +17,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public uint? ProviderId { get; set; }
         public string AccountLegalEntityName { get; set; }
         public long? TransferSenderAccountId { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

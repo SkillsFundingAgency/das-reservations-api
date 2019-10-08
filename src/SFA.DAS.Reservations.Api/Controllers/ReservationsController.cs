@@ -70,7 +70,8 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     AccountLegalEntityName = reservation.AccountLegalEntityName,
                     CreatedDate = DateTime.UtcNow,
                     IsLevyAccount = reservation.IsLevyAccount,
-                    TransferSenderAccountId = reservation.TransferSenderAccountId
+                    TransferSenderAccountId = reservation.TransferSenderAccountId,
+                    UserId = reservation.UserId
                 });
 
                 if (response.Rule != null)

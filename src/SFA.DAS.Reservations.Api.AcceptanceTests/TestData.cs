@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         public AccountLegalEntity AccountLegalEntity { get; set; }
         public bool IsLevyAccount { get; set; }
         public Guid ReservationId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

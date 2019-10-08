@@ -54,7 +54,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 command.ProviderId, 
                 command.AccountLegalEntityId,
                 command.IsLevyAccount,
-                command.TransferSenderAccountId);
+                command.TransferSenderAccountId,
+                command.UserId);
 
             var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);
@@ -110,7 +111,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 reservation.ProviderId,
                 reservation.AccountLegalEntityId,
                 reservation.AccountLegalEntityName,
-                reservation.TransferSenderAccountId
+                reservation.TransferSenderAccountId,
+                reservation.UserId
             );
             return mapReservation;
         }
@@ -130,7 +132,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 AccountLegalEntityId = reservation.AccountLegalEntityId,
                 ProviderId = reservation.ProviderId,
                 AccountLegalEntityName = reservation.AccountLegalEntityName,
-                TransferSenderAccountId = reservation.TransferSenderAccountId
+                TransferSenderAccountId = reservation.TransferSenderAccountId,
+                UserId = reservation.UserId
             };
         }
     }

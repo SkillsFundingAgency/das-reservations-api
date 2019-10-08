@@ -33,12 +33,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private readonly string _expectedCourseId = "asdfopi";
         private readonly bool ExpectedIsLevyAccount = true;
         private Mock<HttpContext> _httpContext;
+        private Guid _expectedUserId;
 
         [SetUp]
         public void Arrange()
         {
+            _expectedUserId = Guid.NewGuid();
+
             _accountReservationsResult = new CreateAccountReservationResult
-                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course(),0,0,"",0)};
+                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course(),0,0,"",0,null)};
             ;
             _mediator = new Mock<IMediator>();
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
@@ -72,7 +75,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 AccountLegalEntityId = _expectedAccountLegalEntityId,
                 AccountLegalEntityName = ExpectedAccountLegalEntityName,
                 IsLevyAccount =  ExpectedIsLevyAccount,
-                TransferSenderAccountId = ExpectedTransferSenderAccountId
+                TransferSenderAccountId = ExpectedTransferSenderAccountId,
+                UserId = _expectedUserId
             };
 
 
@@ -89,6 +93,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     command.Id.Equals(_expectedReservationId) &&
                     command.IsLevyAccount.Equals(ExpectedIsLevyAccount) &&
                     command.AccountLegalEntityName.Equals(ExpectedAccountLegalEntityName) &&
+                    command.UserId.Equals(_expectedUserId) &&
                     command.TransferSenderAccountId.Equals(ExpectedTransferSenderAccountId)
                     ), 
                 It.IsAny<CancellationToken>()), Times.Once);
