@@ -47,6 +47,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 AgreementSigned = true
             };
 
+            TestData.UserId = UserId;
+
             var dbContext = Services.GetService<ReservationsDataContext>();
 
             if (dbContext.Courses.Find(TestData.Course.CourseId) == null)

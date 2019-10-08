@@ -14,5 +14,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         bool IsLevyAccount { get; }
         DateTime CreatedDate { get; }
         long? TransferSenderAccountId { get; }
+        Guid? UserId { get; }
     }
 }
