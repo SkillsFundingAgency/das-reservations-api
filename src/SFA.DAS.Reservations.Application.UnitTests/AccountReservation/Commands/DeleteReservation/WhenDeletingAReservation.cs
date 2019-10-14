@@ -7,8 +7,9 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Validation;
+using SFA.DAS.Reservations.Messages;
 using SFA.DAS.Testing.AutoFixture;
+using SFA.DAS.UnitOfWork.Context;
 using ValidationResult = SFA.DAS.Reservations.Domain.Validation.ValidationResult;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands.DeleteReservation
@@ -34,7 +35,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         [Test, MoqAutoData]
         public async Task Then_Calls_Service_To_Delete_Reservation(
             DeleteReservationCommand command,
-            string propertyName,
             [Frozen] ValidationResult validationResult,
             [Frozen] Mock<IAccountReservationService> mockService,
             DeleteReservationCommandHandler handler)
@@ -46,6 +46,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             mockService
                 .Verify(service => service.DeleteReservation(command.ReservationId),
                 Times.Once);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_An_Event_Is_Fired(
+            DeleteReservationCommand command,
+            [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IUnitOfWorkContext> mockContext,
+            DeleteReservationCommandHandler handler)
+        {
+            validationResult.ValidationDictionary.Clear();
+
+            await handler.Handle(command, CancellationToken.None);
+
+            mockContext.Verify(x => x.AddEvent(It.Is<ReservationDeletedEvent>(e => e.Id.Equals(command.ReservationId))), Times.Once);
         }
     }
 }

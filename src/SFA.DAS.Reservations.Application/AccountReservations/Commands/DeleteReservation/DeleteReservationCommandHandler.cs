@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
+using SFA.DAS.Reservations.Messages;
+using SFA.DAS.UnitOfWork.Context;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation
 {
@@ -12,13 +14,16 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
     {
         private readonly IValidator<DeleteReservationCommand> _validator;
         private readonly IAccountReservationService _reservationService;
+        private readonly IUnitOfWorkContext _context;
 
         public DeleteReservationCommandHandler(
             IValidator<DeleteReservationCommand> validator,
-            IAccountReservationService reservationService)
+            IAccountReservationService reservationService,
+            IUnitOfWorkContext context)
         {
             _validator = validator;
             _reservationService = reservationService;
+            _context = context;
         }
 
         public async Task<Unit> Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
@@ -32,6 +37,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
             }
 
             await _reservationService.DeleteReservation(command.ReservationId);
+            
+            _context.AddEvent(new ReservationDeletedEvent(command.ReservationId));
 
             return Unit.Value;
         }
