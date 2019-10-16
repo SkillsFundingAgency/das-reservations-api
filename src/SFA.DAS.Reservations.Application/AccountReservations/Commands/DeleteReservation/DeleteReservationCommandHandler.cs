@@ -36,9 +36,24 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
                     validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
+            var reservationToDelete = await _reservationService.GetReservation(command.ReservationId);
+
+            var deletedEvent = new ReservationDeletedEvent(
+                command.ReservationId,
+                reservationToDelete.AccountId,
+                reservationToDelete.AccountLegalEntityId,
+                reservationToDelete.AccountLegalEntityName,
+                reservationToDelete.StartDate.GetValueOrDefault(),
+                reservationToDelete.ExpiryDate.GetValueOrDefault(),
+                reservationToDelete.CreatedDate,
+                reservationToDelete.Course?.CourseId,
+                reservationToDelete.Course?.Title,
+                reservationToDelete.Course?.Level,
+                reservationToDelete.ProviderId);
+
             await _reservationService.DeleteReservation(command.ReservationId);
             
-            _context.AddEvent(new ReservationDeletedEvent(command.ReservationId));
+            _context.AddEvent(deletedEvent);
 
             return Unit.Value;
         }
