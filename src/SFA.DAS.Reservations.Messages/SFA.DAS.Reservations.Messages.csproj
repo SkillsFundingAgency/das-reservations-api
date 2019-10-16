@@ -3,8 +3,6 @@
     <TargetFrameworks>netcoreapp2.2;netstandard2.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SFA.DAS.Reservations.Domain\SFA.DAS.Reservations.Domain.csproj" />
-  </ItemGroup>
+  
 
 </Project>
