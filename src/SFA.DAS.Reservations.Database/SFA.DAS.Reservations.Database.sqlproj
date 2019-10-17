@@ -72,7 +72,4 @@
     <Build Include="Tables\UserRuleNotification.sql" />
     <Build Include="Tables\ProviderPermission.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="SFA.DAS.Reservations.Database.refactorlog" />
-  </ItemGroup>
 </Project>
