@@ -6,6 +6,7 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
+using SFA.DAS.Reservations.Application.UnitTests.Customisations;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Messages;
 using SFA.DAS.Testing.AutoFixture;
@@ -48,18 +49,35 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 Times.Once);
         }
 
-        [Test, MoqAutoData]
+        [Test, RecursiveMoqAutoData]
         public async Task Then_An_Event_Is_Fired(
             DeleteReservationCommand command,
+            [ReservationWithCourse] Reservation reservationToDelete,
             [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IAccountReservationService> mockService,
             [Frozen] Mock<IUnitOfWorkContext> mockContext,
             DeleteReservationCommandHandler handler)
         {
             validationResult.ValidationDictionary.Clear();
+            mockService
+                .Setup(service => service.GetReservation(command.ReservationId))
+                .ReturnsAsync(reservationToDelete);
 
             await handler.Handle(command, CancellationToken.None);
 
-            mockContext.Verify(x => x.AddEvent(It.Is<ReservationDeletedEvent>(e => e.Id.Equals(command.ReservationId))), Times.Once);
+            mockContext.Verify(x => x.AddEvent(It.Is<ReservationDeletedEvent>(e => 
+                e.Id.Equals(command.ReservationId)
+                && e.AccountId.Equals(reservationToDelete.AccountId)
+                && e.AccountLegalEntityId.Equals(reservationToDelete.AccountLegalEntityId)
+                && e.AccountLegalEntityName.Equals(reservationToDelete.AccountLegalEntityName)
+                && e.ProviderId.Equals(reservationToDelete.ProviderId)
+                && e.CourseId.Equals(reservationToDelete.Course.CourseId)
+                && e.CourseName.Equals(reservationToDelete.Course.Title)
+                && e.CourseLevel.Equals(reservationToDelete.Course.Level)
+                && e.StartDate.Equals(reservationToDelete.StartDate)
+                && e.EndDate.Equals(reservationToDelete.ExpiryDate)
+                && e.CreatedDate.Equals(reservationToDelete.CreatedDate)
+                )), Times.Once);
         }
     }
 }
