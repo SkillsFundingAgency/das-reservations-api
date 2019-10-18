@@ -42,6 +42,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservation == null ? null : MapReservation(reservation);
         }
 
+        public Task<IList<Reservation>> FindReservations(long accountId, string searchTerm)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Reservation> CreateAccountReservation(IReservationRequest command)
         {
             var reservation = new Reservation(

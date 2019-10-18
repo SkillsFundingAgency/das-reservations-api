@@ -137,6 +137,15 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [HttpGet]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [Route("api/[controller]/search")]
+        public async Task<IActionResult> Search(string term)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [Route("api/[controller]/validate/{id}")]
         public async Task<IActionResult> Validate(Guid id, string courseCode, DateTime startDate)
         {
