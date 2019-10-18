@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
         }
 
         [Test, MoqAutoData]
-        public async Task And_No_LegalEntities_For_Account_Then_Throws_EntityNotFoundException(
+        public void And_No_LegalEntities_For_Account_Then_Throws_EntityNotFoundException(
             GetAccountReservationStatusQuery query,
             List<AccountLegalEntity> accountLegalEntities,
             [Frozen] ValidationResult validationResult,

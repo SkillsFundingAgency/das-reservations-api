@@ -50,14 +50,14 @@ namespace SFA.DAS.Reservations.Infrastructure.DevConfiguration
 
     public class DevUnitOfWorkManager : IUnitOfWorkManager
     {
-        public async Task BeginAsync()
+        public Task BeginAsync()
         {
-            
+            return Task.CompletedTask;
         }
 
-        public async Task EndAsync(Exception ex = null)
+        public Task EndAsync(Exception ex = null)
         {
-            
+            return Task.CompletedTask;
         }
     }
 }
