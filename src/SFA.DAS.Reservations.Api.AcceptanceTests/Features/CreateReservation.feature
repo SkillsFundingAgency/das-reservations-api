@@ -42,3 +42,9 @@ And I have the following existing reservation:
 | 2019-01-01 |          
 When I create a reservation for a course with a start month of July
 Then I have 2 reservation 
+
+Scenario: Create reservation with non levy restriction
+Given I have a levy account
+And there is a restriction for non-levy accounts
+When I create a levy reservation for a course with a start month of August
+Then a reservation with course and start month August is created

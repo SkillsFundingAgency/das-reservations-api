@@ -38,6 +38,23 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             dbContext.SaveChanges();
         }
 
+        [Given(@"there is a restriction for non-levy accounts")]
+        public void GivenThereIsARestrictionForNon_LevyAccounts()
+        {
+            var dbContext = Services.GetService<ReservationsDataContext>();
+
+            dbContext.GlobalRules.Add(new Domain.Entities.GlobalRule
+            {
+                Id = 1,
+                RuleType = (byte)GlobalRuleType.FundingPaused,
+                ActiveFrom = DateTime.UtcNow.AddMonths(-1),
+                ActiveTo = DateTime.UtcNow.AddMonths(2),
+                Restriction = (byte)AccountRestriction.NonLevy,
+            });
+            dbContext.SaveChanges();
+        }
+
+
         [When(@"I acknowledge a rule as being read as a provider")]
         public void WhenIAcknowledgeARuleAsBeingRead()
         {
