@@ -42,9 +42,16 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservation == null ? null : MapReservation(reservation);
         }
 
-        public Task<IList<Reservation>> FindReservations(long accountId, string searchTerm)
+        public async Task<IList<Reservation>> FindReservations(long accountId, string searchTerm)
         {
-            throw new NotImplementedException();
+            //TODO: Remove stub when elastic search feature is implemented
+
+            return await Task.FromResult(new List<Reservation>
+            {
+                new Reservation(Guid.NewGuid(), accountId, DateTime.Now.AddDays(-2),3, "Test Stub Entity"),
+                new Reservation(Guid.NewGuid(), accountId, DateTime.Now,3, "Test Stub Entity"),
+                new Reservation(Guid.NewGuid(), accountId, DateTime.Now.AddDays(2),3, "Test Stub Entity"),
+            });
         }
 
         public async Task<Reservation> CreateAccountReservation(IReservationRequest command)

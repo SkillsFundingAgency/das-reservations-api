@@ -45,6 +45,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             services.AddScoped(typeof(IValidator<GetAvailableDatesQuery>), typeof(GetAvailableDatesValidator));
             services.AddScoped(typeof(IValidator<BulkCreateAccountReservationsCommand>), typeof(BulkCreateAccountReservationsCommandValidator));
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
+            services.AddScoped(typeof(IValidator<FindAccountReservationsQuery>), typeof(FindAccountReservationsValidator));
         }
     }
 
