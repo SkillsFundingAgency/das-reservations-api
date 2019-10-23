@@ -21,17 +21,18 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         [Test, MoqAutoData]
         public async Task And_ArgumentException_Then_Returns_BadRequest(
             Guid reservationId,
+            bool employerDeleted,
             ArgumentException argumentException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.IsAny<DeleteReservationCommand>(), 
+                    It.IsAny<DeleteReservationCommand>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(argumentException);
 
-            var result = await controller.Delete(reservationId) as BadRequestObjectResult;
+            var result = await controller.Delete(reservationId, employerDeleted) as BadRequestObjectResult;
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(400);
@@ -44,17 +45,18 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         [Test, MoqAutoData]
         public async Task And_EntityNotFoundException_Then_Returns_Gone(
             Guid reservationId,
+            bool employerDeleted,
             EntityNotFoundException<Domain.Entities.Reservation> notFoundException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.IsAny<DeleteReservationCommand>(), 
+                    It.IsAny<DeleteReservationCommand>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(notFoundException);
 
-            var result = await controller.Delete(reservationId) as StatusCodeResult;
+            var result = await controller.Delete(reservationId, employerDeleted) as StatusCodeResult;
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(410);
@@ -63,17 +65,18 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         [Test, MoqAutoData]
         public async Task And_InvalidOperationException_Then_Returns_BadRequest(
             Guid reservationId,
+            bool employerDeleted,
             InvalidOperationException invalidOperationException,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
-                    It.IsAny<DeleteReservationCommand>(), 
+                    It.IsAny<DeleteReservationCommand>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(invalidOperationException);
 
-            var result = await controller.Delete(reservationId) as BadRequestResult;
+            var result = await controller.Delete(reservationId, employerDeleted) as BadRequestResult;
 
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(400);
@@ -82,11 +85,18 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         [Test, MoqAutoData]
         public async Task And_No_Error_Then_Returns_Ok(
             Guid reservationId,
+            bool employerDeleted,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
-            var result = await controller.Delete(reservationId) as NoContentResult;
+            var result = await controller.Delete(reservationId, employerDeleted) as NoContentResult;
 
+            mockMediator.Verify(x =>
+                x.Send(
+                    It.Is<DeleteReservationCommand>(c =>
+                        c.ReservationId.Equals(reservationId)
+                        && c.EmployerDeleted.Equals(employerDeleted)),
+                    It.IsAny<CancellationToken>()), Times.Once);
             result.Should().NotBeNull();
             result.StatusCode.Should().Be(204);
         }
