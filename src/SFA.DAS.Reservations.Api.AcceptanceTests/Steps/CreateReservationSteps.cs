@@ -136,23 +136,19 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             controller.Create(reservation).Wait();
         }
 
-        [When(@"I create a levy reservation for a course with a start month of (.*)")]
-        public void WhenICreateALevyReservationForACourseWithAStartMonthOfJuly(string startMonth)
+        [When(@"I create a levy reservation")]
+        public void WhenICreateALevyReservationForACourseWithAStartMonthOfJuly()
         {
-            var month = (int)Enum.Parse<Month>(startMonth);
-
             var controller = Services.GetService<ReservationsController>();
 
             var reservation = new Reservation
             {
                 AccountId = 1,
-                CourseId = TestData.Course.CourseId,
                 AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
                 AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
                 Id = Guid.NewGuid(),
                 IsLevyAccount = true,
                 ProviderId = 12345,
-                StartDate = new DateTime(DateTime.Now.Year, month, 1),
                 TransferSenderAccountId = null,
                 UserId = TestData.UserId
             };
