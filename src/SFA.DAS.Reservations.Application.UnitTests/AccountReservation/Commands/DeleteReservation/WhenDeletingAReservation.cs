@@ -77,6 +77,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 && e.StartDate.Equals(reservationToDelete.StartDate)
                 && e.EndDate.Equals(reservationToDelete.ExpiryDate)
                 && e.CreatedDate.Equals(reservationToDelete.CreatedDate)
+                && e.EmployerDeleted.Equals(command.EmployerDeleted)
                 )), Times.Once);
         }
     }
