@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Messages
             long accountId, long accountLegalEntityId, string accountLegalEntityName,
             DateTime startDate, DateTime endDate, DateTime createdDate, 
             string courseId, string courseName, string courseLevel,
-            uint? providerId)
+            uint? providerId, bool employerDeleted)
         {
             Id = id;
             AccountId = accountId;
@@ -21,6 +21,7 @@ namespace SFA.DAS.Reservations.Messages
             CourseName = courseName;
             CourseLevel = courseLevel;
             ProviderId = providerId;
+            EmployerDeleted = employerDeleted;
         }
 
         public Guid Id { get; set; }
@@ -34,5 +35,6 @@ namespace SFA.DAS.Reservations.Messages
         public string CourseName { get; set; }
         public string CourseLevel { get; set; }
         public uint? ProviderId { get; set; }
+        public bool EmployerDeleted { get; set; }
     }
 }

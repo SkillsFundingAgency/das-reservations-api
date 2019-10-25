@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             var controller = Services.GetService<ReservationsController>();
 
-            controller.Delete(TestData.ReservationId).Wait(5000);
+            controller.Delete(TestData.ReservationId, true).Wait(5000);
         }
         
         [Then(@"the reservation should be deleted")]
