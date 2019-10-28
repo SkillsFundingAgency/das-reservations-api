@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private ReservationsController _reservationsController;
         private Mock<IMediator> _mediator;
         private FindAccountReservationsResult _accountReservationsResult;
-        private const long ExpectedAccountId = 123234;
+        private const long ExpectedProviderId = 123234;
         private const string ExpectedSearchTerm = "test";
          
         [SetUp]
@@ -30,10 +30,10 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             _mediator = new Mock<IMediator>();
             _accountReservationsResult = new FindAccountReservationsResult{Reservations= new List<Domain.Reservations.Reservation>
             {
-                new Domain.Reservations.Reservation(Guid.NewGuid(), ExpectedAccountId, DateTime.Now, 3, "Test Name")
+                new Domain.Reservations.Reservation(Guid.NewGuid(), ExpectedProviderId, DateTime.Now, 3, "Test Name")
             }};
             
-            _mediator.Setup(x => x.Send(It.Is<FindAccountReservationsQuery>(c => c.AccountId.Equals(ExpectedAccountId)),
+            _mediator.Setup(x => x.Send(It.Is<FindAccountReservationsQuery>(c => c.ProviderId.Equals(ExpectedProviderId)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountReservationsResult);
 
@@ -45,7 +45,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public async Task Then_The_Reservations_Are_Returned()
         {
             //Act
-            var actual = await _reservationsController.Search(ExpectedAccountId, ExpectedSearchTerm);
+            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm);
 
             //Assert
             Assert.IsNotNull(actual);
@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         {
             //Arrange
             var expectedValidationMessage = "The following parameters have failed validation";
-            var expectedParam = "AccountId";
+            var expectedParam = "ProviderId";
             _mediator.Setup(x => x.Send(It.IsAny<FindAccountReservationsQuery>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
             

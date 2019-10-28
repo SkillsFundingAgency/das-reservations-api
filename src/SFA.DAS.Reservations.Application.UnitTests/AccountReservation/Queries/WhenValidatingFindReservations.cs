@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
             //Assert
             Assert.IsFalse(actual.IsValid());
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountId has not been supplied"));
+            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("ProviderId has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("SearchTerm has not been supplied"));
         }
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         public async Task Then_The_Query_Is_Valid_If_The_Values_Are_Valid()
         {
             //Act
-            var actual = await _validator.ValidateAsync(new FindAccountReservationsQuery {AccountId = 99432, SearchTerm = "test"});
+            var actual = await _validator.ValidateAsync(new FindAccountReservationsQuery {ProviderId = 99432, SearchTerm = "test"});
 
             //Assert
             Assert.IsTrue(actual.IsValid());

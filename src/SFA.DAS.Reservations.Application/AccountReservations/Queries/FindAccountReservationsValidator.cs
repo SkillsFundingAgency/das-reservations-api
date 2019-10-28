@@ -10,9 +10,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         {
             var validationResult = new ValidationResult();
 
-            if (item.AccountId == 0)
+            if (item.ProviderId == 0)
             {
-                validationResult.AddError(nameof(item.AccountId));
+                validationResult.AddError(nameof(item.ProviderId));
             }
 
             if (string.IsNullOrEmpty(item.SearchTerm))

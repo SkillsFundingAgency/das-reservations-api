@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                                                                  .Aggregate((item1, item2)=> item1 +", "+item2));
             }
 
-            var reservations = await _service.FindReservations(query.AccountId, query.SearchTerm);
+            var reservations = await _service.FindReservations(query.ProviderId, query.SearchTerm);
 
             return new FindAccountReservationsResult
             {

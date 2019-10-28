@@ -138,11 +138,11 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [Route("api/[controller]/search")]
-        public async Task<IActionResult> Search(long accountId, string term)
+        public async Task<IActionResult> Search(long providerId, string searchTerm)
         {
             try
             {
-                var response = await _mediator.Send(new FindAccountReservationsQuery {AccountId = accountId, SearchTerm = term});
+                var response = await _mediator.Send(new FindAccountReservationsQuery {ProviderId = providerId, SearchTerm = searchTerm});
                 return Ok(response.Reservations);
             }
             catch (ArgumentException e)

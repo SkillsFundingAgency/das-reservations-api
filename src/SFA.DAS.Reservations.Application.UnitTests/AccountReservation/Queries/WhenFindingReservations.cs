@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         [SetUp]
         public void Arrange()
         {
-            _query = new FindAccountReservationsQuery{AccountId = ExpectedAccountId, SearchTerm = ExpectedSearchTerm};
+            _query = new FindAccountReservationsQuery{ProviderId = ExpectedAccountId, SearchTerm = ExpectedSearchTerm};
             _validator = new Mock<IValidator<FindAccountReservationsQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<FindAccountReservationsQuery>()))
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
