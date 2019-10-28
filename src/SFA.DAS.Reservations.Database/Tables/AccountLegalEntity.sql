@@ -16,3 +16,13 @@ GO;
 CREATE NONCLUSTERED INDEX [IDX_AccountLegalEntity_AccountLegalEntityId] ON [dbo].[AccountLegalEntity] (AccountLegalEntityId) 
 INCLUDE (Id,[AccountId],[LegalEntityId],[AccountLegalEntityName],[ReservationLimit],[AgreementSigned],[IsLevy],[AgreementType]) WITH (ONLINE = ON) 
 GO;
+
+CREATE NONCLUSTERED INDEX [IDX_AccountLegalEntity_AccountId] ON [dbo].[AccountLegalEntity] (AccountId) 
+INCLUDE (Id,[AccountLegalEntityId],[LegalEntityId],[AccountLegalEntityName],[ReservationLimit],[AgreementSigned],[IsLevy],[AgreementType]) WITH (ONLINE = ON) 
+GO;
+
+CREATE NONCLUSTERED INDEX [IDX_AccountLegalEntity_AccountIdLegalEntityId] ON [dbo].[AccountLegalEntity] (AccountId, LegalEntityId) 
+INCLUDE (Id,[AccountLegalEntityId],[AccountLegalEntityName],[ReservationLimit],[AgreementSigned],[IsLevy],[AgreementType]) WITH (ONLINE = ON) 
+GO;
+
+
