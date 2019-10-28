@@ -8,7 +8,8 @@
 	[ReservationLimit] INT NULL,
 	[AgreementSigned] BIT NOT NULL DEFAULT 0, 
     [IsLevy] BIT NOT NULL DEFAULT 0, 
-    [AgreementType] TINYINT NOT NULL DEFAULT 0
+    [AgreementType] TINYINT NOT NULL DEFAULT 0, 
+    CONSTRAINT [AK_AccountLegalEntity_Column] UNIQUE ([AccountLegalEntityId])
 )
 GO;
 
