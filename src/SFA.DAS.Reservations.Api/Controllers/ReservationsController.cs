@@ -143,7 +143,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             try
             {
                 var response = await _mediator.Send(new FindAccountReservationsQuery {ProviderId = providerId, SearchTerm = searchTerm});
-                return Ok(response.Reservations);
+                return Ok(response);
             }
             catch (ArgumentException e)
             {

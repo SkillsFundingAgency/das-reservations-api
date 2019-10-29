@@ -53,8 +53,9 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             Assert.IsNotNull(result?.StatusCode);
             Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
             Assert.IsNotNull(result.Value);
-            var actualReservations = result.Value as List<Domain.Reservations.Reservation>;
-            Assert.AreEqual(_accountReservationsResult.Reservations,actualReservations);
+            var actualReservations = result.Value as FindAccountReservationsResult;
+            Assert.AreEqual(_accountReservationsResult.Reservations, actualReservations.Reservations);
+            Assert.AreEqual(_accountReservationsResult.NumberOfRecordsFound, actualReservations.NumberOfRecordsFound);
         }
 
         [Test]
