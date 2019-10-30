@@ -245,17 +245,31 @@
       }
     },
     {
-      "type": "Microsoft.ServiceBus/namespaces/providers/roleAssignments",
+      "apiVersion": "2019-05-01",
+      "name": "servicebus-access",
       "resourceGroup": "[parameters('sharedResourceGroup')]",
-      "apiVersion": "2018-09-01-preview",
-      "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(parameters('sharedServiceBusName'))))]",
+      "type": "Microsoft.Resources/deployments",
       "properties": {
-        "roleDefinitionId": "[variables('serviceBusRole')]",
-        "principalId": "[createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
-      },
-      "copy": {
-        "name": "appServiceMsi",
-        "count": "[length(createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value))]"
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "type": "Microsoft.ServiceBus/namespaces/providers/roleAssignments",
+              "apiVersion": "2018-09-01-preview",
+              "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(parameters('sharedServiceBusName'))))]",
+              "properties": {
+                "roleDefinitionId": "[variables('serviceBusRole')]",
+                "principalId": "[createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
+              },
+              "copy": {
+                "name": "appServiceMsi",
+                "count": "[length(createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value))]"
+              }
+            }
+          ]
+        }
       }
     }
   ],
