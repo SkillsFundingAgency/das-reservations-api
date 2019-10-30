@@ -258,14 +258,34 @@
             {
               "type": "Microsoft.ServiceBus/namespaces/providers/roleAssignments",
               "apiVersion": "2018-09-01-preview",
-              "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(parameters('sharedServiceBusName'))))]",
+              "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(reference('app-service').outputs.managedServiceIdentityId.value)))]",
               "properties": {
                 "roleDefinitionId": "[variables('serviceBusRole')]",
-                "principalId": "[createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
-              },
-              "copy": {
-                "name": "appServiceMsi",
-                "count": "[length(createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value))]"
+                "principalId": "[reference('app-service').outputs.managedServiceIdentityId.value]"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2019-05-01",
+      "name": "servicebus-access-staging",
+      "resourceGroup": "[parameters('sharedResourceGroup')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "type": "Microsoft.ServiceBus/namespaces/providers/roleAssignments",
+              "apiVersion": "2018-09-01-preview",
+              "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(reference('app-service').outputs.stagingManagedServiceIdentityId.value)))]",
+              "properties": {
+                "roleDefinitionId": "[variables('serviceBusRole')]",
+                "principalId": "[reference('app-service').outputs.stagingManagedServiceIdentityId.value]"
               }
             }
           ]
