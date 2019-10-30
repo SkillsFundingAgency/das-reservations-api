@@ -57,7 +57,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId, Course = _expectedCourse,
                     ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedAccountLegalEntityId,TransferSenderAccountId = ExpectedTransferSenderAccountId});
             
-            _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object);
+            _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object, Mock.Of<IReservationIndexRepository>());
         }
 
         [Test]

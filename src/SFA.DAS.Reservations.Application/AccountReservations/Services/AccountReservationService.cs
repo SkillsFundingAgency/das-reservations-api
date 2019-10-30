@@ -15,12 +15,15 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         private readonly IReservationRepository _reservationRepository;
         private readonly IRuleRepository _ruleRepository;
         private readonly IOptions<ReservationsConfiguration> _options;
+        private readonly IReservationIndexRepository _reservationIndexRepository;
 
-        public AccountReservationService(IReservationRepository reservationRepository, IRuleRepository ruleRepository, IOptions<ReservationsConfiguration> options)
+        public AccountReservationService(IReservationRepository reservationRepository, IRuleRepository ruleRepository,
+            IOptions<ReservationsConfiguration> options, IReservationIndexRepository reservationIndexRepository)
         {
             _reservationRepository = reservationRepository;
             _ruleRepository = ruleRepository;
             _options = options;
+            _reservationIndexRepository = reservationIndexRepository;
         }
 
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
@@ -42,16 +45,11 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservation == null ? null : MapReservation(reservation);
         }
 
-        public async Task<IList<Reservation>> FindReservations(long accountId, string searchTerm)
+        public async Task<IList<Reservation>> FindReservations(long providerId, string searchTerm)
         {
-            //TODO: Remove stub when elastic search feature is implemented
+            var result = await _reservationIndexRepository.Find(providerId, searchTerm);
 
-            return await Task.FromResult(new List<Reservation>
-            {
-                new Reservation(Guid.NewGuid(), accountId, DateTime.Now.AddDays(-2),3, "Test Stub Entity"),
-                new Reservation(Guid.NewGuid(), accountId, DateTime.Now,3, "Test Stub Entity"),
-                new Reservation(Guid.NewGuid(), accountId, DateTime.Now.AddDays(2),3, "Test Stub Entity"),
-            });
+            return result.Select(r => new Reservation(r)).ToList();
         }
 
         public async Task<Reservation> CreateAccountReservation(IReservationRequest command)
