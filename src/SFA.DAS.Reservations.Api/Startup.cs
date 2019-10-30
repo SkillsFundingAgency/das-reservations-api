@@ -66,6 +66,8 @@ namespace SFA.DAS.Reservations.Api
             
             var serviceProvider = services.BuildServiceProvider();
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
+
+            services.AddElasticSearch(config.Value);
             
             services.AddHealthChecks()
                     .AddSqlServer(config.Value.ConnectionString)
@@ -139,6 +141,8 @@ namespace SFA.DAS.Reservations.Api
             }
 
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+
+           
         }
 
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)

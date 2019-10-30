@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Extensions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
@@ -49,7 +50,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         {
             var result = await _reservationIndexRepository.Find(providerId, searchTerm);
 
-            return result.Select(r => new Reservation(r)).ToList();
+            return result.Select(r => r.ToReservation()).ToList();
         }
 
         public async Task<Reservation> CreateAccountReservation(IReservationRequest command)

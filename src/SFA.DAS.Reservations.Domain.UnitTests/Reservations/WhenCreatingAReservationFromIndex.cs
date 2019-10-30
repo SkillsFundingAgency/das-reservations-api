@@ -1,11 +1,12 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Domain.Extensions;
 using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
 {
-    public class WhenCreatingAReservation
+    public class WhenCreatingAReservationFromIndex
     {
 
         [Test]
@@ -20,7 +21,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
                 .Create();
 
             //Act
-            var reservation = new Reservation(index);
+            var reservation = index.ToReservation();
 
             //Assert
             reservation.Should().BeEquivalentTo(index, options => 

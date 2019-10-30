@@ -34,6 +34,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
             services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
             services.AddTransient<IAzureQueueService, AzureQueueService>();
+            services.AddTransient<IReservationIndexRepository, ReservationIndexRepository>();
 
             services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
                 ? new CurrentDateTime(config.Value.CurrentDateTime)

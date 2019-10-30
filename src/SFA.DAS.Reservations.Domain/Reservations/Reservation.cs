@@ -60,24 +60,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             UserId = userId;
         }
 
-        public Reservation(ReservationIndex index)
-        {
-            Id = index.ReservationId;
-            AccountId = index.AccountId;
-            IsLevyAccount = index.IsLevyAccount;
-            CreatedDate = index.CreatedDate;
-            StartDate = index.StartDate;
-            ExpiryDate = index.ExpiryDate;
-            Status = (ReservationStatus) index.Status;
-            Course = MapCourse(index.Course);
-            ProviderId = index.ProviderId;
-            AccountLegalEntityId = index.AccountLegalEntityId;
-            AccountLegalEntityName = index.AccountLegalEntityName;
-            TransferSenderAccountId = index.TransferSenderAccountId;
-            UserId = index.UserId;
-        }
-
-
         public long? TransferSenderAccountId { get; }
         public Guid Id { get; }
         public long AccountId { get; }
