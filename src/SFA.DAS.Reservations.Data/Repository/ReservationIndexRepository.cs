@@ -18,8 +18,14 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             var searchResponse = await _client.SearchAsync<ReservationIndex>(s => s
                 .From(0)
-                .Size(2000)
-                .Query(q => q.MatchAll()));
+                .Size(10)
+                .Query(q => 
+                    q.Bool(b => b
+                        .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
+                        .Filter(x => x.Wildcard(f => f.CourseTitle, $"*{term}*") ||
+                                     x.Wildcard(f => f.AccountLegalEntityName, $"*{term}*"))
+                        
+                    )));
 
             return searchResponse.Documents;
         }

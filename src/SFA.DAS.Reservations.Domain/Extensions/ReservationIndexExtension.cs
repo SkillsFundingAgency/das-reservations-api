@@ -8,6 +8,20 @@ namespace SFA.DAS.Reservations.Domain.Extensions
     {
         public static Reservation ToReservation(this ReservationIndex index)
         {
+            Course course = null;
+
+            if (!string.IsNullOrEmpty(index.CourseId) && 
+                !string.IsNullOrEmpty(index.CourseTitle) && 
+                index.CourseLevel.HasValue)
+            {
+                course = new Course
+                {
+                    CourseId = index.CourseId,
+                    Title = index.CourseTitle,
+                    Level = index.CourseLevel.Value
+                };
+            }
+
             return new Reservation(
                 null, 
                 index.ReservationId,
@@ -17,7 +31,7 @@ namespace SFA.DAS.Reservations.Domain.Extensions
                 index.StartDate,
                 index.ExpiryDate,
                 (ReservationStatus)index.Status,
-                index.Course,
+                course,
                 index.ProviderId,
                 index.AccountLegalEntityId,
                 index.AccountLegalEntityName,
