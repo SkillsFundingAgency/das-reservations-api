@@ -18,9 +18,9 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.0" />
     <PackageReference Include="NServiceBus.MSDependencyInjection" Version="0.1.4" />
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.1.5" />
-    <PackageReference Include="SFA.DAS.NServiceBus" Version="15.0.8" />
+    <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.1-rc" />
     <PackageReference Include="SFA.DAS.NServiceBus.Mvc" Version="1.0.46" />
-    <PackageReference Include="SFA.DAS.NServiceBus.SqlServer" Version="15.0.8" />
+    <PackageReference Include="SFA.DAS.NServiceBus.SqlServer" Version="16.0.1-rc" />
     <PackageReference Include="SFA.DAS.UnitOfWork.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="SFA.DAS.UnitOfWork.Mvc" Version="9.0.10" />
     <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.10" />

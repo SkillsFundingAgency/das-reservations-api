@@ -18,6 +18,9 @@
     "sharedSqlServerName": {
       "type": "string"
     },
+    "sharedServiceBusName": {
+      "type": "string"
+    },
     "sharedResourceGroup": {
       "type": "string"
     },
@@ -67,11 +70,12 @@
     }
   },
   "variables": {
-    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/staging-slot-msi-output/templates/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "appServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
     "appServicePlanName": "[concat(variables('resourceNamePrefix'), 'api-asp')]",
-    "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]"
+    "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
+    "serviceBusRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '090c5cfd-751d-490a-894a-3ce6f1109419')]"
   },
   "resources": [
     {
@@ -238,6 +242,20 @@
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           }
         }
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/providers/roleAssignments",
+      "resourceGroup": "[parameters('sharedResourceGroup')]",
+      "apiVersion": "2018-09-01-preview",
+      "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(parameters('sharedServiceBusName'))))]",
+      "properties": {
+        "roleDefinitionId": "[variables('serviceBusRole')]",
+        "principalId": "[createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
+      },
+      "copy": {
+        "name": "appServiceMsi",
+        "count": "[length(createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value))]"
       }
     }
   ],
