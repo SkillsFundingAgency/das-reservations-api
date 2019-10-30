@@ -208,11 +208,11 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(410)]
         [Route("api/[controller]/{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, bool employerDeleted)
         {
             try
             {
-                await _mediator.Send(new DeleteReservationCommand {ReservationId = id});
+                await _mediator.Send(new DeleteReservationCommand {ReservationId = id, EmployerDeleted = employerDeleted});
                 return NoContent();
             }
             catch (ArgumentException argumentException)

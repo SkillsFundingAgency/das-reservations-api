@@ -49,7 +49,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
                 reservationToDelete.Course?.CourseId,
                 reservationToDelete.Course?.Title,
                 reservationToDelete.Course?.Level,
-                reservationToDelete.ProviderId);
+                reservationToDelete.ProviderId,
+                command.EmployerDeleted);
 
             await _reservationService.DeleteReservation(command.ReservationId);
             
