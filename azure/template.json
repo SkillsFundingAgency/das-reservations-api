@@ -70,12 +70,11 @@
     }
   },
   "variables": {
-    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/staging-slot-msi-output/templates/",
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/role-assignment/templates/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "appServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
     "appServicePlanName": "[concat(variables('resourceNamePrefix'), 'api-asp')]",
-    "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]",
-    "serviceBusRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '090c5cfd-751d-490a-894a-3ce6f1109419')]"
+    "databaseName": "[concat(variables('resourceNamePrefix'), '-db')]"
   },
   "resources": [
     {
@@ -245,51 +244,31 @@
       }
     },
     {
-      "apiVersion": "2019-05-01",
-      "name": "servicebus-access",
-      "resourceGroup": "[parameters('sharedResourceGroup')]",
+      "apiVersion": "2017-05-10",
+      "name": "role-assignments",
       "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('sharedResourceGroup')]",
       "properties": {
         "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "resources": [
-            {
-              "type": "Microsoft.ServiceBus/namespaces/providers/roleAssignments",
-              "apiVersion": "2018-09-01-preview",
-              "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(reference('app-service').outputs.managedServiceIdentityId.value)))]",
-              "properties": {
-                "roleDefinitionId": "[variables('serviceBusRole')]",
-                "principalId": "[reference('app-service').outputs.managedServiceIdentityId.value]"
-              }
-            }
-          ]
+        "templateLink": {
+          "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "principalId": {
+            "value": "[createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
+          },
+          "assignmentType": {
+            "value": "ServiceBusOwner"
+          },
+          "resourceName": {
+            "value": "[parameters('sharedServiceBusName')]"
+          }
         }
-      }
-    },
-    {
-      "apiVersion": "2019-05-01",
-      "name": "servicebus-access-staging",
-      "resourceGroup": "[parameters('sharedResourceGroup')]",
-      "type": "Microsoft.Resources/deployments",
-      "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "resources": [
-            {
-              "type": "Microsoft.ServiceBus/namespaces/providers/roleAssignments",
-              "apiVersion": "2018-09-01-preview",
-              "name": "[concat(parameters('sharedServiceBusName'), '/Microsoft.Authorization/', guid(uniqueString(reference('app-service').outputs.stagingManagedServiceIdentityId.value)))]",
-              "properties": {
-                "roleDefinitionId": "[variables('serviceBusRole')]",
-                "principalId": "[reference('app-service').outputs.stagingManagedServiceIdentityId.value]"
-              }
-            }
-          ]
-        }
+      },
+      "copy": {
+        "name": "role-assignments",
+        "count": "[length(createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value))]"
       }
     }
   ],
