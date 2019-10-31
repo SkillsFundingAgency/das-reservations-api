@@ -268,7 +268,7 @@
       },
       "copy": {
         "name": "role-assignments",
-        "count": "2"
+        "count": 2
       }
     }
   ],
