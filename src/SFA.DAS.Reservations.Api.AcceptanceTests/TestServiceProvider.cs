@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
                     new KeyValuePair<string, string>("ConfigNames", "SFA.DAS.Reservations.Api"),
                     new KeyValuePair<string, string>("Environment", "DEV"),
                     new KeyValuePair<string, string>("Version", "1.0"),
-                    new KeyValuePair<string, string>("Reservations:ElasticSearchUrl", "http://localhost:9200"),
+                    new KeyValuePair<string, string>("Reservations:ElasticSearchServerUrl", "http://localhost:9200"),
                 }
             };
             
