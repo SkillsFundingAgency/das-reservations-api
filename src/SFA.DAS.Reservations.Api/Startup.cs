@@ -68,6 +68,7 @@ namespace SFA.DAS.Reservations.Api
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
 
             services.AddElasticSearch(config.Value);
+            services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));
             
             services.AddHealthChecks()
                     .AddSqlServer(config.Value.ConnectionString)

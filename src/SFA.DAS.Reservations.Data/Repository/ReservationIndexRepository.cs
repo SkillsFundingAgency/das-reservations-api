@@ -4,24 +4,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nest;
+using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
     public class ReservationIndexRepository : IReservationIndexRepository
     {
-        public const string ReservationIndexLookupName = "reservations-index-registry";
+        public const string ReservationIndexLookupName = "-reservations-index-registry";
 
         private readonly IElasticClient _client;
+        private readonly ReservationsApiEnvironment _environment;
 
-        public ReservationIndexRepository(IElasticClient client)
+        public ReservationIndexRepository(IElasticClient client, ReservationsApiEnvironment environment)
         {
             _client = client;
+            _environment = environment;
         }
 
         public async Task<IEnumerable<ReservationIndex>> Find(long providerId, string term)
         {
             var searchIndexRegistryResponse = _client.Search<IndexRegistryEntry>(s => s
-                .Index(ReservationIndexLookupName)
+                .Index(_environment.EnvironmentName + ReservationIndexLookupName)
                 .From(0)
                 .Size(1)
                 .Sort(x => x.Descending(a => a.DateCreated)));
