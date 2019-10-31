@@ -70,7 +70,7 @@
     }
   },
   "variables": {
-    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/role-assignment/templates/",
+    "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
     "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
     "appServiceName": "[concat(variables('resourceNamePrefix'), 'api-as')]",
     "appServicePlanName": "[concat(variables('resourceNamePrefix'), 'api-asp')]",
