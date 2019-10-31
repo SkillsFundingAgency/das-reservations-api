@@ -16,6 +16,8 @@ namespace SFA.DAS.Reservations.Domain.Configuration
         public virtual DateTime? EoiAvailableDatesMaxDate { get; set; }
         public virtual DateTime? CurrentDateTime { get; set; }
         public string QueueMonitorItems { get; set; }
-        public string ElasticSearchUrl { get; set; }
+        public string ElasticSearchUsername { get; set; }
+        public string ElasticSearchPassword { get; set; }
+        public string ElasticSearchServerUrl { get; set; }
     }
 }

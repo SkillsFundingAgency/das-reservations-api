@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
 
         public static void AddElasticSearch(this IServiceCollection collection, ReservationsConfiguration configuration)
         {
-            var connectionPool = new  SingleNodeConnectionPool(new Uri(configuration.ElasticSearchUrl));
+            var connectionPool = new  SingleNodeConnectionPool(new Uri(configuration.ElasticSearchServerUrl));
 
             var settings = new ConnectionSettings(connectionPool);
 

@@ -3,7 +3,6 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 using Nest;
 
 namespace SFA.DAS.Reservations.Data.Repository
