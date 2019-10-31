@@ -245,7 +245,7 @@
     },
     {
       "apiVersion": "2017-05-10",
-      "name": "role-assignments",
+      "name": "[concat('role-assignments-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedResourceGroup')]",
       "properties": {
@@ -268,7 +268,7 @@
       },
       "copy": {
         "name": "role-assignments",
-        "count": "[length(createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value))]"
+        "count": "2"
       }
     }
   ],
