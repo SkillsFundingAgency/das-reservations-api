@@ -25,6 +25,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
                        .Excluding(x => x.ReservationId)
+                       .Excluding(x => x.CourseName)
                        .Excluding(x => x.CourseId)
                        .Excluding(x => x.CourseTitle)
                        .Excluding(x => x.CourseLevel)
@@ -54,6 +55,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
                     .Excluding(x => x.ReservationId)
+                    .Excluding(x => x.CourseName)
                     .Excluding(x => x.CourseId)
                     .Excluding(x => x.CourseTitle)
                     .Excluding(x => x.CourseLevel)
@@ -82,6 +84,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
                     .Excluding(x => x.ReservationId)
+                    .Excluding(x => x.CourseName)
                     .Excluding(x => x.CourseId)
                     .Excluding(x => x.CourseTitle)
                     .Excluding(x => x.CourseLevel)
@@ -110,6 +113,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
                     .Excluding(x => x.ReservationId)
+                    .Excluding(x => x.CourseName)
                     .Excluding(x => x.CourseId)
                     .Excluding(x => x.CourseTitle)
                     .Excluding(x => x.CourseLevel)

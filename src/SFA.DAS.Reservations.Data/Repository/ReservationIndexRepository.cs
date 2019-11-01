@@ -3,6 +3,7 @@ using SFA.DAS.Reservations.Domain.Reservations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Nest;
 using SFA.DAS.Reservations.Domain.Configuration;
 
@@ -42,17 +43,24 @@ namespace SFA.DAS.Reservations.Data.Repository
                 return new ReservationIndex[0];
             }
 
+            var searchTermWords = term.Split(' ');
+
+            var formattedSearchTerm = searchTermWords.Length > 1 ?
+                searchTermWords.Aggregate((x, y) => $"*{x.Trim()}* AND *{y.Trim()}*") :
+                $"*{term}*";
+
             var searchResponse = await _client.SearchAsync<ReservationIndex>(s => s
                 .Index(reservationIndexName)
                 .From(0)
-                .Size(10)
+                .Size(100)
                 .Query(q =>
+                    
                     q.Bool(b => b
                         .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
                         .Filter(x => x.QueryString(descriptor => descriptor
-                            .Fields(fields => fields.Field(f => f.CourseTitle)
+                            .Fields(fields => fields.Field(f => f.CourseName)
                                                     .Field(f => f.AccountLegalEntityName))
-                            .Query($"*{term}*")))
+                            .Query(formattedSearchTerm)))
                     )));
 
             return searchResponse.Documents;
