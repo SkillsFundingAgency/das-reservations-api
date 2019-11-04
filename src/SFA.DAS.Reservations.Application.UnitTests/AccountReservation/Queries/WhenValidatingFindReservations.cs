@@ -27,7 +27,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsFalse(actual.IsValid());
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("ProviderId has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("SearchTerm has not been supplied"));
         }
 
         [Test]
