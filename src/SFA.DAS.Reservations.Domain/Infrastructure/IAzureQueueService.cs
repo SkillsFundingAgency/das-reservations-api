@@ -5,7 +5,7 @@ namespace SFA.DAS.Reservations.Domain.Infrastructure
 {
     public interface IAzureQueueService
     {
-        Task<IList<QueueMonitor>> GetQueuesToMonitor();
+        IList<QueueMonitor> GetQueuesToMonitor();
         Task<bool> IsQueueHealthy(string expectedQueueName);
     }
 }

@@ -22,7 +22,7 @@ namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
             CancellationToken cancellationToken = new CancellationToken())
         {
             var timer = Stopwatch.StartNew();
-            var queues = await _azureQueueService.GetQueuesToMonitor();
+            var queues = _azureQueueService.GetQueuesToMonitor();
 
             foreach (var queue in queues)
             {
