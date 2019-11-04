@@ -23,7 +23,7 @@ You are able to run the API using an in memory database by doing the following:
 You can also run it using **LOCAL** which will require a SQL instance and also Azure Storage to run in this mode
 
 - Clone repository
-- Publish `SFA.DAS.Forecasting.Database` project to SQL instance
+- Publish `SFA.DAS.Reservations.Database` project to SQL instance
 - Create table in Azure Storage called Configuration, and add an extra column called **Data**. Set partitionkey to `LOCAL`, Rowkey to `SFA.DAS.Reservations.API_1.0`, then for the Data column add the following:
 ```
 {   
