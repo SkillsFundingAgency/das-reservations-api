@@ -20,9 +20,9 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureServiceBus
         public IList<QueueMonitor> GetQueuesToMonitor()
         {
             var queuesToMonitor = _configuration
-                    .QueueMonitorItems.Split(',')
-                    .Select(c => new QueueMonitor(c, null))
-                    .ToList();
+                .QueueMonitorItems.Split(',')
+                .Select(c => new QueueMonitor(c, null))
+                .ToList();
             
             return queuesToMonitor;
         }
@@ -30,6 +30,12 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureServiceBus
         public async Task<bool> IsQueueHealthy(string queueName)
         {
             var client = new ManagementClient(_configuration.NServiceBusConnectionString);
+
+            if (!await client.QueueExistsAsync(queueName))
+            {
+                return false;
+            }
+
             var queue = await client.GetQueueRuntimeInfoAsync(queueName);
 
             return queue.MessageCount == 0;

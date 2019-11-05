@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                 var reservation = new Reservation(
                     request.Id,
                     request.AccountId,
-                    request.StartDate.Value,
+                    request.StartDate,
                     _options.ExpiryPeriodInMonths,
                     request.AccountLegalEntityName,
                     request.CourseId,
