@@ -27,6 +27,17 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
         public static void AddElasticSearch(this IServiceCollection collection, ReservationsConfiguration configuration)
         {
             var connectionPool = new  SingleNodeConnectionPool(new Uri(configuration.ElasticSearchServerUrl));
+            
+            var settings = new ConnectionSettings(connectionPool);
+            
+            if (!string.IsNullOrEmpty(configuration.ElasticSearchUsername) &&
+                !string.IsNullOrEmpty(configuration.ElasticSearchPassword))
+            {
+                settings.BasicAuthentication(configuration.ElasticSearchUsername, configuration.ElasticSearchPassword);
+            }
+            
+
+            collection.AddTransient<IElasticClient>(sp => new ElasticClient(settings));
 
             var settings = new ConnectionSettings(connectionPool);
 
