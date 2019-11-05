@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Data.Repository
                         ))
                     .Sort(ss => ss.Ascending(f => f.AccountLegalEntityName.Suffix("keyword"))
                         .Ascending(index => index.CourseTitle.Suffix("keyword"))
-                        .Ascending(index => index.StartDate)));
+                        .Descending(index => index.StartDate)));
             }
             else
             {
@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Data.Repository
                                 .Query(formattedSearchTerm)))
                         )).Sort(ss => ss.Ascending(f => f.AccountLegalEntityName.Suffix("keyword"))
                         .Ascending(index => index.CourseTitle.Suffix("keyword"))
-                        .Ascending(index => index.StartDate)));
+                        .Descending(index => index.StartDate)));
             }
 
             return searchResponse.Documents;
