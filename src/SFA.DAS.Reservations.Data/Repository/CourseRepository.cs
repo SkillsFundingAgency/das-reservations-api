@@ -21,7 +21,10 @@ namespace SFA.DAS.Reservations.Data.Repository
         public async Task<IEnumerable<Course>> GetCourses()
         {
 
-            return  await _reservationsDataContext.Courses.Where(x => x.EffectiveTo == null || x.EffectiveTo > DateTime.UtcNow).ToListAsync();
+            return await _reservationsDataContext.Courses
+                .Where(x => x.EffectiveTo == null || x.EffectiveTo > DateTime.UtcNow)
+                .Where(x => !x.CourseId.Contains('-'))
+                .ToListAsync();
         }
 
         public async Task<Course> GetCourseById(string id)
