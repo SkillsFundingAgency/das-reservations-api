@@ -28,7 +28,10 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
                 throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var result = await _globalRulesService.GetAccountRules(request.AccountId);
+            var result = (await _globalRulesService.GetAccountRules(request.AccountId)).ToList();
+            var globalRuleResult = await _globalRulesService.GetActiveRules(DateTime.UtcNow);
+
+            result.AddRange(globalRuleResult);
 
             return new GetAccountRulesResult
             {

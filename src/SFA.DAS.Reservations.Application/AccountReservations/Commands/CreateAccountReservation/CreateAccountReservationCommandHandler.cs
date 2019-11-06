@@ -47,12 +47,39 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
 
             if (globalRule != null)
             {
-                return new CreateAccountReservationResult
+                var shouldReturnError = false;
+                switch (globalRule.Restriction)
                 {
-                    Reservation = null,
-                    Rule = globalRule
-                };
+                    case AccountRestriction.All:
+                    case AccountRestriction.Account:
+                        shouldReturnError = true;
+                        break;
+                    case AccountRestriction.Levy:
+                        if (request.IsLevyAccount)
+                        {
+                            shouldReturnError = true;
+                        }
+
+                        break;
+                    case AccountRestriction.NonLevy:
+                        if (!request.IsLevyAccount)
+                        {
+                            shouldReturnError = true;
+                        }
+
+                        break;
+                }
+
+                if (shouldReturnError)
+                {
+                    return new CreateAccountReservationResult
+                    {
+                        Reservation = null,
+                        Rule = globalRule
+                    };
+                }
             }
+
             var accountLegalEntity =
                 await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
 

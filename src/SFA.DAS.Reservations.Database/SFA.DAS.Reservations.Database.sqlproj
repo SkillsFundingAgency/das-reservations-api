@@ -60,6 +60,8 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Tables" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\PostDeployment" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Course.sql" />
@@ -71,5 +73,8 @@
     <Build Include="Tables\ClientOutboxData.sql" />
     <Build Include="Tables\UserRuleNotification.sql" />
     <Build Include="Tables\ProviderPermission.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\PostDeployment\ChangeReservationExpiredDateTime.sql" />
   </ItemGroup>
 </Project>

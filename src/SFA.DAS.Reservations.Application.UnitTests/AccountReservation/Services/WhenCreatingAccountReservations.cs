@@ -37,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public void Arrange()
         {
             var expiryDate = _expectedStartDate.AddMonths(ExpiryPeriodInMonths);
-            _expectedExpiryDate = new DateTime(expiryDate.Year,expiryDate.Month, DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month));
+            _expectedExpiryDate = new DateTime(expiryDate.Year,expiryDate.Month, DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month), 23, 59, 59);
             
             _expectedCourse = new Course
             {

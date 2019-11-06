@@ -66,6 +66,20 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Assert.IsNotNull(actual);
         }
 
+
+        [Test]
+        public async Task Then_If_There_Is_A_Rule_Matching_The_Levy_Reservation_It_Is_Returned()
+        {
+            //Arrange
+            var reservation = new Reservation(Guid.NewGuid(), 123, null, 2,"Test");
+
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
+
+            //Assert
+            Assert.IsNotNull(actual);
+        }
+
         [Test]
         public async Task Then_The_Restriction_Type_Is_Checked_Against_The_Reservation()
         {
