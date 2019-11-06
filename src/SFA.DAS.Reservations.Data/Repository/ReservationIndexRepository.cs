@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<IEnumerable<ReservationIndex>> Find(long providerId, string term)
         {
-            var searchIndexRegistryResponse = _client.Search<IndexRegistryEntry>(s => s
+            var searchIndexRegistryResponse = await _client.SearchAsync<IndexRegistryEntry>(s => s
                 .Index(_environment.EnvironmentName + ReservationIndexLookupName)
                 .From(0)
                 .Size(1)
