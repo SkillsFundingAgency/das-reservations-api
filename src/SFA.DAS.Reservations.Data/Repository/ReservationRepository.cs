@@ -23,6 +23,10 @@ namespace SFA.DAS.Reservations.Data.Repository
             var result = await _reservationsDataContext.Reservations
                 .Where(c=>c.AccountId.Equals(accountId) &&
                           c.Status != (int)ReservationStatus.Deleted)
+                .OrderBy(x => x.AccountLegalEntityName)
+                .ThenBy(x => x.Course.Title)
+                .ThenBy(x => x.Course.Level)
+                .ThenByDescending(x => x.StartDate)
                 .ToListAsync();
             
             return result;

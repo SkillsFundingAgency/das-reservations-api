@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.ExpressionTranslators.Internal;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Data.UnitTests.DatabaseMock;
+using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using Reservation = SFA.DAS.Reservations.Domain.Entities.Reservation;
 
@@ -17,37 +17,93 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
     {
         private Mock<IReservationsDataContext> _reservationsDataContext;
         private ReservationRepository _reservationRepository;
+        private Reservation[] _reservations;
 
         [SetUp]
         public void Arrange()
         {
-            var rules = new List<Reservation>
+            var today = DateTime.UtcNow;
+
+
+            _reservations = new []
             {
                 new Reservation
                 {
                     AccountId = 1,
-                    CreatedDate = DateTime.UtcNow
+                    AccountLegalEntityName = "A Team",
+                    Course = new Course {Title = "Book Keeping", Level = 1},
+                    CreatedDate = today
                 },
                 new Reservation
                 {
                     AccountId = 1,
-                    CreatedDate = DateTime.UtcNow
+                    AccountLegalEntityName = "A Team",
+                    Course = new Course {Title = "Plant Engineering", Level = 1},
+                    CreatedDate = today
+                },
+                new Reservation
+                {
+                    AccountId = 1,
+                    AccountLegalEntityName = "B Team",
+                    Course = new Course {Title = "Accounting", Level = 1},
+                    CreatedDate = today
+
+                },
+                new Reservation
+                {
+                    AccountId = 1,
+                    AccountLegalEntityName = "B Team",
+                    Course = new Course {Title = "Accounting", Level = 2},
+                    CreatedDate = today
+                },
+                new Reservation
+                {
+                    AccountId = 1,
+                    AccountLegalEntityName = "C Team",
+                    Course = new Course {Title = "Computing", Level = 1},
+                    CreatedDate = today,
+                    StartDate = today.AddDays(3)
+                },
+                new Reservation
+                {
+                    AccountId = 1,
+                    AccountLegalEntityName = "C Team",
+                    Course = new Course {Title = "Computing", Level = 1},
+                    CreatedDate = today,
+                    StartDate = today.AddDays(1)
+
+                },
+                new Reservation
+                {
+                    AccountId = 1,
+                    AccountLegalEntityName = "A Team",
+                    Course = new Course {Title = "Accounting", Level = 3},
+                    Status = (int)ReservationStatus.Deleted
                 },
                 new Reservation
                 {
                     AccountId = 2,
-                    CreatedDate = DateTime.UtcNow
+                    AccountLegalEntityName = "A Team",
+                    Course = new Course {Title = "Accounting", Level = 1},
+                    CreatedDate = today
                 },
-                new Reservation
-                {
-                    AccountId = 1,
-                    CreatedDate = DateTime.UtcNow,
-                    Status = (int)ReservationStatus.Deleted
-                }
             };
 
+            var unorderedReservations = new List<Reservation>
+            { 
+                _reservations[7],
+                _reservations[6],
+                _reservations[5],
+                _reservations[4],
+                _reservations[3],
+                _reservations[2],
+                _reservations[1],
+                _reservations[0],
+            };
+         
             _reservationsDataContext = new Mock<IReservationsDataContext>();
-            _reservationsDataContext.Setup(x => x.Reservations).ReturnsDbSet(rules);
+           
+            _reservationsDataContext.Setup(x => x.Reservations).ReturnsDbSet(unorderedReservations);
 
             _reservationRepository = new ReservationRepository(_reservationsDataContext.Object);
         }
@@ -59,7 +115,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _reservationRepository.GetAccountReservations(1);
 
             //Assert
-            Assert.AreEqual(2, actual.Count);
+            Assert.AreEqual(6, actual.Count);
         }
 
         [Test]
@@ -79,6 +135,29 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             //Assert
             Assert.IsEmpty(actual);
+        }
+
+        [Test]
+        public async Task Then_Orders_Reservations_Correctly()
+        {
+            //Arrange
+            var expectedOrderedReservations = new List<Reservation>
+            {
+                _reservations[0],
+                _reservations[1],
+                _reservations[2],
+                _reservations[3],
+                _reservations[4],
+                _reservations[5]
+            };
+
+            //Act
+            var actual = await _reservationRepository.GetAccountReservations(1);
+
+            //Assert
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expectedOrderedReservations.Count, actual.Count);
+            actual.Should().BeEquivalentTo(expectedOrderedReservations, options => options.WithStrictOrdering());
         }
 
     }
