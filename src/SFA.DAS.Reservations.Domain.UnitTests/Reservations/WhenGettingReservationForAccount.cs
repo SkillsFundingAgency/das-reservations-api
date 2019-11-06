@@ -114,10 +114,10 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         [TestCase(2018,04,30)]
         [TestCase(2018,02,28)]
         [TestCase(2018,10,31)]
-        public void Then_When_Creating_A_New_Reservation_The_Expiry_Is_Set_To_The_Last_Day_Of_The_Month_With_Added_Expiry_Months(int year, int month, int day)
+        public void Then_When_Creating_A_New_Reservation_The_Expiry_Is_Set_To_The_End_Of_The_Last_Day_Of_The_Month_With_Added_Expiry_Months(int year, int month, int day)
         {
             //Arrange
-            var expectedExpiryDate = new DateTime(year, month, day);
+            var expectedExpiryDate = new DateTime(year, month, day, 23, 59, 59);
             var expiryPeriod = 1;
 
             //Act

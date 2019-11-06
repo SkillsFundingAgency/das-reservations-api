@@ -117,7 +117,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             {
                 var expiryDate = StartDate.Value.AddMonths(expiryPeriodInMonths);
                 var lastDayInMonth = DateTime.DaysInMonth(expiryDate.Year, expiryDate.Month);
-                return new DateTime(expiryDate.Year, expiryDate.Month, lastDayInMonth);
+                return new DateTime(expiryDate.Year, expiryDate.Month, lastDayInMonth, 23, 59, 59);
             }
 
             return null;

@@ -139,6 +139,22 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test]
+        public async Task Then_If_There_Are_Global_Restrictions_In_Place_For_Non_Levy_Then_The_Levy_Reservation_Is_Created_And_Global_Rules_Returned()
+        {
+            //Arrange
+            _command.IsLevyAccount = true;
+            _globalRulesService.Setup(x => x.CheckReservationAgainstRules(_command))
+                .ReturnsAsync(new GlobalRule(new Domain.Entities.GlobalRule { Id = 1, Restriction = (byte)AccountRestriction.NonLevy, RuleType = 1 }));
+
+            //Act
+            var actual = await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(_command), Times.Once);
+            Assert.IsNull(actual.Rule);
+        }
+
+        [Test]
         public async Task Then_If_The_Request_Is_For_A_NonLevy_And_Has_No_Eoi_Agreement_Then_The_Reservation_Is_Not_Created()
         {
             //Arrange
