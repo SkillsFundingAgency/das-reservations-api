@@ -7,7 +7,6 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Data.UnitTests.DatabaseMock;
 using SFA.DAS.Reservations.Domain.Entities;
-using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 {
@@ -18,6 +17,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         private Course _activeCourse3;
         private Course _expiredCourse1;
         private Course _expiredCourse2;
+        private Course _frameworkCourse;
         private Mock<IReservationsDataContext> _reservationsDataContext;
         private CourseRepository _courseRepository;
         private List<Course> _courses;
@@ -66,14 +66,23 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 EffectiveTo = DateTime.UtcNow.AddHours(-3)
             };
 
-            _courses = new List<Course>{ _activeCourse1, _expiredCourse2, _activeCourse3, _activeCourse2, _expiredCourse1};
+            _frameworkCourse = new Course
+            {
+                CourseId = "5-1",
+                Title = "Framework 1",
+                Level = 3,
+                EffectiveTo = DateTime.UtcNow.AddHours(4)
+            };
+
+            _courses = new List<Course> { _activeCourse1, _expiredCourse2, _activeCourse3, _activeCourse2, _expiredCourse1, _frameworkCourse };
             _reservationsDataContext = new Mock<IReservationsDataContext>();
             _reservationsDataContext.Setup(x => x.Courses).ReturnsDbSet(_courses);
             _courseRepository = new CourseRepository(_reservationsDataContext.Object);
         }
 
         [Test]
-        public async Task ThenNonExpiredCoursesAreReturned() { 
+        public async Task ThenNonExpiredCoursesAreReturned()
+        {
 
             var result = (await _courseRepository.GetCourses()).ToList();
 
@@ -83,6 +92,14 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             Assert.IsTrue(result.Contains(_activeCourse3));
             Assert.IsFalse(result.Contains(_expiredCourse1));
             Assert.IsFalse(result.Contains(_expiredCourse2));
+        }
+
+        [Test]
+        public async Task ThenFrameworkCoursesAreNotReturned()
+        {
+            var result = (await _courseRepository.GetCourses()).ToList();
+
+            Assert.IsFalse(result.Contains(_frameworkCourse));
         }
 
     }
