@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             _environment = environment;
         }
 
-        public async Task<IEnumerable<ReservationIndex>> Find(long providerId, string term)
+        public async Task<IndexedReservationSearchResult> Find(long providerId, string term, ushort pageNumber, ushort pageItemCount)
         {
             var searchIndexRegistryResponse = _client.Search<IndexRegistryEntry>(s => s
                 .Index(_environment.EnvironmentName + ReservationIndexLookupName)
@@ -32,14 +32,16 @@ namespace SFA.DAS.Reservations.Data.Repository
             if (searchIndexRegistryResponse?.Documents == null || 
                 !searchIndexRegistryResponse.Documents.Any())
             {
-                return new ReservationIndex[0];
+                return new IndexedReservationSearchResult();
             }
 
             var reservationIndexName = searchIndexRegistryResponse.Documents.First().Name;
 
+            var formDocumentCount = pageNumber < 1 ? 0 : pageNumber * pageItemCount;
+
             if (string.IsNullOrEmpty(reservationIndexName))
             {
-                return new ReservationIndex[0];
+                return new IndexedReservationSearchResult();
             }
 
             ISearchResponse<ReservationIndex> searchResponse;
@@ -48,8 +50,8 @@ namespace SFA.DAS.Reservations.Data.Repository
             {
                 searchResponse = await _client.SearchAsync<ReservationIndex>(s => s
                     .Index(reservationIndexName)
-                    .From(0)
-                    .Size(100)
+                    .From(formDocumentCount)
+                    .Size(pageItemCount)
                     .Query(q =>
                         q.Bool(b => b
                             .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
@@ -68,8 +70,8 @@ namespace SFA.DAS.Reservations.Data.Repository
 
                 searchResponse = await _client.SearchAsync<ReservationIndex>(s => s
                     .Index(reservationIndexName)
-                    .From(0)
-                    .Size(100)
+                    .From(formDocumentCount)
+                    .Size(pageItemCount)
                     .Query(q =>
                         q.Bool(b => b
                             .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
@@ -82,7 +84,7 @@ namespace SFA.DAS.Reservations.Data.Repository
                         .Descending(index => index.StartDate)));
             }
 
-            return searchResponse.Documents;
+            return new IndexedReservationSearchResult(); //searchResponse.Documents;
         }
 
         private class IndexRegistryEntry

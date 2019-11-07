@@ -38,7 +38,6 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ReturnsAsync(_accountReservationsResult);
 
             _reservationsController = new ReservationsController(Mock.Of<ILogger<ReservationsController>>(), _mediator.Object);
-            
         }
 
         [Test]

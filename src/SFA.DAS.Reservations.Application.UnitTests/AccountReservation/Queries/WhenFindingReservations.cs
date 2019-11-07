@@ -14,6 +14,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
     {
         private const long ExpectedAccountId = 553234;
         private const string ExpectedSearchTerm = "test";
+        private const ushort ExpectedPageNumber = 2;
+        private const ushort ExpectedPageItemCount = 50;
 
         private FindAccountReservationsQueryHandler _handler;
         private Mock<IValidator<FindAccountReservationsQuery>> _validator;
@@ -28,15 +30,26 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         [SetUp]
         public void Arrange()
         {
-            _query = new FindAccountReservationsQuery{ProviderId = ExpectedAccountId, SearchTerm = ExpectedSearchTerm};
+            _query = new FindAccountReservationsQuery
+            {
+                ProviderId = ExpectedAccountId, 
+                SearchTerm = ExpectedSearchTerm,
+                PageNumber = ExpectedPageNumber,
+                PageItemCount = ExpectedPageItemCount
+            };
             _validator = new Mock<IValidator<FindAccountReservationsQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<FindAccountReservationsQuery>()))
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
             _cancellationToken = new CancellationToken();
             _service = new Mock<IAccountReservationService>();
 
-            _service.Setup(x => x.FindReservations(ExpectedAccountId, ExpectedSearchTerm)) 
-                .ReturnsAsync(_expectedSearchResults);
+            _service.Setup(x => x.FindReservations(
+                    ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber, ExpectedPageItemCount))
+                .ReturnsAsync(new ReservationSearchResult
+                {
+                    Reservations = _expectedSearchResults
+                });
+                
             
             _handler = new FindAccountReservationsQueryHandler(_service.Object, _validator.Object);
         }
@@ -69,7 +82,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            _service.Verify(x => x.FindReservations(ExpectedAccountId, ExpectedSearchTerm), Times.Once);
+            _service.Verify(x => x.FindReservations(
+                ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber, ExpectedPageItemCount), Times.Once);
         }
 
         [Test]

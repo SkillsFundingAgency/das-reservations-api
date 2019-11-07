@@ -46,11 +46,15 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservation == null ? null : MapReservation(reservation);
         }
 
-        public async Task<IList<Reservation>> FindReservations(long providerId, string searchTerm)
+        public async Task<ReservationSearchResult> FindReservations(
+            long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount)
         {
-            var result = await _reservationIndexRepository.Find(providerId, searchTerm);
+            var result = await _reservationIndexRepository.Find(providerId, searchTerm, pageNumber, pageItemCount);
 
-            return result.Select(r => r.ToReservation()).ToList();
+            return new ReservationSearchResult
+            {
+                Reservations = result?.Reservations?.Select(r => r.ToReservation()).ToList() ?? new List<Reservation>()
+            };
         }
 
         public async Task<Reservation> CreateAccountReservation(IReservationRequest command)

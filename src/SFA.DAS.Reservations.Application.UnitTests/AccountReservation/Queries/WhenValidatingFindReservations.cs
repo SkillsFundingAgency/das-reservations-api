@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 
@@ -27,13 +24,21 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsFalse(actual.IsValid());
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("ProviderId has not been supplied"));
+            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("PageNumber has not been supplied"));
+            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("PageItemCount has not been supplied"));
         }
 
         [Test]
         public async Task Then_The_Query_Is_Valid_If_The_Values_Are_Valid()
         {
             //Act
-            var actual = await _validator.ValidateAsync(new FindAccountReservationsQuery {ProviderId = 99432, SearchTerm = "test"});
+            var actual = await _validator.ValidateAsync(new FindAccountReservationsQuery
+            {
+                ProviderId = 99432, 
+                SearchTerm = "test",
+                PageNumber = 1,
+                PageItemCount = 50
+            });
 
             //Assert
             Assert.IsTrue(actual.IsValid());

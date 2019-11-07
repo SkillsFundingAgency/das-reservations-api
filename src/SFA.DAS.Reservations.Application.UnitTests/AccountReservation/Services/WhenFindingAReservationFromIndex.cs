@@ -15,6 +15,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 {
     public class WhenFindingAReservationFromIndex
     {
+        private const int ProviderId = 2;
+        private const string SearchTerm = "test search";
+        private const ushort PageNumber = 2;
+        private const ushort PageItemNumber = 2;
+
         private AccountReservationService _service;
         private Mock<IReservationRepository> _reservationRepository;
         private Mock<IReservationIndexRepository> _reservationIndexRepository;
@@ -37,51 +42,54 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public async Task ThenShouldSearchRepository()
         {
             //Arrange
-            const int providerId = 2;
-            const string searchTerm = "test search";
+            
 
             //Act
-            await _service.FindReservations(providerId, searchTerm);
+            await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber);
 
             //Assert
-            _reservationIndexRepository.Verify(x => x.Find(providerId, searchTerm), Times.Once);
+            _reservationIndexRepository.Verify(x => x.Find(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber), Times.Once);
         }
 
         [Test]
         public async Task ThenShouldReturnReservationFound()
         {
             //Arrange
-            const int providerId = 2;
-            const string searchTerm = "test search";
+           
+            
             var expectedReservation = new Reservation(
                 Guid.NewGuid(), 1, DateTime.Now, 3,
                 "Test Reservation", null, 3, 4);
 
 
-            _reservationIndexRepository.Setup(x => x.Find(providerId, searchTerm))
-                .ReturnsAsync(new List<ReservationIndex>
-                {
-                    new ReservationIndex()
+            _reservationIndexRepository.Setup(x => x.Find(ProviderId, SearchTerm, PageNumber, PageItemNumber))
+                .ReturnsAsync(new IndexedReservationSearchResult
+                { 
+                    Reservations = new List<ReservationIndex>
                     {
-                        AccountId = expectedReservation.AccountId,
-                        AccountLegalEntityId = expectedReservation.AccountLegalEntityId,
-                        ProviderId = expectedReservation.ProviderId,
-                        StartDate = expectedReservation.StartDate,
-                        ExpiryDate = expectedReservation.ExpiryDate,
-                        IsLevyAccount = expectedReservation.IsLevyAccount,
-                        Status = (short) expectedReservation.Status,
-                        ReservationId = expectedReservation.Id,
-                        CreatedDate = expectedReservation.CreatedDate,
-                        AccountLegalEntityName = expectedReservation.AccountLegalEntityName
+                        new ReservationIndex
+                        {
+                            AccountId = expectedReservation.AccountId,
+                            AccountLegalEntityId = expectedReservation.AccountLegalEntityId,
+                            ProviderId = expectedReservation.ProviderId,
+                            StartDate = expectedReservation.StartDate,
+                            ExpiryDate = expectedReservation.ExpiryDate,
+                            IsLevyAccount = expectedReservation.IsLevyAccount,
+                            Status = (short) expectedReservation.Status,
+                            ReservationId = expectedReservation.Id,
+                            CreatedDate = expectedReservation.CreatedDate,
+                            AccountLegalEntityName = expectedReservation.AccountLegalEntityName
+                        }
                     }
                 });
 
             //Act
-            var result = await _service.FindReservations(providerId, searchTerm);
+            var result = await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber);
 
             //Assert
-            result.Should().NotBeNullOrEmpty();
-            result.First().Should().BeEquivalentTo(expectedReservation);
+            result.Reservations.Should().NotBeNullOrEmpty();
+            result.Reservations.First().Should().BeEquivalentTo(expectedReservation);
         }
     }
 }

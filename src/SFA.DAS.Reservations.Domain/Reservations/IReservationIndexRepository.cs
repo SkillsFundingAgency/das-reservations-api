@@ -5,6 +5,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public interface IReservationIndexRepository
     {
-        Task<IEnumerable<ReservationIndex>> Find(long providerId, string term);
+        Task<IndexedReservationSearchResult> Find(long providerId, string term, ushort pageNumber, ushort pageItemCount);
     }
 }
