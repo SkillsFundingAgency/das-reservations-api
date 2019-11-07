@@ -10,7 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.Controllers;
+using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests
 {
@@ -22,7 +24,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         {
             var serviceCollection = new ServiceCollection();
             var configuration = GenerateConfiguration();
-
+            
             var startup = new Startup(configuration);
 
             startup.ConfigureServices(serviceCollection);
@@ -47,6 +49,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
                     new KeyValuePair<string, string>("ConfigNames", "SFA.DAS.Reservations.Api"),
                     new KeyValuePair<string, string>("Environment", "DEV"),
                     new KeyValuePair<string, string>("Version", "1.0"),
+                    new KeyValuePair<string, string>("Reservations:ElasticSearchServerUrl", "http://localhost:9200"),
                 }
             };
             

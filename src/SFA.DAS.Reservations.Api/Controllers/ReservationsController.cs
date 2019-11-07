@@ -137,6 +137,27 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [HttpGet]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
+        [Route("api/[controller]/search")]
+        public async Task<IActionResult> Search(long providerId, string searchTerm)
+        {
+            try
+            {
+                var response = await _mediator.Send(new FindAccountReservationsQuery {ProviderId = providerId, SearchTerm = searchTerm});
+                return Ok(response);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [Route("api/[controller]/validate/{id}")]
         public async Task<IActionResult> Validate(Guid id, string courseCode, DateTime startDate)
         {

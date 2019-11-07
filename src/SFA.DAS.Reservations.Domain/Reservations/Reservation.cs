@@ -60,7 +60,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             UserId = userId;
         }
 
-
         public long? TransferSenderAccountId { get; }
         public Guid Id { get; }
         public long AccountId { get; }
