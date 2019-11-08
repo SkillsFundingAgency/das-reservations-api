@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Data.Repository
                         q.Bool(b => b
                             .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
                             .Filter(x => x.QueryString(descriptor => descriptor
-                                .Fields(fields => fields.Field(f => f.CourseName)
+                                .Fields(fields => fields.Field(f => f.CourseDescription)
                                     .Field(f => f.AccountLegalEntityName))
                                 .Query(formattedSearchTerm)))
                         )));
