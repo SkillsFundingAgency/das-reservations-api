@@ -36,14 +36,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object,
                 _options.Object, _reservationIndexRepository.Object);
+
+            _reservationIndexRepository.Setup(x => x.Find(ProviderId, SearchTerm, PageNumber, PageItemNumber))
+                .ReturnsAsync(new IndexedReservationSearchResult());
         }
 
         [Test]
         public async Task ThenShouldSearchRepository()
         {
-            //Arrange
-            
-
             //Act
             await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber);
 
@@ -56,12 +56,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public async Task ThenShouldReturnReservationFound()
         {
             //Arrange
-           
-            
             var expectedReservation = new Reservation(
                 Guid.NewGuid(), 1, DateTime.Now, 3,
                 "Test Reservation", null, 3, 4);
 
+            const int expectedSearchTotal = 1;
 
             _reservationIndexRepository.Setup(x => x.Find(ProviderId, SearchTerm, PageNumber, PageItemNumber))
                 .ReturnsAsync(new IndexedReservationSearchResult
@@ -81,7 +80,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                             CreatedDate = expectedReservation.CreatedDate,
                             AccountLegalEntityName = expectedReservation.AccountLegalEntityName
                         }
-                    }
+                    },
+                    TotalReservations = expectedSearchTotal
                 });
 
             //Act
@@ -90,6 +90,23 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             //Assert
             result.Reservations.Should().NotBeNullOrEmpty();
             result.Reservations.First().Should().BeEquivalentTo(expectedReservation);
+            result.TotalReservations.Should().Be(expectedSearchTotal);
+        }
+
+        [Test]
+        public async Task ThenShouldReturnNoReservationsIfNoneFound()
+        {
+            //Arrange
+            var expectedReservation = new Reservation(
+                Guid.NewGuid(), 1, DateTime.Now, 3,
+                "Test Reservation", null, 3, 4);
+
+            //Act
+            var result = await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber);
+
+            //Assert
+            result.Reservations.Should().BeEmpty();
+            result.TotalReservations.Should().Be(0);
         }
     }
 }

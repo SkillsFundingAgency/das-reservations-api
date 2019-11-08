@@ -53,7 +53,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
             return new ReservationSearchResult
             {
-                Reservations = result?.Reservations?.Select(r => r.ToReservation()).ToList() ?? new List<Reservation>()
+                Reservations = result.Reservations.Select(r => r.ToReservation()),
+                TotalReservations = result.TotalReservations
             };
         }
 

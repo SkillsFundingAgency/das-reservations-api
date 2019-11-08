@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                                                                  .Aggregate((item1, item2)=> item1 +", "+item2));
             }
 
-            var reservations = await _service.FindReservations(
+            var result = await _service.FindReservations(
                 query.ProviderId, 
                 query.SearchTerm, 
                 query.PageNumber, 
@@ -38,7 +38,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 
             return new FindAccountReservationsResult
             {
-                Reservations = reservations.Reservations
+                Reservations = result.Reservations,
+                NumberOfRecordsFound = result.TotalReservations
             };
         }
     }

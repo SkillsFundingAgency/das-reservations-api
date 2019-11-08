@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
     public class FindAccountReservationsResult
     {
         public IEnumerable<Reservation> Reservations { get; set; }
-        public int NumberOfRecordsFound { get; set; }
+        public uint NumberOfRecordsFound { get; set; }
     }
 }

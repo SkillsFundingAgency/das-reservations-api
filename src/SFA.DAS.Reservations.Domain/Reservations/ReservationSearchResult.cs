@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class ReservationSearchResult
     {
         public IEnumerable<Reservation> Reservations { get; set; }
-        public long TotalReservations { get; set; }
+        public uint TotalReservations { get; set; }
     }
 }

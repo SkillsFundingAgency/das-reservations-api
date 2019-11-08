@@ -16,6 +16,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         private const string ExpectedSearchTerm = "test";
         private const ushort ExpectedPageNumber = 2;
         private const ushort ExpectedPageItemCount = 50;
+        private const ushort ExpectedSearchResultTotal = 1;
 
         private FindAccountReservationsQueryHandler _handler;
         private Mock<IValidator<FindAccountReservationsQuery>> _validator;
@@ -47,7 +48,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                     ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber, ExpectedPageItemCount))
                 .ReturnsAsync(new ReservationSearchResult
                 {
-                    Reservations = _expectedSearchResults
+                    Reservations = _expectedSearchResults,
+                    TotalReservations = ExpectedSearchResultTotal
                 });
                 
             
@@ -95,6 +97,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(_expectedSearchResults, result.Reservations);
+            Assert.AreEqual(ExpectedSearchResultTotal, result.NumberOfRecordsFound);
         }
     }
 }
