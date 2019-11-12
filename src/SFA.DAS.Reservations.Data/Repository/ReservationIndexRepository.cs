@@ -53,7 +53,8 @@ namespace SFA.DAS.Reservations.Data.Repository
                     .Query(q =>
                         q.Bool(b => b
                             .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
-                        )));
+                            .MustNot(x => x.Match(m => m.Field(f => f.Status).Query(((short)ReservationStatus.Deleted).ToString()))))
+                        ));
             }
             else
             {
@@ -70,7 +71,8 @@ namespace SFA.DAS.Reservations.Data.Repository
                             .Query(term)
                             .Type(TextQueryType.PhrasePrefix)
                             .Fields(f=>f.Fields("courseDescription", "accountLegalEntityName"))
-                            ) 
+                            ) && q.Bool(b => b
+                            .MustNot(x => x.Match(m => m.Field(f => f.Status).Query(((short)ReservationStatus.Deleted).ToString())))) 
                         ));
                 
             }
