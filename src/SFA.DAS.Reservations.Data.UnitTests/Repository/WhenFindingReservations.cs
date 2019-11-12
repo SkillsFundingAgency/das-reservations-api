@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -27,7 +28,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         {
             _mockClient = new Mock<IElasticLowLevelClient>();
             _apiEnvironment = new ReservationsApiEnvironment(ExpectedEnvironmentName);
-            _repository = new ReservationIndexRepository(_mockClient.Object, _apiEnvironment);
+            _repository = new ReservationIndexRepository(_mockClient.Object, _apiEnvironment, Mock.Of<ILogger<ReservationIndexRepository>>());
 
             var indexLookUpResponse =  @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},""hits"":{""total"":
             {""value"":3,""relation"":""eq""},""max_score"":null,""hits"":[{""_index"":""local-reservations-index-registry"",""_type"":""_doc"",
@@ -251,6 +252,106 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             Assert.AreEqual("30/09/2020", reservation.ExpiryDate.Value.ToString("d"));
             Assert.AreEqual(false, reservation.IsLevyAccount);
             Assert.AreEqual(1, reservation.Status);
+        }
+
+        [Test]
+        public async Task ThenWillReturnEmptyResultIfReservationIndexLookupReturnInvalidResponse()
+        {
+            //Arrange
+            _mockClient.Setup(c =>
+                    c.SearchAsync<StringResponse>(
+                        ExpectedReservationIndexLookupName,
+                        It.IsAny<PostData>(),
+                        It.IsAny<SearchRequestParameters>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StringResponse(""));
+
+
+            //Act
+            var result = await _repository.Find(1, string.Empty, 1, 10);
+
+            //Assert
+            Assert.IsNotNull(result?.Reservations);
+            Assert.IsEmpty(result.Reservations);
+            Assert.AreEqual(0, result.TotalReservations);
+        }
+
+        [Test]
+        public async Task ThenWillReturnEmptyResultIfReservationIndexRequestReturnsInvalidResponse()
+        {
+            //Arrange
+            _mockClient.Setup(c =>
+                    c.SearchAsync<StringResponse>(
+                        ExpectedLatestReservationIndexName,
+                        It.IsAny<PostData>(),
+                        It.IsAny<SearchRequestParameters>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StringResponse(""));
+
+
+            //Act
+            var result = await _repository.Find(1, string.Empty, 1, 10);
+
+            //Assert
+            Assert.IsNotNull(result?.Reservations);
+            Assert.IsEmpty(result.Reservations);
+            Assert.AreEqual(0, result.TotalReservations);
+        }
+
+        [Test]
+        public async Task ThenWillReturnEmptyResultIfReservationIndexLookupReturnFailedResponse()
+        {
+            //Arrange
+            var response =  @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":0,""skipped"":0,""failed"":1},""hits"":{""total"":
+            {""value"":0,""relation"":""eq""},""max_score"":null,""hits"":[]}}";
+
+            _mockClient.Setup(c =>
+                    c.SearchAsync<StringResponse>(
+                        ExpectedReservationIndexLookupName,
+                        It.IsAny<PostData>(),
+                        It.IsAny<SearchRequestParameters>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StringResponse(response));
+
+            //Act
+            var result = await _repository.Find(1, string.Empty, 1, 10);
+
+            //Assert
+            Assert.IsNotNull(result?.Reservations);
+            Assert.IsEmpty(result.Reservations);
+            Assert.AreEqual(0, result.TotalReservations);
+
+            _mockClient.Verify(c =>
+                c.SearchAsync<StringResponse>(
+                    It.Is<string>(s => !s.Equals(ExpectedReservationIndexLookupName)),
+                    It.IsAny<PostData>(),
+                    It.IsAny<SearchRequestParameters>(),
+                    It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test]
+        public async Task ThenWillReturnEmptyResultIfReservationIndexRequestReturnsFailedResponse()
+        {
+            //Arrange
+            var response =  @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":0,""skipped"":0,""failed"":1},""hits"":{""total"":
+            {""value"":0,""relation"":""eq""},""max_score"":null,""hits"":[]}}";
+
+
+            _mockClient.Setup(c =>
+                    c.SearchAsync<StringResponse>(
+                        ExpectedLatestReservationIndexName,
+                        It.IsAny<PostData>(),
+                        It.IsAny<SearchRequestParameters>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StringResponse(response));
+
+            //Act
+            var result = await _repository.Find(1, string.Empty, 1, 10);
+
+            //Assert
+            Assert.IsNotNull(result?.Reservations);
+            Assert.IsEmpty(result.Reservations);
+            Assert.AreEqual(0, result.TotalReservations);
         }
     }
 }
