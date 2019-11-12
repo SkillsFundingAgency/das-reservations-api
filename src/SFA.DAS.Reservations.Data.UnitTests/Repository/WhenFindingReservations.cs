@@ -217,10 +217,10 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             Assert.AreEqual("4", reservation.CourseId);
             Assert.AreEqual("Computer Management", reservation.CourseTitle);
             Assert.AreEqual(2, reservation.CourseLevel);
-            Assert.AreEqual("01/09/2019", reservation.StartDate.Value.ToString("d"));
+            Assert.AreEqual("01/09/2019", reservation.StartDate.Value.ToString("dd/MM/yyyy"));
             Assert.AreEqual(2, reservation.IndexedProviderId);
-            Assert.AreEqual("20/08/2019", reservation.CreatedDate.ToString("d"));
-            Assert.AreEqual("30/09/2020", reservation.ExpiryDate.Value.ToString("d"));
+            Assert.AreEqual("20/08/2019", reservation.CreatedDate.ToString("dd/MM/yyyy"));
+            Assert.AreEqual("30/09/2020", reservation.ExpiryDate.Value.ToString("dd/MM/yyyy"));
             Assert.AreEqual(false, reservation.IsLevyAccount);
             Assert.AreEqual(1, reservation.Status);
         }
@@ -246,10 +246,10 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             Assert.AreEqual("4", reservation.CourseId);
             Assert.AreEqual("Computer Management", reservation.CourseTitle);
             Assert.AreEqual(2, reservation.CourseLevel);
-            Assert.AreEqual("01/09/2019", reservation.StartDate.Value.ToString("d"));
+            Assert.AreEqual("01/09/2019", reservation.StartDate.Value.ToString("dd/MM/yyyy"));
             Assert.AreEqual(2, reservation.IndexedProviderId);
-            Assert.AreEqual("20/08/2019", reservation.CreatedDate.ToString("d"));
-            Assert.AreEqual("30/09/2020", reservation.ExpiryDate.Value.ToString("d"));
+            Assert.AreEqual("20/08/2019", reservation.CreatedDate.ToString("dd/MM/yyyy"));
+            Assert.AreEqual("30/09/2020", reservation.ExpiryDate.Value.ToString("dd/MM/yyyy"));
             Assert.AreEqual(false, reservation.IsLevyAccount);
             Assert.AreEqual(1, reservation.Status);
         }
