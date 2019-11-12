@@ -1,8 +1,11 @@
 ﻿using System;
 using SFA.DAS.Reservations.Domain.Reservations;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Nest;
+using Elasticsearch.Net;
+using Newtonsoft.Json;
+using SFA.DAS.Reservations.Data.ElasticSearch;
 using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Data.Repository
@@ -11,53 +14,48 @@ namespace SFA.DAS.Reservations.Data.Repository
     {
         public const string ReservationIndexLookupName = "-reservations-index-registry";
 
-        private readonly IElasticClient _client;
+        private readonly IElasticLowLevelClient _client;
         private readonly ReservationsApiEnvironment _environment;
 
-        public ReservationIndexRepository(IElasticClient client, ReservationsApiEnvironment environment)
+        public ReservationIndexRepository(IElasticLowLevelClient client, ReservationsApiEnvironment environment)
         {
             _client = client;
             _environment = environment;
         }
 
+        //TODO: Create test for special characters being used and making sure they do not affect search
+
         public async Task<IndexedReservationSearchResult> Find(long providerId, string term, ushort pageNumber, ushort pageItemCount)
         {
-            var searchIndexRegistryResponse = _client.Search<IndexRegistryEntry>(s => s
-                .Index(_environment.EnvironmentName + ReservationIndexLookupName)
-                .From(0)
-                .Size(1)
-                .Sort(x => x.Descending(a => a.DateCreated)));
+            var data = PostData.String(GetIndexSearchString());
 
-            if (searchIndexRegistryResponse?.Documents == null || 
-                !searchIndexRegistryResponse.Documents.Any())
+            var response = await _client.SearchAsync<StringResponse>(
+               _environment.EnvironmentName + ReservationIndexLookupName, data);
+
+            var elasticResponse = JsonConvert.DeserializeObject<ElasticResponse<IndexRegistryEntry>>(response.Body);
+
+            if (!elasticResponse.Items.Any())
             {
                 return new IndexedReservationSearchResult();
             }
 
-            var reservationIndexName = searchIndexRegistryResponse.Documents.First().Name;
+            var reservationIndexName = elasticResponse.Items.First().Name;
 
-            if (string.IsNullOrEmpty(reservationIndexName))
+            ElasticResponse<ReservationIndex> elasticSearchResult;
+
+            if (string.IsNullOrWhiteSpace(reservationIndexName))
             {
                 return new IndexedReservationSearchResult();
             }
 
-            var startingDocumentIndex = pageNumber < 2 ? 0 : (pageNumber - 1) * pageItemCount;
-
-            ISearchResponse<ReservationIndex> searchResponse;
+            var startingDocumentIndex = (ushort) (pageNumber < 2 ? 0 : (pageNumber - 1) * pageItemCount);
 
             if (string.IsNullOrEmpty(term))
             {
-                searchResponse = await _client.SearchAsync<ReservationIndex>(s => s
-                    .Index(reservationIndexName)
-                    .From(startingDocumentIndex)
-                    .Size(pageItemCount)
-                    .Query(q =>
-                        q.Bool(b => b
-                            .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
-                        ))
-                    .Sort(ss => ss.Ascending(f => f.AccountLegalEntityName.Suffix("keyword"))
-                                  .Ascending(index => index.CourseTitle.Suffix("keyword"))
-                                  .Descending(index => index.StartDate)));
+                var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId);
+
+                var searchRawResponse = await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
+                elasticSearchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(searchRawResponse.Body);
             }
             else
             {
@@ -67,27 +65,40 @@ namespace SFA.DAS.Reservations.Data.Repository
                     ? searchTermWords.Aggregate((x, y) => $"*{x.Trim()}* AND *{y.Trim()}*")
                     : $"*{term}*";
 
-                searchResponse = await _client.SearchAsync<ReservationIndex>(s => s
-                    .Index(reservationIndexName)
-                    .From(startingDocumentIndex)
-                    .Size(pageItemCount)
-                    .Query(q =>
-                        q.Bool(b => b
-                            .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
-                            .Filter(x => x.QueryString(descriptor => descriptor
-                                .Fields(fields => fields.Field(f => f.CourseName)
-                                    .Field(f => f.AccountLegalEntityName))
-                                .Query(formattedSearchTerm)))
-                        )).Sort(ss => ss.Ascending(f => f.AccountLegalEntityName.Suffix("keyword"))
-                                        .Ascending(index => index.CourseTitle.Suffix("keyword"))
-                                        .Descending(index => index.StartDate)));
+                var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, formattedSearchTerm);
+
+                var searchRawResponse = await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
+                elasticSearchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(searchRawResponse.Body);
             }
 
             return new IndexedReservationSearchResult
-                {
-                    Reservations = searchResponse.Documents,
-                    TotalReservations = (uint) searchResponse.Total
-                }; 
+            {
+               Reservations = elasticSearchResult.Items,
+               TotalReservations = (uint) elasticSearchResult.hits.total.value
+            }; 
+        }
+
+        private string GetIndexSearchString()
+        {
+            var queryBuilder = new StringBuilder();
+            queryBuilder.Append(@"{""from"": 0,");
+            queryBuilder.Append(@"""size"": 0,");
+            queryBuilder.Append(@"""sort"":  {""dateCreated"": {""order"": ""desc""}}");
+
+            return queryBuilder.ToString();
+        }
+
+        private string GetReservationsSearchString(ushort startingDocumentIndex, ushort pageItemCount, long providerId)
+        {
+            return @"{""from"": " + startingDocumentIndex + @",""query"":{""bool"":{""must"":[{""match"":{""indexedProviderId"":{""query"":""" + providerId + @"""}}}]}},""size"":" + pageItemCount + @",""sort"":[{
+            ""accountLegalEntityName.keyword"":{""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
+        }
+
+        private string GetReservationsSearchString(ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm)
+        {
+            return @"{""from"": " + startingDocumentIndex + @",""query"":{""bool"":{""filter"":[{""query_string"":{""fields"":[""courseName"",""accountLegalEntityName""],
+            ""query"":""" + searchTerm + @"""}}],""must"":[{""match"":{""indexedProviderId"":{""query"":""" + providerId + @"""}}}]}},""size"":" + pageItemCount + @",""sort"":[{
+            ""accountLegalEntityName.keyword"":{""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
         }
 
         private class IndexRegistryEntry
