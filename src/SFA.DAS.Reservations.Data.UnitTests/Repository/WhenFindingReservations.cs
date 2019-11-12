@@ -70,8 +70,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             //Arrange
             var queryBuilder = new StringBuilder();
             queryBuilder.Append(@"{""from"": 0,");
-            queryBuilder.Append(@"""size"": 0,");
-            queryBuilder.Append(@"""sort"":  {""dateCreated"": {""order"": ""desc""}}");
+            queryBuilder.Append(@"""size"": 1,");
+            queryBuilder.Append(@"""sort"":  {""dateCreated"": {""order"": ""desc""}}}");
 
             //Act
             await _repository.Find(10, "10", 1, 1);

@@ -74,8 +74,8 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             var queryBuilder = new StringBuilder();
             queryBuilder.Append(@"{""from"": 0,");
-            queryBuilder.Append(@"""size"": 0,");
-            queryBuilder.Append(@"""sort"":  {""dateCreated"": {""order"": ""desc""}}");
+            queryBuilder.Append(@"""size"": 1,");
+            queryBuilder.Append(@"""sort"":  {""dateCreated"": {""order"": ""desc""}}}");
 
             return queryBuilder.ToString();
         }

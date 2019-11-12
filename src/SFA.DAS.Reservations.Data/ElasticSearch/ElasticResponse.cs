@@ -10,7 +10,7 @@ namespace SFA.DAS.Reservations.Data.ElasticSearch
         public Shards _shards { get; set; }
         public Hits<T> hits { get; set; }
 
-        public ICollection<T> Items => hits.hits.Select(h => h._source).ToList();
+        public ICollection<T> Items => hits?.hits?.Select(h => h._source).ToList() ?? new List<T>();
     }
 
     public class Shards
