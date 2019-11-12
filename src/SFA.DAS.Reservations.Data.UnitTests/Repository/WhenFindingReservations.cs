@@ -94,10 +94,11 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var expectedProviderId = 1001;
             ushort pageNumber = 1;
             ushort pageItemSize = 2;
-            var query =  @"{""from"": 0,""query"":{""bool"":{""filter"":[{""query_string"":{""fields"":[""courseName"",""accountLegalEntityName""],
-            ""query"":""" + $"*{expectedSearchTerm}*" + @"""}}],""must"":[{""match"":{""indexedProviderId"":{""query"":""" + expectedProviderId + @"""}}}]}},
-            ""size"":" + pageItemSize + @",""sort"":[{""accountLegalEntityName.keyword"":{""order"":""asc""}},{""courseTitle.keyword"":
-            {""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
+
+            var query = @"{""from"":""0"",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+            {""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},{""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",""fields"":
+            [""accountLegalEntityName"",""courseDescription""]}}]}},""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
 
             //Act
             await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize);
@@ -119,9 +120,10 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var expectedProviderId = 1001;
             ushort pageNumber = 1;
             ushort pageItemSize = 2;
-            var query =  @"{""from"": 0,""query"":{""bool"":{""must"":[{""match"":{""indexedProviderId"":{""query"":""" + expectedProviderId + @"""}}}]}},
-            ""size"":" + pageItemSize + @",""sort"":[{""accountLegalEntityName.keyword"":{""order"":""asc""}},{""courseTitle.keyword"":
-            {""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
+
+            var query = @"{""from"":""0"",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+            {""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}},""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
 
             //Act
             await _repository.Find(expectedProviderId, string.Empty, pageNumber, pageItemSize);

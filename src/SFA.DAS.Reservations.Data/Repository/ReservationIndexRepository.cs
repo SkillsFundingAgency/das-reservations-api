@@ -23,9 +23,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             _environment = environment;
         }
 
-        //TODO: Create test for special characters being used and making sure they do not affect search
-
-        public async Task<IndexedReservationSearchResult> Find(long providerId, string term, ushort pageNumber, ushort pageItemCount)
+        public async Task<IndexedReservationSearchResult> Find(long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount)
         {
             var data = PostData.String(GetIndexSearchString());
 
@@ -50,7 +48,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             var startingDocumentIndex = (ushort) (pageNumber < 2 ? 0 : (pageNumber - 1) * pageItemCount);
 
-            if (string.IsNullOrEmpty(term))
+            if (string.IsNullOrEmpty(searchTerm))
             {
                 var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId);
 
@@ -59,13 +57,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             }
             else
             {
-                var searchTermWords = term.Split(' ');
-
-                var formattedSearchTerm = searchTermWords.Length > 1
-                    ? searchTermWords.Aggregate((x, y) => $"*{x.Trim()}* AND *{y.Trim()}*")
-                    : $"*{term}*";
-
-                var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, formattedSearchTerm);
+                var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, searchTerm);
 
                 var searchRawResponse = await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
                 elasticSearchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(searchRawResponse.Body);
@@ -90,15 +82,17 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         private string GetReservationsSearchString(ushort startingDocumentIndex, ushort pageItemCount, long providerId)
         {
-            return @"{""from"": " + startingDocumentIndex + @",""query"":{""bool"":{""must"":[{""match"":{""indexedProviderId"":{""query"":""" + providerId + @"""}}}]}},""size"":" + pageItemCount + @",""sort"":[{
-            ""accountLegalEntityName.keyword"":{""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
+            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+            {""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
         }
 
         private string GetReservationsSearchString(ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm)
         {
-            return @"{""from"": " + startingDocumentIndex + @",""query"":{""bool"":{""filter"":[{""query_string"":{""fields"":[""courseName"",""accountLegalEntityName""],
-            ""query"":""" + searchTerm + @"""}}],""must"":[{""match"":{""indexedProviderId"":{""query"":""" + providerId + @"""}}}]}},""size"":" + pageItemCount + @",""sort"":[{
-            ""accountLegalEntityName.keyword"":{""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
+            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+            {""indexedProviderId"":{""value"":""" + providerId + @"""}}},{""multi_match"":{""query"":""" + searchTerm + @""",""type"":""phrase_prefix"",""fields"":
+            [""accountLegalEntityName"",""courseDescription""]}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
         }
 
         private class IndexRegistryEntry
