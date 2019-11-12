@@ -16,9 +16,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
         private CancellationToken _cancellationToken;
         private GetAccountRulesQuery _query;
         private Mock<IGlobalRulesService> _globalRuleService;
+        private List<GlobalRule> _accountGlobalRules;
         private List<GlobalRule> _globalRules;
         private Mock<IValidator<GetAccountRulesQuery>> _validator;
-        private const long ExpectedReservationGlobalRuleId = 0;
+        private const long ExpectedAccountReservationGlobalRuleId = 0;
         private const long ExpectedAccountId = 123554;
 
         [SetUp]
@@ -30,14 +31,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             };
             _cancellationToken = new CancellationToken();
             _globalRuleService = new Mock<IGlobalRulesService>();
-            _globalRules = new List<GlobalRule>{new GlobalRule(new Domain.Entities.GlobalRule
+            _accountGlobalRules = new List<GlobalRule>{new GlobalRule(new Domain.Entities.GlobalRule
             {
-                Id= ExpectedReservationGlobalRuleId,
+                Id= ExpectedAccountReservationGlobalRuleId,
                 RuleType = (byte)GlobalRuleType.ReservationLimit,
                 Restriction = (byte)AccountRestriction.Account
             })};
-            _globalRuleService.Setup(x => x.GetAccountRules(ExpectedAccountId)).ReturnsAsync(_globalRules);
-;
+            _globalRules = new List<GlobalRule>();
+            _globalRuleService.Setup(x => x.GetAccountRules(ExpectedAccountId)).ReturnsAsync(_accountGlobalRules);
+            _globalRuleService.Setup(x=>x.GetActiveRules(It.IsAny<DateTime>())).ReturnsAsync(_globalRules);
+
             _validator = new Mock<IValidator<GetAccountRulesQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<GetAccountRulesQuery>()))
                 .ReturnsAsync(new ValidationResult());
@@ -76,7 +79,29 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             //Assert
             _globalRuleService.Verify(x => x.GetAccountRules(ExpectedAccountId), Times.Once);
             Assert.IsNotNull(actual.GlobalRules);
-            Assert.AreEqual(ExpectedReservationGlobalRuleId, actual.GlobalRules[0].Id);
+            Assert.AreEqual(ExpectedAccountReservationGlobalRuleId, actual.GlobalRules[0].Id);
+        }
+
+        [Test]
+        public async Task Then_The_Active_Global_Rules_Are_Read_And_Added_To_The_Response()
+        {
+            //Arrange
+            _globalRules = new List<GlobalRule>{new GlobalRule(new Domain.Entities.GlobalRule
+            {
+                Id = 10,
+                RuleType = (byte)GlobalRuleType.FundingPaused,
+                Restriction = (byte)AccountRestriction.All
+            })};
+            _globalRuleService.Setup(x => x.GetActiveRules(It.IsAny<DateTime>())).ReturnsAsync(_globalRules);
+
+            //Act
+            var actual = await _handler.Handle(_query, _cancellationToken);
+
+            //Assert
+            _globalRuleService.Verify(x => x.GetAccountRules(ExpectedAccountId), Times.Once);
+            _globalRuleService.Verify(x => x.GetActiveRules(It.IsAny<DateTime>()), Times.Once);
+            Assert.IsNotNull(actual.GlobalRules);
+            Assert.AreEqual(2, actual.GlobalRules.Count);
         }
     }
 }
