@@ -81,6 +81,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(_expectedSearchResults, result.Reservations);
+            Assert.AreEqual(_expectedSearchResults.Count, result.NumberOfRecordsFound);
         }
     }
 }

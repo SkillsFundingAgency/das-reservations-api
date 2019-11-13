@@ -53,28 +53,28 @@ namespace SFA.DAS.Reservations.Data.Repository
                     .Query(q =>
                         q.Bool(b => b
                             .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
-                        )));
+                            .MustNot(x => x.Match(m => m.Field(f => f.Status).Query(((short)ReservationStatus.Deleted).ToString()))))
+                        ));
             }
             else
             {
-                var searchTermWords = term.Split(' ');
-
-                var formattedSearchTerm = searchTermWords.Length > 1
-                    ? searchTermWords.Aggregate((x, y) => $"*{x.Trim()}* AND *{y.Trim()}*")
-                    : $"*{term}*";
-
                 searchResponse = await _client.SearchAsync<ReservationIndex>(s => s
                     .Index(reservationIndexName)
                     .From(0)
                     .Size(100)
-                    .Query(q =>
-                        q.Bool(b => b
-                            .Must(x => x.Match(m => m.Field(f => f.IndexedProviderId).Query(providerId.ToString())))
-                            .Filter(x => x.QueryString(descriptor => descriptor
-                                .Fields(fields => fields.Field(f => f.CourseName)
-                                    .Field(f => f.AccountLegalEntityName))
-                                .Query(formattedSearchTerm)))
-                        )));
+                    .PostFilter(f=>
+                        f.Term(fi=>
+                            fi.Field("indexedProviderId")
+                                .Value(providerId.ToString())))
+                    .Query(q=>
+                        q.MultiMatch(b => b
+                            .Query(term)
+                            .Type(TextQueryType.PhrasePrefix)
+                            .Fields(f=>f.Fields("courseDescription", "accountLegalEntityName"))
+                            ) && q.Bool(b => b
+                            .MustNot(x => x.Match(m => m.Field(f => f.Status).Query(((short)ReservationStatus.Deleted).ToString())))) 
+                        ));
+                
             }
 
             return searchResponse.Documents;
