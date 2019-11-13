@@ -74,16 +74,13 @@ namespace SFA.DAS.Reservations.Data.Repository
                 _logger.LogDebug("Searching with search term");
 
                 var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, searchTerm);
-
                 var searchRawResponse = await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
-
                 elasticSearchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(searchRawResponse.Body);
             }
 
             if (elasticSearchResult == null)
             {
                 _logger.LogWarning("Searching failed. Elastic search response could not be de-serialised");
-
                 return new IndexedReservationSearchResult();
             }
 
