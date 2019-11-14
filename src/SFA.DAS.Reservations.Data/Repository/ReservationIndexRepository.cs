@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
 using System.Linq;
 using System.Text;
@@ -30,25 +31,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             _logger.LogInformation("Starting reservation search");
 
-            var data = PostData.String(GetIndexSearchString());
-
-            _logger.LogDebug("Getting latest reservation index name");
-
-            var response = await _client.SearchAsync<StringResponse>(
-                _environment.EnvironmentName + ReservationIndexLookupName, data);
-           
-            var elasticResponse = JsonConvert.DeserializeObject<ElasticResponse<IndexRegistryEntry>>(response.Body);
-
-            if (elasticResponse?.Items == null || !elasticResponse.Items.Any())
-            {
-                _logger.LogWarning("Searching failed. Could not find any reservation index names to search");
-
-                return new IndexedReservationSearchResult();
-            }
-
-            var reservationIndexName = elasticResponse.Items.First().Name;
-
-            ElasticResponse<ReservationIndex> elasticSearchResult;
+            var reservationIndexName = await GetCurrentReservationIndexName();
 
             if (string.IsNullOrWhiteSpace(reservationIndexName))
             {
@@ -59,24 +42,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             var startingDocumentIndex = (ushort) (pageNumber < 2 ? 0 : (pageNumber - 1) * pageItemCount);
 
-            if (string.IsNullOrEmpty(searchTerm))
-            {
-                _logger.LogDebug("Searching without search term");
-
-                var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId);
-
-                var searchRawResponse = await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
-
-                elasticSearchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(searchRawResponse.Body);
-            }
-            else
-            {
-                _logger.LogDebug("Searching with search term");
-
-                var request = GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, searchTerm);
-                var searchRawResponse = await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
-                elasticSearchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(searchRawResponse.Body);
-            }
+            var elasticSearchResult = await GetSearchResult(providerId, searchTerm, pageItemCount, startingDocumentIndex, reservationIndexName);
 
             if (elasticSearchResult == null)
             {
@@ -86,11 +52,75 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             _logger.LogDebug("Searching complete, returning search results");
 
-            return new IndexedReservationSearchResult
+            var courseFilterValues = await GetCourseFilterValues(reservationIndexName);
+
+            var searchResult =  new IndexedReservationSearchResult
             {
                Reservations = elasticSearchResult.Items,
-               TotalReservations = (uint) elasticSearchResult.hits.total.value
-            }; 
+               TotalReservations = (uint) elasticSearchResult.hits.total.value,
+               Filters = new SearchFilters { CourseFilters = courseFilterValues}
+            };
+
+            return searchResult;
+        }
+
+        private async Task<ICollection<string>> GetCourseFilterValues(string reservationIndexName)
+        {
+            var request = GetCourseFilterValuesQuery();
+            
+            var jsonResponse =
+                await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
+            
+            var response = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
+
+            var courseFilterValues = response.aggregations?.uniqueCourseDescription?.buckets?.Select(b => b.key).ToList();
+            
+            return courseFilterValues ?? new List<string>();
+        }
+
+        private async Task<ElasticResponse<ReservationIndex>> GetSearchResult(
+            long providerId, string searchTerm, ushort pageItemCount,
+            ushort startingDocumentIndex, string reservationIndexName)
+        {
+            var request = string.IsNullOrEmpty(searchTerm) ?
+                GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId) :
+                GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, searchTerm);
+
+            _logger.LogDebug($"Searching with search term: {searchTerm}");
+
+            var jsonResponse =
+                await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
+
+            var searchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
+
+            return searchResult;
+        }
+
+        private async Task<string> GetCurrentReservationIndexName()
+        {
+            var data = PostData.String(GetIndexSearchString());
+
+            _logger.LogDebug("Getting latest reservation index name");
+
+            var response = await _client.SearchAsync<StringResponse>(
+                _environment.EnvironmentName + ReservationIndexLookupName, data);
+
+            var elasticResponse = JsonConvert.DeserializeObject<ElasticResponse<IndexRegistryEntry>>(response.Body);
+
+            if (elasticResponse?.Items != null && elasticResponse.Items.Any())
+            {
+                return elasticResponse.Items.First().Name;
+            }
+
+            _logger.LogWarning("Searching failed. Could not find any reservation index names to search");
+
+            return null;
+        }
+
+        private string GetCourseFilterValuesQuery()
+        {
+            return @"{""aggs"":{""uniqueCourseDescription"":
+                    { ""terms"":{ ""field"":""courseDescription.keyword""} }}}";
         }
 
         private string GetIndexSearchString()
