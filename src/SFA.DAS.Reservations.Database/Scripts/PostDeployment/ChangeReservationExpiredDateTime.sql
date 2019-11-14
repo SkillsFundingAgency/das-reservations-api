@@ -3,7 +3,7 @@
                  WHERE TABLE_SCHEMA = 'dbo' 
                  AND  TABLE_NAME = 'Reservation'))
 BEGIN
-	UPDATE [SFA.DAS.Reservations.Database].[dbo].[Reservation]
+	UPDATE [dbo].[Reservation]
 	SET [ExpiryDate] = DATEADD(second, -1, DATEADD(day, 1, [ExpiryDate]))
 	WHERE [ExpiryDate] IS NOT NULL
 	AND DATEPART(hour, ExpiryDate) = 0
