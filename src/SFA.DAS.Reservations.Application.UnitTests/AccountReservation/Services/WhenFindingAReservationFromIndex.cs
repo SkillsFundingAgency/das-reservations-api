@@ -94,6 +94,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         }
 
         [Test]
+        public async Task ThenShouldReturnAvailableCourseFilters()
+        {
+            //Arrange
+            var expectedFilters = new List<string>{"Test1", "Test2"};
+
+            
+            _reservationIndexRepository.Setup(x => x.Find(ProviderId, SearchTerm, PageNumber, PageItemNumber))
+                .ReturnsAsync(new IndexedReservationSearchResult
+                {
+                    Reservations = new List<ReservationIndex>(),
+                    TotalReservations = 0,
+                    Filters = new SearchFilters { CourseFilters = expectedFilters}
+                });
+
+            //Act
+            var result = await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber);
+
+            //Assert
+            result.Filters.CourseFilters.Should().BeEquivalentTo(expectedFilters);
+        }
+
+        [Test]
         public async Task ThenShouldReturnNoReservationsIfNoneFound()
         {
             //Arrange

@@ -39,7 +39,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             return new FindAccountReservationsResult
             {
                 Reservations = result.Reservations,
-                NumberOfRecordsFound = result.TotalReservations
+                NumberOfRecordsFound = result.TotalReservations,
+                Filters = result.Filters
             };
         }
     }

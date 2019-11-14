@@ -27,6 +27,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         {
             new Reservation(Guid.NewGuid(), ExpectedAccountId, DateTime.Now, 3, "Test Name")
         };
+        private readonly List<string> _expectedCourseFilters = new List<string>{"Baker - Level 1", "Banking - Level 3"};
 
         [SetUp]
         public void Arrange()
@@ -49,7 +50,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 .ReturnsAsync(new ReservationSearchResult
                 {
                     Reservations = _expectedSearchResults,
-                    TotalReservations = ExpectedSearchResultTotal
+                    TotalReservations = ExpectedSearchResultTotal,
+                    Filters = new SearchFilters() { CourseFilters = _expectedCourseFilters}
                 });
                 
             
@@ -98,6 +100,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.IsNotNull(result);
             Assert.AreEqual(_expectedSearchResults, result.Reservations);
             Assert.AreEqual(ExpectedSearchResultTotal, result.NumberOfRecordsFound);
+            Assert.AreEqual(_expectedCourseFilters, result.Filters.CourseFilters);
         }
     }
 }
