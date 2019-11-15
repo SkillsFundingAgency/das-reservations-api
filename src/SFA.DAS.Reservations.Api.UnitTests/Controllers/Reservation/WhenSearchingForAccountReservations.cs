@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public async Task Then_The_Reservations_Are_Returned()
         {
             //Act
-            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm);
+            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null);
 
             //Assert
             Assert.IsNotNull(actual);
@@ -67,7 +67,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
             
             //Act
-            var actual = await _reservationsController.Search(0, "test");
+            var actual = await _reservationsController.Search(0, "test", null);
 
             //Assert
             var result = actual as ObjectResult;

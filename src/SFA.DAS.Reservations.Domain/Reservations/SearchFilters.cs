@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SFA.DAS.Reservations.Domain.Reservations
 {
@@ -10,5 +11,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         }
 
         public ICollection<string> CourseFilters { get; set; }
+
+        public bool HasFilters => CourseFilters.Any();
     }
 }

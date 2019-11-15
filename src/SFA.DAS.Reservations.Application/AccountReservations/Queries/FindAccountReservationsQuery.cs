@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 {
@@ -8,5 +9,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         public string SearchTerm { get; set; }
         public ushort PageNumber { get; set; }
         public ushort PageItemCount { get; set; }
+        public SearchFilters SelectedFilters { get; set; }
     }
 }

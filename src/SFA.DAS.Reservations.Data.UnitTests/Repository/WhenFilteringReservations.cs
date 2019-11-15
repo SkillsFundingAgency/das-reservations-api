@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Data.UnitTests.ElasticSearch;
 using SFA.DAS.Reservations.Data.UnitTests.Extensions;
 using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 {
@@ -20,6 +21,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         private Mock<IElasticLowLevelClient> _mockClient;
         private ReservationsApiEnvironment _apiEnvironment;
         private ReservationIndexRepository _repository;
+        private readonly List<string> _expectedCourseFilters = new List<string> { "Baker - Level 1", "Banking - Level 3" };
+        private SearchFilters _expectedSearchFilter;
 
         [SetUp]
         public void Init()
@@ -27,6 +30,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             _mockClient = new Mock<IElasticLowLevelClient>();
             _apiEnvironment = new ReservationsApiEnvironment("test");
             _repository = new ReservationIndexRepository(_mockClient.Object, _apiEnvironment, Mock.Of<ILogger<ReservationIndexRepository>>());
+
+            _expectedSearchFilter = new SearchFilters {CourseFilters = _expectedCourseFilters};
 
             var indexLookUpResponse = @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},""hits"":{""total"":
             {""value"":3,""relation"":""eq""},""max_score"":null,""hits"":[{""_index"":""local-reservations-index-registry"",""_type"":""_doc"",
@@ -89,7 +94,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                                   {""terms"":{""field"":""courseDescription.keyword""}}}}";
 
             //Act
-            await _repository.Find(10, "10", 1, 1);
+            await _repository.Find(10, "10", 1, 1, _expectedSearchFilter);
 
             //Assert
             _mockClient.Verify(c =>
@@ -106,7 +111,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenShouldReturnAllAvailableCourseFilterOptions()
         {
             //Act
-            var result = await _repository.Find(10, "10", 1, 1);
+            var result = await _repository.Find(10, "10", 1, 1, _expectedSearchFilter);
 
             //Assert
             result.Filters.Should().NotBeNull();
@@ -114,6 +119,36 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             result.Filters.CourseFilters.Count.Should().Be(2);
             result.Filters.CourseFilters.Should().Contain("Baker - Level 1");
             result.Filters.CourseFilters.Should().Contain("Banking - Level 2");
+        }
+
+        [Test]
+        public async Task ThenWillFilterSearchResultsByCourse()
+        {
+            //Arrange
+            var expectedSearchTerm = "test";
+            var expectedProviderId = 1001;
+            ushort pageNumber = 1;
+            ushort pageItemSize = 2;
+            var expectedCourseFilters = new List<string> {"Course 1", "Course 2"};
+
+            var query = @"{""from"":""0"",""query"":{""bool"":{""should"":[{""term"":{""courseDescription"":""Course 1""}},{""term"":{""courseDescription"":""Course 2""}}],
+            ""minimum_should_match"":1,""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+            {""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},{""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",""fields"":
+            [""accountLegalEntityName"",""courseDescription""]}}]}},""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
+
+            //Act
+            await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, 
+                new SearchFilters{CourseFilters = expectedCourseFilters});
+
+            //Assert
+            _mockClient.Verify(c =>
+                c.SearchAsync<StringResponse>(
+                    "test",
+                    It.Is<PostData>(pd =>
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                    It.IsAny<SearchRequestParameters>(),
+                    It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

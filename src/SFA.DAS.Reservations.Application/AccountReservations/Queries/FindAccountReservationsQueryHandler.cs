@@ -34,7 +34,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 query.ProviderId, 
                 query.SearchTerm, 
                 query.PageNumber, 
-                query.PageItemCount);
+                query.PageItemCount,
+                query.SelectedFilters);
 
             return new FindAccountReservationsResult
             {

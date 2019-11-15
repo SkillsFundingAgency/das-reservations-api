@@ -37,7 +37,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 ProviderId = ExpectedAccountId, 
                 SearchTerm = ExpectedSearchTerm,
                 PageNumber = ExpectedPageNumber,
-                PageItemCount = ExpectedPageItemCount
+                PageItemCount = ExpectedPageItemCount,
+                SelectedFilters = new SearchFilters { CourseFilters = _expectedCourseFilters}
             };
             _validator = new Mock<IValidator<FindAccountReservationsQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<FindAccountReservationsQuery>()))
@@ -46,14 +47,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             _service = new Mock<IAccountReservationService>();
 
             _service.Setup(x => x.FindReservations(
-                    ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber, ExpectedPageItemCount))
+                    ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber, 
+                    ExpectedPageItemCount, It.IsAny<SearchFilters>()))
                 .ReturnsAsync(new ReservationSearchResult
                 {
                     Reservations = _expectedSearchResults,
                     TotalReservations = ExpectedSearchResultTotal,
-                    Filters = new SearchFilters() { CourseFilters = _expectedCourseFilters}
+                    Filters = new SearchFilters { CourseFilters = _expectedCourseFilters}
                 });
-                
             
             _handler = new FindAccountReservationsQueryHandler(_service.Object, _validator.Object);
         }
@@ -87,7 +88,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
             //Assert
             _service.Verify(x => x.FindReservations(
-                ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber, ExpectedPageItemCount), Times.Once);
+                ExpectedAccountId, 
+                ExpectedSearchTerm, 
+                ExpectedPageNumber, 
+                ExpectedPageItemCount,
+                It.Is<SearchFilters>(sf => sf.CourseFilters.Equals(_expectedCourseFilters))), Times.Once);
         }
 
         [Test]

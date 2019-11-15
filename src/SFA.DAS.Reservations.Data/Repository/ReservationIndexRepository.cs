@@ -27,7 +27,8 @@ namespace SFA.DAS.Reservations.Data.Repository
             _logger = logger;
         }
 
-        public async Task<IndexedReservationSearchResult> Find(long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount)
+        public async Task<IndexedReservationSearchResult> Find(
+            long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SearchFilters selectedFilters)
         {
             _logger.LogInformation("Starting reservation search");
 
@@ -42,7 +43,8 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             var startingDocumentIndex = (ushort) (pageNumber < 2 ? 0 : (pageNumber - 1) * pageItemCount);
 
-            var elasticSearchResult = await GetSearchResult(providerId, searchTerm, pageItemCount, startingDocumentIndex, reservationIndexName);
+            var elasticSearchResult = await GetSearchResult(
+                providerId, searchTerm, pageItemCount, startingDocumentIndex, reservationIndexName, selectedFilters);
 
             if (elasticSearchResult == null)
             {
@@ -80,11 +82,12 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         private async Task<ElasticResponse<ReservationIndex>> GetSearchResult(
             long providerId, string searchTerm, ushort pageItemCount,
-            ushort startingDocumentIndex, string reservationIndexName)
+            ushort startingDocumentIndex, string reservationIndexName, 
+            SearchFilters selectedFilters)
         {
             var request = string.IsNullOrEmpty(searchTerm) ?
-                GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId) :
-                GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, searchTerm);
+                GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, selectedFilters) :
+                GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, searchTerm, selectedFilters);
 
             _logger.LogDebug($"Searching with search term: {searchTerm}");
 
@@ -133,19 +136,49 @@ namespace SFA.DAS.Reservations.Data.Repository
             return queryBuilder.ToString();
         }
 
-        private string GetReservationsSearchString(ushort startingDocumentIndex, ushort pageItemCount, long providerId)
+        private string GetReservationsSearchString(
+            ushort startingDocumentIndex, ushort pageItemCount, long providerId, SearchFilters selectedFilters)
         {
-            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+            var filterClause = string.Empty;
+
+            if (selectedFilters.HasFilters)
+            {
+                filterClause = GetFilterSearchSubString(selectedFilters);
+            }
+
+            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{" + filterClause + @"""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
             {""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
             {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
         }
 
-        private string GetReservationsSearchString(ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm)
+        private string GetReservationsSearchString(
+            ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm, SearchFilters selectedFilters)
         {
-            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+            var filterClause = string.Empty;
+
+            if (selectedFilters.HasFilters)
+            {
+                filterClause = GetFilterSearchSubString(selectedFilters);
+            }
+
+            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{" + filterClause + @"""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
             {""indexedProviderId"":{""value"":""" + providerId + @"""}}},{""multi_match"":{""query"":""" + searchTerm + @""",""type"":""phrase_prefix"",""fields"":
             [""accountLegalEntityName"",""courseDescription""]}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
             {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
+        }
+
+        private string GetFilterSearchSubString(SearchFilters selectedFilters)
+        {
+            var filterClauseBuilder = new StringBuilder();
+
+            foreach (var courseFilterTerm in selectedFilters.CourseFilters)
+            {
+                filterClauseBuilder.Append(@"{""term"" : { ""courseDescription"" : """ + courseFilterTerm + @"""}},");
+            }
+
+            var filterClause = filterClauseBuilder.ToString().TrimEnd(',');
+
+            return @"""should"": [" + filterClause + @"], ""minimum_should_match"": 1,";
         }
 
         private class IndexRegistryEntry
