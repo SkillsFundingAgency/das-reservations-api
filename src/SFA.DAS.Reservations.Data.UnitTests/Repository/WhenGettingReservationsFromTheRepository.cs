@@ -137,28 +137,6 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             Assert.IsEmpty(actual);
         }
 
-        [Test]
-        public async Task Then_Orders_Reservations_Correctly()
-        {
-            //Arrange
-            var expectedOrderedReservations = new List<Reservation>
-            {
-                _reservations[0],
-                _reservations[1],
-                _reservations[2],
-                _reservations[3],
-                _reservations[4],
-                _reservations[5]
-            };
-
-            //Act
-            var actual = await _reservationRepository.GetAccountReservations(1);
-
-            //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(expectedOrderedReservations.Count, actual.Count);
-            actual.Should().BeEquivalentTo(expectedOrderedReservations, options => options.WithStrictOrdering());
-        }
 
     }
 }
