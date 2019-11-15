@@ -76,7 +76,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             queryBuilder.Append(@"""sort"":  {""dateCreated"": {""order"": ""desc""}}}");
 
             //Act
-            await _repository.Find(10, "10", 1, 1, new SearchFilters());
+            await _repository.Find(10, "10", 1, 1, new SelectedSearchFilters());
 
             //Assert
             _mockClient.Verify(c =>
@@ -103,7 +103,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
 
             //Act
-            await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, new SearchFilters());
+            await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, new SelectedSearchFilters());
 
             //Assert
             _mockClient.Verify(c =>
@@ -128,7 +128,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
 
             //Act
-            await _repository.Find(expectedProviderId, string.Empty, pageNumber, pageItemSize, new SearchFilters());
+            await _repository.Find(expectedProviderId, string.Empty, pageNumber, pageItemSize, new SelectedSearchFilters());
 
             //Assert
             _mockClient.Verify(c =>
@@ -157,7 +157,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .ReturnsAsync(new StringResponse(indexLookUpResponse));
 
             //Act
-            await _repository.Find(10, "10", 1, 1, new SearchFilters());
+            await _repository.Find(10, "10", 1, 1, new SelectedSearchFilters());
 
             //Assert
             _mockClient.Verify(c =>
@@ -186,7 +186,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .ReturnsAsync(new StringResponse(indexLookUpResponse));
 
             //Act
-            await _repository.Find(10, "10", 1, 1, new SearchFilters());
+            await _repository.Find(10, "10", 1, 1, new SelectedSearchFilters());
 
             //Assert
             _mockClient.Verify(c =>
@@ -201,7 +201,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenWillReturnReservationsFoundWithEmptySearch()
         {
             //Act
-            var results = await _repository.Find(2, string.Empty, 1, 1, new SearchFilters());
+            var results = await _repository.Find(2, string.Empty, 1, 1, new SelectedSearchFilters());
 
             //Assert
             Assert.AreEqual(3, results.TotalReservations);
@@ -230,7 +230,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenWillReturnReservationsFoundWithSearchTerm()
         {
             //Act
-            var results = await _repository.Find(2, "Test", 1, 1, new SearchFilters());
+            var results = await _repository.Find(2, "Test", 1, 1, new SelectedSearchFilters());
 
             //Assert
             Assert.AreEqual(3, results.TotalReservations);
@@ -269,7 +269,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
 
             //Act
-            var result = await _repository.Find(1, string.Empty, 1, 10, new SearchFilters());
+            var result = await _repository.Find(1, string.Empty, 1, 10, new SelectedSearchFilters());
 
             //Assert
             Assert.IsNotNull(result?.Reservations);
@@ -291,7 +291,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
 
             //Act
-            var result = await _repository.Find(1, string.Empty, 1, 10, new SearchFilters());
+            var result = await _repository.Find(1, string.Empty, 1, 10, new SelectedSearchFilters());
 
             //Assert
             Assert.IsNotNull(result?.Reservations);
@@ -315,7 +315,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .ReturnsAsync(new StringResponse(response));
 
             //Act
-            var result = await _repository.Find(1, string.Empty, 1, 10, new SearchFilters());
+            var result = await _repository.Find(1, string.Empty, 1, 10, new SelectedSearchFilters());
 
             //Assert
             Assert.IsNotNull(result?.Reservations);
@@ -347,7 +347,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .ReturnsAsync(new StringResponse(response));
 
             //Act
-            var result = await _repository.Find(1, string.Empty, 1, 10, new SearchFilters());
+            var result = await _repository.Find(1, string.Empty, 1, 10, new SelectedSearchFilters());
 
             //Assert
             Assert.IsNotNull(result?.Reservations);

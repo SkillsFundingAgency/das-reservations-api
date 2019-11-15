@@ -18,6 +18,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         private const ushort ExpectedPageItemCount = 50;
         private const ushort ExpectedSearchResultTotal = 1;
 
+
         private FindAccountReservationsQueryHandler _handler;
         private Mock<IValidator<FindAccountReservationsQuery>> _validator;
         private CancellationToken _cancellationToken;
@@ -28,6 +29,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             new Reservation(Guid.NewGuid(), ExpectedAccountId, DateTime.Now, 3, "Test Name")
         };
         private readonly List<string> _expectedCourseFilters = new List<string>{"Baker - Level 1", "Banking - Level 3"};
+        private SelectedSearchFilters _expectedSelectedFilters = new SelectedSearchFilters
+        {
+            CourseFilter = "Baker - Level 1"
+        };
 
         [SetUp]
         public void Arrange()
@@ -38,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 SearchTerm = ExpectedSearchTerm,
                 PageNumber = ExpectedPageNumber,
                 PageItemCount = ExpectedPageItemCount,
-                SelectedFilters = new SearchFilters { CourseFilters = _expectedCourseFilters}
+                SelectedFilters = _expectedSelectedFilters
             };
             _validator = new Mock<IValidator<FindAccountReservationsQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<FindAccountReservationsQuery>()))
@@ -48,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
             _service.Setup(x => x.FindReservations(
                     ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber, 
-                    ExpectedPageItemCount, It.IsAny<SearchFilters>()))
+                    ExpectedPageItemCount, It.IsAny<SelectedSearchFilters>()))
                 .ReturnsAsync(new ReservationSearchResult
                 {
                     Reservations = _expectedSearchResults,
@@ -92,7 +97,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 ExpectedSearchTerm, 
                 ExpectedPageNumber, 
                 ExpectedPageItemCount,
-                It.Is<SearchFilters>(sf => sf.CourseFilters.Equals(_expectedCourseFilters))), Times.Once);
+                _expectedSelectedFilters), Times.Once);
         }
 
         [Test]

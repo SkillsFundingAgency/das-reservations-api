@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         }
 
         public async Task<IndexedReservationSearchResult> Find(
-            long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SearchFilters selectedFilters)
+            long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SelectedSearchFilters selectedFilters)
         {
             _logger.LogInformation("Starting reservation search");
 
@@ -82,8 +82,8 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         private async Task<ElasticResponse<ReservationIndex>> GetSearchResult(
             long providerId, string searchTerm, ushort pageItemCount,
-            ushort startingDocumentIndex, string reservationIndexName, 
-            SearchFilters selectedFilters)
+            ushort startingDocumentIndex, string reservationIndexName,
+            SelectedSearchFilters selectedFilters)
         {
             var request = string.IsNullOrEmpty(searchTerm) ?
                 GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, selectedFilters) :
@@ -137,7 +137,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         }
 
         private string GetReservationsSearchString(
-            ushort startingDocumentIndex, ushort pageItemCount, long providerId, SearchFilters selectedFilters)
+            ushort startingDocumentIndex, ushort pageItemCount, long providerId, SelectedSearchFilters selectedFilters)
         {
             var filterClause = string.Empty;
 
@@ -152,7 +152,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         }
 
         private string GetReservationsSearchString(
-            ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm, SearchFilters selectedFilters)
+            ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm, SelectedSearchFilters selectedFilters)
         {
             var filterClause = string.Empty;
 
@@ -167,13 +167,15 @@ namespace SFA.DAS.Reservations.Data.Repository
             {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":{""order"":""desc""}}]}";
         }
 
-        private string GetFilterSearchSubString(SearchFilters selectedFilters)
+        private string GetFilterSearchSubString(SelectedSearchFilters selectedFilters)
         {
             var filterClauseBuilder = new StringBuilder();
 
-            foreach (var courseFilterTerm in selectedFilters.CourseFilters)
+            if(!string.IsNullOrWhiteSpace(selectedFilters.CourseFilter))
             {
-                filterClauseBuilder.Append(@"{""term"" : { ""courseDescription"" : """ + courseFilterTerm + @"""}},");
+                filterClauseBuilder.Append(@"{""match"" : { ""courseDescription"" : { 
+                                              ""query"":""" + selectedFilters.CourseFilter + 
+                                              @""", ""operator"":""and""}}},");
             }
 
             var filterClause = filterClauseBuilder.ToString().TrimEnd(',');

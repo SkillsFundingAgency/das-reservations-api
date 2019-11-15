@@ -6,6 +6,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     {
         Task<IndexedReservationSearchResult> Find(
             long providerId, string searchTerm, ushort pageNumber, 
-            ushort pageItemCount, SearchFilters selectedFilters);
+            ushort pageItemCount, SelectedSearchFilters selectedFilters);
     }
 }

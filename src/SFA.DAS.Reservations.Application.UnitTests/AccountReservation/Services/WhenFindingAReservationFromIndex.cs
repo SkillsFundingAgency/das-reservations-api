@@ -25,8 +25,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         private Mock<IReservationIndexRepository> _reservationIndexRepository;
         private Mock<IRuleRepository> _ruleRepository;
         private Mock<IOptions<ReservationsConfiguration>> _options;
-        private readonly List<string> _expectedCourseFilters = new List<string> { "Baker - Level 1", "Banking - Level 3" };
-        private SearchFilters _expectedSearchFilter;
+        private SelectedSearchFilters _expectedSelectedFilter;
 
         [SetUp]
         public void Init()
@@ -39,13 +38,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object,
                 _options.Object, _reservationIndexRepository.Object);
 
-            _expectedSearchFilter = new SearchFilters
+            _expectedSelectedFilter = new SelectedSearchFilters
             {
-                CourseFilters = _expectedCourseFilters
+                CourseFilter = "Baker - Level 1"
             };
 
             _reservationIndexRepository.Setup(x => x.Find(
-                    ProviderId, SearchTerm, PageNumber, PageItemNumber, It.IsAny<SearchFilters>()))
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, It.IsAny<SelectedSearchFilters>()))
                 .ReturnsAsync(new IndexedReservationSearchResult());
         }
 
@@ -53,13 +52,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public async Task ThenShouldSearchRepository()
         {
             //Act
-            await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber,
-                                            _expectedSearchFilter);
+            await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
 
             //Assert
             _reservationIndexRepository.Verify(x => x.Find(
-                ProviderId, SearchTerm, PageNumber, PageItemNumber,
-                It.Is<SearchFilters>(sf => sf.CourseFilters.Equals(_expectedCourseFilters))), Times.Once);
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter), Times.Once);
         }
 
         [Test]
@@ -73,7 +70,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             const int expectedSearchTotal = 1;
 
             _reservationIndexRepository.Setup(x => x.Find(
-                    ProviderId, SearchTerm, PageNumber, PageItemNumber, It.IsAny<SearchFilters>()))
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
                 .ReturnsAsync(new IndexedReservationSearchResult
                 { 
                     Reservations = new List<ReservationIndex>
@@ -96,8 +93,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 });
 
             //Act
-            var result = await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber,
-                                                         _expectedSearchFilter);
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
 
             //Assert
             result.Reservations.Should().NotBeNullOrEmpty();
@@ -113,7 +110,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             
             _reservationIndexRepository.Setup(x => x.Find(
-                    ProviderId, SearchTerm, PageNumber, PageItemNumber, It.IsAny<SearchFilters>()))
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
                 .ReturnsAsync(new IndexedReservationSearchResult
                 {
                     Reservations = new List<ReservationIndex>(),
@@ -122,8 +119,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 });
 
             //Act
-            var result = await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber,
-                                                        _expectedSearchFilter);
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
 
             //Assert
             result.Filters.CourseFilters.Should().BeEquivalentTo(expectedFilters);
@@ -138,8 +135,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 "Test Reservation", null, 3, 4);
 
             //Act
-            var result = await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber,
-                                                         _expectedSearchFilter);
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
 
             //Assert
             result.Reservations.Should().BeEmpty();

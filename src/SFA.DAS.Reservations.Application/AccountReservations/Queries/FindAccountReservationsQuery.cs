@@ -9,6 +9,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         public string SearchTerm { get; set; }
         public ushort PageNumber { get; set; }
         public ushort PageItemCount { get; set; }
-        public SearchFilters SelectedFilters { get; set; }
+        public SelectedSearchFilters SelectedFilters { get; set; }
     }
 }

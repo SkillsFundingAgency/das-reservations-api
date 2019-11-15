@@ -33,7 +33,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 new Domain.Reservations.Reservation(Guid.NewGuid(), ExpectedProviderId, DateTime.Now, 3, "Test Name")
             }};
             
-            _mediator.Setup(x => x.Send(It.Is<FindAccountReservationsQuery>(c => c.ProviderId.Equals(ExpectedProviderId)),
+            _mediator.Setup(x => x.Send(It.Is<FindAccountReservationsQuery>(c => 
+                        c.ProviderId.Equals(ExpectedProviderId)),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_accountReservationsResult);
 

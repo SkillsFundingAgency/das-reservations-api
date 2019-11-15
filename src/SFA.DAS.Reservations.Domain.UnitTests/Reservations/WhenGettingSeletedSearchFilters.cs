@@ -4,15 +4,15 @@ using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
 {
-    public class WhenGettingSearchFilters
+    public class WhenGettingSeletedSearchFilters
     {
         [Test]
         public void ThenWillSayIfCourseFiltersAreSelected()
         {
             //Arrange
-            var filters = new SearchFilters
+            var filters = new SelectedSearchFilters
             {
-                CourseFilters = new List<string> {"test"}
+                CourseFilter = "Test"
             };
 
             //Act
@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
         public void ThenWillSayIfFiltersAreNotSelected()
         {
             //Arrange
-            var filters = new SearchFilters();
+            var filters = new SelectedSearchFilters();
 
             //Act
             var result = filters.HasFilters;

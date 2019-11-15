@@ -47,7 +47,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         }
 
         public async Task<ReservationSearchResult> FindReservations(
-            long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SearchFilters selectedFilters)
+            long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SelectedSearchFilters selectedFilters)
         {
             var result = await _reservationIndexRepository.Find(
                 providerId, searchTerm, pageNumber, pageItemCount, selectedFilters);
