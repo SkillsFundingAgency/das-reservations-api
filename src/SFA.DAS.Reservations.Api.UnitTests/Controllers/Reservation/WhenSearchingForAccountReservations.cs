@@ -12,6 +12,7 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
@@ -31,7 +32,14 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             _accountReservationsResult = new FindAccountReservationsResult{Reservations= new List<Domain.Reservations.Reservation>
             {
                 new Domain.Reservations.Reservation(Guid.NewGuid(), ExpectedProviderId, DateTime.Now, 3, "Test Name")
-            }};
+            },
+                NumberOfRecordsFound = 3,
+                Filters = new SearchFilters
+                {
+                    CourseFilters = new [] {"Baker - Level 1", "Banking - Level 2"},
+                    AccountLegalEntityFilters = new [] {"Test Ltd", "Acme Bank"}
+                }
+            };
             
             _mediator.Setup(x => x.Send(It.Is<FindAccountReservationsQuery>(c => 
                         c.ProviderId.Equals(ExpectedProviderId)),
@@ -56,6 +64,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actualReservations = result.Value as FindAccountReservationsResult;
             Assert.AreEqual(_accountReservationsResult.Reservations, actualReservations.Reservations);
             Assert.AreEqual(_accountReservationsResult.NumberOfRecordsFound, actualReservations.NumberOfRecordsFound);
+            Assert.AreEqual(_accountReservationsResult.Filters, actualReservations.Filters);
         }
 
         [Test]

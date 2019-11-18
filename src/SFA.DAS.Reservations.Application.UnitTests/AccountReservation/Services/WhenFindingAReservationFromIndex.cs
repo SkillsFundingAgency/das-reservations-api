@@ -127,6 +127,30 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         }
 
         [Test]
+        public async Task ThenShouldReturnAvailableEmployerNameFilters()
+        {
+            //Arrange
+            var expectedFilters = new List<string>{"Test1", "Test2"};
+
+            
+            _reservationIndexRepository.Setup(x => x.Find(
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
+                .ReturnsAsync(new IndexedReservationSearchResult
+                {
+                    Reservations = new List<ReservationIndex>(),
+                    TotalReservations = 0,
+                    Filters = new SearchFilters { AccountLegalEntityFilters = expectedFilters}
+                });
+
+            //Act
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
+
+            //Assert
+            result.Filters.AccountLegalEntityFilters.Should().BeEquivalentTo(expectedFilters);
+        }
+
+        [Test]
         public async Task ThenShouldReturnNoReservationsIfNoneFound()
         {
             //Arrange

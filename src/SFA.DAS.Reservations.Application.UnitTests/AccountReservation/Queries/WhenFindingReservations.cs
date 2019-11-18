@@ -29,6 +29,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             new Reservation(Guid.NewGuid(), ExpectedAccountId, DateTime.Now, 3, "Test Name")
         };
         private readonly List<string> _expectedCourseFilters = new List<string>{"Baker - Level 1", "Banking - Level 3"};
+        private readonly List<string> _expectedAccountLegalEntityFilters = new List<string>{"Test Ltd", "Acme Bank"};
         private SelectedSearchFilters _expectedSelectedFilters = new SelectedSearchFilters
         {
             CourseFilter = "Baker - Level 1"
@@ -58,7 +59,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                 {
                     Reservations = _expectedSearchResults,
                     TotalReservations = ExpectedSearchResultTotal,
-                    Filters = new SearchFilters { CourseFilters = _expectedCourseFilters}
+                    Filters = new SearchFilters
+                    {
+                        CourseFilters = _expectedCourseFilters,
+                        AccountLegalEntityFilters = _expectedAccountLegalEntityFilters
+                    }
                 });
             
             _handler = new FindAccountReservationsQueryHandler(_service.Object, _validator.Object);
@@ -111,6 +116,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.AreEqual(_expectedSearchResults, result.Reservations);
             Assert.AreEqual(ExpectedSearchResultTotal, result.NumberOfRecordsFound);
             Assert.AreEqual(_expectedCourseFilters, result.Filters.CourseFilters);
+            Assert.AreEqual(_expectedAccountLegalEntityFilters, result.Filters.AccountLegalEntityFilters);
         }
     }
 }

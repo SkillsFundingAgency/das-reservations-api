@@ -86,10 +86,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenWillSearchForAllCourseTypesAvailable()
         {
             //Arrange
-            var expectedQuery = @"{""aggs"":{""uniqueCourseDescription"":
-                                  {""terms"":{""field"":""courseDescription.keyword""}}},
-                                  {""uniqueAccountLegalEntityName"":
-                                  {""terms"":{""field"":""accountLegalEntityName.keyword""}}}}";
+            var expectedQuery = @"{""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
+                                ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}}}}";
 
             //Act
             await _repository.Find(10, "10", 1, 1, _expectedSelectedFilters);
