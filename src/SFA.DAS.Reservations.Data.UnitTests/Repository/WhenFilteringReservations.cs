@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FluentAssertions;
@@ -28,13 +27,16 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             _apiEnvironment = new ReservationsApiEnvironment("test");
             _repository = new ReservationIndexRepository(_mockClient.Object, _apiEnvironment, Mock.Of<ILogger<ReservationIndexRepository>>());
 
-            _expectedSelectedFilters = new SelectedSearchFilters {CourseFilter = "Baker - Level 1"};
+            _expectedSelectedFilters = new SelectedSearchFilters
+            {
+                CourseFilter = "Baker - Level 1",
+                EmployerNameFilter = "Test Ltd"
+            };
 
             var indexLookUpResponse = @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},""hits"":{""total"":
             {""value"":3,""relation"":""eq""},""max_score"":null,""hits"":[{""_index"":""local-reservations-index-registry"",""_type"":""_doc"",
             ""_id"":""41444ccb-9687-4d3a-b0d5-295f3c35b153"",""_score"":null,""_source"":{""id"":""41444ccb-9687-4d3a-b0d5-295f3c35b153"",""name"":
             ""test"",""dateCreated"":""2019-11-06T15:11:00.5385739+00:00""},""sort"":[1573053060538]}]}}";
-
 
             _mockClient.Setup(c =>
                     c.SearchAsync<StringResponse>(
@@ -44,14 +46,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(indexLookUpResponse));
 
-
             var aggregationResponse =
-                @"{""took"":1,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,
-                ""skipped"":0,""failed"":0},""hits"":{""total"":{""value"":14,""relation"":""eq""},
-                ""max_score"":null,""hits"":[]},""aggregations"":{""uniqueCourseDescription"":
-                {""doc_count_error_upper_bound"":0,""sum_other_doc_count"":0,""buckets"":[{""key"":
-                ""Baker - Level 1"",""doc_count"":4},{""key"":""Banking - Level 2"",""doc_count"":2}]}}}";
-
+                @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},""hits"":
+                {""total"":{""value"":5,""relation"":""eq""},""max_score"":null,""hits"":[]},""aggregations"":{""uniqueAccountLegalEntityName"":
+                {""doc_count_error_upper_bound"":0,""sum_other_doc_count"":0,""buckets"":[{""key"":""Acme Bank"",""doc_count"":2},
+                {""key"":""Test Ltd"",""doc_count"":2}]},""uniqueCourseDescription"":{""doc_count_error_upper_bound"":0,""sum_other_doc_count"":0,
+                ""buckets"":[{""key"":""Baker - Level 1"",""doc_count"":4},{""key"":""Banking - Level 2"",""doc_count"":2}]}}}";
 
             _mockClient.Setup(c =>
                     c.SearchAsync<StringResponse>(
@@ -60,7 +60,6 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<SearchRequestParameters>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(aggregationResponse));
-
 
             var searchReponse =
                 @"{""took"":33,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},
@@ -88,7 +87,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         {
             //Arrange
             var expectedQuery = @"{""aggs"":{""uniqueCourseDescription"":
-                                  {""terms"":{""field"":""courseDescription.keyword""}}}}";
+                                  {""terms"":{""field"":""courseDescription.keyword""}}},
+                                  {""uniqueAccountLegalEntityName"":
+                                  {""terms"":{""field"":""accountLegalEntityName.keyword""}}}}";
 
             //Act
             await _repository.Find(10, "10", 1, 1, _expectedSelectedFilters);
@@ -118,6 +119,21 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             result.Filters.CourseFilters.Should().Contain("Banking - Level 2");
         }
 
+        
+        [Test]
+        public async Task ThenShouldReturnAllAvailableEmployerNameFilterOptions()
+        {
+            //Act
+            var result = await _repository.Find(10, "10", 1, 1, _expectedSelectedFilters);
+
+            //Assert
+            result.Filters.Should().NotBeNull();
+            result.Filters.AccountLegalEntityFilters.Should().NotBeNull();
+            result.Filters.AccountLegalEntityFilters.Count.Should().Be(2);
+            result.Filters.AccountLegalEntityFilters.Should().Contain("Test Ltd");
+            result.Filters.AccountLegalEntityFilters.Should().Contain("Acme Bank");
+        }
+
         [Test]
         public async Task ThenWillFilterSearchResultsByCourse()
         {
@@ -129,8 +145,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             var query =
                 @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""courseDescription"":
-                {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}}],
-                ""minimum_should_match"":1,""must_not"":[{""term"":{""status"":{""value"":""3""}}}],
+                {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}},{""match"":{""accountLegalEntityName"":
+                {""query"":""" + _expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,""must_not"":
+                [{""term"":{""status"":{""value"":""3""}}}],
                 ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
                 {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
                 ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},

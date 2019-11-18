@@ -54,30 +54,39 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             _logger.LogDebug("Searching complete, returning search results");
 
-            var courseFilterValues = await GetCourseFilterValues(reservationIndexName);
+            var filterValues = await GetFilterValues(reservationIndexName);
 
             var searchResult =  new IndexedReservationSearchResult
             {
                Reservations = elasticSearchResult.Items,
                TotalReservations = (uint) elasticSearchResult.hits.total.value,
-               Filters = new SearchFilters { CourseFilters = courseFilterValues}
+               Filters = new SearchFilters
+               {
+                   CourseFilters = filterValues.Courses,
+                   AccountLegalEntityFilters = filterValues.AccountLegalEntityNames
+               }
             };
 
             return searchResult;
         }
 
-        private async Task<ICollection<string>> GetCourseFilterValues(string reservationIndexName)
+        private async Task<FilterValues> GetFilterValues(string reservationIndexName)
         {
-            var request = GetCourseFilterValuesQuery();
+            var request = GetFilterValuesQuery();
             
             var jsonResponse =
                 await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
             
             var response = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
 
-            var courseFilterValues = response.aggregations?.uniqueCourseDescription?.buckets?.Select(b => b.key).ToList();
+            var coursefilterValues = response.aggregations?.uniqueCourseDescription?.buckets?.Select(b => b.key).ToList();
+            var accountLegalEntityfilterValues = response.aggregations?.uniqueAccountLegalEntityName?.buckets?.Select(b => b.key).ToList();
             
-            return courseFilterValues ?? new List<string>();
+            return new FilterValues
+            {
+                Courses = coursefilterValues,
+                AccountLegalEntityNames = accountLegalEntityfilterValues
+            };
         }
 
         private async Task<ElasticResponse<ReservationIndex>> GetSearchResult(
@@ -120,10 +129,12 @@ namespace SFA.DAS.Reservations.Data.Repository
             return null;
         }
 
-        private string GetCourseFilterValuesQuery()
+        private string GetFilterValuesQuery()
         {
             return @"{""aggs"":{""uniqueCourseDescription"":
-                    { ""terms"":{ ""field"":""courseDescription.keyword""} }}}";
+                    { ""terms"":{ ""field"":""courseDescription.keyword""}}},
+                    {""uniqueAccountLegalEntityName"":
+                    { ""terms"":{ ""field"":""accountLegalEntityName.keyword""}}}}";
         }
 
         private string GetIndexSearchString()
@@ -178,6 +189,13 @@ namespace SFA.DAS.Reservations.Data.Repository
                                               @""", ""operator"":""and""}}},");
             }
 
+            if(!string.IsNullOrWhiteSpace(selectedFilters.EmployerNameFilter))
+            {
+                filterClauseBuilder.Append(@"{""match"" : { ""accountLegalEntityName"" : { 
+                                              ""query"":""" + selectedFilters.EmployerNameFilter + 
+                                           @""", ""operator"":""and""}}},");
+            }
+
             var filterClause = filterClauseBuilder.ToString().TrimEnd(',');
 
             return @"""should"": [" + filterClause + @"], ""minimum_should_match"": 1,";
@@ -188,6 +206,12 @@ namespace SFA.DAS.Reservations.Data.Repository
             public Guid Id { get; set; }
             public string Name { get; set; }
             public DateTime DateCreated { get; set; }
+        }
+
+        private struct FilterValues
+        {
+            public ICollection<string> Courses { get; set; }
+            public ICollection<string> AccountLegalEntityNames { get; set; }
         }
     }
 }

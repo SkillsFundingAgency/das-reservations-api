@@ -10,5 +10,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         }
 
         public ICollection<string> CourseFilters { get; set; }
+        public ICollection<string> AccountLegalEntityFilters { get; set; }
     }
 }
