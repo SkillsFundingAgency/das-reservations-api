@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FluentAssertions;
@@ -30,7 +31,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             _expectedSelectedFilters = new SelectedSearchFilters
             {
                 CourseFilter = "Baker - Level 1",
-                EmployerNameFilter = "Test Ltd"
+                EmployerNameFilter = "Test Ltd",
+                StartDateFilter = DateTime.Now.ToString("dd/MM/yyyy")
             };
 
             var indexLookUpResponse = @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},""hits"":{""total"":
@@ -47,11 +49,13 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .ReturnsAsync(new StringResponse(indexLookUpResponse));
 
             var aggregationResponse =
-                @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},""hits"":
-                {""total"":{""value"":5,""relation"":""eq""},""max_score"":null,""hits"":[]},""aggregations"":{""uniqueAccountLegalEntityName"":
+                @"{""took"":0,""timed_out"":false,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0},
+                ""hits"":{""total"":{""value"":5,""relation"":""eq""},""max_score"":null,""hits"":[]},""aggregations"":
+                {""uniqueStartDate"":{""doc_count_error_upper_bound"":0,""sum_other_doc_count"":0,""buckets"":[{""key"":
+                ""2019-09-01 00:00:00"",""doc_count"":2},{""key"":""2019-10-01 00:00:00"",""doc_count"":2}]},""uniqueAccountLegalEntityName"":
                 {""doc_count_error_upper_bound"":0,""sum_other_doc_count"":0,""buckets"":[{""key"":""Acme Bank"",""doc_count"":2},
-                {""key"":""Test Ltd"",""doc_count"":2}]},""uniqueCourseDescription"":{""doc_count_error_upper_bound"":0,""sum_other_doc_count"":0,
-                ""buckets"":[{""key"":""Baker - Level 1"",""doc_count"":4},{""key"":""Banking - Level 2"",""doc_count"":2}]}}}";
+                {""key"":""Test Ltd"",""doc_count"":2}]},""uniqueCourseDescription"":{""doc_count_error_upper_bound"":0,
+                ""sum_other_doc_count"":0,""buckets"":[{""key"":""Baker - Level 1"",""doc_count"":4},{""key"":""Banking - Level 2"",""doc_count"":2}]}}}";
 
             _mockClient.Setup(c =>
                     c.SearchAsync<StringResponse>(
@@ -83,11 +87,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         }
 
         [Test]
-        public async Task ThenWillSearchForAllCourseTypesAvailable()
+        public async Task ThenWillSearchForAllFilterTypesAvailable()
         {
             //Arrange
             var expectedQuery = @"{""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
-                                ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}}}}";
+                                ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}},
+                                ""uniqueStartDate"":{""terms"":{""field"":""startDate.keyword""}}}}";
 
             //Act
             await _repository.Find(10, "10", 1, 1, _expectedSelectedFilters);
@@ -133,7 +138,21 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         }
 
         [Test]
-        public async Task ThenWillFilterSearchResultsByCourse()
+        public async Task ThenShouldReturnAllAvailableStartDateFilterOptions()
+        {
+            //Act
+            var result = await _repository.Find(10, "10", 1, 1, _expectedSelectedFilters);
+
+            //Assert
+            result.Filters.Should().NotBeNull();
+            result.Filters.StartDateFilters.Should().NotBeNull();
+            result.Filters.StartDateFilters.Count.Should().Be(2);
+            result.Filters.StartDateFilters.Should().Contain("2019-09-01 00:00:00");
+            result.Filters.StartDateFilters.Should().Contain("2019-10-01 00:00:00");
+        }
+
+        [Test]
+        public async Task ThenWillFilterSearchResultsByAllFilters()
         {
             //Arrange
             var expectedSearchTerm = "test";
@@ -144,13 +163,129 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var query =
                 @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""courseDescription"":
                 {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}},{""match"":{""accountLegalEntityName"":
+                {""query"":""" + _expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}},{""match"":{""startDate"":
+                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":3,""must_not"":
+                [{""term"":{""status"":{""value"":""3""}}}],
+                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
+                {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
+                ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
+                ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
+                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":
+                {""order"":""desc""}}]}";
+
+            //Act
+            await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, _expectedSelectedFilters);
+
+            //Assert
+            _mockClient.Verify(c =>
+                c.SearchAsync<StringResponse>(
+                    "test",
+                    It.Is<PostData>(pd =>
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                    It.IsAny<SearchRequestParameters>(),
+                    It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task ThenWillFilterSearchResultsByCourse()
+        {
+            //Arrange
+            var expectedSearchTerm = "test";
+            var expectedProviderId = 1001;
+            ushort pageNumber = 1;
+            ushort pageItemSize = 2;
+
+            _expectedSelectedFilters = new SelectedSearchFilters
+            {
+                CourseFilter = "Baker - Level 1"
+            };
+
+            var query =
+                @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""courseDescription"":
+                {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,""must_not"":
+                [{""term"":{""status"":{""value"":""3""}}}],
+                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
+                {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
+                ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
+                ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
+                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":
+                {""order"":""desc""}}]}";
+
+            //Act
+            await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, _expectedSelectedFilters);
+
+            //Assert
+            _mockClient.Verify(c =>
+                c.SearchAsync<StringResponse>(
+                    "test",
+                    It.Is<PostData>(pd =>
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                    It.IsAny<SearchRequestParameters>(),
+                    It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task ThenWillFilterSearchResultsByEmployerName()
+        {
+            //Arrange
+            var expectedSearchTerm = "test";
+            var expectedProviderId = 1001;
+            ushort pageNumber = 1;
+            ushort pageItemSize = 2;
+
+            _expectedSelectedFilters = new SelectedSearchFilters
+            {
+                EmployerNameFilter = "Test Ltd"
+            };
+
+            var query =
+                @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""accountLegalEntityName"":
                 {""query"":""" + _expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,""must_not"":
                 [{""term"":{""status"":{""value"":""3""}}}],
                 ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
                 {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
                 ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
                 ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
-                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate"":
+                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":
+                {""order"":""desc""}}]}";
+
+            //Act
+            await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, _expectedSelectedFilters);
+
+            //Assert
+            _mockClient.Verify(c =>
+                c.SearchAsync<StringResponse>(
+                    "test",
+                    It.Is<PostData>(pd =>
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                    It.IsAny<SearchRequestParameters>(),
+                    It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+
+        [Test]
+        public async Task ThenWillFilterSearchResultsByStartDate()
+        {
+            //Arrange
+            var expectedSearchTerm = "test";
+            var expectedProviderId = 1001;
+            ushort pageNumber = 1;
+            ushort pageItemSize = 2;
+
+            _expectedSelectedFilters = new SelectedSearchFilters
+            {
+                StartDateFilter = DateTime.Now.ToString("dd/MM/yyyy")
+            };
+
+            var query =
+                @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""startDate"":
+                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,""must_not"":
+                [{""term"":{""status"":{""value"":""3""}}}],
+                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
+                {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
+                ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
+                ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
+                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":
                 {""order"":""desc""}}]}";
 
             //Act
