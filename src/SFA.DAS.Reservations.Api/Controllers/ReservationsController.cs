@@ -140,7 +140,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [ProducesResponseType(404)]
         [Route("api/[controller]/search")]
         public async Task<IActionResult> Search(
-            long providerId, string searchTerm, string selectedCourse, string selectedEmployer, ushort pageNumber = 1, ushort pageItemCount = 10)
+            long providerId, string searchTerm, string selectedCourse, string selectedEmployer, string selectedStartDate, ushort pageNumber = 1, ushort pageItemCount = 10)
         {
             try
             {
@@ -153,7 +153,8 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     SelectedFilters = new SelectedSearchFilters
                     {
                         CourseFilter = selectedCourse,
-                        EmployerNameFilter = selectedEmployer
+                        EmployerNameFilter = selectedEmployer,
+                        StartDateFilter = selectedStartDate
                     }
                 });
 

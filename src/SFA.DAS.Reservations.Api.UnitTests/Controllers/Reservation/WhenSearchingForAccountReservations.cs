@@ -35,7 +35,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 Filters = new SearchFilters
                 {
                     CourseFilters = new [] {"Baker - Level 1", "Banking - Level 2"},
-                    EmployerFilters = new [] {"Test Ltd", "Acme Bank"}
+                    EmployerFilters = new [] {"Test Ltd", "Acme Bank"},
+                    StartDateFilters = new [] {DateTime.Now.AddDays(-1).ToString("d"), DateTime.Now.ToString("d")}
                 }
             };
             
@@ -54,7 +55,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var selectedCourse = "Test = Level 1";
 
             //Act
-            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, selectedCourse, null);
+            await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, selectedCourse, null, null);
 
             //Assert
             _mediator.Verify(m => m.Send(It.Is<FindAccountReservationsQuery>(q => q.SelectedFilters.CourseFilter.Equals(selectedCourse)), It.IsAny<CancellationToken>()));
@@ -67,10 +68,23 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var selectedEmployerName = "Test Ltd";
 
             //Act
-            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, selectedEmployerName);
+            await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, selectedEmployerName, null);
 
             //Assert
             _mediator.Verify(m => m.Send(It.Is<FindAccountReservationsQuery>(q => q.SelectedFilters.EmployerNameFilter.Equals(selectedEmployerName)), It.IsAny<CancellationToken>()));
+        }
+
+        [Test]
+        public async Task Then_Will_Filter_Reservations_By_Selected_Start_Date()
+        {
+            //Arrange
+            var selectedStartDate = DateTime.Now.ToString("g");
+
+            //Act
+            await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, null, selectedStartDate);
+
+            //Assert
+            _mediator.Verify(m => m.Send(It.Is<FindAccountReservationsQuery>(q => q.SelectedFilters.StartDateFilter.Equals(selectedStartDate)), It.IsAny<CancellationToken>()));
         }
 
 
@@ -78,7 +92,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         public async Task Then_The_Reservations_Are_Returned()
         {
             //Act
-            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, null);
+            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, null, null);
 
             //Assert
             Assert.IsNotNull(actual);
@@ -102,7 +116,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
             
             //Act
-            var actual = await _reservationsController.Search(0, "test", null, null);
+            var actual = await _reservationsController.Search(0, "test", null, null, null);
 
             //Assert
             var result = actual as ObjectResult;
