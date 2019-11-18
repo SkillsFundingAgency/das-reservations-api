@@ -30,9 +30,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         };
         private readonly List<string> _expectedCourseFilters = new List<string>{"Baker - Level 1", "Banking - Level 3"};
         private readonly List<string> _expectedAccountLegalEntityFilters = new List<string>{"Test Ltd", "Acme Bank"};
-        private SelectedSearchFilters _expectedSelectedFilters = new SelectedSearchFilters
+        private readonly List<string> _expectedStartDateFilters = new List<string>{DateTime.Now.AddDays(-1).ToString("g"), DateTime.Now.ToString("g")};
+       
+        private readonly SelectedSearchFilters _expectedSelectedFilters = new SelectedSearchFilters
         {
-            CourseFilter = "Baker - Level 1"
+            CourseFilter = "Baker - Level 1",
+            EmployerNameFilter = "Test Ltd",
+            StartDateFilter = DateTime.Now.ToString("g")
         };
 
         [SetUp]
@@ -62,7 +66,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                     Filters = new SearchFilters
                     {
                         CourseFilters = _expectedCourseFilters,
-                        EmployerFilters = _expectedAccountLegalEntityFilters
+                        EmployerFilters = _expectedAccountLegalEntityFilters,
+                        StartDateFilters = _expectedStartDateFilters
                     }
                 });
             
@@ -117,6 +122,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.AreEqual(ExpectedSearchResultTotal, result.NumberOfRecordsFound);
             Assert.AreEqual(_expectedCourseFilters, result.Filters.CourseFilters);
             Assert.AreEqual(_expectedAccountLegalEntityFilters, result.Filters.EmployerFilters);
+            Assert.AreEqual(_expectedStartDateFilters, result.Filters.StartDateFilters);
         }
     }
 }

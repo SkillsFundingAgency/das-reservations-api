@@ -40,7 +40,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             _expectedSelectedFilter = new SelectedSearchFilters
             {
-                CourseFilter = "Baker - Level 1"
+                CourseFilter = "Baker - Level 1",
+                EmployerNameFilter = "Test Ltd",
+                StartDateFilter = DateTime.Now.ToString("g")
             };
 
             _reservationIndexRepository.Setup(x => x.Find(
@@ -148,6 +150,29 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             //Assert
             result.Filters.EmployerFilters.Should().BeEquivalentTo(expectedFilters);
+        }
+
+        [Test]
+        public async Task ThenShouldReturnAvailableStartDateFilters()
+        {
+            //Arrange
+            var expectedFilters = new List<string>{DateTime.Now.AddDays(-1).ToString("g"), DateTime.Now.ToString("g")};
+            
+            _reservationIndexRepository.Setup(x => x.Find(
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
+                .ReturnsAsync(new IndexedReservationSearchResult
+                {
+                    Reservations = new List<ReservationIndex>(),
+                    TotalReservations = 0,
+                    Filters = new SearchFilters { StartDateFilters = expectedFilters}
+                });
+
+            //Act
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
+
+            //Assert
+            result.Filters.StartDateFilters.Should().BeEquivalentTo(expectedFilters);
         }
 
         [Test]
