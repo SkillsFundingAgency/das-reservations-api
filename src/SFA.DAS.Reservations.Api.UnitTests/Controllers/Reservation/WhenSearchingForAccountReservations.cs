@@ -50,10 +50,37 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
+        public async Task Then_Will_Filter_Reservations_By_Selected_Course()
+        {
+            //Arrange
+            var selectedCourse = "Test = Level 1";
+
+            //Act
+            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, selectedCourse, null);
+
+            //Assert
+            _mediator.Verify(m => m.Send(It.Is<FindAccountReservationsQuery>(q => q.SelectedFilters.CourseFilter.Equals(selectedCourse)), It.IsAny<CancellationToken>()));
+        }
+
+        [Test]
+        public async Task Then_Will_Filter_Reservations_By_Selected_Employer_Name()
+        {
+            //Arrange
+            var selectedEmployerName = "Test Ltd";
+
+            //Act
+            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, selectedEmployerName);
+
+            //Assert
+            _mediator.Verify(m => m.Send(It.Is<FindAccountReservationsQuery>(q => q.SelectedFilters.EmployerNameFilter.Equals(selectedEmployerName)), It.IsAny<CancellationToken>()));
+        }
+
+
+        [Test]
         public async Task Then_The_Reservations_Are_Returned()
         {
             //Act
-            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null);
+            var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, null);
 
             //Assert
             Assert.IsNotNull(actual);
@@ -77,7 +104,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
             
             //Act
-            var actual = await _reservationsController.Search(0, "test", null);
+            var actual = await _reservationsController.Search(0, "test", null, null);
 
             //Assert
             var result = actual as ObjectResult;
