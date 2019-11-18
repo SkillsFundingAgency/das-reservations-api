@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -13,7 +12,6 @@ using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Reservations;
-using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
@@ -37,7 +35,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 Filters = new SearchFilters
                 {
                     CourseFilters = new [] {"Baker - Level 1", "Banking - Level 2"},
-                    AccountLegalEntityFilters = new [] {"Test Ltd", "Acme Bank"}
+                    EmployerFilters = new [] {"Test Ltd", "Acme Bank"}
                 }
             };
             

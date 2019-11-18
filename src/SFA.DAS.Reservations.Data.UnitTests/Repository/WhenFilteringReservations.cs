@@ -126,10 +126,10 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             //Assert
             result.Filters.Should().NotBeNull();
-            result.Filters.AccountLegalEntityFilters.Should().NotBeNull();
-            result.Filters.AccountLegalEntityFilters.Count.Should().Be(2);
-            result.Filters.AccountLegalEntityFilters.Should().Contain("Test Ltd");
-            result.Filters.AccountLegalEntityFilters.Should().Contain("Acme Bank");
+            result.Filters.EmployerFilters.Should().NotBeNull();
+            result.Filters.EmployerFilters.Count.Should().Be(2);
+            result.Filters.EmployerFilters.Should().Contain("Test Ltd");
+            result.Filters.EmployerFilters.Should().Contain("Acme Bank");
         }
 
         [Test]

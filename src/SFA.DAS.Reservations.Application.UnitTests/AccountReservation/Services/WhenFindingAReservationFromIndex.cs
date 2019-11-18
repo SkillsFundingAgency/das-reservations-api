@@ -139,7 +139,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 {
                     Reservations = new List<ReservationIndex>(),
                     TotalReservations = 0,
-                    Filters = new SearchFilters { AccountLegalEntityFilters = expectedFilters}
+                    Filters = new SearchFilters { EmployerFilters = expectedFilters}
                 });
 
             //Act
@@ -147,7 +147,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
 
             //Assert
-            result.Filters.AccountLegalEntityFilters.Should().BeEquivalentTo(expectedFilters);
+            result.Filters.EmployerFilters.Should().BeEquivalentTo(expectedFilters);
         }
 
         [Test]

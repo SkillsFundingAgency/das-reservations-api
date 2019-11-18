@@ -63,7 +63,7 @@ namespace SFA.DAS.Reservations.Data.Repository
                Filters = new SearchFilters
                {
                    CourseFilters = filterValues.Courses,
-                   AccountLegalEntityFilters = filterValues.AccountLegalEntityNames
+                   EmployerFilters = filterValues.AccountLegalEntityNames
                }
             };
 

@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
                     Filters = new SearchFilters
                     {
                         CourseFilters = _expectedCourseFilters,
-                        AccountLegalEntityFilters = _expectedAccountLegalEntityFilters
+                        EmployerFilters = _expectedAccountLegalEntityFilters
                     }
                 });
             
@@ -116,7 +116,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.AreEqual(_expectedSearchResults, result.Reservations);
             Assert.AreEqual(ExpectedSearchResultTotal, result.NumberOfRecordsFound);
             Assert.AreEqual(_expectedCourseFilters, result.Filters.CourseFilters);
-            Assert.AreEqual(_expectedAccountLegalEntityFilters, result.Filters.AccountLegalEntityFilters);
+            Assert.AreEqual(_expectedAccountLegalEntityFilters, result.Filters.EmployerFilters);
         }
     }
 }
