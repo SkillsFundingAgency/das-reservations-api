@@ -49,7 +49,7 @@ namespace SFA.DAS.Reservations.Data.ElasticSearch
     {
         public AggregationsTerm uniqueCourseDescription { get; set; }
         public AggregationsTerm uniqueAccountLegalEntityName { get; set; }
-        public AggregationsTerm uniqueStartDate { get; set; }
+        public AggregationsTerm uniqueReservationPeriod { get; set; }
     }
 
     public class AggregationsTerm

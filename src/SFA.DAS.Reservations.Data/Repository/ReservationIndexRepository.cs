@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             var coursefilterValues = response.aggregations?.uniqueCourseDescription?.buckets?.Select(b => b.key).ToList();
             var accountLegalEntityfilterValues = response.aggregations?.uniqueAccountLegalEntityName?.buckets?.Select(b => b.key).ToList();
-            var startDateFilterValues = response.aggregations?.uniqueStartDate?.buckets?.Select(b => b.key).ToList();
+            var startDateFilterValues = response.aggregations?.uniqueReservationPeriod?.buckets?.Select(b => b.key).ToList();
             
             return new FilterValues
             {
@@ -136,7 +136,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             return @"{""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
                       ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}},
-                      ""uniqueStartDate"":{""terms"":{""field"":""startDate.keyword""}}}}";
+                      ""uniqueReservationPeriod"":{""terms"":{""field"":""reservationPeriod.keyword""}}}}";
         }
 
         private string GetIndexSearchString()
@@ -161,7 +161,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{" + filterClause + @"""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
             {""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
-            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":{""order"":""desc""}}]}";
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":{""order"":""desc""}}]}";
         }
 
         private string GetReservationsSearchString(
@@ -177,7 +177,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{" + filterClause + @"""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
             {""indexedProviderId"":{""value"":""" + providerId + @"""}}},{""multi_match"":{""query"":""" + searchTerm + @""",""type"":""phrase_prefix"",""fields"":
             [""accountLegalEntityName"",""courseDescription""]}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
-            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":{""order"":""desc""}}]}";
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":{""order"":""desc""}}]}";
         }
 
         private string GetFilterSearchSubString(SelectedSearchFilters selectedFilters)
@@ -205,7 +205,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             if(!string.IsNullOrWhiteSpace(selectedFilters.StartDateFilter))
             {
-                filterClauseBuilder.Append(@"{""match"" : { ""startDate"" : { 
+                filterClauseBuilder.Append(@"{""match"" : { ""reservationPeriod"" : { 
                                               ""query"":""" + selectedFilters.StartDateFilter + 
                                            @""", ""operator"":""and""}}},");
 

@@ -100,7 +100,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var query = @"{""from"":""0"",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
             {""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},{""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",""fields"":
             [""accountLegalEntityName"",""courseDescription""]}}]}},""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
-            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":{""order"":""desc""}}]}";
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":{""order"":""desc""}}]}";
 
             //Act
             await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, new SelectedSearchFilters());
@@ -125,7 +125,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             var query = @"{""from"":""0"",""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
             {""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}},""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
-            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""startDate.keyword"":{""order"":""desc""}}]}";
+            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":{""order"":""desc""}}]}";
 
             //Act
             await _repository.Find(expectedProviderId, string.Empty, pageNumber, pageItemSize, new SelectedSearchFilters());
