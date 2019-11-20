@@ -56,7 +56,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             {
                 Reservations = result.Reservations.Select(r => r.ToReservation()),
                 TotalReservations = result.TotalReservations,
-                Filters = result.Filters
+                Filters = result.Filters,
+                TotalReservationsForProvider = result.TotalReservationsForProvider
             };
         }
 
@@ -64,12 +65,12 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         {
             var reservation = new Reservation(
                 command.Id,
-                command.AccountId, 
+                command.AccountId,
                 command.StartDate,
                 _options.Value.ExpiryPeriodInMonths,
                 command.AccountLegalEntityName,
                 command.CourseId,
-                command.ProviderId, 
+                command.ProviderId,
                 command.AccountLegalEntityId,
                 command.IsLevyAccount,
                 command.TransferSenderAccountId,
@@ -117,7 +118,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         private Reservation MapReservation(Domain.Entities.Reservation reservation)
         {
-            var mapReservation = new Reservation(_ruleRepository.GetReservationRules, 
+            var mapReservation = new Reservation(_ruleRepository.GetReservationRules,
                 reservation.Id,
                 reservation.AccountId,
                 reservation.IsLevyAccount,

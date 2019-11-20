@@ -70,11 +70,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 "Test Reservation", null, 3, 4);
 
             const int expectedSearchTotal = 1;
+            const int expectedTotalReservationsForProvider = 10;
 
             _reservationIndexRepository.Setup(x => x.Find(
                     ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
                 .ReturnsAsync(new IndexedReservationSearchResult
-                { 
+                {
                     Reservations = new List<ReservationIndex>
                     {
                         new ReservationIndex
@@ -91,6 +92,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                             AccountLegalEntityName = expectedReservation.AccountLegalEntityName
                         }
                     },
+                    TotalReservationsForProvider = expectedTotalReservationsForProvider,
                     TotalReservations = expectedSearchTotal
                 });
 
@@ -102,6 +104,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             result.Reservations.Should().NotBeNullOrEmpty();
             result.Reservations.First().Should().BeEquivalentTo(expectedReservation);
             result.TotalReservations.Should().Be(expectedSearchTotal);
+            result.TotalReservationsForProvider.Should().Be(expectedTotalReservationsForProvider);
         }
 
         [Test]
@@ -110,7 +113,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             //Arrange
             var expectedFilters = new List<string>{"Test1", "Test2"};
 
-            
+
             _reservationIndexRepository.Setup(x => x.Find(
                     ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
                 .ReturnsAsync(new IndexedReservationSearchResult
@@ -134,7 +137,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             //Arrange
             var expectedFilters = new List<string>{"Test1", "Test2"};
 
-            
+
             _reservationIndexRepository.Setup(x => x.Find(
                     ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
                 .ReturnsAsync(new IndexedReservationSearchResult
@@ -157,7 +160,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         {
             //Arrange
             var expectedFilters = new List<string>{DateTime.Now.AddDays(-1).ToString("g"), DateTime.Now.ToString("g")};
-            
+
             _reservationIndexRepository.Setup(x => x.Find(
                     ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
                 .ReturnsAsync(new IndexedReservationSearchResult
