@@ -8,5 +8,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         public IEnumerable<Reservation> Reservations { get; set; }
         public uint NumberOfRecordsFound { get; set; }
         public SearchFilters Filters { get; set; }
+        public int TotalReservationsForProvider { get; set; }
     }
 }
