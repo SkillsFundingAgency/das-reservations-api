@@ -96,13 +96,16 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenWillSearchForAllFilterTypesAvailable()
         {
             //Arrange
-            var expectedQuery = @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}]}},
-                                ""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
-                                ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}},
-                                ""uniqueReservationPeriod"":{""terms"":{""field"":""reservationPeriod.keyword""}}}}";
+            var expectedProviderId = 1001;
+
+            var expectedQuery = @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
+                                {""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}},""aggs"":{""uniqueCourseDescription"":{""terms"":
+                                {""field"":""courseDescription.keyword"",""size"":1000}},""uniqueAccountLegalEntityName"":{""terms"":
+                                {""field"":""accountLegalEntityName.keyword"",""size"":1000}},""uniquePeriod"":{""terms"":{""field"":
+                                ""reservationPeriod.keyword"",""size"":1000}}}}";
 
             //Act
-            await _repository.Find(10, "10", 1, 1, _expectedSelectedFilters);
+            await _repository.Find(expectedProviderId, "10", 1, 1, _expectedSelectedFilters);
 
             //Assert
             _mockClient.Verify(c =>

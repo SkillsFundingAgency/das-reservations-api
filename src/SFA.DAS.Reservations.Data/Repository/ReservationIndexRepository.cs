@@ -56,7 +56,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             _logger.LogDebug("Searching complete, returning search results");
 
-            var filterValues = await GetFilterValues(reservationIndexName);
+            var filterValues = await GetFilterValues(reservationIndexName, providerId);
 
             var searchResult =  new IndexedReservationSearchResult
             {
@@ -74,9 +74,9 @@ namespace SFA.DAS.Reservations.Data.Repository
             return searchResult;
         }
 
-        private async Task<FilterValues> GetFilterValues(string reservationIndexName)
+        private async Task<FilterValues> GetFilterValues(string reservationIndexName, long providerId)
         {
-            var request = GetFilterValuesQuery();
+            var request = GetFilterValuesQuery(providerId);
 
             var jsonResponse =
                 await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
@@ -147,12 +147,13 @@ namespace SFA.DAS.Reservations.Data.Repository
             return null;
         }
 
-        private string GetFilterValuesQuery()
+        private string GetFilterValuesQuery(long providerId)
         {
-            return @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}]}},
-                      ""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
-                      ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}},
-                      ""uniqueReservationPeriod"":{""terms"":{""field"":""reservationPeriod.keyword""}}}}";
+            return @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":
+                    [{""term"":{""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}},""aggs"":{""uniqueCourseDescription"":
+                    {""terms"":{""field"":""courseDescription.keyword"",""size"":1000}},""uniqueAccountLegalEntityName"":
+                    {""terms"":{""field"":""accountLegalEntityName.keyword"",""size"":1000}},""uniquePeriod"":{""terms"":
+                    {""field"":""reservationPeriod.keyword"",""size"":1000}}}}";
         }
 
         private string GetReservationCountForProviderSearchString(long providerId)
