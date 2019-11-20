@@ -84,6 +84,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<SearchRequestParameters>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(searchReponse));
+
+            _mockClient.Setup(x => x.CountAsync<StringResponse>("test",
+                It.IsAny<PostData>(),
+                It.IsAny<CountRequestParameters>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(new StringResponse(
+                @"{""count"":50,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0}}"));
         }
 
         [Test]
@@ -301,25 +307,6 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                     It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        [Test]
-        public async Task Then_Will_Return_The_Total_Number_Of_Non_Deleted_Reservations_For_That_Provider()
-        {
-            //Arrange
-            var expectedProviderId = 1001;
-            var query =
-                @"{""query"":{""bool"":{""must_not"":
-                [{""term"":{""status"":{""value"":""3""}}}],
-                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}}}";
-
-            //Act
-            await _repository.Find(expectedProviderId, "", 1, 50, _expectedSelectedFilters);
-
-            //Assert
-            _mockClient.Verify(x=>x.CountAsync<StringResponse>("test",
-                It.Is<PostData>(p=>p.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
-                It.IsAny<CountRequestParameters>(),
-                It.IsAny<CancellationToken>()), Times.Once);
-        }
 
         [Test]
         public async Task Then_The_Number_Of_Results_Is_Returned_In_The_Response()

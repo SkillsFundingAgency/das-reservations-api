@@ -64,6 +64,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<SearchRequestParameters>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(searchReponse));
+
+            _mockClient.Setup(x => x.CountAsync<StringResponse>(ExpectedLatestReservationIndexName,
+                It.IsAny<PostData>(),
+                It.IsAny<CountRequestParameters>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(new StringResponse(
+                @"{""count"":50,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0}}"));
         }
 
         [Test]
@@ -82,7 +88,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             _mockClient.Verify(c =>
                 c.SearchAsync<StringResponse>(
                     ExpectedReservationIndexLookupName,
-                    It.Is<PostData>(pd => 
+                    It.Is<PostData>(pd =>
                         pd.GetRequestString().Equals(queryBuilder.ToString())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
@@ -109,7 +115,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             _mockClient.Verify(c =>
                 c.SearchAsync<StringResponse>(
                     ExpectedLatestReservationIndexName,
-                    It.Is<PostData>(pd => 
+                    It.Is<PostData>(pd =>
                         pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
@@ -134,7 +140,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             _mockClient.Verify(c =>
                 c.SearchAsync<StringResponse>(
                     ExpectedLatestReservationIndexName,
-                    It.Is<PostData>(pd => 
+                    It.Is<PostData>(pd =>
                         pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
