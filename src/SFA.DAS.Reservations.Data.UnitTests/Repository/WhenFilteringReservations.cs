@@ -96,7 +96,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenWillSearchForAllFilterTypesAvailable()
         {
             //Arrange
-            var expectedQuery = @"{""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
+            var expectedQuery = @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}]}},
+                                ""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
                                 ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}},
                                 ""uniqueReservationPeriod"":{""terms"":{""field"":""reservationPeriod.keyword""}}}}";
 

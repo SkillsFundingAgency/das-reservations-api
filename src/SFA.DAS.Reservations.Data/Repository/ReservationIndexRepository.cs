@@ -149,7 +149,8 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         private string GetFilterValuesQuery()
         {
-            return @"{""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
+            return @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}]}},
+                      ""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
                       ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}},
                       ""uniqueReservationPeriod"":{""terms"":{""field"":""reservationPeriod.keyword""}}}}";
         }
