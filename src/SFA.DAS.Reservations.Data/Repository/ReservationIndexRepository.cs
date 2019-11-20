@@ -52,6 +52,8 @@ namespace SFA.DAS.Reservations.Data.Repository
                 return new IndexedReservationSearchResult();
             }
 
+            var totalRecordCount = await GetSearchResultCount(reservationIndexName, providerId);
+
             _logger.LogDebug("Searching complete, returning search results");
 
             var filterValues = await GetFilterValues(reservationIndexName);
@@ -60,11 +62,12 @@ namespace SFA.DAS.Reservations.Data.Repository
             {
                Reservations = elasticSearchResult.Items,
                TotalReservations = (uint) elasticSearchResult.hits.total.value,
+               TotalReservationsForProvider = totalRecordCount,
                Filters = new SearchFilters
                {
                    CourseFilters = filterValues.Courses,
                    EmployerFilters = filterValues.AccountLegalEntityNames,
-                   StartDateFilters = filterValues.StartDates
+                   StartDateFilters = filterValues.StartDates,
                }
             };
 
@@ -74,16 +77,16 @@ namespace SFA.DAS.Reservations.Data.Repository
         private async Task<FilterValues> GetFilterValues(string reservationIndexName)
         {
             var request = GetFilterValuesQuery();
-            
+
             var jsonResponse =
                 await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
-            
+
             var response = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
 
             var coursefilterValues = response.aggregations?.uniqueCourseDescription?.buckets?.Select(b => b.key).ToList();
             var accountLegalEntityfilterValues = response.aggregations?.uniqueAccountLegalEntityName?.buckets?.Select(b => b.key).ToList();
             var startDateFilterValues = response.aggregations?.uniqueReservationPeriod?.buckets?.Select(b => b.key).ToList();
-            
+
             return new FilterValues
             {
                 Courses = coursefilterValues,
@@ -109,6 +112,18 @@ namespace SFA.DAS.Reservations.Data.Repository
             var searchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
 
             return searchResult;
+        }
+
+        private async Task<int> GetSearchResultCount(string reservationIndexName, long providerId)
+        {
+            var jsonResponse = await _client.CountAsync<StringResponse>(reservationIndexName,
+                PostData.String(GetReservationCountForProviderSearchString(providerId)));
+
+
+            var result = JsonConvert.DeserializeObject<ElasticCountResponse>(jsonResponse.Body);
+
+            return result.count;
+
         }
 
         private async Task<string> GetCurrentReservationIndexName()
@@ -137,6 +152,13 @@ namespace SFA.DAS.Reservations.Data.Repository
             return @"{""aggs"":{""uniqueCourseDescription"":{""terms"":{""field"":""courseDescription.keyword""}},
                       ""uniqueAccountLegalEntityName"":{""terms"":{""field"":""accountLegalEntityName.keyword""}},
                       ""uniqueReservationPeriod"":{""terms"":{""field"":""reservationPeriod.keyword""}}}}";
+        }
+
+        private string GetReservationCountForProviderSearchString(long providerId)
+        {
+            return  @"{""query"":{""bool"":{""must_not"":
+                [{""term"":{""status"":{""value"":""3""}}}],
+                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}}}";
         }
 
         private string GetIndexSearchString()
@@ -188,7 +210,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             if(!string.IsNullOrWhiteSpace(selectedFilters.CourseFilter))
             {
                 filterClauseBuilder.Append(@"{""match"" : { ""courseDescription"" : { 
-                                              ""query"":""" + selectedFilters.CourseFilter + 
+                                              ""query"":""" + selectedFilters.CourseFilter +
                                               @""", ""operator"":""and""}}},");
 
                 minMatchValue++;
@@ -197,7 +219,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             if(!string.IsNullOrWhiteSpace(selectedFilters.EmployerNameFilter))
             {
                 filterClauseBuilder.Append(@"{""match"" : { ""accountLegalEntityName"" : { 
-                                              ""query"":""" + selectedFilters.EmployerNameFilter + 
+                                              ""query"":""" + selectedFilters.EmployerNameFilter +
                                            @""", ""operator"":""and""}}},");
 
                 minMatchValue++;
@@ -206,7 +228,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             if(!string.IsNullOrWhiteSpace(selectedFilters.StartDateFilter))
             {
                 filterClauseBuilder.Append(@"{""match"" : { ""reservationPeriod"" : { 
-                                              ""query"":""" + selectedFilters.StartDateFilter + 
+                                              ""query"":""" + selectedFilters.StartDateFilter +
                                            @""", ""operator"":""and""}}},");
 
                 minMatchValue++;

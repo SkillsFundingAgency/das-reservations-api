@@ -14,6 +14,12 @@ namespace SFA.DAS.Reservations.Data.ElasticSearch
         public ICollection<T> Items => hits?.hits?.Select(h => h._source).ToList() ?? new List<T>();
     }
 
+    public class ElasticCountResponse
+    {
+        public int count { get; set; }
+        public Shards _shards { get; set; }
+    }
+
     public class Shards
     {
         public int total { get; set; }

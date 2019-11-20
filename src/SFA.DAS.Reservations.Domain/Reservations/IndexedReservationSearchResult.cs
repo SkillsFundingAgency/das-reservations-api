@@ -13,5 +13,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         public SearchFilters Filters { get; set; }
         public IEnumerable<ReservationIndex> Reservations { get; set; }
         public uint TotalReservations { get; set; }
+        public int TotalReservationsForProvider { get; set; }
     }
 }

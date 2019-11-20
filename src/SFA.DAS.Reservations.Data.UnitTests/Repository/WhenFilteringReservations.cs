@@ -122,7 +122,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             result.Filters.CourseFilters.Should().Contain("Banking - Level 2");
         }
 
-        
+
         [Test]
         public async Task ThenShouldReturnAllAvailableEmployerNameFilterOptions()
         {
@@ -299,6 +299,51 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_Will_Return_The_Total_Number_Of_Non_Deleted_Reservations_For_That_Provider()
+        {
+            //Arrange
+            var expectedProviderId = 1001;
+            var query =
+                @"{""query"":{""bool"":{""must_not"":
+                [{""term"":{""status"":{""value"":""3""}}}],
+                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}}}";
+
+            //Act
+            await _repository.Find(expectedProviderId, "", 1, 50, _expectedSelectedFilters);
+
+            //Assert
+            _mockClient.Verify(x=>x.CountAsync<StringResponse>("test",
+                It.Is<PostData>(p=>p.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                It.IsAny<CountRequestParameters>(),
+                It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_The_Number_Of_Results_Is_Returned_In_The_Response()
+        {
+            //Arrange
+            var expectedProviderId = 1001;
+            var expectedCount = 37;
+            var query =
+                @"{""query"":{""bool"":{""must_not"":
+                [{""term"":{""status"":{""value"":""3""}}}],
+                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}}}";
+            _mockClient.Setup(x => x.CountAsync<StringResponse>("test",
+                It.Is<PostData>(p =>
+                    p.GetRequestString().RemoveLineEndingsAndWhiteSpace()
+                        .Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                It.IsAny<CountRequestParameters>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(new StringResponse(
+                @"{""count"":"+expectedCount+@",""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0}}"));
+
+            //Act
+            var actual = await _repository.Find(expectedProviderId, "", 1, 50, _expectedSelectedFilters);
+
+            //Assert
+            Assert.AreEqual(expectedCount, actual.TotalReservationsForProvider);
         }
     }
 }
