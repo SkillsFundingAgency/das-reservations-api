@@ -6,8 +6,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using SFA.DAS.Reservations.Data.ElasticSearch;
 using SFA.DAS.Reservations.Data.Repository;
-using SFA.DAS.Reservations.Data.UnitTests.ElasticSearch;
 using SFA.DAS.Reservations.Data.UnitTests.Extensions;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -20,13 +20,15 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         private ReservationsApiEnvironment _apiEnvironment;
         private ReservationIndexRepository _repository;
         private SelectedSearchFilters _expectedSelectedFilters;
+        private Mock<IElasticSearchQueries> _mockElasticSearchQueries;
 
         [SetUp]
         public void Init()
         {
             _mockClient = new Mock<IElasticLowLevelClient>();
+            _mockElasticSearchQueries = new Mock<IElasticSearchQueries>();
             _apiEnvironment = new ReservationsApiEnvironment("test");
-            _repository = new ReservationIndexRepository(_mockClient.Object, _apiEnvironment, Mock.Of<ILogger<ReservationIndexRepository>>());
+            _repository = new ReservationIndexRepository(_mockClient.Object, _apiEnvironment, _mockElasticSearchQueries.Object, Mock.Of<ILogger<ReservationIndexRepository>>());
 
             _expectedSelectedFilters = new SelectedSearchFilters
             {
@@ -85,24 +87,22 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(searchReponse));
 
-            _mockClient.Setup(x => x.CountAsync<StringResponse>("test",
-                It.IsAny<PostData>(),
-                It.IsAny<CountRequestParameters>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(new StringResponse(
-                @"{""count"":50,""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0}}"));
+            _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns("search");
+            _mockElasticSearchQueries.Setup(x => x.GetAllReservationsQuery).Returns("search");
+            _mockElasticSearchQueries.Setup(x => x.GetFilterValuesQuery).Returns("aggs");
+            _mockElasticSearchQueries.Setup(x => x.LastIndexSearchQuery).Returns("Get index");
         }
 
         [Test]
         public async Task ThenWillSearchForAllFilterTypesAvailable()
         {
             //Arrange
-            var expectedProviderId = 1001;
+            var expectedProviderId = 1011;
+            var queryTemplate = "test {providerId}";
 
-            var expectedQuery = @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
-                                {""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}},""aggs"":{""uniqueCourseDescription"":{""terms"":
-                                {""field"":""courseDescription.keyword"",""size"":1000}},""uniqueAccountLegalEntityName"":{""terms"":
-                                {""field"":""accountLegalEntityName.keyword"",""size"":1000}},""uniquePeriod"":{""terms"":{""field"":
-                                ""reservationPeriod.keyword"",""size"":1000}}}}";
+            _mockElasticSearchQueries.Setup(x => x.GetFilterValuesQuery).Returns(queryTemplate);
+
+            var expectedQuery = $"test {expectedProviderId}";
 
             //Act
             await _repository.Find(expectedProviderId, "10", 1, 1, _expectedSelectedFilters);
@@ -112,8 +112,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 c.SearchAsync<StringResponse>(
                     "test",
                     It.Is<PostData>(pd =>
-                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace()
-                            .Equals(expectedQuery.RemoveLineEndingsAndWhiteSpace())),
+                        pd.GetRequestString().Equals(expectedQuery)),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -132,7 +131,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             result.Filters.CourseFilters.Should().Contain("Banking - Level 2");
         }
 
-
+        
         [Test]
         public async Task ThenShouldReturnAllAvailableEmployerNameFilterOptions()
         {
@@ -170,18 +169,14 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             ushort pageNumber = 1;
             ushort pageItemSize = 2;
 
-            var query =
-                @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""courseDescription"":
+            var queryTemplate = @"""should"": []";
+
+            var expectedQuery = @"""should"": [{""match"":{""courseDescription"":
                 {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}},{""match"":{""accountLegalEntityName"":
                 {""query"":""" + _expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}},{""match"":{""reservationPeriod"":
-                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":3,""must_not"":
-                [{""term"":{""status"":{""value"":""3""}}}],
-                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
-                {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
-                ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
-                ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
-                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":
-                {""order"":""desc""}}]}";
+                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":3,";
+
+            _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 
             //Act
             await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, _expectedSelectedFilters);
@@ -191,7 +186,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 c.SearchAsync<StringResponse>(
                     "test",
                     It.Is<PostData>(pd =>
-                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(expectedQuery.RemoveLineEndingsAndWhiteSpace())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -210,16 +205,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 CourseFilter = "Baker - Level 1"
             };
 
-            var query =
-                @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""courseDescription"":
-                {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,""must_not"":
-                [{""term"":{""status"":{""value"":""3""}}}],
-                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
-                {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
-                ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
-                ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
-                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":
-                {""order"":""desc""}}]}";
+            var queryTemplate = @"""should"": []";
+
+            var expectedQuery = @"""should"": [{""match"":{""courseDescription"":
+                {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,";
+
+            _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 
             //Act
             await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, _expectedSelectedFilters);
@@ -229,7 +220,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 c.SearchAsync<StringResponse>(
                     "test",
                     It.Is<PostData>(pd =>
-                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(expectedQuery.RemoveLineEndingsAndWhiteSpace())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -248,16 +239,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 EmployerNameFilter = "Test Ltd"
             };
 
-            var query =
-                @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""accountLegalEntityName"":
-                {""query"":""" + _expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,""must_not"":
-                [{""term"":{""status"":{""value"":""3""}}}],
-                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
-                {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
-                ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
-                ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
-                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":
-                {""order"":""desc""}}]}";
+            var queryTemplate = @"""should"": []";
+
+            var expectedQuery = @"""should"": [{""match"":{""accountLegalEntityName"":
+                {""query"":""" +_expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,";
+
+            _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 
             //Act
             await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, _expectedSelectedFilters);
@@ -267,7 +254,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 c.SearchAsync<StringResponse>(
                     "test",
                     It.Is<PostData>(pd =>
-                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(expectedQuery.RemoveLineEndingsAndWhiteSpace())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -287,16 +274,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 StartDateFilter = DateTime.Now.ToString("dd/MM/yyyy")
             };
 
-            var query =
-                @"{""from"":""0"",""query"":{""bool"":{""should"":[{""match"":{""reservationPeriod"":
-                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,""must_not"":
-                [{""term"":{""status"":{""value"":""3""}}}],
-                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}},
-                {""multi_match"":{""query"":""" + expectedSearchTerm + @""",""type"":""phrase_prefix"",
-                ""fields"":[""accountLegalEntityName"",""courseDescription""]}}]}},
-                ""size"":""" + pageItemSize + @""",""sort"":[{""accountLegalEntityName.keyword"":
-                {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":
-                {""order"":""desc""}}]}";
+            var queryTemplate = @"""should"": []";
+
+            var expectedQuery = @"""should"": [{""match"":{""reservationPeriod"":
+                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,";
+
+            _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 
             //Act
             await _repository.Find(expectedProviderId, expectedSearchTerm, pageNumber, pageItemSize, _expectedSelectedFilters);
@@ -306,35 +289,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 c.SearchAsync<StringResponse>(
                     "test",
                     It.Is<PostData>(pd =>
-                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(query.RemoveLineEndingsAndWhiteSpace())),
+                        pd.GetRequestString().RemoveLineEndingsAndWhiteSpace().Equals(expectedQuery.RemoveLineEndingsAndWhiteSpace())),
                     It.IsAny<SearchRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-
-        [Test]
-        public async Task Then_The_Number_Of_Results_Is_Returned_In_The_Response()
-        {
-            //Arrange
-            var expectedProviderId = 1001;
-            var expectedCount = 37;
-            var query =
-                @"{""query"":{""bool"":{""must_not"":
-                [{""term"":{""status"":{""value"":""3""}}}],
-                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + expectedProviderId + @"""}}}]}}}";
-            _mockClient.Setup(x => x.CountAsync<StringResponse>("test",
-                It.Is<PostData>(p =>
-                    p.GetRequestString().RemoveLineEndingsAndWhiteSpace()
-                        .Equals(query.RemoveLineEndingsAndWhiteSpace())),
-                It.IsAny<CountRequestParameters>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(new StringResponse(
-                @"{""count"":"+expectedCount+@",""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0}}"));
-
-            //Act
-            var actual = await _repository.Find(expectedProviderId, "", 1, 50, _expectedSelectedFilters);
-
-            //Assert
-            Assert.AreEqual(expectedCount, actual.TotalReservationsForProvider);
         }
     }
 }

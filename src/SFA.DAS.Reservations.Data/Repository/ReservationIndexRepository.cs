@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
 using System.Linq;
@@ -18,12 +18,14 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         private readonly IElasticLowLevelClient _client;
         private readonly ReservationsApiEnvironment _environment;
+        private readonly IElasticSearchQueries _elasticQueries;
         private readonly ILogger<ReservationIndexRepository> _logger;
 
-        public ReservationIndexRepository(IElasticLowLevelClient client, ReservationsApiEnvironment environment, ILogger<ReservationIndexRepository> logger)
+        public ReservationIndexRepository(IElasticLowLevelClient client, ReservationsApiEnvironment environment, IElasticSearchQueries elasticQueries, ILogger<ReservationIndexRepository> logger)
         {
             _client = client;
             _environment = environment;
+            _elasticQueries = elasticQueries;
             _logger = logger;
         }
 
@@ -52,8 +54,6 @@ namespace SFA.DAS.Reservations.Data.Repository
                 return new IndexedReservationSearchResult();
             }
 
-            var totalRecordCount = await GetSearchResultCount(reservationIndexName, providerId);
-
             _logger.LogDebug("Searching complete, returning search results");
 
             var filterValues = await GetFilterValues(reservationIndexName, providerId);
@@ -62,12 +62,11 @@ namespace SFA.DAS.Reservations.Data.Repository
             {
                Reservations = elasticSearchResult.Items,
                TotalReservations = (uint) elasticSearchResult.hits.total.value,
-               TotalReservationsForProvider = totalRecordCount,
                Filters = new SearchFilters
                {
                    CourseFilters = filterValues.Courses,
                    EmployerFilters = filterValues.AccountLegalEntityNames,
-                   StartDateFilters = filterValues.StartDates,
+                   StartDateFilters = filterValues.StartDates
                }
             };
 
@@ -77,16 +76,16 @@ namespace SFA.DAS.Reservations.Data.Repository
         private async Task<FilterValues> GetFilterValues(string reservationIndexName, long providerId)
         {
             var request = GetFilterValuesQuery(providerId);
-
+            
             var jsonResponse =
                 await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
-
+            
             var response = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
 
             var coursefilterValues = response.aggregations?.uniqueCourseDescription?.buckets?.Select(b => b.key).ToList();
             var accountLegalEntityfilterValues = response.aggregations?.uniqueAccountLegalEntityName?.buckets?.Select(b => b.key).ToList();
             var startDateFilterValues = response.aggregations?.uniqueReservationPeriod?.buckets?.Select(b => b.key).ToList();
-
+            
             return new FilterValues
             {
                 Courses = coursefilterValues,
@@ -114,21 +113,9 @@ namespace SFA.DAS.Reservations.Data.Repository
             return searchResult;
         }
 
-        private async Task<int> GetSearchResultCount(string reservationIndexName, long providerId)
-        {
-            var jsonResponse = await _client.CountAsync<StringResponse>(reservationIndexName,
-                PostData.String(GetReservationCountForProviderSearchString(providerId)));
-
-
-            var result = JsonConvert.DeserializeObject<ElasticCountResponse>(jsonResponse.Body);
-
-            return result.count;
-
-        }
-
         private async Task<string> GetCurrentReservationIndexName()
         {
-            var data = PostData.String(GetIndexSearchString());
+            var data = PostData.String(_elasticQueries.LastIndexSearchQuery);
 
             _logger.LogDebug("Getting latest reservation index name");
 
@@ -149,59 +136,42 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         private string GetFilterValuesQuery(long providerId)
         {
-            return @"{""query"":{""bool"":{""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":
-                    [{""term"":{""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}},""aggs"":{""uniqueCourseDescription"":
-                    {""terms"":{""field"":""courseDescription.keyword"",""size"":1000}},""uniqueAccountLegalEntityName"":
-                    {""terms"":{""field"":""accountLegalEntityName.keyword"",""size"":1000}},""uniquePeriod"":{""terms"":
-                    {""field"":""reservationPeriod.keyword"",""size"":1000}}}}";
-        }
-
-        private string GetReservationCountForProviderSearchString(long providerId)
-        {
-            return  @"{""query"":{""bool"":{""must_not"":
-                [{""term"":{""status"":{""value"":""3""}}}],
-                ""must"":[{""term"":{""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}}}";
-        }
-
-        private string GetIndexSearchString()
-        {
-            var queryBuilder = new StringBuilder();
-            queryBuilder.Append(@"{""from"": 0,");
-            queryBuilder.Append(@"""size"": 1,");
-            queryBuilder.Append(@"""sort"":  {""dateCreated"": {""order"": ""desc""}}}");
-
-            return queryBuilder.ToString();
+            return _elasticQueries.GetFilterValuesQuery.Replace("{providerId}", providerId.ToString());
         }
 
         private string GetReservationsSearchString(
             ushort startingDocumentIndex, ushort pageItemCount, long providerId, SelectedSearchFilters selectedFilters)
         {
-            var filterClause = string.Empty;
+            var query = _elasticQueries.GetAllReservationsQuery.Replace("{startingDocumentIndex}", startingDocumentIndex.ToString());
+            query = query.Replace("{providerId}", providerId.ToString());
+            query = query.Replace("{pageItemCount}", pageItemCount.ToString());
 
             if (selectedFilters.HasFilters)
             {
-                filterClause = GetFilterSearchSubString(selectedFilters);
+                var filterClause = GetFilterSearchSubString(selectedFilters);
+                query = query.Replace(@"""should"": []", @"""should"": [" + filterClause + @"]");
             }
 
-            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{" + filterClause + @"""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
-            {""indexedProviderId"":{""value"":""" + providerId + @"""}}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
-            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":{""order"":""desc""}}]}";
+            query = query.Replace("{pageItemCount}", pageItemCount.ToString());
+
+            return query;
         }
 
         private string GetReservationsSearchString(
             ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm, SelectedSearchFilters selectedFilters)
         {
-            var filterClause = string.Empty;
+            var query = _elasticQueries.FindReservationsQuery.Replace("{startingDocumentIndex}", startingDocumentIndex.ToString());
+            query = query.Replace("{providerId}", providerId.ToString());
+            query = query.Replace("{pageItemCount}", pageItemCount.ToString());
+            query = query.Replace("{searchTerm}", searchTerm);
 
             if (selectedFilters.HasFilters)
             {
-                filterClause = GetFilterSearchSubString(selectedFilters);
+                var filterClause = GetFilterSearchSubString(selectedFilters);
+                query = query.Replace(@"""should"": []", filterClause);
             }
 
-            return @"{""from"":""" + startingDocumentIndex + @""",""query"":{""bool"":{" + filterClause + @"""must_not"":[{""term"":{""status"":{""value"":""3""}}}],""must"":[{""term"":
-            {""indexedProviderId"":{""value"":""" + providerId + @"""}}},{""multi_match"":{""query"":""" + searchTerm + @""",""type"":""phrase_prefix"",""fields"":
-            [""accountLegalEntityName"",""courseDescription""]}}]}},""size"":""" + pageItemCount + @""",""sort"":[{""accountLegalEntityName.keyword"":
-            {""order"":""asc""}},{""courseTitle.keyword"":{""order"":""asc""}},{""reservationPeriod.keyword"":{""order"":""desc""}}]}";
+            return query;
         }
 
         private string GetFilterSearchSubString(SelectedSearchFilters selectedFilters)
@@ -212,7 +182,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             if(!string.IsNullOrWhiteSpace(selectedFilters.CourseFilter))
             {
                 filterClauseBuilder.Append(@"{""match"" : { ""courseDescription"" : { 
-                                              ""query"":""" + selectedFilters.CourseFilter +
+                                              ""query"":""" + selectedFilters.CourseFilter + 
                                               @""", ""operator"":""and""}}},");
 
                 minMatchValue++;
@@ -221,7 +191,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             if(!string.IsNullOrWhiteSpace(selectedFilters.EmployerNameFilter))
             {
                 filterClauseBuilder.Append(@"{""match"" : { ""accountLegalEntityName"" : { 
-                                              ""query"":""" + selectedFilters.EmployerNameFilter +
+                                              ""query"":""" + selectedFilters.EmployerNameFilter + 
                                            @""", ""operator"":""and""}}},");
 
                 minMatchValue++;
@@ -230,7 +200,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             if(!string.IsNullOrWhiteSpace(selectedFilters.StartDateFilter))
             {
                 filterClauseBuilder.Append(@"{""match"" : { ""reservationPeriod"" : { 
-                                              ""query"":""" + selectedFilters.StartDateFilter +
+                                              ""query"":""" + selectedFilters.StartDateFilter + 
                                            @""", ""operator"":""and""}}},");
 
                 minMatchValue++;

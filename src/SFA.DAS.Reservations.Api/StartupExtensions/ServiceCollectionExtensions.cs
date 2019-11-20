@@ -3,6 +3,7 @@ using Elasticsearch.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SFA.DAS.NServiceBus.Services;
+using SFA.DAS.Reservations.Data.ElasticSearch;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.UnitOfWork.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
@@ -36,6 +37,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             }
                         
             collection.AddTransient<IElasticLowLevelClient>(sp => new ElasticLowLevelClient(settings));
+            collection.AddSingleton<IElasticSearchQueries, ElasticSearchQueries>();
         }
     }
 }
