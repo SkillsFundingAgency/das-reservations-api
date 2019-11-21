@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         private ReservationIndexRepository _repository;
         private SelectedSearchFilters _expectedSelectedFilters;
         private Mock<IElasticSearchQueries> _mockElasticSearchQueries;
-
+        
         [SetUp]
         public void Init()
         {
@@ -87,10 +87,19 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(searchReponse));
 
+            _mockClient.Setup(c =>
+                    c.CountAsync<StringResponse>(
+                        "test",
+                        It.IsAny<PostData>(),
+                        It.IsAny<CountRequestParameters>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StringResponse(@"{""count"":10}"));
+
             _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns("search");
             _mockElasticSearchQueries.Setup(x => x.GetAllReservationsQuery).Returns("search");
             _mockElasticSearchQueries.Setup(x => x.GetFilterValuesQuery).Returns("aggs");
             _mockElasticSearchQueries.Setup(x => x.LastIndexSearchQuery).Returns("Get index");
+            _mockElasticSearchQueries.Setup(x => x.GetReservationCountQuery).Returns("ReservationCount");
         }
 
         [Test]

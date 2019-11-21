@@ -6,5 +6,6 @@
         string GetFilterValuesQuery { get; }
         string FindReservationsQuery { get; }
         string GetAllReservationsQuery { get; }
+        string GetReservationCountQuery { get; }
     }
 }

@@ -8,6 +8,7 @@ namespace SFA.DAS.Reservations.Data.ElasticSearch
         public string GetFilterValuesQuery { get; }
         public string FindReservationsQuery { get; }
         public string GetAllReservationsQuery { get; }
+        public string GetReservationCountQuery { get; }
 
         public ElasticSearchQueries()
         {
@@ -15,6 +16,7 @@ namespace SFA.DAS.Reservations.Data.ElasticSearch
             GetFilterValuesQuery = File.ReadAllText("ElasticSearch/GetFilterValuesQuery.json");
             FindReservationsQuery = File.ReadAllText("ElasticSearch/FindReservationsQuery.json");
             GetAllReservationsQuery = File.ReadAllText("ElasticSearch/GetAllReservationsQuery.json");
+            GetReservationCountQuery = File.ReadAllText("ElasticSearch/GetReservationCountQuery.json");
         }
     }
 }

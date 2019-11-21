@@ -56,12 +56,15 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             _logger.LogDebug("Searching complete, returning search results");
 
+            var totalRecordCount = await GetSearchResultCount(reservationIndexName, providerId);
+
             var filterValues = await GetFilterValues(reservationIndexName, providerId);
 
             var searchResult =  new IndexedReservationSearchResult
             {
                Reservations = elasticSearchResult.Items,
                TotalReservations = (uint) elasticSearchResult.hits.total.value,
+               TotalReservationsForProvider = totalRecordCount,
                Filters = new SearchFilters
                {
                    CourseFilters = filterValues.Courses,
@@ -139,6 +142,11 @@ namespace SFA.DAS.Reservations.Data.Repository
             return _elasticQueries.GetFilterValuesQuery.Replace("{providerId}", providerId.ToString());
         }
 
+        private string GetReservationCountForProviderQuery(long providerId)
+        {
+            return _elasticQueries.GetReservationCountQuery.Replace("{providerId}", providerId.ToString());
+        }
+
         private string GetReservationsSearchString(
             ushort startingDocumentIndex, ushort pageItemCount, long providerId, SelectedSearchFilters selectedFilters)
         {
@@ -172,6 +180,18 @@ namespace SFA.DAS.Reservations.Data.Repository
             }
 
             return query;
+        }
+
+        private async Task<int> GetSearchResultCount(string reservationIndexName, long providerId)
+        {
+            var query = GetReservationCountForProviderQuery(providerId);
+
+            var jsonResponse = await _client.CountAsync<StringResponse>(reservationIndexName,
+                PostData.String(query));
+
+            var result = JsonConvert.DeserializeObject<ElasticCountResponse>(jsonResponse.Body);
+
+            return result.count;
         }
 
         private string GetFilterSearchSubString(SelectedSearchFilters selectedFilters)

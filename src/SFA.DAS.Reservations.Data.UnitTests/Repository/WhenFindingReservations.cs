@@ -66,10 +66,19 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(searchReponse));
 
+            _mockClient.Setup(c =>
+                    c.CountAsync<StringResponse>(
+                        ExpectedLatestReservationIndexName,
+                        It.IsAny<PostData>(),
+                        It.IsAny<CountRequestParameters>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StringResponse(@"{""count"":10}"));
+
             _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(string.Empty);
             _mockElasticSearchQueries.Setup(x => x.GetAllReservationsQuery).Returns(string.Empty);
             _mockElasticSearchQueries.Setup(x => x.GetFilterValuesQuery).Returns(string.Empty);
             _mockElasticSearchQueries.Setup(x => x.LastIndexSearchQuery).Returns(string.Empty);
+            _mockElasticSearchQueries.Setup(x => x.GetReservationCountQuery).Returns(string.Empty);
         }
 
         [Test]
@@ -89,6 +98,26 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                     It.Is<PostData>(pd => 
                         pd.GetRequestString().Equals(expectedQuery)),
                     It.IsAny<SearchRequestParameters>(),
+                    It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task ThenWillLookupTotalReservationForProviderCount()
+        {
+            //Arrange
+            var expectedQuery = "test query {providerId}";
+            _mockElasticSearchQueries.Setup(x => x.GetReservationCountQuery).Returns(expectedQuery);
+
+            //Act
+            await _repository.Find(10, "10", 1, 1, new SelectedSearchFilters());
+
+            //Assert
+            _mockClient.Verify(c =>
+                c.CountAsync<StringResponse>(
+                    ExpectedLatestReservationIndexName,
+                    It.Is<PostData>(pd => 
+                        pd.GetRequestString().Equals("test query 10")),
+                    It.IsAny<CountRequestParameters>(),
                     It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -261,6 +290,33 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             Assert.AreEqual("30/09/2020", reservation.ExpiryDate.Value.ToString("dd/MM/yyyy"));
             Assert.AreEqual(false, reservation.IsLevyAccount);
             Assert.AreEqual(1, reservation.Status);
+        }
+
+        [Test]
+        public async Task ThenWillReturnTotalReservationForProviderCount()
+        {
+            //Arrange
+            var countQuery = "Test Query";
+
+            _mockElasticSearchQueries.Setup(x => x.GetReservationCountQuery).Returns(countQuery);
+
+            var expectedCount = 20;
+            var response = @"{""count"":" + expectedCount +
+                           @",""_shards"":{""total"":1,""successful"":1,""skipped"":0,""failed"":0}}";
+
+            _mockClient.Setup(c =>
+                    c.CountAsync<StringResponse>(
+                        ExpectedLatestReservationIndexName,
+                        It.Is<PostData>(pd => pd.GetRequestString().Equals(countQuery)),
+                        It.IsAny<CountRequestParameters>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StringResponse(response));
+
+            //Act
+            var results = await _repository.Find(2, "Test", 1, 1, new SelectedSearchFilters());
+
+            //Assert
+            Assert.AreEqual(expectedCount, results.TotalReservationsForProvider);
         }
 
         [Test]
