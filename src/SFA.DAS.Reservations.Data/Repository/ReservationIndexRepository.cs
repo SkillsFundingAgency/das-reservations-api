@@ -149,7 +149,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             if (selectedFilters.HasFilters)
             {
                 var filterClause = GetFilterSearchSubString(selectedFilters);
-                query = query.Replace(@"""should"": []", @"""should"": [" + filterClause + @"]");
+                query = query.Replace(@"""should"": []", filterClause);
             }
 
             query = query.Replace("{pageItemCount}", pageItemCount.ToString());
