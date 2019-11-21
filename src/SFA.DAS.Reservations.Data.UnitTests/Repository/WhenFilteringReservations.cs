@@ -174,7 +174,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var expectedQuery = @"""should"": [{""match"":{""courseDescription"":
                 {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}},{""match"":{""accountLegalEntityName"":
                 {""query"":""" + _expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}},{""match"":{""reservationPeriod"":
-                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":3,";
+                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":3";
 
             _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 
@@ -208,7 +208,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var queryTemplate = @"""should"": []";
 
             var expectedQuery = @"""should"": [{""match"":{""courseDescription"":
-                {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,";
+                {""query"":""" + _expectedSelectedFilters.CourseFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1";
 
             _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 
@@ -242,7 +242,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var queryTemplate = @"""should"": []";
 
             var expectedQuery = @"""should"": [{""match"":{""accountLegalEntityName"":
-                {""query"":""" +_expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,";
+                {""query"":""" +_expectedSelectedFilters.EmployerNameFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1";
 
             _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 
@@ -277,7 +277,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var queryTemplate = @"""should"": []";
 
             var expectedQuery = @"""should"": [{""match"":{""reservationPeriod"":
-                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1,";
+                {""query"":""" + _expectedSelectedFilters.StartDateFilter + @""",""operator"":""and""}}}],""minimum_should_match"":1";
 
             _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(queryTemplate);
 

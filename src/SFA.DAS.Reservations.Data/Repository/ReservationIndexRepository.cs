@@ -208,7 +208,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             var filterClause = filterClauseBuilder.ToString().TrimEnd(',');
 
-            return @"""should"": [" + filterClause + @"], ""minimum_should_match"": " + minMatchValue + ",";
+            return @"""should"": [" + filterClause + @"], ""minimum_should_match"": " + minMatchValue;
         }
 
         private class IndexRegistryEntry
