@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
 using System.Linq;
@@ -9,13 +9,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Data.ElasticSearch;
 using SFA.DAS.Reservations.Domain.Configuration;
+ using SFA.DAS.Reservations.Domain.Infrastructure;
 
-namespace SFA.DAS.Reservations.Data.Repository
+ namespace SFA.DAS.Reservations.Data.Repository
 {
     public class ReservationIndexRepository : IReservationIndexRepository
     {
-        public const string ReservationIndexLookupName = "-reservations-index-registry";
-
         private readonly IElasticLowLevelClient _client;
         private readonly ReservationsApiEnvironment _environment;
         private readonly IElasticSearchQueries _elasticQueries;
@@ -123,7 +122,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             _logger.LogDebug("Getting latest reservation index name");
 
             var response = await _client.SearchAsync<StringResponse>(
-                _environment.EnvironmentName + ReservationIndexLookupName, data);
+                _environment.EnvironmentName + _elasticQueries.ReservationIndexLookupName, data);
 
             var elasticResponse = JsonConvert.DeserializeObject<ElasticResponse<IndexRegistryEntry>>(response.Body);
 

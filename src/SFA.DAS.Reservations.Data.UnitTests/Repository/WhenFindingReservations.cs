@@ -5,10 +5,10 @@ using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Reservations.Data.ElasticSearch;
 using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Data.UnitTests.Extensions;
 using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Infrastructure;
 using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Data.UnitTests.Repository
@@ -16,7 +16,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
     public class WhenFindingReservations
     {
         private const string ExpectedEnvironmentName = "test";
-        private const string ExpectedReservationIndexLookupName = ExpectedEnvironmentName + "-reservations-index-registry";
+        private const string ExpectedIndexRegistryPostfix = "-reservations-index-registry";
+        private const string ExpectedReservationIndexLookupName = ExpectedEnvironmentName + ExpectedIndexRegistryPostfix;
         private const string ExpectedLatestReservationIndexName = "test-reservations-35c937c2-f0b1-4a57-9ebb-621a2834ae8b";
 
         private Mock<IElasticLowLevelClient> _mockClient;
@@ -74,6 +75,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(@"{""count"":10}"));
 
+            _mockElasticSearchQueries.Setup(x => x.ReservationIndexLookupName).Returns(ExpectedIndexRegistryPostfix);
             _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns(string.Empty);
             _mockElasticSearchQueries.Setup(x => x.GetAllReservationsQuery).Returns(string.Empty);
             _mockElasticSearchQueries.Setup(x => x.GetFilterValuesQuery).Returns(string.Empty);
