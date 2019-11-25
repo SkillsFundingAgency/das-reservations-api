@@ -1,0 +1,24 @@
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "term": {
+            "status": {
+              "value": "3"
+            }
+          }
+        }
+      ],
+      "must": [
+        {
+          "term": {
+            "indexedProviderId": {
+              "value": "{providerId}"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

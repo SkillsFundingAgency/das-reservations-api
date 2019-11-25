@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using SFA.DAS.Reservations.Domain.Reservations;
 
-namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
+namespace SFA.DAS.Reservations.Domain.Reservations
 {
-    public class FindAccountReservationsResult
+    public class ReservationSearchResult
     {
         public IEnumerable<Reservation> Reservations { get; set; }
-        public uint NumberOfRecordsFound { get; set; }
+        public uint TotalReservations { get; set; }
         public SearchFilters Filters { get; set; }
         public int TotalReservationsForProvider { get; set; }
     }

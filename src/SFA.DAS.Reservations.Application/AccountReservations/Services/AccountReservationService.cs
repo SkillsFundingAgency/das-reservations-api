@@ -46,23 +46,31 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservation == null ? null : MapReservation(reservation);
         }
 
-        public async Task<IList<Reservation>> FindReservations(long providerId, string searchTerm)
+        public async Task<ReservationSearchResult> FindReservations(
+            long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SelectedSearchFilters selectedFilters)
         {
-            var result = await _reservationIndexRepository.Find(providerId, searchTerm);
+            var result = await _reservationIndexRepository.Find(
+                providerId, searchTerm, pageNumber, pageItemCount, selectedFilters);
 
-            return result.Select(r => r.ToReservation()).ToList();
+            return new ReservationSearchResult
+            {
+                Reservations = result.Reservations.Select(r => r.ToReservation()),
+                TotalReservations = result.TotalReservations,
+                Filters = result.Filters,
+                TotalReservationsForProvider = result.TotalReservationsForProvider
+            };
         }
 
         public async Task<Reservation> CreateAccountReservation(IReservationRequest command)
         {
             var reservation = new Reservation(
                 command.Id,
-                command.AccountId, 
+                command.AccountId,
                 command.StartDate,
                 _options.Value.ExpiryPeriodInMonths,
                 command.AccountLegalEntityName,
                 command.CourseId,
-                command.ProviderId, 
+                command.ProviderId,
                 command.AccountLegalEntityId,
                 command.IsLevyAccount,
                 command.TransferSenderAccountId,
@@ -110,7 +118,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         private Reservation MapReservation(Domain.Entities.Reservation reservation)
         {
-            var mapReservation = new Reservation(_ruleRepository.GetReservationRules, 
+            var mapReservation = new Reservation(_ruleRepository.GetReservationRules,
                 reservation.Id,
                 reservation.AccountId,
                 reservation.IsLevyAccount,

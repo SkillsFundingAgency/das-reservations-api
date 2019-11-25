@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public interface IReservationIndexRepository
     {
-        Task<IEnumerable<ReservationIndex>> Find(long providerId, string term);
+        Task<IndexedReservationSearchResult> Find(
+            long providerId, string searchTerm, ushort pageNumber, 
+            ushort pageItemCount, SelectedSearchFilters selectedFilters);
     }
 }

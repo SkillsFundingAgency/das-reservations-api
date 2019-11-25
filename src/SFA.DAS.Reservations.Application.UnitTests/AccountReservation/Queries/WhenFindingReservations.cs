@@ -14,6 +14,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
     {
         private const long ExpectedAccountId = 553234;
         private const string ExpectedSearchTerm = "test";
+        private const ushort ExpectedPageNumber = 2;
+        private const ushort ExpectedPageItemCount = 50;
+        private const ushort ExpectedSearchResultTotal = 1;
+        private const ushort ExpectedTotalReservationsForProvider = 10;
+
 
         private FindAccountReservationsQueryHandler _handler;
         private Mock<IValidator<FindAccountReservationsQuery>> _validator;
@@ -24,20 +29,50 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
         {
             new Reservation(Guid.NewGuid(), ExpectedAccountId, DateTime.Now, 3, "Test Name")
         };
+        private readonly List<string> _expectedCourseFilters = new List<string>{"Baker - Level 1", "Banking - Level 3"};
+        private readonly List<string> _expectedAccountLegalEntityFilters = new List<string>{"Test Ltd", "Acme Bank"};
+        private readonly List<string> _expectedStartDateFilters = new List<string>{DateTime.Now.AddDays(-1).ToString("g"), DateTime.Now.ToString("g")};
+
+        private readonly SelectedSearchFilters _expectedSelectedFilters = new SelectedSearchFilters
+        {
+            CourseFilter = "Baker - Level 1",
+            EmployerNameFilter = "Test Ltd",
+            StartDateFilter = DateTime.Now.ToString("g")
+        };
 
         [SetUp]
         public void Arrange()
         {
-            _query = new FindAccountReservationsQuery{ProviderId = ExpectedAccountId, SearchTerm = ExpectedSearchTerm};
+            _query = new FindAccountReservationsQuery
+            {
+                ProviderId = ExpectedAccountId,
+                SearchTerm = ExpectedSearchTerm,
+                PageNumber = ExpectedPageNumber,
+                PageItemCount = ExpectedPageItemCount,
+                SelectedFilters = _expectedSelectedFilters
+            };
             _validator = new Mock<IValidator<FindAccountReservationsQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<FindAccountReservationsQuery>()))
                 .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string>() });
             _cancellationToken = new CancellationToken();
             _service = new Mock<IAccountReservationService>();
 
-            _service.Setup(x => x.FindReservations(ExpectedAccountId, ExpectedSearchTerm)) 
-                .ReturnsAsync(_expectedSearchResults);
-            
+            _service.Setup(x => x.FindReservations(
+                    ExpectedAccountId, ExpectedSearchTerm, ExpectedPageNumber,
+                    ExpectedPageItemCount, It.IsAny<SelectedSearchFilters>()))
+                .ReturnsAsync(new ReservationSearchResult
+                {
+                    Reservations = _expectedSearchResults,
+                    TotalReservations = ExpectedSearchResultTotal,
+                    TotalReservationsForProvider = ExpectedTotalReservationsForProvider,
+                    Filters = new SearchFilters
+                    {
+                        CourseFilters = _expectedCourseFilters,
+                        EmployerFilters = _expectedAccountLegalEntityFilters,
+                        StartDateFilters = _expectedStartDateFilters
+                    }
+                });
+
             _handler = new FindAccountReservationsQueryHandler(_service.Object, _validator.Object);
         }
 
@@ -69,7 +104,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            _service.Verify(x => x.FindReservations(ExpectedAccountId, ExpectedSearchTerm), Times.Once);
+            _service.Verify(x => x.FindReservations(
+                ExpectedAccountId,
+                ExpectedSearchTerm,
+                ExpectedPageNumber,
+                ExpectedPageItemCount,
+                _expectedSelectedFilters), Times.Once);
         }
 
         [Test]
@@ -81,7 +121,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             //Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(_expectedSearchResults, result.Reservations);
-            Assert.AreEqual(_expectedSearchResults.Count, result.NumberOfRecordsFound);
+            Assert.AreEqual(ExpectedSearchResultTotal, result.NumberOfRecordsFound);
+            Assert.AreEqual(ExpectedTotalReservationsForProvider, result.TotalReservationsForProvider);
+            Assert.AreEqual(_expectedCourseFilters, result.Filters.CourseFilters);
+            Assert.AreEqual(_expectedAccountLegalEntityFilters, result.Filters.EmployerFilters);
+            Assert.AreEqual(_expectedStartDateFilters, result.Filters.StartDateFilters);
         }
     }
 }

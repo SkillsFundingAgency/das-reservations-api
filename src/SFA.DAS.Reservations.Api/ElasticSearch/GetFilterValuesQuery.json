@@ -1,0 +1,46 @@
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "term": {
+            "status": {
+              "value": "3"
+            }
+          }
+        }
+      ],
+      "must": [
+        {
+          "term": {
+            "indexedProviderId": {
+              "value": "{providerId}"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "uniqueCourseDescription": {
+      "terms": {
+        "field": "courseDescription.keyword",
+        "size": 1000
+      }
+
+    },
+    "uniqueAccountLegalEntityName": {
+      "terms": {
+        "field": "accountLegalEntityName.keyword",
+        "size": 1000
+      }
+    },
+    "uniqueReservationPeriod": {
+      "terms": {
+        "field": "reservationPeriod.keyword",
+        "size": 1000
+
+      }
+    }
+  }
+}

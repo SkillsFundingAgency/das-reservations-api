@@ -15,11 +15,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 {
     public class WhenFindingAReservationFromIndex
     {
+        private const int ProviderId = 2;
+        private const string SearchTerm = "test search";
+        private const ushort PageNumber = 2;
+        private const ushort PageItemNumber = 2;
+
         private AccountReservationService _service;
         private Mock<IReservationRepository> _reservationRepository;
         private Mock<IReservationIndexRepository> _reservationIndexRepository;
         private Mock<IRuleRepository> _ruleRepository;
         private Mock<IOptions<ReservationsConfiguration>> _options;
+        private SelectedSearchFilters _expectedSelectedFilter;
 
         [SetUp]
         public void Init()
@@ -31,57 +37,162 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object,
                 _options.Object, _reservationIndexRepository.Object);
+
+            _expectedSelectedFilter = new SelectedSearchFilters
+            {
+                CourseFilter = "Baker - Level 1",
+                EmployerNameFilter = "Test Ltd",
+                StartDateFilter = DateTime.Now.ToString("g")
+            };
+
+            _reservationIndexRepository.Setup(x => x.Find(
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, It.IsAny<SelectedSearchFilters>()))
+                .ReturnsAsync(new IndexedReservationSearchResult());
         }
 
         [Test]
         public async Task ThenShouldSearchRepository()
         {
-            //Arrange
-            const int providerId = 2;
-            const string searchTerm = "test search";
-
             //Act
-            await _service.FindReservations(providerId, searchTerm);
+            await _service.FindReservations(ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
 
             //Assert
-            _reservationIndexRepository.Verify(x => x.Find(providerId, searchTerm), Times.Once);
+            _reservationIndexRepository.Verify(x => x.Find(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter), Times.Once);
         }
 
         [Test]
         public async Task ThenShouldReturnReservationFound()
         {
             //Arrange
-            const int providerId = 2;
-            const string searchTerm = "test search";
             var expectedReservation = new Reservation(
                 Guid.NewGuid(), 1, DateTime.Now, 3,
                 "Test Reservation", null, 3, 4);
 
+            const int expectedSearchTotal = 1;
+            const int expectedTotalReservationsForProvider = 10;
 
-            _reservationIndexRepository.Setup(x => x.Find(providerId, searchTerm))
-                .ReturnsAsync(new List<ReservationIndex>
+            _reservationIndexRepository.Setup(x => x.Find(
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
+                .ReturnsAsync(new IndexedReservationSearchResult
                 {
-                    new ReservationIndex()
+                    Reservations = new List<ReservationIndex>
                     {
-                        AccountId = expectedReservation.AccountId,
-                        AccountLegalEntityId = expectedReservation.AccountLegalEntityId,
-                        ProviderId = expectedReservation.ProviderId,
-                        StartDate = expectedReservation.StartDate,
-                        ExpiryDate = expectedReservation.ExpiryDate,
-                        IsLevyAccount = expectedReservation.IsLevyAccount,
-                        Status = (short) expectedReservation.Status,
-                        ReservationId = expectedReservation.Id,
-                        CreatedDate = expectedReservation.CreatedDate,
-                        AccountLegalEntityName = expectedReservation.AccountLegalEntityName
-                    }
+                        new ReservationIndex
+                        {
+                            AccountId = expectedReservation.AccountId,
+                            AccountLegalEntityId = expectedReservation.AccountLegalEntityId,
+                            ProviderId = expectedReservation.ProviderId,
+                            StartDate = expectedReservation.StartDate,
+                            ExpiryDate = expectedReservation.ExpiryDate,
+                            IsLevyAccount = expectedReservation.IsLevyAccount,
+                            Status = (short) expectedReservation.Status,
+                            ReservationId = expectedReservation.Id,
+                            CreatedDate = expectedReservation.CreatedDate,
+                            AccountLegalEntityName = expectedReservation.AccountLegalEntityName
+                        }
+                    },
+                    TotalReservationsForProvider = expectedTotalReservationsForProvider,
+                    TotalReservations = expectedSearchTotal
                 });
 
             //Act
-            var result = await _service.FindReservations(providerId, searchTerm);
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
 
             //Assert
-            result.Should().NotBeNullOrEmpty();
-            result.First().Should().BeEquivalentTo(expectedReservation);
+            result.Reservations.Should().NotBeNullOrEmpty();
+            result.Reservations.First().Should().BeEquivalentTo(expectedReservation);
+            result.TotalReservations.Should().Be(expectedSearchTotal);
+            result.TotalReservationsForProvider.Should().Be(expectedTotalReservationsForProvider);
+        }
+
+        [Test]
+        public async Task ThenShouldReturnAvailableCourseFilters()
+        {
+            //Arrange
+            var expectedFilters = new List<string>{"Test1", "Test2"};
+
+
+            _reservationIndexRepository.Setup(x => x.Find(
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
+                .ReturnsAsync(new IndexedReservationSearchResult
+                {
+                    Reservations = new List<ReservationIndex>(),
+                    TotalReservations = 0,
+                    Filters = new SearchFilters { CourseFilters = expectedFilters}
+                });
+
+            //Act
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
+
+            //Assert
+            result.Filters.CourseFilters.Should().BeEquivalentTo(expectedFilters);
+        }
+
+        [Test]
+        public async Task ThenShouldReturnAvailableEmployerNameFilters()
+        {
+            //Arrange
+            var expectedFilters = new List<string>{"Test1", "Test2"};
+
+
+            _reservationIndexRepository.Setup(x => x.Find(
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
+                .ReturnsAsync(new IndexedReservationSearchResult
+                {
+                    Reservations = new List<ReservationIndex>(),
+                    TotalReservations = 0,
+                    Filters = new SearchFilters { EmployerFilters = expectedFilters}
+                });
+
+            //Act
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
+
+            //Assert
+            result.Filters.EmployerFilters.Should().BeEquivalentTo(expectedFilters);
+        }
+
+        [Test]
+        public async Task ThenShouldReturnAvailableStartDateFilters()
+        {
+            //Arrange
+            var expectedFilters = new List<string>{DateTime.Now.AddDays(-1).ToString("g"), DateTime.Now.ToString("g")};
+
+            _reservationIndexRepository.Setup(x => x.Find(
+                    ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter))
+                .ReturnsAsync(new IndexedReservationSearchResult
+                {
+                    Reservations = new List<ReservationIndex>(),
+                    TotalReservations = 0,
+                    Filters = new SearchFilters { StartDateFilters = expectedFilters}
+                });
+
+            //Act
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
+
+            //Assert
+            result.Filters.StartDateFilters.Should().BeEquivalentTo(expectedFilters);
+        }
+
+        [Test]
+        public async Task ThenShouldReturnNoReservationsIfNoneFound()
+        {
+            //Arrange
+            var expectedReservation = new Reservation(
+                Guid.NewGuid(), 1, DateTime.Now, 3,
+                "Test Reservation", null, 3, 4);
+
+            //Act
+            var result = await _service.FindReservations(
+                ProviderId, SearchTerm, PageNumber, PageItemNumber, _expectedSelectedFilter);
+
+            //Assert
+            result.Reservations.Should().BeEmpty();
+            result.TotalReservations.Should().Be(0);
         }
     }
 }
