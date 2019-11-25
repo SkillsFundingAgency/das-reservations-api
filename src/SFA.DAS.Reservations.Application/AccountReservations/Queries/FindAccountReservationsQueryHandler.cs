@@ -31,15 +31,18 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             }
 
             var result = await _service.FindReservations(
-                query.ProviderId, 
-                query.SearchTerm, 
-                query.PageNumber, 
-                query.PageItemCount);
+                query.ProviderId,
+                query.SearchTerm,
+                query.PageNumber,
+                query.PageItemCount,
+                query.SelectedFilters);
 
             return new FindAccountReservationsResult
             {
                 Reservations = result.Reservations,
-                NumberOfRecordsFound = result.TotalReservations
+                NumberOfRecordsFound = result.TotalReservations,
+                Filters = result.Filters,
+                TotalReservationsForProvider = result.TotalReservationsForProvider
             };
         }
     }

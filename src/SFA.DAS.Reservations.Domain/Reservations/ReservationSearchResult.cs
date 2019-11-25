@@ -6,5 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     {
         public IEnumerable<Reservation> Reservations { get; set; }
         public uint TotalReservations { get; set; }
+        public SearchFilters Filters { get; set; }
+        public int TotalReservationsForProvider { get; set; }
     }
 }

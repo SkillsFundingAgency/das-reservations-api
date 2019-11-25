@@ -12,6 +12,7 @@ using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReserv
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
+using SFA.DAS.Reservations.Domain.Reservations;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 
@@ -138,7 +139,8 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [Route("api/[controller]/search")]
-        public async Task<IActionResult> Search(long providerId, string searchTerm, ushort pageNumber = 1, ushort pageItemCount = 10)
+        public async Task<IActionResult> Search(
+            long providerId, string searchTerm, string selectedCourse, string selectedEmployer, string selectedStartDate, ushort pageNumber = 1, ushort pageItemCount = 10)
         {
             try
             {
@@ -147,7 +149,13 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     ProviderId = providerId, 
                     SearchTerm = searchTerm,
                     PageNumber = pageNumber,
-                    PageItemCount = pageItemCount
+                    PageItemCount = pageItemCount,
+                    SelectedFilters = new SelectedSearchFilters
+                    {
+                        CourseFilter = selectedCourse,
+                        EmployerNameFilter = selectedEmployer,
+                        StartDateFilter = selectedStartDate
+                    }
                 });
 
                 return Ok(response);

@@ -2,7 +2,7 @@
 using System.Text;
 using Elasticsearch.Net;
 
-namespace SFA.DAS.Reservations.Data.UnitTests.ElasticSearch
+namespace SFA.DAS.Reservations.Data.UnitTests.Extensions
 {
     public static class PostDataExtensions
     {
@@ -12,6 +12,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.ElasticSearch
             {
                 pd.Write(stream, new ConnectionConfiguration());
             }
+
+            if (pd.WrittenBytes == null || pd.WrittenBytes.Length == 0)
+                return string.Empty;
 
             return Encoding.UTF8.GetString(pd.WrittenBytes);
         }

@@ -8,7 +8,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Extensions
     {
         public static string RemoveLineEndingsAndWhiteSpace(this string value)
         {
-            if(String.IsNullOrEmpty(value))
+            if(string.IsNullOrEmpty(value))
             {
                 return value;
             }
