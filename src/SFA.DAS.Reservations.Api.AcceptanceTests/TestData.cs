@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         public bool IsLevyAccount { get; set; }
         public Guid ReservationId { get; set; }
         public Guid UserId { get; set; }
+        public ProviderPermission ProviderPermission { get ; set ; }
     }
 }

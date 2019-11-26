@@ -70,4 +70,16 @@
     </SpecFlowFeatureFiles>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Features\AccountAutoReservationStatus.feature" />
+    <Content Include="Features\AccountLegalEntities.feature" />
+    <Content Include="Features\AcknowledgedRules.feature" />
+    <Content Include="Features\AvailableDates.feature" />
+    <Content Include="Features\BulkCreateReservation.feature" />
+    <Content Include="Features\CreateReservation.feature" />
+    <Content Include="Features\DeleteReservation.feature" />
+    <Content Include="Features\GetCourses.feature" />
+    <Content Include="Features\ValidateReservation.feature" />
+  </ItemGroup>
+
 </Project>
