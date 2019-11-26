@@ -7,4 +7,3 @@ Feature: AccountLegalEntitiesForProvider
     When I get the account legal entities
     Then The non levy employers are returned
     
-   Scenario
