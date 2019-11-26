@@ -33,9 +33,9 @@ using SFA.DAS.Reservations.Domain.Configuration;
         {
             _logger.LogInformation("Starting reservation search");
 
-            var reservationIndexName = await GetCurrentReservationIndexName();
+            var reservationIndex = await GetCurrentReservationIndex();
 
-            if (string.IsNullOrWhiteSpace(reservationIndexName))
+            if (string.IsNullOrWhiteSpace(reservationIndex.Name))
             {
                 _logger.LogWarning("Searching failed. Latest Reservation index does not have a name value");
 
@@ -45,7 +45,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
             var startingDocumentIndex = (ushort) (pageNumber < 2 ? 0 : (pageNumber - 1) * pageItemCount);
 
             var elasticSearchResult = await GetSearchResult(
-                providerId, searchTerm, pageItemCount, startingDocumentIndex, reservationIndexName, selectedFilters);
+                providerId, searchTerm, pageItemCount, startingDocumentIndex, reservationIndex.Name, selectedFilters);
 
             if (elasticSearchResult == null)
             {
@@ -55,9 +55,9 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
             _logger.LogDebug("Searching complete, returning search results");
 
-            var totalRecordCount = await GetSearchResultCount(reservationIndexName, providerId);
+            var totalRecordCount = await GetSearchResultCount(reservationIndex.Name, providerId);
 
-            var filterValues = await GetFilterValues(reservationIndexName, providerId);
+            var filterValues = await GetFilterValues(reservationIndex.Name, providerId);
 
             var searchResult =  new IndexedReservationSearchResult
             {
@@ -115,7 +115,14 @@ using SFA.DAS.Reservations.Domain.Configuration;
             return searchResult;
         }
 
-        private async Task<string> GetCurrentReservationIndexName()
+        public async Task<bool> PingAsync()
+        {
+            var pingResponse = await _client.PingAsync<StringResponse>();
+
+            return pingResponse.Success;
+        }
+
+        public async Task<IndexRegistryEntry> GetCurrentReservationIndex()
         {
             var data = PostData.String(_elasticQueries.LastIndexSearchQuery);
 
@@ -128,7 +135,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
             if (elasticResponse?.Items != null && elasticResponse.Items.Any())
             {
-                return elasticResponse.Items.First().Name;
+                return elasticResponse.Items.First();
             }
 
             _logger.LogWarning("Searching failed. Could not find any reservation index names to search");
@@ -229,14 +236,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
             return @"""should"": [" + filterClause + @"], ""minimum_should_match"": " + minMatchValue;
         }
-
-        private class IndexRegistryEntry
-        {
-            public Guid Id { get; set; }
-            public string Name { get; set; }
-            public DateTime DateCreated { get; set; }
-        }
-
+        
         private struct FilterValues
         {
             public ICollection<string> Courses { get; set; }

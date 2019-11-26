@@ -26,7 +26,15 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public void Init()
         {
             _mockClient = new Mock<IElasticLowLevelClient>();
+            
             _mockElasticSearchQueries = new Mock<IElasticSearchQueries>();
+            _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns("search");
+            _mockElasticSearchQueries.Setup(x => x.GetAllReservationsQuery).Returns("search");
+            _mockElasticSearchQueries.Setup(x => x.GetFilterValuesQuery).Returns("aggs");
+            _mockElasticSearchQueries.Setup(x => x.LastIndexSearchQuery).Returns("Get index");
+            _mockElasticSearchQueries.Setup(x => x.GetReservationCountQuery).Returns("ReservationCount");
+            _mockElasticSearchQueries.Setup(x => x.ReservationIndexLookupName).Returns("-reservations-index-registry");
+
             _apiEnvironment = new ReservationsApiEnvironment("test");
             _repository = new ReservationIndexRepository(_mockClient.Object, _apiEnvironment, _mockElasticSearchQueries.Object, Mock.Of<ILogger<ReservationIndexRepository>>());
 
@@ -94,12 +102,6 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                         It.IsAny<CountRequestParameters>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse(@"{""count"":10}"));
-
-            _mockElasticSearchQueries.Setup(x => x.FindReservationsQuery).Returns("search");
-            _mockElasticSearchQueries.Setup(x => x.GetAllReservationsQuery).Returns("search");
-            _mockElasticSearchQueries.Setup(x => x.GetFilterValuesQuery).Returns("aggs");
-            _mockElasticSearchQueries.Setup(x => x.LastIndexSearchQuery).Returns("Get index");
-            _mockElasticSearchQueries.Setup(x => x.GetReservationCountQuery).Returns("ReservationCount");
         }
 
         [Test]

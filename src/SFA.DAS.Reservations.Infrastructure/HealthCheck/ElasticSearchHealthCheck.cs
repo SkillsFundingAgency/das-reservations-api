@@ -1,39 +1,43 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SFA.DAS.Reservations.Domain.Configuration;
-using SFA.DAS.Reservations.Domain.Infrastructure;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
 {
     public class ElasticSearchHealthCheck : IHealthCheck
     {
-        private readonly IElasticLowLevelClient _client;
-        private readonly ReservationsApiEnvironment _environment;
-        private readonly IElasticSearchQueries _elasticQueries;
+        private readonly IReservationIndexRepository _repository;
 
-        public ElasticSearchHealthCheck(IElasticLowLevelClient client, 
-            ReservationsApiEnvironment environment, 
-            IElasticSearchQueries elasticQueries)
+
+        public ElasticSearchHealthCheck(IReservationIndexRepository repository)
         {
-            _client = client;
-            _environment = environment;
-            _elasticQueries = elasticQueries;
+            _repository = repository;
         }
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
         {
-            //_client.PingAsync<>()
+            var elasticInstanceOnline = await _repository.PingAsync();
 
-            //var data = PostData.String(_elasticQueries.LastIndexSearchQuery);
+            if (!elasticInstanceOnline)
+            {
+                return HealthCheckResult.Unhealthy("Ping to elastic instance failed");
+            }
 
-            //_logger.LogDebug("Getting latest reservation index name");
+            var latestIndex = await _repository.GetCurrentReservationIndex();
 
-            //var response = await _client.SearchAsync<StringResponse>(
-            //    _environment.EnvironmentName + ReservationIndexLookupName, data);
-            throw new NotImplementedException();
+            if (latestIndex == null)
+            {
+                return HealthCheckResult.Unhealthy("There are no available indices");
+            }
+
+            if (latestIndex.DateCreated < DateTime.Now.AddDays(-1))
+            {
+                return HealthCheckResult.Degraded("Latest index is more than one day old");
+            }
+
+            return HealthCheckResult.Healthy("All elastic search checks have passed");
         }
     }
 }
