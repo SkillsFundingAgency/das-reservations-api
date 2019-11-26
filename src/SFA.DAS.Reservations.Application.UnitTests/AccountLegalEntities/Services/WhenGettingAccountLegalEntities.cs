@@ -35,7 +35,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountLegalEntityName = "Test",
                     LegalEntityId = 43,
                     ReservationLimit = 4,
-                    AgreementSigned = false
+                    AgreementSigned = false,
+                    ProviderPermissions = null
                 },
                 new Domain.Entities.AccountLegalEntity
                 {
@@ -45,7 +46,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountLegalEntityName = "Test 2",
                     LegalEntityId = 54,
                     ReservationLimit = 4,
-                    AgreementSigned = true
+                    AgreementSigned = true,
+                    ProviderPermissions = null
                 }
             };
             
@@ -79,7 +81,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             //Assert
             Assert.IsAssignableFrom<List<AccountLegalEntity>>(actual);
             Assert.AreEqual(2,actual.Count);
-            actual.Should().BeEquivalentTo(_legalEntities);
+            actual.Should().BeEquivalentTo(_legalEntities, options => options.Excluding(p=>p.ProviderPermissions));
         }
 
         [Test]

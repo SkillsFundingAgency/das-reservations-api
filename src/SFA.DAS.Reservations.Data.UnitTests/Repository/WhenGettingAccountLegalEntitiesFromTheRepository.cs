@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Data.UnitTests.DatabaseMock;
 using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Exceptions;
+using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 {
@@ -77,6 +81,22 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             //Assert
             Assert.IsEmpty(actual);
+        }
+        
+        [Test, MoqAutoData]
+        public void And_ALE_Not_Found_Then_Throws_Exception(
+            long accountLegalEntityId,
+            [Frozen] Mock<IReservationsDataContext> mockDataContext,
+            AccountLegalEntityRepository repository)
+        {
+            mockDataContext
+                .Setup(context => context.AccountLegalEntities)
+                .ReturnsDbSet(new List<AccountLegalEntity>());
+
+            var act = new Func<Task>(async () => await repository.Get(accountLegalEntityId));
+
+            act.Should().Throw<EntityNotFoundException<AccountLegalEntity>>()
+                .WithInnerException<InvalidOperationException>();
         }
     }
 }
