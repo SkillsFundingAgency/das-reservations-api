@@ -10,6 +10,7 @@ using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReserv
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Application.Courses.Services;
+using SFA.DAS.Reservations.Application.ProviderPermissions.Queries;
 using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Application.Rules.Services;
@@ -46,6 +47,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             services.AddScoped(typeof(IValidator<BulkCreateAccountReservationsCommand>), typeof(BulkCreateAccountReservationsCommandValidator));
             services.AddScoped(typeof(IValidator<DeleteReservationCommand>), typeof(DeleteReservationCommandValidator));
             services.AddScoped(typeof(IValidator<FindAccountReservationsQuery>), typeof(FindAccountReservationsValidator));
+            services.AddScoped(typeof(IValidator<GetAccountLegalEntitiesForProviderQuery>), typeof(GetAccountLegalEntitiesForProviderValidator));
         }
     }
 
