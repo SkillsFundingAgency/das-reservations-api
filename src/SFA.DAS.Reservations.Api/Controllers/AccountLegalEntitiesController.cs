@@ -7,6 +7,7 @@ using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntity;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
+using SFA.DAS.Reservations.Application.ProviderPermissions.Queries;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 
@@ -92,6 +93,26 @@ namespace SFA.DAS.Reservations.Api.Controllers
             {
                 _logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
                 return NotFound();
+            }
+        }
+
+        [Route("provider/{providerId}")]
+        public async Task<IActionResult> GetByProviderId(uint providerId)
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetAccountLegalEntitiesForProviderQuery { ProviderId = providerId });
+                
+                return Ok(response.ProviderPermissions);
+            }
+            catch (ArgumentException e)
+            {
+                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
             }
         }
     }
