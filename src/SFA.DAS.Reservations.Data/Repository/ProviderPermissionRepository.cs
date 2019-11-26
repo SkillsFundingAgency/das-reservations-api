@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.ProviderPermissions;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class ProviderPermissionRepository
+    public class ProviderPermissionRepository : IProviderPermissionRepository
     {
         private readonly IReservationsDataContext _dataContext;
 
@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             _dataContext = dataContext;
         }
 
-        public async Task<IList<ProviderPermission>> GetByProviderId(uint ukPrn)
+        public async Task<IList<Domain.Entities.ProviderPermission>> GetByProviderId(uint ukPrn)
         {
             var providerPermissions =
                 await _dataContext.ProviderPermissions.Where(c => c.UkPrn.Equals(ukPrn)).ToListAsync();
