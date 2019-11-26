@@ -35,7 +35,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
             var reservationIndex = await GetCurrentReservationIndex();
 
-            if (string.IsNullOrWhiteSpace(reservationIndex.Name))
+            if (string.IsNullOrWhiteSpace(reservationIndex?.Name))
             {
                 _logger.LogWarning("Searching failed. Latest Reservation index does not have a name value");
 
