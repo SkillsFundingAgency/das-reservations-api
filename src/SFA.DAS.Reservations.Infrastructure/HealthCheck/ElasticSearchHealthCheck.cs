@@ -32,9 +32,9 @@ namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
                 return HealthCheckResult.Unhealthy("There are no available indices");
             }
 
-            if (latestIndex.DateCreated < DateTime.Now.AddDays(-1))
+            if (latestIndex.DateCreated < DateTime.Now.AddHours(-25))
             {
-                return HealthCheckResult.Degraded("Latest index is more than one day old");
+                return HealthCheckResult.Degraded("Latest index is more than a day old");
             }
 
             return HealthCheckResult.Healthy("All elastic search checks have passed");

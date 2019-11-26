@@ -91,7 +91,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             {
                 Id = Guid.NewGuid(),
                 Name = "Test",
-                DateCreated = DateTime.Now.AddHours(-25)
+                DateCreated = DateTime.Now.AddHours(-26)
             });
 
             //Act
