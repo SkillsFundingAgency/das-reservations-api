@@ -35,10 +35,13 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenReturnsTrueIfPassed()
         {
             //Arrange
+            var apiCallMock = new Mock<IApiCallDetails>();
+            apiCallMock.Setup(api => api.Success).Returns(true);
+
             _mockClient.Setup(c => c.PingAsync<StringResponse>(It.IsAny<PingRequestParameters>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse
                 {
-                    ApiCall = new ApiCallDetails {HttpStatusCode = 200, Success = true}
+                    ApiCall = apiCallMock.Object
                 });
 
             //Act
@@ -52,10 +55,13 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         public async Task ThenReturnsFailIfFailed()
         {
             //Arrange
+            var apiCallMock = new Mock<IApiCallDetails>();
+            apiCallMock.Setup(api => api.Success).Returns(false);
+
             _mockClient.Setup(c => c.PingAsync<StringResponse>(It.IsAny<PingRequestParameters>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new StringResponse
                 {
-                    ApiCall = new ApiCallDetails {HttpStatusCode = 400, Success = false}
+                    ApiCall = apiCallMock.Object
                 });
 
             //Act

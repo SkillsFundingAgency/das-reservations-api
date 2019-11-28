@@ -119,6 +119,11 @@ using SFA.DAS.Reservations.Domain.Configuration;
         {
             var pingResponse = await _client.PingAsync<StringResponse>();
 
+            if(!pingResponse.Success)
+            {
+                _logger.LogDebug($"Elastic search ping failed: {pingResponse.DebugInformation ?? "no information available"}");
+            }
+
             return pingResponse.Success;
         }
 
