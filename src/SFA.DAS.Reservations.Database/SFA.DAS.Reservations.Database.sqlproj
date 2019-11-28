@@ -73,6 +73,7 @@
     <Build Include="Tables\ClientOutboxData.sql" />
     <Build Include="Tables\UserRuleNotification.sql" />
     <Build Include="Tables\ProviderPermission.sql" />
+    <Build Include="Tables\Account.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\PostDeployment\ChangeReservationExpiredDateTime.sql" />
