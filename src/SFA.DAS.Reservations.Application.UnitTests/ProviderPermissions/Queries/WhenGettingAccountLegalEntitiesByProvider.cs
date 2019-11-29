@@ -87,6 +87,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Queries
                         AccountLegalEntity = new AccountLegalEntity
                         {
                             AccountLegalEntityName = "test"
+                        },
+                        Account = new Account
+                        {
+                            Name = "test"
                         }
                     })
                 });

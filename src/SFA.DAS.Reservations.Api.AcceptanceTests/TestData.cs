@@ -12,5 +12,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         public Guid ReservationId { get; set; }
         public Guid UserId { get; set; }
         public ProviderPermission ProviderPermission { get ; set ; }
+        public Account Account { get ; set ; }
     }
 }

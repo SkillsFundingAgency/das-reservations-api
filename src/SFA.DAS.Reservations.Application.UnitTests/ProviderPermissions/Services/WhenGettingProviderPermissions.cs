@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Service
                     AccountLegalEntity = new AccountLegalEntity(),
                     AccountLegalEntityId = 2,
                     CanCreateCohort = true,
-                        
+                    Account = new Account{Name = "test"}
                 }
             };
             providerPermissionRepository.Setup(x => x.GetByProviderId(providerId)).ReturnsAsync(providerPermissions);
@@ -64,6 +64,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Service
                     },
                     AccountLegalEntityId = 2,
                     CanCreateCohort = true,
+                    Account = new Account{Name = "test"}
                 },
                 new Domain.Entities.ProviderPermission
                 {
@@ -76,6 +77,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Service
                     },
                     AccountLegalEntityId = 2,
                     CanCreateCohort = true,
+                    Account = new Account{Name = "test"}
                 },
                 new Domain.Entities.ProviderPermission
                 {
@@ -88,6 +90,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Service
                     },
                     AccountLegalEntityId = 2,
                     CanCreateCohort = true,
+                    Account = new Account{Name = "test"}
                 },
                 new Domain.Entities.ProviderPermission
                 {
@@ -100,6 +103,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Service
                     },
                     AccountLegalEntityId = 2,
                     CanCreateCohort = false,
+                    Account = new Account{Name = "test"}
                 }
             };
             providerPermissionRepository.Setup(x => x.GetByProviderId(providerId)).ReturnsAsync(providerPermissions);

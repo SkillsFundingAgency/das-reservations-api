@@ -72,6 +72,20 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
                 dbContext.SaveChanges();
             }
+
+            TestData.Account = new Account
+            {
+                Id = AccountId,
+                Name = "Test Account"
+            };
+
+            var account = dbContext.Accounts.Find(AccountId);
+
+            if (account == null)
+            {
+                dbContext.Accounts.Add(TestData.Account);
+                dbContext.SaveChanges();
+            }
         }
 
     }

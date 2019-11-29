@@ -14,6 +14,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ProviderPermissions
             long accountLegalEntityId,
             uint ukPrn,
             string accountLegalEntityName,
+            string accountName,
             AgreementType agreementType
             )
         {
@@ -30,6 +31,11 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ProviderPermissions
                     AccountId = accountId,
                     AccountLegalEntityId = accountLegalEntityId,
                     AgreementType = agreementType
+                },
+                Account = new Account
+                {
+                    Id = accountId,
+                    Name = accountName
                 }
             };
             
@@ -43,6 +49,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ProviderPermissions
             actual.AgreementSigned.Should().BeTrue();
             actual.AccountLegalEntityName.Should().Be(accountLegalEntityName);
             actual.AgreementType.Should().Be(agreementType);
+            actual.AccountName.Should().Be(accountName);
         }
     }
 }
