@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Domain.Entities;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests
@@ -13,5 +14,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         public Guid UserId { get; set; }
         public ProviderPermission ProviderPermission { get ; set ; }
         public Account Account { get ; set ; }
+        public IActionResult ActualResult { get; set; }
     }
 }

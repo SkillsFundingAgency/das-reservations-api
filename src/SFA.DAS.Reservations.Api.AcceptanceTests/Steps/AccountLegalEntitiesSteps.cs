@@ -11,7 +11,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class AccountLegalEntitiesSteps : StepsBase
     {
-        private OkObjectResult _actualResult;
 
         public AccountLegalEntitiesSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
         {
@@ -32,13 +31,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             var controller = Services.GetService<AccountLegalEntitiesController>();
 
-            _actualResult = controller.GetByProviderId(ProviderId).Result as OkObjectResult;
+            TestData.ActualResult = controller.GetByProviderId(ProviderId).Result;
         }
 
         [Then("The non levy employers are returned")]
         public void ThenTheNonLevyEmployersAreReturned()
         {
-            var result = _actualResult.Value as List<Domain.ProviderPermissions.ProviderPermission>;
+            var result = ((OkObjectResult)TestData.ActualResult).Value as List<Domain.ProviderPermissions.ProviderPermission>;
 
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
