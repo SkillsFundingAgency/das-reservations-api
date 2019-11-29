@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
@@ -117,9 +118,11 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
         public async Task<bool> PingAsync()
         {
-            var pingResponse = await _client.PingAsync<StringResponse>();
+            var index = await GetCurrentReservationIndex();
 
-            if(!pingResponse.Success)
+            var pingResponse = await _client.CountAsync<StringResponse>(index.Name, PostData.String(""), new CountRequestParameters(), CancellationToken.None);
+
+            if (!pingResponse.Success)
             {
                 _logger.LogDebug($"Elastic search ping failed: {pingResponse.DebugInformation ?? "no information available"}");
             }
