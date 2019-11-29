@@ -20,6 +20,11 @@ namespace SFA.DAS.Reservations.Data.Configuration
                 .WithMany(c => c.ProviderPermissions)
                 .HasForeignKey(c => c.AccountLegalEntityId)
                 .HasPrincipalKey(c => c.AccountLegalEntityId);
+
+            builder.HasOne(c => c.Account)
+                .WithMany(c => c.ProviderPermissions)
+                .HasForeignKey(c => c.AccountId)
+                .HasPrincipalKey(c => c.Id);
         }
     }
 }
