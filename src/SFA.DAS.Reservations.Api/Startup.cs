@@ -75,6 +75,10 @@ namespace SFA.DAS.Reservations.Api
                     .AddCheck<QueueHealthCheck>(
                         "ServiceBus Queue Health",
                         HealthStatus.Unhealthy,
+                        new []{"ready"})
+                    .AddCheck<ElasticSearchHealthCheck>(
+                        "Elastic Search Health",
+                        HealthStatus.Unhealthy,
                         new []{"ready"});
 
             if (!ConfigurationIsLocalOrDev())

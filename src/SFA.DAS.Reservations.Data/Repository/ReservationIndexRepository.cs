@@ -1,21 +1,21 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SFA.DAS.Reservations.Data.ElasticSearch;
 using SFA.DAS.Reservations.Domain.Configuration;
+ using SFA.DAS.Reservations.Domain.Infrastructure;
 
-namespace SFA.DAS.Reservations.Data.Repository
+ namespace SFA.DAS.Reservations.Data.Repository
 {
     public class ReservationIndexRepository : IReservationIndexRepository
     {
-        public const string ReservationIndexLookupName = "-reservations-index-registry";
-
         private readonly IElasticLowLevelClient _client;
         private readonly ReservationsApiEnvironment _environment;
         private readonly IElasticSearchQueries _elasticQueries;
@@ -34,9 +34,9 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             _logger.LogInformation("Starting reservation search");
 
-            var reservationIndexName = await GetCurrentReservationIndexName();
+            var reservationIndex = await GetCurrentReservationIndex();
 
-            if (string.IsNullOrWhiteSpace(reservationIndexName))
+            if (string.IsNullOrWhiteSpace(reservationIndex?.Name))
             {
                 _logger.LogWarning("Searching failed. Latest Reservation index does not have a name value");
 
@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Data.Repository
             var startingDocumentIndex = (ushort) (pageNumber < 2 ? 0 : (pageNumber - 1) * pageItemCount);
 
             var elasticSearchResult = await GetSearchResult(
-                providerId, searchTerm, pageItemCount, startingDocumentIndex, reservationIndexName, selectedFilters);
+                providerId, searchTerm, pageItemCount, startingDocumentIndex, reservationIndex.Name, selectedFilters);
 
             if (elasticSearchResult == null)
             {
@@ -56,9 +56,9 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             _logger.LogDebug("Searching complete, returning search results");
 
-            var totalRecordCount = await GetSearchResultCount(reservationIndexName, providerId);
+            var totalRecordCount = await GetSearchResultCount(reservationIndex.Name, providerId);
 
-            var filterValues = await GetFilterValues(reservationIndexName, providerId);
+            var filterValues = await GetFilterValues(reservationIndex.Name, providerId);
 
             var searchResult =  new IndexedReservationSearchResult
             {
@@ -116,20 +116,34 @@ namespace SFA.DAS.Reservations.Data.Repository
             return searchResult;
         }
 
-        private async Task<string> GetCurrentReservationIndexName()
+        public async Task<bool> PingAsync()
+        {
+            var index = await GetCurrentReservationIndex();
+
+            var pingResponse = await _client.CountAsync<StringResponse>(index.Name, PostData.String(""), new CountRequestParameters(), CancellationToken.None);
+
+            if (!pingResponse.Success)
+            {
+                _logger.LogDebug($"Elastic search ping failed: {pingResponse.DebugInformation ?? "no information available"}");
+            }
+
+            return pingResponse.Success;
+        }
+
+        public async Task<IndexRegistryEntry> GetCurrentReservationIndex()
         {
             var data = PostData.String(_elasticQueries.LastIndexSearchQuery);
 
             _logger.LogDebug("Getting latest reservation index name");
 
             var response = await _client.SearchAsync<StringResponse>(
-                _environment.EnvironmentName + ReservationIndexLookupName, data);
+                _environment.EnvironmentName + _elasticQueries.ReservationIndexLookupName, data);
 
             var elasticResponse = JsonConvert.DeserializeObject<ElasticResponse<IndexRegistryEntry>>(response.Body);
 
             if (elasticResponse?.Items != null && elasticResponse.Items.Any())
             {
-                return elasticResponse.Items.First().Name;
+                return elasticResponse.Items.First();
             }
 
             _logger.LogWarning("Searching failed. Could not find any reservation index names to search");
@@ -230,14 +244,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
             return @"""should"": [" + filterClause + @"], ""minimum_should_match"": " + minMatchValue;
         }
-
-        private class IndexRegistryEntry
-        {
-            public Guid Id { get; set; }
-            public string Name { get; set; }
-            public DateTime DateCreated { get; set; }
-        }
-
+        
         private struct FilterValues
         {
             public ICollection<string> Courses { get; set; }
