@@ -18,8 +18,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     public class AvailableDatesSteps: StepsBase
     {
         private const int DefaultAvailableDatesMonthCount = 6;
-        private static readonly DateTime EoiDefaultMinDate = new DateTime(2019, 08, 1);
-        private static readonly DateTime EoiDefaultMaxDate = new DateTime(2019, 12, 1);
+        private static readonly DateTime EoiDefaultMinDate = new DateTime(2019, 8, 1);
+        private static readonly DateTime EoiDefaultMaxDate = new DateTime(2020, 1, 1);
 
         private GetAvailableDatesResult _availableDatesResult;
 
@@ -64,7 +64,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Then(@"I should get EOI available dates back")]
         public void ThenIShouldGetEoiAvailableDatesBack()
         {
-            Assert.AreEqual(5, _availableDatesResult.AvailableDates.Count());
+            Assert.AreEqual(6, _availableDatesResult.AvailableDates.Count());
 
             var expectedDates = GetExpectedDates(DefaultAvailableDatesMonthCount, EoiDefaultMinDate,  EoiDefaultMaxDate);
 
