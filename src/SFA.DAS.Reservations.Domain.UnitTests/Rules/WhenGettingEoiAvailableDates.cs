@@ -12,7 +12,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         [Test]
         public void Then_Number_Defaults_To_6()
         {
-            var expectedMaxDate = new DateTime(2019, 12, 1);
+            var expectedMaxDate = new DateTime(2020, 1, 1);
 
             var actualDates = new EoiAvailableDates(DateTime.UtcNow, null).Dates;
 
@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         [Test]
         public void Then_Max_Date_Defaults_To_Dec_2019()
         {
-            var expectedMaxDate = new DateTime(2019, 12, 1);
+            var expectedMaxDate =  new DateTime(2020, 1, 1);
 
             var actualDates = new EoiAvailableDates(DateTime.UtcNow).Dates;
 
