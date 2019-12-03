@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             };
             
             _repository = new Mock<IAccountLegalEntitiesRepository>();
-            _repository.Setup(x => x.GetByAccountIdWithAgreementSigned(ExpectedAccountId)).ReturnsAsync(_legalEntities);
+            _repository.Setup(x => x.GetByAccountId(ExpectedAccountId)).ReturnsAsync(_legalEntities);
 
             _options = new Mock<IOptions<ReservationsConfiguration>>();
             _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(ExpectedReservationLimit);
@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             var actual = await _service.GetAccountLegalEntities(ExpectedAccountId);
 
             //Assert
-            _repository.Verify(x=>x.GetByAccountIdWithAgreementSigned(ExpectedAccountId), Times.Once);
+            _repository.Verify(x=>x.GetByAccountId(ExpectedAccountId), Times.Once);
             Assert.IsNotNull(actual);
             Assert.IsNotEmpty(actual);
         }
@@ -86,7 +86,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
         public async Task Then_If_No_Limit_Has_Been_Set_On_The_Number_Of_Reservations_Then_The_Default_Limit_Is_Used()
         {
             //Arrange
-            _repository.Setup(x => x.GetByAccountIdWithAgreementSigned(ExpectedAccountId)).ReturnsAsync(new List<Domain.Entities.AccountLegalEntity>
+            _repository.Setup(x => x.GetByAccountId(ExpectedAccountId)).ReturnsAsync(new List<Domain.Entities.AccountLegalEntity>
             {
                 new Domain.Entities.AccountLegalEntity
                 {
