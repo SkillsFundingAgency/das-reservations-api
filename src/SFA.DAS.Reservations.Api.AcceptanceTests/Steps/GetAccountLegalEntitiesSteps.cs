@@ -14,9 +14,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class GetAccountLegalEntitiesSteps : StepsBase
     {
-        private IEnumerable<Domain.AccountLegalEntities.AccountLegalEntity> _accountLegalEntitiesList;
-
-        public GetAccountLegalEntitiesSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public GetAccountLegalEntitiesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
         }
 
@@ -75,14 +73,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             var accountLegalEntitiesController = Services.GetService<AccountLegalEntitiesController>();
 
             var actionResult = accountLegalEntitiesController.GetByAccountId(AccountId).Result as OkObjectResult;
-            _accountLegalEntitiesList = actionResult.Value as IEnumerable<Domain.AccountLegalEntities.AccountLegalEntity>;
+            TestResults.AccountLegalEntities = actionResult.Value as IEnumerable<Domain.AccountLegalEntities.AccountLegalEntity>;
         }
 
         [Then(@"all legal entities for my account are returned")]
         public void ThenAllLegalEntitiesForMyAccountAreReturned()
         {
-            Assert.True(
-                _accountLegalEntitiesList.All(ale => ale.AccountId.Equals(TestData.AccountLegalEntity.AccountId)));
+            Assert.True(TestResults.AccountLegalEntities.All(ale => ale.AccountId.Equals(TestData.AccountLegalEntity.AccountId)));
 
         }
 

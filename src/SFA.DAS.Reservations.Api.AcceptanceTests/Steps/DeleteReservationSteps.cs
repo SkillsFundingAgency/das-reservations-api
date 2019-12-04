@@ -11,7 +11,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class DeleteReservationSteps: StepsBase
     {
-        public DeleteReservationSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public DeleteReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
 
         }

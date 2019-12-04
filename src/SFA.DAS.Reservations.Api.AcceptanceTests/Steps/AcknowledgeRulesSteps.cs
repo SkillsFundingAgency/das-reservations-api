@@ -4,12 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Data;
-using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Rules;
 using TechTalk.SpecFlow;
 
@@ -18,7 +16,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class AcknowledgeRulesSteps : StepsBase
     {
-        public AcknowledgeRulesSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public AcknowledgeRulesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
         }
 

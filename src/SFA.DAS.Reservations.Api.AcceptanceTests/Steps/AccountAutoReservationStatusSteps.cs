@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         private long? _transferSenderId = null;
         private bool _canAutoCreateReservations;
 
-        public CheckAccountAutoReservationStatusSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public CheckAccountAutoReservationStatusSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
         }
 
