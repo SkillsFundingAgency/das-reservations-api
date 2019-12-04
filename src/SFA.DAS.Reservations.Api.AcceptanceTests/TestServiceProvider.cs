@@ -10,9 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Api.Controllers;
-using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests
 {

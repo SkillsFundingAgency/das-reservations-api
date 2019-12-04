@@ -2,11 +2,6 @@
 	In order to be able to auto create reservations
 	as a levy or a non levy employer
 	I want to check auto reservation status
-			
-Scenario: Get available legal entities for account
-	Given I have a non levy account 
-	When I get my legal entities attached to the account
-	Then Only legal entities with their agreement signed are returned
 
 Scenario: Check auto reservation status
 	Given I have a levy account

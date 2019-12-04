@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SFA.DAS.Common.Domain.Types;
@@ -16,7 +14,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     public class CheckAccountAutoReservationStatusSteps : StepsBase
     {
         private long? _transferSenderId = null;
-        private IEnumerable<Domain.AccountLegalEntities.AccountLegalEntity> _accountLegalEntitiesList;
         private bool _canAutoCreateReservations;
 
         public CheckAccountAutoReservationStatusSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
@@ -43,15 +40,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
         }
         
-        [When(@"I get my legal entities attached to the account")]
-        public void WhenIGetMyLegalEntitiesAttachedToTheAccount()
-        {
-            var accountLegalEntitiesController = Services.GetService<AccountLegalEntitiesController>();
-
-            var actionResult = accountLegalEntitiesController.GetByAccountId(AccountId).Result as OkObjectResult;
-            _accountLegalEntitiesList = actionResult.Value as IEnumerable<Domain.AccountLegalEntities.AccountLegalEntity>;
-        }
-        
         [When(@"I get the account reservation status")]
         public void WhenIGetTheAccountReservationStatus()
         {
@@ -60,16 +48,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             var accountReservationStatus = actionResult.Value as AccountReservationStatus;
             _canAutoCreateReservations = accountReservationStatus.CanAutoCreateReservations;
 
-        }
-        
-        
-        [Then(@"Only legal entities with their agreement signed are returned")]
-        public void ThenOnlyLegalEntitiesWithTheirAgreementSignedAreReturned()
-        {
-            foreach (var accountLegalEntity in _accountLegalEntitiesList)
-            {
-                Assert.True(accountLegalEntity.AgreementSigned);
-            }
         }
         
         [Then(@"I am allowed to auto create reservations")]

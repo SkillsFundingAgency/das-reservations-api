@@ -47,6 +47,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 AgreementSigned = true
             };
 
+           
+
             TestData.UserId = UserId;
 
             var dbContext = Services.GetService<ReservationsDataContext>();
@@ -61,6 +63,24 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             if (legalEntity == null)
             {
                 dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
+
+                dbContext.SaveChanges();
+            }
+
+            var anotherAccountLegalEntity = new AccountLegalEntity
+            {
+                AccountId = AccountId + 1,
+                AccountLegalEntityId = AccountLegalEntityId + 100,
+                AccountLegalEntityName = "Pass Mark Corp",
+                AgreementType = AgreementType.NonLevyExpressionOfInterest,
+                AgreementSigned = true
+            };
+
+            legalEntity = dbContext.AccountLegalEntities.SingleOrDefault(e => e.AccountLegalEntityId.Equals(anotherAccountLegalEntity.AccountLegalEntityId));
+
+            if (legalEntity == null)
+            {
+                dbContext.AccountLegalEntities.Add(anotherAccountLegalEntity);
 
                 dbContext.SaveChanges();
             }
