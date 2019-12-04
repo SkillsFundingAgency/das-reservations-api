@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,7 +46,15 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 AgreementType = AgreementType.NonLevyExpressionOfInterest,
                 AgreementSigned = true
             };
-
+            
+            TestData.ProviderPermission = new ProviderPermission
+            {
+                AccountId = AccountId,
+                UkPrn = ProviderId,
+                CanCreateCohort = true,
+                AccountLegalEntityId = AccountLegalEntityId
+            };
+            
             TestData.UserId = UserId;
 
             var dbContext = Services.GetService<ReservationsDataContext>();
@@ -62,6 +70,20 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             {
                 dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
 
+                dbContext.SaveChanges();
+            }
+
+            TestData.Account = new Account
+            {
+                Id = AccountId,
+                Name = "Test Account"
+            };
+
+            var account = dbContext.Accounts.Find(AccountId);
+
+            if (account == null)
+            {
+                dbContext.Accounts.Add(TestData.Account);
                 dbContext.SaveChanges();
             }
         }

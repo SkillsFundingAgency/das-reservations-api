@@ -37,6 +37,9 @@
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
+    <Content Update="appsettings.development.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
     <Content Update="ElasticSearch\FindReservationsQuery.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

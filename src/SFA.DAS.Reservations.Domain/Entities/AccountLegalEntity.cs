@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.Reservations.Domain.Entities
@@ -14,5 +15,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public bool AgreementSigned { get; set; }
         public bool IsLevy { get; set; }
         public AgreementType AgreementType { get; set; }
+        public virtual ICollection<ProviderPermission> ProviderPermissions { get; set; }
     }
 }
