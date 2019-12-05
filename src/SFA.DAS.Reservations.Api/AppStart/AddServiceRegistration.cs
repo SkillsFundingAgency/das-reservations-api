@@ -3,12 +3,14 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Application.Courses.Services;
+using SFA.DAS.Reservations.Application.ProviderPermissions.Services;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Infrastructure;
+using SFA.DAS.Reservations.Domain.ProviderPermissions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.AzureServiceBus;
@@ -35,6 +37,8 @@ namespace SFA.DAS.Reservations.Api.AppStart
             services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
             services.AddTransient<IAzureQueueService, AzureQueueService>();
             services.AddTransient<IReservationIndexRepository, ReservationIndexRepository>();
+            services.AddTransient<IProviderPermissionRepository, ProviderPermissionRepository>();
+            services.AddTransient<IProviderPermissionService, ProviderPermissionsService>();
 
             services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
                 ? new CurrentDateTime(config.Value.CurrentDateTime)

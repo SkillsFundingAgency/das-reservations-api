@@ -15,3 +15,7 @@ GO;
 CREATE NONCLUSTERED INDEX [IDX_ProviderPermission_UkprnAccountLegalEntityId] ON [dbo].[ProviderPermission] ([Ukprn], [AccountLegalEntityId]) 
 INCLUDE ([AccountId],[CanCreateCohort]) WITH (ONLINE = ON) 
 GO;
+
+CREATE NONCLUSTERED INDEX [IDX_ProviderPermission_Ukprn] ON [dbo].[ProviderPermission] ([Ukprn]) 
+INCLUDE ([AccountLegalEntityId], [AccountId],[CanCreateCohort]) WITH (ONLINE = ON) 
+GO;
