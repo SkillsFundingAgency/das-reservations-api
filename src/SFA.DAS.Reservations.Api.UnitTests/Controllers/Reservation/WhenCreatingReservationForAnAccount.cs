@@ -154,7 +154,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
-        public async Task Then_If_There_Is_A_NonLevy_With_No_Eoi_Agreement_And_Unprocessable_Entity_Response_Is_Returned()
+        public async Task Then_If_There_Is_A_NonLevy_With_Unsigned_Agreement_An_Unprocessable_Entity_Response_Is_Returned()
         {
             //Arrange
             _mediator.Setup(x => x.Send(It.IsAny<CreateAccountReservationCommand>(), It.IsAny<CancellationToken>()))
@@ -162,7 +162,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 {
                     Reservation = null,
                     Rule = null,
-                    NonLevyNonEoiAgreementSigned = true
+                    AgreementNotSigned = true
                 });
 
 
