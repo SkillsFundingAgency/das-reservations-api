@@ -35,8 +35,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                 3, 
                 4, 
                 true, 
-                true,
-                AgreementType.Levy);
+                true);
 
             _mediator = new Mock<IMediator>();
             _accountLegalEntityResult = new GetAccountLegalEntityResult { LegalEntity  = _expectedLegalEntity};

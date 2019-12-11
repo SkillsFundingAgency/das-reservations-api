@@ -33,7 +33,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 AccountId = _transferSenderId.Value,
                 AccountLegalEntityId = AccountLegalEntityId + 4,
                 AccountLegalEntityName = "Test 4 Corp",
-                AgreementType = AgreementType.NonLevyExpressionOfInterest,
                 AgreementSigned = true,
                 IsLevy = true
             };

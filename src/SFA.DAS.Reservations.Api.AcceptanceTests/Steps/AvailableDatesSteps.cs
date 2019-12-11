@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Data;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -31,7 +30,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
             var legalEntity = dbContext.AccountLegalEntities.Single(le => le.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
 
-            legalEntity.AgreementType = AgreementType.Levy;
+            legalEntity.AgreementSigned = true;
 
             dbContext.SaveChanges();
         }
