@@ -93,7 +93,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                 {
                     Reservation = null,
                     Rule = null,
-                    AgreementNotSigned = true
+                    AgreementSigned = false
                 };
             }
 

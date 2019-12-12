@@ -84,7 +84,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     return UnprocessableEntity(modelStateDictionary);
                 }
 
-                if (response.AgreementNotSigned)
+                if (!response.AgreementSigned)
                 {
                     var modelStateDictionary = new ModelStateDictionary();
                     var errorMessage = $"None levy Account Id: {reservation.AccountId} has tried to make reservation with no agreement signed";
