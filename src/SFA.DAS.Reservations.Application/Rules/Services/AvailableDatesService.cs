@@ -16,18 +16,8 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             _configuration = options.Value;
         }
 
-        public IEnumerable<AvailableDateStartWindow> GetAvailableDates(bool isEoi)
+        public IEnumerable<AvailableDateStartWindow> GetAvailableDates()
         {
-            if (isEoi)
-            {
-                return new EoiAvailableDates(
-                    _currentDateTime.GetDate(),
-                    _configuration.EoiNumberOfAvailableDates,
-                    _configuration.EoiAvailableDatesMinDate,
-                    _configuration.EoiAvailableDatesMaxDate)
-                    .Dates;
-            }
-
             return new AvailableDates(
                 _currentDateTime.GetDate(),
                 _configuration.NumberOfAvailableDates,

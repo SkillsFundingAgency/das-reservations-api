@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
@@ -17,7 +18,10 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class CreateReservationSteps : StepsBase
     {
-        public CreateReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
+        private CreatedResult _actual;
+
+        public CreateReservationSteps(TestData testData, TestServiceProvider serviceProvider) 
+            : base(testData, serviceProvider)
         {
         }
         
@@ -114,6 +118,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [When(@"I create a reservation for a course with a start month of (.*)")]
         public void WhenICreateAReservationForACourseWithAStartMonth(string startMonth)
         {
+            TestData.ReservationId = Guid.NewGuid();
             var month = (int) Enum.Parse<Month>(startMonth);
 
             var controller = Services.GetService<ReservationsController>();
@@ -124,7 +129,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 CourseId = TestData.Course.CourseId,
                 AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
                 AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
-                Id = Guid.NewGuid(),
+                Id = TestData.ReservationId,
                 IsLevyAccount = TestData.IsLevyAccount,
                 ProviderId = 12345,
                 StartDate = new DateTime(DateTime.Now.Year, month, 1),
@@ -132,27 +137,28 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 UserId = TestData.UserId
             };
 
-            controller.Create(reservation).Wait();
+            _actual = (controller.Create(reservation).Result) as CreatedResult;
         }
 
         [When(@"I create a levy reservation")]
         public void WhenICreateALevyReservationForACourseWithAStartMonthOfJuly()
         {
+            TestData.ReservationId = Guid.NewGuid();
             var controller = Services.GetService<ReservationsController>();
-
             var reservation = new Reservation
             {
                 AccountId = 1,
                 AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
                 AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
-                Id = Guid.NewGuid(),
+                Id = TestData.ReservationId,
                 IsLevyAccount = true,
                 ProviderId = 12345,
                 TransferSenderAccountId = null,
                 UserId = TestData.UserId
             };
 
-            controller.Create(reservation).Wait();
+            _actual = (controller.Create(reservation).Result) as CreatedResult;
+            
         }
 
 
@@ -171,6 +177,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             Assert.AreEqual(month, reservation.StartDate.Value.Month);
             Assert.AreEqual(TestData.IsLevyAccount, reservation.IsLevyAccount);
             Assert.AreEqual(TestData.UserId, reservation.UserId);
+            Assert.IsNotNull(_actual);
+            Assert.AreEqual($"api/Reservations/{TestData.ReservationId}",_actual.Location);
         }
 
         [Then(@"I have (.*) reservation")]
@@ -181,6 +189,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             var reservation = dbContext.Reservations.Count();
 
             Assert.AreEqual(reservationCount,reservation);
+            
         }
 
     }

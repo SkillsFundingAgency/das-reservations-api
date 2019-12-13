@@ -11,9 +11,6 @@ namespace SFA.DAS.Reservations.Domain.Configuration
         public virtual int NumberOfAvailableDates { get; set; }
         public virtual int MaxNumberOfReservations { get; set; }
         public string NServiceBusConnectionString { get; set; }
-        public virtual int? EoiNumberOfAvailableDates { get; set; }
-        public virtual DateTime? EoiAvailableDatesMinDate { get; set; }
-        public virtual DateTime? EoiAvailableDatesMaxDate { get; set; }
         public virtual DateTime? CurrentDateTime { get; set; }
         public string QueueMonitorItems { get; set; }
         public string ElasticSearchUsername { get; set; }

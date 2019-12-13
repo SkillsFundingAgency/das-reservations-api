@@ -86,13 +86,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
             if (request.IsLevyAccount)
             {
                 request.AccountLegalEntityName = accountLegalEntity.AccountLegalEntityName;
-            } else if (!accountLegalEntity.IsLevy && accountLegalEntity.AgreementType != AgreementType.NonLevyExpressionOfInterest)
+            } 
+            else if (!accountLegalEntity.IsLevy && !accountLegalEntity.AgreementSigned)
             {
                 return new CreateAccountReservationResult
                 {
-                    NonLevyNonEoiAgreementSigned = true,
                     Reservation = null,
-                    Rule = null
+                    Rule = null,
+                    AgreementSigned = false
                 };
             }
 
@@ -127,7 +128,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
 
             return new CreateAccountReservationResult
             {
-                Reservation = reservation
+                Reservation = reservation,
+                AgreementSigned = true
             };
         }
     }

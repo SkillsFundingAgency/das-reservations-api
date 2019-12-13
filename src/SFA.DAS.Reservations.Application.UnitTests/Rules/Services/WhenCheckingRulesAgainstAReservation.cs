@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
@@ -181,7 +180,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false, AgreementType.NonLevyExpressionOfInterest)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -208,7 +207,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false, AgreementType.NonLevyExpressionOfInterest)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -227,7 +226,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var expectedAccountId = 123;
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 0, true, true, AgreementType.Levy)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 0, true, true)});
             var existingReservations = new List<Reservation>();
             for (var i = 0; i<5;i++)
             {
@@ -261,7 +260,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, true, AgreementType.Levy)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, true)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -286,7 +285,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(expectedAccountId)).ReturnsAsync(
                 new List<AccountLegalEntity>
-                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false, AgreementType.Levy)});
+                    {new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 2, true, false)});
 
             //Act
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
@@ -312,7 +311,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 .Setup(x => x.GetAccountLegalEntities(expectedAccountId))
                 .ReturnsAsync(new List<AccountLegalEntity>
                 {
-                    new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 1, true, false, AgreementType.Levy)
+                    new AccountLegalEntity(Guid.NewGuid(), expectedAccountId, "test", 1, 1, 1, true, false)
                 });
 
             //Act

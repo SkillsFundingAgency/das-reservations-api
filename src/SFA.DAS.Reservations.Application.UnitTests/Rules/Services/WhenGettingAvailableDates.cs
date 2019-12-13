@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
     public class WhenGettingAvailableDates
     {
         [Test, MoqAutoData]
-        public void And_Account_Not_Eoi_Then_Uses_AvailableDates(
+        public void Then_Uses_AvailableDates(
             [Frozen]Mock<ICurrentDateTime> currentDateTime,
             Mock<IOptions<ReservationsConfiguration>> mockOptions)
         {
@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var availableDatesService = new AvailableDatesService(mockOptions.Object, currentDateTime.Object);
             
             //Act
-            var actualDates = availableDatesService.GetAvailableDates(false);
+            var actualDates = availableDatesService.GetAvailableDates();
             
             //Assert
             actualDates.Should().BeEquivalentTo(expectedDates);
@@ -56,31 +56,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var availableDatesService = new AvailableDatesService(mockOptions.Object, currentDateTime.Object);
 
             //Act
-            var actualDates = availableDatesService.GetAvailableDates(false);
+            var actualDates = availableDatesService.GetAvailableDates();
 
-            //Assert
-            actualDates.Should().BeEquivalentTo(expectedDates);
-        }
-
-        [Test, MoqAutoData]
-        public void And_Account_Is_Eoi_Then_Uses_EoiAvailableDates(
-            [Frozen]Mock<ICurrentDateTime> currentDateTime,
-            Mock<IOptions<ReservationsConfiguration>> mockOptions)
-        {
-            currentDateTime.Setup(x => x.GetDate()).Returns(DateTime.UtcNow);
-            var config = mockOptions.Object.Value;
-            var expectedDates = new EoiAvailableDates(
-                    DateTime.UtcNow,
-                    config.EoiNumberOfAvailableDates,
-                    config.EoiAvailableDatesMinDate,
-                    config.EoiAvailableDatesMaxDate)
-                .Dates;
-
-            var availableDatesService = new AvailableDatesService(mockOptions.Object, currentDateTime.Object);
-
-            //Act
-            var actualDates = availableDatesService.GetAvailableDates(true);
-            
             //Assert
             actualDates.Should().BeEquivalentTo(expectedDates);
         }

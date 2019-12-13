@@ -11,7 +11,6 @@ namespace SFA.DAS.Reservations.Domain.ProviderPermissions
             UkPrn = (uint) providerPermission.UkPrn;
             AccountLegalEntityId = providerPermission.AccountLegalEntityId;
             AccountLegalEntityName = providerPermission.AccountLegalEntity.AccountLegalEntityName;
-            AgreementType = providerPermission.AccountLegalEntity.AgreementType;
             AccountName = providerPermission.Account.Name;
         }
 
@@ -20,7 +19,6 @@ namespace SFA.DAS.Reservations.Domain.ProviderPermissions
         public long AccountLegalEntityId { get ; }
         public bool AgreementSigned { get ;  }
         public string AccountLegalEntityName { get ;  }
-        public AgreementType AgreementType { get ; }
         public string AccountName { get ; set ; }
     }
 }
