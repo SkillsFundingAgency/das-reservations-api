@@ -49,8 +49,7 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Services
                 accountLegalEntity.AccountLegalEntityId,
                 reservationLimit,
                 accountLegalEntity.AgreementSigned,
-                accountLegalEntity.IsLevy,
-                accountLegalEntity.AgreementType);
+                accountLegalEntity.IsLevy);
             return mapAccountLegalEntity;
         }
     }

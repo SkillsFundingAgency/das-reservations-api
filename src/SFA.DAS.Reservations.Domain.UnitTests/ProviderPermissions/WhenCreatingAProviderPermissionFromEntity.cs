@@ -29,8 +29,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ProviderPermissions
                     AgreementSigned = true,
                     AccountLegalEntityName = accountLegalEntityName,
                     AccountId = accountId,
-                    AccountLegalEntityId = accountLegalEntityId,
-                    AgreementType = agreementType
+                    AccountLegalEntityId = accountLegalEntityId
                 },
                 Account = new Account
                 {
@@ -48,7 +47,6 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ProviderPermissions
             actual.AccountLegalEntityId.Should().Be(accountLegalEntityId);
             actual.AgreementSigned.Should().BeTrue();
             actual.AccountLegalEntityName.Should().Be(accountLegalEntityName);
-            actual.AgreementType.Should().Be(agreementType);
             actual.AccountName.Should().Be(accountName);
         }
     }

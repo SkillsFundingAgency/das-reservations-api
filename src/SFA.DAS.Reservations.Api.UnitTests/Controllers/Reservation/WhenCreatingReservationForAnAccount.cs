@@ -41,7 +41,11 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             _expectedUserId = Guid.NewGuid();
 
             _accountReservationsResult = new CreateAccountReservationResult
-                {Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, new Course(),0,0,"",0,null)};
+            {
+                Reservation = new Domain.Reservations.Reservation(null,_expectedReservationId,ExpectedAccountId,false,DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow,ReservationStatus.Pending, 
+                    new Course(),0,0,"",0,null),
+                AgreementSigned = true
+            };
             ;
             _mediator = new Mock<IMediator>();
             _mediator.Setup(x => x.Send(It.Is<CreateAccountReservationCommand>(c => 
@@ -138,7 +142,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 .ReturnsAsync(new CreateAccountReservationResult
                 {
                     Reservation = null,
-                    Rule = new Domain.Rules.GlobalRule(new Domain.Entities.GlobalRule())
+                    Rule = new Domain.Rules.GlobalRule(new Domain.Entities.GlobalRule()),
+                    AgreementSigned = true
                 });
 
 
@@ -154,7 +159,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test]
-        public async Task Then_If_There_Is_A_NonLevy_With_No_Eoi_Agreement_And_Unprocessable_Entity_Response_Is_Returned()
+        public async Task Then_If_There_Is_A_NonLevy_With_Unsigned_Agreement_An_Unprocessable_Entity_Response_Is_Returned()
         {
             //Arrange
             _mediator.Setup(x => x.Send(It.IsAny<CreateAccountReservationCommand>(), It.IsAny<CancellationToken>()))
@@ -162,7 +167,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                 {
                     Reservation = null,
                     Rule = null,
-                    NonLevyNonEoiAgreementSigned = true
+                    AgreementSigned = false
                 });
 
 

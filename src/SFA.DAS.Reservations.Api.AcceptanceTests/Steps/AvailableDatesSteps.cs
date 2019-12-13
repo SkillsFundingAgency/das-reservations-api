@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Data;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -18,35 +17,20 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     public class AvailableDatesSteps: StepsBase
     {
         private const int DefaultAvailableDatesMonthCount = 6;
-        private static readonly DateTime EoiDefaultMinDate = new DateTime(2019, 8, 1);
-        private static readonly DateTime EoiDefaultMaxDate = new DateTime(2020, 1, 1);
-
         private GetAvailableDatesResult _availableDatesResult;
 
         public AvailableDatesSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
         {
         }
 
-        [Given(@"I have signed an EOI Agreement")]
-        public void GivenIHaveSignedAnEoiAgreement()
+        [Given(@"I have signed an Agreement")]
+        public void GivenIHaveSignedAnAgreement()
         {
             var dbContext = Services.GetService<ReservationsDataContext>();
 
             var legalEntity = dbContext.AccountLegalEntities.Single(le => le.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
 
-            legalEntity.AgreementType = AgreementType.NonLevyExpressionOfInterest;
-
-            dbContext.SaveChanges();
-        }
-        
-        [Given(@"I have not signed an EOI Agreement")]
-        public void GivenIHaveNotSignedAnEoiAgreement()
-        {
-            var dbContext = Services.GetService<ReservationsDataContext>();
-
-            var legalEntity = dbContext.AccountLegalEntities.Single(le => le.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
-
-            legalEntity.AgreementType = AgreementType.Levy;
+            legalEntity.AgreementSigned = true;
 
             dbContext.SaveChanges();
         }
@@ -61,17 +45,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             _availableDatesResult = result?.Value as GetAvailableDatesResult;
         }
         
-        [Then(@"I should get EOI available dates back")]
-        public void ThenIShouldGetEoiAvailableDatesBack()
-        {
-            Assert.AreEqual(6, _availableDatesResult.AvailableDates.Count());
-
-            var expectedDates = GetExpectedDates(DefaultAvailableDatesMonthCount, EoiDefaultMinDate,  EoiDefaultMaxDate);
-
-            _availableDatesResult.AvailableDates.Should().BeEquivalentTo(expectedDates);
-        }
-        
-        [Then(@"I should get standard available dates back")]
+        [Then(@"I should get available dates back")]
         public void ThenIShouldGetStandardAvailableDatesBack()
         {
             Assert.AreEqual(6, _availableDatesResult.AvailableDates.Count());

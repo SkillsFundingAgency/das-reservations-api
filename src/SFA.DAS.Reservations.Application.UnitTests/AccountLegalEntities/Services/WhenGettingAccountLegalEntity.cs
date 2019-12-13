@@ -55,7 +55,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                 AccountId = 123,
                 Id = Guid.NewGuid(),
                 AgreementSigned = true,
-                AgreementType = AgreementType.NonLevyExpressionOfInterest,
                 IsLevy = false,
                 ProviderPermissions = null,
                 ReservationLimit = 10,

@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 .ReturnsAsync(_reservationCreated);
 
             _accountLegalEntitiesService = new Mock<IAccountLegalEntitiesService>();
-            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId,2,true,true, AgreementType.Levy);
+            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId,2,true,true);
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
                 .ReturnsAsync(_expectedAccountLegalEntity);
 
@@ -155,10 +155,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         }
 
         [Test]
-        public async Task Then_If_The_Request_Is_For_A_NonLevy_And_Has_No_Eoi_Agreement_Then_The_Reservation_Is_Not_Created()
+        public async Task Then_If_The_Request_Is_For_A_NonLevy_Agreement_That_Is_Signed_Then_The_Reservation_Is_Created()
         {
             //Arrange
-            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId, 2, true, false, AgreementType.Levy);
+            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1,
+                _command.AccountLegalEntityId, 2, true, false);
+            _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
+                .ReturnsAsync(_expectedAccountLegalEntity);
+
+            //Act
+            var actual = await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(_command), Times.Once);
+        }
+
+        [Test]
+        public async Task Then_If_The_Request_Is_For_A_NonLevy_Agreement_That_Is_Not_Signed_Then_The_Reservation_Is_Not_Created()
+        {
+            //Arrange
+            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1,
+                _command.AccountLegalEntityId, 2, false, false);
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
                 .ReturnsAsync(_expectedAccountLegalEntity);
 
@@ -167,7 +184,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 
             //Assert
             _accountReservationsService.Verify(x => x.CreateAccountReservation(_command), Times.Never);
-            Assert.IsTrue(actual.NonLevyNonEoiAgreementSigned);
         }
 
         [Test]
@@ -247,6 +263,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 
             //Assert
             Assert.AreEqual(_reservationCreated, actual.Reservation);
+            Assert.IsTrue(actual.AgreementSigned);
         }
     }
 }
