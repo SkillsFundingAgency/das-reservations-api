@@ -32,7 +32,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                     AccountId = AccountId,
                     AccountLegalEntityId = AccountLegalEntityId + 1,
                     AccountLegalEntityName = "Test Corp 2",
-                    AgreementType = AgreementType.NonLevyExpressionOfInterest,
                     AgreementSigned = false
                 };
 
@@ -56,7 +55,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                     AccountId = AccountId,
                     AccountLegalEntityId = AccountLegalEntityId + 2,
                     AccountLegalEntityName = "Test Corp 3",
-                    AgreementType = AgreementType.NonLevyExpressionOfInterest,
                     AgreementSigned = true
                 };
 

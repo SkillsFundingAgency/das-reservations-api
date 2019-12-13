@@ -78,7 +78,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 AccountId = AccountId + 1,
                 AccountLegalEntityId = AccountLegalEntityId + 100,
                 AccountLegalEntityName = "Pass Mark Corp",
-                AgreementType = AgreementType.NonLevyExpressionOfInterest,
                 AgreementSigned = true
             };
 
