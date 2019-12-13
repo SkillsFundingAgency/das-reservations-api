@@ -128,7 +128,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
 
             return new CreateAccountReservationResult
             {
-                Reservation = reservation
+                Reservation = reservation,
+                AgreementSigned = true
             };
         }
     }

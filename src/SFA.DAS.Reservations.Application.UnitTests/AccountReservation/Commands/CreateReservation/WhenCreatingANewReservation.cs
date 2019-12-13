@@ -263,6 +263,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 
             //Assert
             Assert.AreEqual(_reservationCreated, actual.Reservation);
+            Assert.IsTrue(actual.AgreementSigned);
         }
     }
 }
