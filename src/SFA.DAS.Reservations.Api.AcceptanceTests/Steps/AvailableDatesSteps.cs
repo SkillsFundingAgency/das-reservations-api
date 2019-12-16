@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         private const int DefaultAvailableDatesMonthCount = 6;
         private GetAvailableDatesResult _availableDatesResult;
 
-        public AvailableDatesSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public AvailableDatesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
         }
 

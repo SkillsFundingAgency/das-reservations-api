@@ -9,7 +9,6 @@ using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Assist;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
@@ -18,7 +17,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     {
         private List<Course> _collectedCourses;
 
-        public GetCoursesSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public GetCoursesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
             
         }

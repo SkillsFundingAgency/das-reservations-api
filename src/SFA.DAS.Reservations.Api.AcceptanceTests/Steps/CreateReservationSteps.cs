@@ -18,10 +18,9 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class CreateReservationSteps : StepsBase
     {
-        private CreatedResult _actual;
 
-        public CreateReservationSteps(TestData testData, TestServiceProvider serviceProvider) 
-            : base(testData, serviceProvider)
+        public CreateReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) 
+            : base(testData,testResults, serviceProvider)
         {
         }
         
@@ -137,7 +136,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 UserId = TestData.UserId
             };
 
-            _actual = (controller.Create(reservation).Result) as CreatedResult;
+            TestResults.Result = (controller.Create(reservation).Result) as CreatedResult;
         }
 
         [When(@"I create a levy reservation")]
@@ -157,7 +156,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 UserId = TestData.UserId
             };
 
-            _actual = (controller.Create(reservation).Result) as CreatedResult;
+            TestResults.Result = (controller.Create(reservation).Result) as CreatedResult;
             
         }
 
@@ -177,8 +176,9 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             Assert.AreEqual(month, reservation.StartDate.Value.Month);
             Assert.AreEqual(TestData.IsLevyAccount, reservation.IsLevyAccount);
             Assert.AreEqual(TestData.UserId, reservation.UserId);
-            Assert.IsNotNull(_actual);
-            Assert.AreEqual($"api/Reservations/{TestData.ReservationId}",_actual.Location);
+            var actual = TestResults.Result as CreatedResult;
+            Assert.IsNotNull(actual);
+            Assert.AreEqual($"api/Reservations/{TestData.ReservationId}",actual.Location);
         }
 
         [Then(@"I have (.*) reservation")]

@@ -15,8 +15,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     {
         private IActionResult _validationResult;
 
-        public ValidateReservationSteps(TestData testData, TestServiceProvider serviceProvider) 
-            : base(testData, serviceProvider)
+        public ValidateReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
         }
 

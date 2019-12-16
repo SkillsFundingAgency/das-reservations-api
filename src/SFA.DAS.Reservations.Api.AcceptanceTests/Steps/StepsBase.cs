@@ -9,7 +9,6 @@ using TechTalk.SpecFlow;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
-    
     public class StepsBase
     {
         protected const long AccountId = 1;
@@ -17,11 +16,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         protected const uint ProviderId = 15214;
         protected Guid UserId;
         protected readonly TestData TestData;
+        protected readonly TestResults TestResults;
         protected readonly IServiceProvider Services;
 
-        public StepsBase(TestData testData, TestServiceProvider serviceProvider)
+        public StepsBase(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
         {
             TestData = testData;
+            TestResults = testResults;
             Services = serviceProvider;
             UserId = Guid.NewGuid();
         }
@@ -68,6 +69,23 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             if (legalEntity == null)
             {
                 dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
+
+                dbContext.SaveChanges();
+            }
+
+            var anotherAccountLegalEntity = new AccountLegalEntity
+            {
+                AccountId = AccountId + 1,
+                AccountLegalEntityId = AccountLegalEntityId + 100,
+                AccountLegalEntityName = "Pass Mark Corp",
+                AgreementSigned = true
+            };
+
+            legalEntity = dbContext.AccountLegalEntities.SingleOrDefault(e => e.AccountLegalEntityId.Equals(anotherAccountLegalEntity.AccountLegalEntityId));
+
+            if (legalEntity == null)
+            {
+                dbContext.AccountLegalEntities.Add(anotherAccountLegalEntity);
 
                 dbContext.SaveChanges();
             }

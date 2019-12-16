@@ -1,18 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
-using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
-using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Data;
-using SFA.DAS.Reservations.Domain.Entities;
-using SFA.DAS.Reservations.Domain.Rules;
 using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
@@ -22,7 +16,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         private long _reservationCount;
         private long? _transferSenderId = null;
 
-        public BulkCreateSteps(TestData testData, TestServiceProvider serviceProvider) : base(testData, serviceProvider)
+        public BulkCreateSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
         {
         }
 
