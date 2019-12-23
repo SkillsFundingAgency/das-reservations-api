@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
@@ -60,6 +61,26 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 
             //Assert
             actualDates.Should().BeEquivalentTo(expectedDates);
+        }
+        
+        [Test,MoqAutoData]
+        public void Then_If_The_CurrentDate_Exceeds_The_Max_Date_It_IsNot_Added(
+            [Frozen]Mock<ICurrentDateTime> currentDateTime,
+            Mock<IOptions<ReservationsConfiguration>> mockOptions)
+        {
+            var expectedDateTime = DateTime.Today.AddDays(1);
+
+            currentDateTime.Setup(x => x.GetDate()).Returns(expectedDateTime);
+            var config = mockOptions.Object.Value;
+            config.AvailableDatesMinDate = null;
+            config.AvailableDatesMaxDate = DateTime.Today;
+            var availableDatesService = new AvailableDatesService(mockOptions.Object, currentDateTime.Object);
+
+            //Act
+            var actualDates = availableDatesService.GetAvailableDates();
+
+            //Assert
+            actualDates.Count().Should().Be(0);
         }
     }
 }
