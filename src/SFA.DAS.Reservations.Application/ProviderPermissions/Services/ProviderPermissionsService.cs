@@ -17,7 +17,11 @@ namespace SFA.DAS.Reservations.Application.ProviderPermissions.Services
         {
             var result = await _permissionRepository.GetByProviderId(providerId);
 
-            return result.Where(x => x.CanCreateCohort && !x.AccountLegalEntity.IsLevy)
+            return result.Where(x => 
+                    x.CanCreateCohort 
+                    && x.AccountLegalEntity != null 
+                    && x.Account != null
+                    && !x.AccountLegalEntity.IsLevy)
                 .Select(c => new ProviderPermission(c)).ToList();
         }
     }

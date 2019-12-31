@@ -96,6 +96,28 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Service
                 {
                     AccountId = 1,
                     UkPrn = providerId,
+                    AccountLegalEntity = null,
+                    AccountLegalEntityId = 2,
+                    CanCreateCohort = true,
+                    Account = null
+                },
+                new Domain.Entities.ProviderPermission
+                {
+                    AccountId = 1,
+                    UkPrn = providerId,
+                    AccountLegalEntity = new AccountLegalEntity
+                    {
+                        IsLevy = false,
+                        AccountLegalEntityName = accountLegalEntityName
+                    },
+                    AccountLegalEntityId = 2,
+                    CanCreateCohort = true,
+                    Account = null
+                },
+                new Domain.Entities.ProviderPermission
+                {
+                    AccountId = 1,
+                    UkPrn = providerId,
                     AccountLegalEntity = new AccountLegalEntity
                     {
                         IsLevy = false,
