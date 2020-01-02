@@ -94,8 +94,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
 
             var result = await handler.Handle(query, CancellationToken.None);
 
-            result.CanAutoCreateReservations.Should().Be(accountLegalEntities[0].IsLevy);
-            //todo: could also put other fields here such as ReservationsLimit
+            var accountLegalEntity = accountLegalEntities[0];
+            result.CanAutoCreateReservations.Should().Be(accountLegalEntity.IsLevy);
+            result.AccountLegalEntityAgreementStatus[accountLegalEntity.AccountLegalEntityId].Should().Be(accountLegalEntity.AgreementSigned);
         }
     }
 }
