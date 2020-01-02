@@ -16,6 +16,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Models
             var model = new AccountReservationStatus(response);
 
             model.CanAutoCreateReservations.Should().Be(response.CanAutoCreateReservations);
+            model.AccountLegalEntityAgreementStatus.Should().BeEquivalentTo(response.AccountLegalEntityAgreementStatus);
         }
     }
 }
