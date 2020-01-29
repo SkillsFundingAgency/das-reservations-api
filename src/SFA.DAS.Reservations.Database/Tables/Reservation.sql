@@ -25,4 +25,5 @@ CREATE NONCLUSTERED INDEX [IDX_Reservation_ProviderId] ON [dbo].[Reservation] (P
 INCLUDE (Id,IsLevyAccount,CreatedDate,ExpiryDate,  StartDate, [Status], CourseId,[AccountLegalEntityId],AccountId, AccountLegalEntityName,[TransferSenderAccountId], [UserId]) WITH (ONLINE = ON) 
 GO;
 
-
+CREATE NONCLUSTERED INDEX [IDX_Reservation_AccountLegalEntityIsLevyAccountStatus] ON [dbo].[Reservation] ([AccountLegalEntityId], [IsLevyAccount], [Status]) WITH (ONLINE = ON)
+GO;
