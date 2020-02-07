@@ -26,6 +26,13 @@ namespace SFA.DAS.Reservations.Domain.Rules
             var twoMonthsFromNow = startDate.AddMonths(2);
             var lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
 
+
+            if (maxStartDate.HasValue && startDate > maxStartDate)
+            {
+                Dates =  new List<AvailableDateStartWindow>();
+                return;
+            }
+            
             var availableDates = new List<AvailableDateStartWindow>
             {
                 new AvailableDateStartWindow
