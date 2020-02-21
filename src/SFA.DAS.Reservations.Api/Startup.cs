@@ -87,7 +87,7 @@ namespace SFA.DAS.Reservations.Api
                     serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
                 services.AddAuthorization(o =>
                 {
-                    o.AddPolicy("default", policy => { policy.RequireAuthenticatedUser(); });
+                    o.AddPolicy("default", policy => { policy.RequireAuthenticatedUser().RequireRole("Default"); });
                 });
                 services.AddAuthentication(auth => { auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
                     .AddJwtBearer(auth =>
