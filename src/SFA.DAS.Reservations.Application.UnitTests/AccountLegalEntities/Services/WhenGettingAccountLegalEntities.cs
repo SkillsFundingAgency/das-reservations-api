@@ -25,6 +25,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
         [SetUp]
         public void Arrange()
         {
+            var account = new Domain.Entities.Account
+            {
+                Id = 1,
+                Name = "Test",
+                IsLevy = true
+            };
+            
             _legalEntities = new List<Domain.Entities.AccountLegalEntity>
             {
                 new Domain.Entities.AccountLegalEntity
@@ -36,7 +43,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     LegalEntityId = 43,
                     ReservationLimit = 4,
                     AgreementSigned = false,
-                    ProviderPermissions = null
+                    ProviderPermissions = null,
+                    Account = account
                 },
                 new Domain.Entities.AccountLegalEntity
                 {
@@ -47,7 +55,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     LegalEntityId = 54,
                     ReservationLimit = 4,
                     AgreementSigned = true,
-                    ProviderPermissions = null
+                    ProviderPermissions = null,
+                    Account = account
                 }
             };
             
@@ -81,7 +90,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             //Assert
             Assert.IsAssignableFrom<List<AccountLegalEntity>>(actual);
             Assert.AreEqual(2,actual.Count);
-            actual.Should().BeEquivalentTo(_legalEntities, options => options.Excluding(p=>p.ProviderPermissions));
+            actual.Should().BeEquivalentTo(_legalEntities, options => 
+                options.Excluding(p=>p.ProviderPermissions).Excluding(p=>p.Account));
         }
 
         [Test]
@@ -97,7 +107,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountLegalEntityId = 1,
                     AccountLegalEntityName = "Test",
                     LegalEntityId = 4,
-                    ReservationLimit = null
+                    ReservationLimit = null,
+                    Account = new Domain.Entities.Account
+                    {
+                        Id = 1
+                    }
                 }
             });
 
