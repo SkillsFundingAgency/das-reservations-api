@@ -6,6 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Entities
     {
         public long Id { get; set; }
         public string Name { get; set; } 
+        public bool IsLevy { get; set; }
         public virtual ICollection<ProviderPermission> ProviderPermissions { get; set; }
     }
 }
