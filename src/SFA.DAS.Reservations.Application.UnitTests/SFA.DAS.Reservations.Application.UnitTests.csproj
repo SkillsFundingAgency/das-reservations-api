@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
     <PackageReference Include="SFA.DAS.Testing.AutoFixture" Version="3.0.106" />
     <PackageReference Include="SFA.DAS.UnitOfWork" Version="9.0.10" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.2.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Application\SFA.DAS.Reservations.Application.csproj" />
