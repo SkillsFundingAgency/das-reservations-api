@@ -13,7 +13,6 @@
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="SFA.DAS.Testing.AutoFixture" Version="3.0.106" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.2.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Reservations.Api\SFA.DAS.Reservations.Api.csproj" />
