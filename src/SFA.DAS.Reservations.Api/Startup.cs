@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using SFA.DAS.Reservations.Api.StartupConfig;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Reservations.Api.AppStart;
@@ -147,7 +148,12 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
-           
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
+
+
         }
 
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)

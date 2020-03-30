@@ -34,6 +34,7 @@
     <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.2" />
     <PackageReference Include="SFA.DAS.NServiceBus.Mvc" Version="1.0.46" />
     <PackageReference Include="SFA.DAS.NServiceBus.SqlServer" Version="16.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.2.1" />
   </ItemGroup>
 
   <ItemGroup>
