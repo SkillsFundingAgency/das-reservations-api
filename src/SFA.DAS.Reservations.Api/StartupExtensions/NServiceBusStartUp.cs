@@ -19,7 +19,6 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             IConfiguration configuration, bool configurationIsLocalOrDev)
         {
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Reservations.Api")
-                .UseErrorQueue()
                 .UseInstallers()
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
