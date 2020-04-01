@@ -89,7 +89,10 @@ jobs:
 
 - job: 'DACPACBuild'
   pool: 
-    vmImage: 'windows-2019'
+    name: 'DAS - Continuous Integration'
+    demands:
+    - msbuild
+    - visualstudio 
   workspace:
     clean: all
   steps:
