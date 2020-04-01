@@ -91,7 +91,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
         {
             var accountLimit = await _accountLegalEntitiesService.GetAccountLegalEntities(accountId);
 
-            if (!accountLimit.Any() || accountLimit.Any(a => a.IsLevy))
+            if (!accountLimit.Any())
             {
                 return 0;
             }
@@ -103,9 +103,14 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         private async Task<GlobalRule> CheckAccountReservationLimit(long accountId, bool isLevyReservation = false)
         {
+            if (isLevyReservation)
+            {
+                return null;
+            }
+            
             var maxNumberOfReservations = await GetReservationLimit(accountId);
 
-            if (maxNumberOfReservations == 0 || isLevyReservation)
+            if (maxNumberOfReservations == 0)
             {
                 return null;
             }

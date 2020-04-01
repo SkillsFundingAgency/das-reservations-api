@@ -13,7 +13,7 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public string AccountLegalEntityName { get; set; }
         public int? ReservationLimit { get; set; }
         public bool AgreementSigned { get; set; }
-        public bool IsLevy { get; set; }
+        public virtual Account Account { get; set; }
         public virtual ICollection<ProviderPermission> ProviderPermissions { get; set; }
     }
 }

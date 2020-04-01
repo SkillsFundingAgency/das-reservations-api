@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Application.ProviderPermissions.Services
                     x.CanCreateCohort 
                     && x.AccountLegalEntity != null 
                     && x.Account != null
-                    && !x.AccountLegalEntity.IsLevy)
+                    && !x.Account.IsLevy)
                 .Select(c => new ProviderPermission(c)).ToList();
         }
     }

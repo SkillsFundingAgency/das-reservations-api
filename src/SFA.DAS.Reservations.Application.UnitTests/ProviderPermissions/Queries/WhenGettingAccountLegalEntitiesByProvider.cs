@@ -88,7 +88,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Queries
                         {
                             AccountLegalEntityName = "test"
                         },
-                        Account = new Account
+                        Account = new Domain.Entities.Account
                         {
                             Name = "test"
                         }
