@@ -10,7 +10,6 @@ using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAc
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
-using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
@@ -281,5 +280,21 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 return NotFound();
             }
         }
+
+        [HttpPost]
+        [ProducesResponseType(400)]
+        [Route("api/[controller]/{id}/change")]
+        public async Task<IActionResult> Change(ChangeOfCircumstancesRequest request)
+        {
+            await Task.CompletedTask;
+            return Ok();
+        }
+    }
+
+    public class ChangeOfCircumstancesRequest
+    {
+        public Guid ReservationId { get; set; }
+        public long? AccountId { get; set; }
+        public uint? ProviderId { get; set; }
     }
 }

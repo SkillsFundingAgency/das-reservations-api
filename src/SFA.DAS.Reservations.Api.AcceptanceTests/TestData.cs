@@ -15,5 +15,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
         public ProviderPermission ProviderPermission { get ; set ; }
         public Account Account { get ; set ; }
         public IActionResult ActualResult { get; set; }
+        public object Request { get; set; }
     }
 }
