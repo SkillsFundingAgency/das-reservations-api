@@ -25,15 +25,21 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             _transferSenderId = 123234;
             var dbContext = Services.GetService<ReservationsDataContext>();
+            var account = new Account
+            {
+                Id = _transferSenderId.Value,
+                Name = "Test Account",
+                IsLevy = true    
+            };
             var entity = new AccountLegalEntity
             {
                 AccountId = _transferSenderId.Value,
                 AccountLegalEntityId = AccountLegalEntityId + 4,
                 AccountLegalEntityName = "Test 4 Corp",
-                AgreementSigned = true,
-                IsLevy = true
+                AgreementSigned = true
+                
             };
-
+            dbContext.Accounts.Add(account);
             dbContext.AccountLegalEntities.Add(entity);
             dbContext.SaveChanges();
 

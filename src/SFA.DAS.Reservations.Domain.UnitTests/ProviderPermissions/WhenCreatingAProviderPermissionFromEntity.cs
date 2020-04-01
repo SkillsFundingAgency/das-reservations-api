@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ProviderPermissions
                     AccountId = accountId,
                     AccountLegalEntityId = accountLegalEntityId
                 },
-                Account = new Account
+                Account = new Entities.Account
                 {
                     Id = accountId,
                     Name = accountName

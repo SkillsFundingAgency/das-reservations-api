@@ -12,7 +12,8 @@ namespace SFA.DAS.Reservations.Data.Configuration
 
             builder.Property(x => x.Id).HasColumnName("Id").HasColumnType("bigint").IsRequired();
             builder.Property(x => x.Name).HasColumnName("Name").HasColumnType("varchar").HasMaxLength(500).IsRequired();
-
+            builder.Property(x => x.IsLevy).HasColumnName(@"IsLevy").HasColumnType("bit").IsRequired();
+            
             builder.HasIndex(x => x.Id).IsUnique();
         }
     }

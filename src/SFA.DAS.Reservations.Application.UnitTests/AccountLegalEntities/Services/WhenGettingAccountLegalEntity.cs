@@ -45,7 +45,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             var accountLegalEntity = await service.GetAccountLegalEntity(accountLegalEntityId);
 
             accountLegalEntity.Should().BeOfType<AccountLegalEntity>();
-            accountLegalEntity.Should().BeEquivalentTo(accountLegalEntityEntity, options=>options.Excluding(p=>p.ProviderPermissions));
+            accountLegalEntity.Should().BeEquivalentTo(accountLegalEntityEntity, 
+                options=>options.Excluding(p=>p.ProviderPermissions).Excluding(p=>p.Account));
         }
 
         private static Domain.Entities.AccountLegalEntity BuildAccountLegalEntity(long accountLegalEntityId)
@@ -55,12 +56,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                 AccountId = 123,
                 Id = Guid.NewGuid(),
                 AgreementSigned = true,
-                IsLevy = false,
                 ProviderPermissions = null,
                 ReservationLimit = 10,
                 LegalEntityId = 23,
                 AccountLegalEntityId = accountLegalEntityId,
-                AccountLegalEntityName = "Test Name"
+                AccountLegalEntityName = "Test Name",
+                Account = new Domain.Entities.Account
+                {
+                    Id = 123,
+                    Name = "Test"
+                }
             };
         }
     }

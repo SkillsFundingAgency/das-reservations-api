@@ -295,6 +295,19 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         }
 
         [Test]
+        public async Task Then_If_It_Is_A_levy_Reservation_The_Existing_Reservations_Are_Not_Checked_To_Determine_Whether_Limit_Has_Been_Reached()
+        {
+            //Arrange
+            var reservation = new Reservation(Guid.NewGuid(), 123, DateTime.UtcNow, 2, "test", isLevyAccount: true);
+            
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
+            
+            //Assert
+            _accountLegalEntitiesService.Verify(x => x.GetAccountLegalEntities(It.IsAny<long>()), Times.Never);
+        }
+
+        [Test]
         public async Task And_Reservation_Limit_Reached_And_Reservation_Expired_Then_Null_Returned()
         {
             //Arrange
