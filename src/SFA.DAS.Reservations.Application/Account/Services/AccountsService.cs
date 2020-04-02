@@ -24,7 +24,8 @@ namespace SFA.DAS.Reservations.Application.Account.Services
             {
                 Id = account.Id,
                 Name = account.Name,
-                IsLevy = account.IsLevy
+                IsLevy = account.IsLevy,
+                ReservationLimit = account.ReservationLimit
             };
         }
     }
