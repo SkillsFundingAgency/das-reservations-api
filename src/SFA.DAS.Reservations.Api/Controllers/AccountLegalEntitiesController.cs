@@ -27,7 +27,8 @@ namespace SFA.DAS.Reservations.Api.Controllers
             _mediator = mediator;
             _logger = logger;
         }
-
+        
+        [HttpGet]
         [Route("/api/{accountId}/[controller]")]
         public async Task<IActionResult> GetByAccountId(long accountId)
         {
@@ -47,6 +48,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
         }
 
+        [HttpGet]
         [Route("{legalEntityId}")]
         public async Task<IActionResult> GetByAccountLegalEntityId(long legalEntityId)
         {
@@ -67,6 +69,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
         }
 
+        [HttpGet]
         [Route("/api/accounts/{accountId}/status")]
         public async Task<IActionResult> GetAccountReservationStatus(long accountId, [FromQuery]long? transferSenderId)
         {
@@ -96,6 +99,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
         }
 
+        [HttpGet]
         [Route("provider/{providerId}")]
         public async Task<IActionResult> GetByProviderId(uint providerId)
         {

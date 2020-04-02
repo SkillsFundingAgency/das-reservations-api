@@ -21,6 +21,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet]
         public async Task<IActionResult> All()
         {
             var response = await _mediator.Send(new GetRulesQuery());
@@ -28,6 +29,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             return Ok(response);
         }
 
+        [HttpGet]
         [Route("available-dates/{accountLegalEntityId}")]
         public async Task<IActionResult> GetAvailableDates(long accountLegalEntityId = 0)
         {
@@ -50,6 +52,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
         }
 
+        [HttpGet]
         [Route("account/{accountId}")]
         public async Task<IActionResult> Account(long accountId)
         {

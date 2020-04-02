@@ -17,6 +17,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             _mediator = mediator;
         }
         
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var response = await _mediator.Send(new GetCoursesQuery());
