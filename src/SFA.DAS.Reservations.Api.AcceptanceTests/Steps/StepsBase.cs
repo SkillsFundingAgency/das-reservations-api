@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using SFA.DAS.Reservations.Api.AcceptanceTests.ValueComparers;
 using SFA.DAS.Reservations.Api.AcceptanceTests.ValueRetrievers;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.Entities;
@@ -34,6 +35,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         public void InitialiseTestDatabaseData()
         {
             ConfigureCustomValueRetrievers();
+            ConfigureCustomValueComparers();
 
             TestData.Course = new Course
             {
@@ -113,6 +115,12 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             Service.Instance.ValueRetrievers.Replace<DateTimeValueRetriever, CustomDateTimeValueRetriever>();
             Service.Instance.ValueRetrievers.Replace<NullableDateTimeValueRetriever, CustomNullableDateTimeValueRetriever>();
+            Service.Instance.ValueRetrievers.Replace<ShortValueRetriever, CustomShortValueRetriever>();
+        }
+
+        private void ConfigureCustomValueComparers()
+        {
+            Service.Instance.ValueComparers.Register<CustomShortValueComparer>();
         }
     }
 }

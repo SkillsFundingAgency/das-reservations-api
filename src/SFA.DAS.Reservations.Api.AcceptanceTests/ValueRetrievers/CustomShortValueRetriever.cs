@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
+using TechTalk.SpecFlow.Assist;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.ValueRetrievers
 {
-    public class CustomShortValueRetriever
+    public class CustomShortValueRetriever : IValueRetriever
     {
         public virtual short GetValue(string value)
         {
