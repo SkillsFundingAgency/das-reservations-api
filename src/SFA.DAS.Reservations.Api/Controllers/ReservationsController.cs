@@ -294,7 +294,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
     public class ChangeOfPartyRequest
     {
         public Guid ReservationId { get; set; }
-        public long? AccountId { get; set; }
+        public long? AccountLegalEntityId { get; set; }
         public uint? ProviderId { get; set; }
     }
 }

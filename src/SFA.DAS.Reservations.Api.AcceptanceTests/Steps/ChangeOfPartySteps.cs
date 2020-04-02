@@ -10,9 +10,9 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class ChangeOfCircumstancesSteps : StepsBase
+    public class ChangeOfPartySteps : StepsBase
     {
-        public ChangeOfCircumstancesSteps(
+        public ChangeOfPartySteps(
             TestData testData, 
             TestResults testResults, 
             TestServiceProvider serviceProvider) 
@@ -30,13 +30,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             };
         }
 
-        [Given(@"I want to change employer to (.*)")]
-        public void GivenIWantToChangeEmployerTo(long accountId)
+        [Given(@"I want to change account legal entity to (.*)")]
+        public void GivenIWantToChangeAccountLegalEntityTo(long accountLegalEntityId)
         {
             TestData.Request = new ChangeOfPartyRequest
             {
                 ReservationId = TestData.ReservationId,
-                AccountId = accountId
+                AccountLegalEntityId = accountLegalEntityId
             };
         }
 
