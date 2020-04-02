@@ -284,14 +284,14 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [HttpPost]
         [ProducesResponseType(400)]
         [Route("api/[controller]/{id}/change")]
-        public async Task<IActionResult> Change(ChangeOfCircumstancesRequest request)
+        public async Task<IActionResult> Change(ChangeOfPartyRequest request)
         {
             await Task.CompletedTask;
             return Ok();
         }
     }
 
-    public class ChangeOfCircumstancesRequest
+    public class ChangeOfPartyRequest
     {
         public Guid ReservationId { get; set; }
         public long? AccountId { get; set; }

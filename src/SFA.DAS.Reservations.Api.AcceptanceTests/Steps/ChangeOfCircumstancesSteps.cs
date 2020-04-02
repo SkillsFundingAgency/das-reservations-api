@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Given(@"I want to change provider to (.*)")]
         public void GivenIWantToChangeProviderTo(uint providerId)
         {
-            TestData.Request = new ChangeOfCircumstancesRequest
+            TestData.Request = new ChangeOfPartyRequest
             {
                 ReservationId = TestData.ReservationId,
                 ProviderId = providerId
@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Given(@"I want to change employer to (.*)")]
         public void GivenIWantToChangeEmployerTo(long accountId)
         {
-            TestData.Request = new ChangeOfCircumstancesRequest
+            TestData.Request = new ChangeOfPartyRequest
             {
                 ReservationId = TestData.ReservationId,
                 AccountId = accountId
@@ -43,7 +43,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [When("I call change of circumstances")]
         public async Task WhenICallChangeOfCircumstances()
         {
-            var request = TestData.Request as ChangeOfCircumstancesRequest;
+            var request = TestData.Request as ChangeOfPartyRequest;
 
             var controller = Services.GetService<ReservationsController>();
 
