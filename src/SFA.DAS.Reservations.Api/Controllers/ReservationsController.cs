@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOfParty;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
@@ -286,15 +287,36 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [Route("api/[controller]/{id}/change")]
         public async Task<IActionResult> Change(ChangeOfPartyRequest request)
         {
-            await Task.CompletedTask;
-            return Ok();
+            try
+            {
+                var result = await _mediator.Send(new ChangeOfPartyCommand
+                {
+                    ReservationId = request.ReservationId,
+                    AccountLegalEntityId = request.AccountLegalEntityId,
+                    ProviderId = request.ProviderId
+                });
+                return Ok(new ChangeOfPartyResponse
+                {
+                    ReservationId = result.ReservationId
+                });
+            }
+            catch (ArgumentException argumentException)
+            {
+                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = argumentException.Message,
+                    Params = argumentException.ParamName
+                });
+            }
+            catch (EntityNotFoundException<Domain.Entities.Reservation> notFoundException)
+            {
+                _logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = notFoundException.Message
+                });
+            }
         }
-    }
-
-    public class ChangeOfPartyRequest
-    {
-        public Guid ReservationId { get; set; }
-        public long? AccountLegalEntityId { get; set; }
-        public uint? ProviderId { get; set; }
     }
 }

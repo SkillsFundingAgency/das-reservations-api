@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
+using SFA.DAS.Reservations.Api.Models;
 using TechTalk.SpecFlow;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
