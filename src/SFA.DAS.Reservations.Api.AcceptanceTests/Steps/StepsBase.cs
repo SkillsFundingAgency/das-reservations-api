@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.Reservations.Api.AcceptanceTests.ValueRetrievers;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.Entities;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
+using TechTalk.SpecFlow.Assist.ValueRetrievers;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
@@ -31,6 +33,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [BeforeScenario()]
         public void InitialiseTestDatabaseData()
         {
+            ConfigureCustomValueRetrievers();
+
             TestData.Course = new Course
             {
                 CourseId = "1",
@@ -105,5 +109,10 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             }
         }
 
+        private void ConfigureCustomValueRetrievers()
+        {
+            Service.Instance.ValueRetrievers.Replace<DateTimeValueRetriever, CustomDateTimeValueRetriever>();
+            Service.Instance.ValueRetrievers.Replace<NullableDateTimeValueRetriever, CustomNullableDateTimeValueRetriever>();
+        }
     }
 }
