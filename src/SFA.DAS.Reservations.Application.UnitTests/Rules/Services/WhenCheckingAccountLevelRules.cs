@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
+using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -19,6 +20,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         private GlobalRulesService _globalRulesService;
         private Domain.Entities.GlobalRule _globalRule;
         private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
+        private Mock<IAccountsService> _accountService;
         private const long ExpectedAccountId = 534542143;
 
         [SetUp]
@@ -37,11 +39,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 DateTime.UtcNow.Date, 
                 2,
                 "Name")});
-            _accountLegalEntitiesService = new Mock<IAccountLegalEntitiesService>();
-            _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntities(It.IsAny<long>()))
-                .ReturnsAsync(new List<AccountLegalEntity>{new AccountLegalEntity(Guid.NewGuid(),ExpectedAccountId,"test",1,1,1, true, false)});
+            _accountService = new Mock<IAccountsService>();
+            _accountService.Setup(x => x.GetAccount(It.IsAny<long>()))
+                .ReturnsAsync(new Domain.Account.Account(ExpectedAccountId, false, "test", 1));
 
-            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), Mock.Of<IOptions<ReservationsConfiguration>>(), _repository.Object, _accountLegalEntitiesService.Object);
+            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), Mock.Of<IOptions<ReservationsConfiguration>>(), _repository.Object, _accountService.Object);
         }
 
         [Test]

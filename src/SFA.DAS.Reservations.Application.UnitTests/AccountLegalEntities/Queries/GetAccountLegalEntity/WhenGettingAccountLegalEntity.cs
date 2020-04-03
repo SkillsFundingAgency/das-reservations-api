@@ -87,7 +87,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             const bool agreementSigned = true;
             const bool isLevy = false;
             const string legalEntityName = "Test Entity";
-            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, accountId, legalEntityName, legalEntityId, ExpectedAccountLegalEntityId, reservationLimit, agreementSigned, isLevy);
+            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, accountId, legalEntityName, legalEntityId, ExpectedAccountLegalEntityId, agreementSigned, isLevy);
             
             _service.Setup(x => x.GetAccountLegalEntity(It.IsAny<long>())).ReturnsAsync(accountLegalEntity);
 
@@ -100,7 +100,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             Assert.AreEqual(legalEntityName, actual.LegalEntity.AccountLegalEntityName);
             Assert.AreEqual(legalEntityId, actual.LegalEntity.LegalEntityId);
             Assert.AreEqual(ExpectedAccountLegalEntityId, actual.LegalEntity.AccountLegalEntityId);
-            Assert.AreEqual(reservationLimit, actual.LegalEntity.ReservationLimit);
             Assert.AreEqual(agreementSigned, actual.LegalEntity.AgreementSigned);
             Assert.AreEqual(isLevy, actual.LegalEntity.IsLevy);
         }

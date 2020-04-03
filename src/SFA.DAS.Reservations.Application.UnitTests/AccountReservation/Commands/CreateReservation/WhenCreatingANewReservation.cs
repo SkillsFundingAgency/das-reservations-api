@@ -78,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 .ReturnsAsync(_reservationCreated);
 
             _accountLegalEntitiesService = new Mock<IAccountLegalEntitiesService>();
-            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId,2,true,true);
+            _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1, _command.AccountLegalEntityId,true,true);
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
                 .ReturnsAsync(_expectedAccountLegalEntity);
 
@@ -159,7 +159,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             //Arrange
             _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1,
-                _command.AccountLegalEntityId, 2, true, false);
+                _command.AccountLegalEntityId, true, false);
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
                 .ReturnsAsync(_expectedAccountLegalEntity);
 
@@ -175,7 +175,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             //Arrange
             _expectedAccountLegalEntity = new AccountLegalEntity(Guid.NewGuid(), _command.AccountId, "Test Name 2", 1,
-                _command.AccountLegalEntityId, 2, false, false);
+                _command.AccountLegalEntityId, false, false);
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
                 .ReturnsAsync(_expectedAccountLegalEntity);
 

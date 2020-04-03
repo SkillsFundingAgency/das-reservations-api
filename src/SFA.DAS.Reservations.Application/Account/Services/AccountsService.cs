@@ -1,15 +1,18 @@
 using System.Threading.Tasks;
 using SFA.DAS.Reservations.Domain.Account;
+using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Application.Account.Services
 {
     public class AccountsService : IAccountsService
     {
         private readonly IAccountRepository _repository;
+        private readonly ReservationsConfiguration _configuration;
 
-        public AccountsService (IAccountRepository repository)
+        public AccountsService (IAccountRepository repository, ReservationsConfiguration configuration)
         {
             _repository = repository;
+            _configuration = configuration;
         }
         public async Task<Domain.Account.Account> GetAccount(long accountId)
         {
@@ -20,12 +23,18 @@ namespace SFA.DAS.Reservations.Application.Account.Services
 
         private Domain.Account.Account MapAccount(Domain.Entities.Account account)
         {
+            var reservationLimit = _configuration.MaxNumberOfReservations;
+
+            if (account.ReservationLimit.HasValue)
+            {
+                reservationLimit = account.ReservationLimit.Value;
+            }
             return new Domain.Account.Account
             {
                 Id = account.Id,
                 Name = account.Name,
                 IsLevy = account.IsLevy,
-                ReservationLimit = account.ReservationLimit
+                ReservationLimit = reservationLimit
             };
         }
     }

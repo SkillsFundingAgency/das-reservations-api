@@ -57,7 +57,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                 Id = Guid.NewGuid(),
                 AgreementSigned = true,
                 ProviderPermissions = null,
-                ReservationLimit = 10,
                 LegalEntityId = 23,
                 AccountLegalEntityId = accountLegalEntityId,
                 AccountLegalEntityName = "Test Name",

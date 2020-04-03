@@ -23,12 +23,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         private Mock<IOptions<ReservationsConfiguration>> _options;
         private Mock<IAccountReservationService> _reservationRepository;
         private Mock<IAccountsService> _accountsService;
-
-        public WhenCheckingRulesAgainstAReservation(Mock<IAccountsService> accountsService)
-        {
-            _accountsService = accountsService;
-        }
-
+        
         [SetUp]
         public void Arrange()
         {

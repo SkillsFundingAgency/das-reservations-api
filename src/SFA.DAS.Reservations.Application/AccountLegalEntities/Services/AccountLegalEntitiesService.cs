@@ -34,20 +34,12 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Services
 
         private AccountLegalEntity MapAccountLegalEntity(Domain.Entities.AccountLegalEntity accountLegalEntity)
         {
-            var reservationLimit = _configuration.MaxNumberOfReservations;
-
-            if (accountLegalEntity.ReservationLimit.HasValue)
-            {
-                reservationLimit = accountLegalEntity.ReservationLimit.Value;
-            }
-
             var mapAccountLegalEntity = new AccountLegalEntity(
                 accountLegalEntity.Id, 
                 accountLegalEntity.AccountId,
                 accountLegalEntity.AccountLegalEntityName, 
                 accountLegalEntity.LegalEntityId,
                 accountLegalEntity.AccountLegalEntityId,
-                reservationLimit,
                 accountLegalEntity.AgreementSigned ,
                 accountLegalEntity.Account.IsLevy
                 );
