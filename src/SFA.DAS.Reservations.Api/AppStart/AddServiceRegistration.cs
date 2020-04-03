@@ -30,6 +30,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
             services.AddTransient<ICourseRepository, CourseRepository>();
             services.AddTransient<IAccountLegalEntitiesRepository, AccountLegalEntityRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();
             services.AddTransient<IAccountsService, AccountsService>();
             services.AddTransient<IRulesService, RulesService>();
