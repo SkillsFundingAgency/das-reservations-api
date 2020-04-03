@@ -46,7 +46,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
 
             accountLegalEntity.Should().BeOfType<AccountLegalEntity>();
             accountLegalEntity.Should().BeEquivalentTo(accountLegalEntityEntity, 
-                options=>options.Excluding(p=>p.ProviderPermissions).Excluding(p=>p.Account));
+                options=>options
+                    .Excluding(p=>p.ProviderPermissions)
+                    .Excluding(p=>p.Account));
         }
 
         private static Domain.Entities.AccountLegalEntity BuildAccountLegalEntity(long accountLegalEntityId)

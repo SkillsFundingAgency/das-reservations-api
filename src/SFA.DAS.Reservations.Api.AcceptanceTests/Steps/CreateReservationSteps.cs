@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             var dbContext = Services.GetService<ReservationsDataContext>();
             var accountLegalEntity = dbContext.AccountLegalEntities.FirstOrDefault(c=>c.AccountLegalEntityId.Equals(1));
-            accountLegalEntity.ReservationLimit = limit;
+            accountLegalEntity.Account.ReservationLimit = limit;
             dbContext.SaveChanges();
         }
 
