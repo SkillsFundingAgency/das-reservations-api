@@ -102,6 +102,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return reservations.Select(c=>c.Id).ToList();
         }
 
+        public async Task<Guid> ChangeOfParty(ChangeOfPartyServiceRequest request)
+        {
+            //todo: get reservation, throw if not found
+            //todo: create new but with specific status 4 and set cloned reservation id
+            await Task.CompletedTask;
+            return Guid.Empty;
+        }
+
         private Domain.Entities.Reservation CreateReservation(long accountId, long accountLegalEntityId, string accountLegalEntityName, long? transferSenderAccountId)
         {
             return new Domain.Entities.Reservation

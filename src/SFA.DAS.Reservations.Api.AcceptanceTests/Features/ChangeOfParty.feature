@@ -1,5 +1,5 @@
 ﻿Feature: Change of party
-	In order to be able change employer during an apprenticeship
+	In order to be able change employer or provider during an apprenticeship
 	as a levy or a non levy employer
 	I want my reservation to be carried over
 
