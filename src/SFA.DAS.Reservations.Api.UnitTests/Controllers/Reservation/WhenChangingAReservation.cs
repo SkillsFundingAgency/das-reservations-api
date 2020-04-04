@@ -57,6 +57,25 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test, MoqAutoData]
+        public async Task And_AccountLegalEntity_Not_Found_Then_Returns_Http_Bad_Request(
+            ChangeOfPartyRequest request,
+            EntityNotFoundException<Domain.Entities.AccountLegalEntity> notFoundException,
+            [Frozen] Mock<IMediator> mockMediator,
+            ReservationsController controller)
+        {
+            mockMediator
+                .Setup(mediator => mediator.Send(
+                    It.IsAny<ChangeOfPartyCommand>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(notFoundException);
+
+            var result = await controller.Change(request) as BadRequestObjectResult;
+
+            var model = result.Value as ArgumentErrorViewModel;
+            model.Message.Should().Be(notFoundException.Message);
+        }
+
+        [Test, MoqAutoData]
         public async Task Then_Returns_Http_OK_With_New_ReservationId(
             ChangeOfPartyRequest request,
             ChangeOfPartyResult mediatorResult,

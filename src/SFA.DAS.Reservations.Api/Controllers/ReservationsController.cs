@@ -317,6 +317,14 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Message = notFoundException.Message
                 });
             }
+            catch (EntityNotFoundException<Domain.Entities.AccountLegalEntity> notFoundException)
+            {
+                _logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = notFoundException.Message
+                });
+            }
         }
     }
 }

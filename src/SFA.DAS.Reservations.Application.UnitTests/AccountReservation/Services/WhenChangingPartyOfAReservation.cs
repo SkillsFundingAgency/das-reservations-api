@@ -1,23 +1,100 @@
-﻿namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
+﻿using System;
+using System.Threading.Tasks;
+using AutoFixture.NUnit3;
+using FluentAssertions;
+using Moq;
+using NUnit.Framework;
+using SFA.DAS.Reservations.Application.AccountReservations.Services;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
+using SFA.DAS.Reservations.Domain.Exceptions;
+using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Testing.AutoFixture;
+
+namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 {
     public class WhenChangingPartyOfAReservation
     {
-        
-        /*[Test, MoqAutoData]
+        [Test, MoqAutoData]
         public void And_Reservation_Not_Found_Then_Throws_EntityNotFoundException(
-            ChangeOfPartyCommand command,
-            [Frozen] ValidationResult validationResult,
-            [Frozen] Mock<IAccountReservationService> mockService,
-            ChangeOfPartyCommandHandler handler)
+            ChangeOfPartyServiceRequest request,
+            [Frozen] Mock<IReservationRepository> mockRepository,
+            AccountReservationService service)
         {
-            validationResult.ValidationDictionary.Clear();
-            mockService
-                .Setup(service => service.GetReservation(command.ReservationId))
-                .ReturnsAsync((Reservation) null);
+            mockRepository
+                .Setup(repository => repository.GetById(request.ReservationId))
+                .ReturnsAsync((Domain.Entities.Reservation) null);
 
-            var act = new Func<Task>(async () => await handler.Handle(command, CancellationToken.None));
+            var act = new Func<Task>(async () => await service.ChangeOfParty(request));
 
-            act.Should().Throw<EntityNotFoundException<Reservation>>();
-        }*/
+            act.Should().Throw<EntityNotFoundException<Domain.Entities.Reservation>>();
+        }
+
+        [Test, RecursiveMoqAutoData]
+        public async Task Then_New_Reservation_Cloned_From_Existing(
+            ChangeOfPartyServiceRequest request,
+            Domain.Entities.Reservation existingReservation,
+            [Frozen] Mock<IReservationRepository> mockRepository,
+            AccountReservationService service)
+        {
+            request.AccountLegalEntityId = null;
+            mockRepository
+                .Setup(repository => repository.GetById(request.ReservationId))
+                .ReturnsAsync(existingReservation);
+
+            var newReservationId = await service.ChangeOfParty(request);
+
+            newReservationId.Should().NotBeEmpty();
+            mockRepository
+                .Verify(repository => repository.CreateAccountReservation(
+                    It.Is<Domain.Entities.Reservation>(reservation => 
+                        reservation.Id == newReservationId &&
+                        reservation.Status == (short)ReservationStatus.Change &&
+                        reservation.ClonedReservationId == existingReservation.Id &&
+                        reservation.AccountId == existingReservation.AccountId &&
+                        reservation.AccountLegalEntityId == existingReservation.AccountLegalEntityId &&
+                        reservation.AccountLegalEntityName == existingReservation.AccountLegalEntityName &&
+                        reservation.ProviderId == request.ProviderId &&
+                        reservation.CourseId == existingReservation.CourseId &&
+                        reservation.StartDate == existingReservation.StartDate &&
+                        reservation.ExpiryDate == existingReservation.ExpiryDate &&
+                        reservation.IsLevyAccount == existingReservation.IsLevyAccount &&
+                        reservation.TransferSenderAccountId == existingReservation.TransferSenderAccountId)));
+        }
+
+        [Test, RecursiveMoqAutoData]
+        public async Task And_New_AccountLegalEntityId_Then_Gets_All_Details_For_That_AccountLegalEntity(
+            ChangeOfPartyServiceRequest request,
+            Domain.Entities.Reservation existingReservation,
+            Domain.Entities.AccountLegalEntity newAccountLegalEntity,
+            [Frozen] Mock<IReservationRepository> mockRepository,
+            [Frozen] Mock<IAccountLegalEntitiesRepository> mockAleRepository,
+            AccountReservationService service)
+        {
+            request.ProviderId = null;
+            mockRepository
+                .Setup(repository => repository.GetById(request.ReservationId))
+                .ReturnsAsync(existingReservation);
+            mockAleRepository
+                .Setup(repository => repository.Get(request.AccountLegalEntityId.Value))
+                .ReturnsAsync(newAccountLegalEntity);
+
+            var newReservationId = await service.ChangeOfParty(request);
+
+            newReservationId.Should().NotBeEmpty();
+            mockRepository
+                .Verify(repository => repository.CreateAccountReservation(
+                    It.Is<Domain.Entities.Reservation>(reservation => 
+                        reservation.Id == newReservationId &&
+                        reservation.Status == (short)ReservationStatus.Change &&
+                        reservation.ClonedReservationId == existingReservation.Id &&
+                        reservation.AccountId == newAccountLegalEntity.AccountId &&
+                        reservation.AccountLegalEntityId == newAccountLegalEntity.AccountLegalEntityId &&
+                        reservation.AccountLegalEntityName == newAccountLegalEntity.AccountLegalEntityName &&
+                        reservation.ProviderId == existingReservation.ProviderId &&
+                        reservation.CourseId == existingReservation.CourseId &&
+                        reservation.StartDate == existingReservation.StartDate &&
+                        reservation.ExpiryDate == existingReservation.ExpiryDate &&
+                        reservation.IsLevyAccount == newAccountLegalEntity.Account.IsLevy)));
+        }
     }
 }
