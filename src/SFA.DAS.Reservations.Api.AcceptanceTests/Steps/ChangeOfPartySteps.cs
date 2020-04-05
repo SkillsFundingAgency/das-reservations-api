@@ -26,7 +26,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             TestData.Request = new ChangeOfPartyRequest
             {
-                ReservationId = TestData.ReservationId,
                 ProviderId = providerId
             };
         }
@@ -36,7 +35,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             TestData.Request = new ChangeOfPartyRequest
             {
-                ReservationId = TestData.ReservationId,
                 AccountLegalEntityId = accountLegalEntityId
             };
         }
@@ -48,7 +46,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
             var controller = Services.GetService<ReservationsController>();
 
-            TestResults.Result = await controller.Change(request);
+            TestResults.Result = await controller.Change(TestData.ReservationId, request);
         }
 
         [Then("an http status code of (.*) is returned")]

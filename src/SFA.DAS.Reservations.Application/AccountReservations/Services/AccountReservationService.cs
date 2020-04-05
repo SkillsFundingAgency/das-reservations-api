@@ -118,6 +118,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 throw new EntityNotFoundException<Domain.Entities.Reservation>();
             }
 
+            if (existingReservation.Status != (short)ReservationStatus.Confirmed &&
+                existingReservation.Status != (short)ReservationStatus.Change)
+            {
+                throw new ArgumentException(
+                    "Reservation cannot be changed due to it's status.",
+                    nameof(ChangeOfPartyServiceRequest.ReservationId));
+            }
+
             var newReservation = new Domain.Entities.Reservation
             {
                 Id = Guid.NewGuid(),

@@ -285,13 +285,13 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [HttpPost]
         [ProducesResponseType(400)]
         [Route("api/[controller]/{id}/change")]
-        public async Task<IActionResult> Change(ChangeOfPartyRequest request)
+        public async Task<IActionResult> Change(Guid id, ChangeOfPartyRequest request)
         {
             try
             {
                 var result = await _mediator.Send(new ChangeOfPartyCommand
                 {
-                    ReservationId = request.ReservationId,
+                    ReservationId = id,
                     AccountLegalEntityId = request.AccountLegalEntityId,
                     ProviderId = request.ProviderId
                 });

@@ -30,6 +30,26 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         }
 
         [Test, RecursiveMoqAutoData]
+        public void And_Reservation_Not_Confirmed_Status_Then_Throws_ArgumentException(
+            ChangeOfPartyServiceRequest request,
+            Domain.Entities.Reservation existingReservation,
+            [Frozen] Mock<IReservationRepository> mockRepository,
+            AccountReservationService service)
+        {
+            existingReservation.Status = (short) ReservationStatus.Completed;
+            mockRepository
+                .Setup(repository => repository.GetById(request.ReservationId))
+                .ReturnsAsync(existingReservation);
+
+            var act = new Func<Task>(async () => await service.ChangeOfParty(request));
+
+            act.Should().Throw<ArgumentException>()
+                .Where(exception => 
+                    exception.ParamName == nameof(ChangeOfPartyServiceRequest.ReservationId) &&
+                    exception.Message.StartsWith("Reservation cannot be changed due to it's status."));
+        }
+
+        [Test, RecursiveMoqAutoData]
         public async Task Then_New_Reservation_Cloned_From_Existing(
             ChangeOfPartyServiceRequest request,
             Domain.Entities.Reservation existingReservation,
@@ -37,6 +57,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             AccountReservationService service)
         {
             request.AccountLegalEntityId = null;
+            existingReservation.Status = (short) ReservationStatus.Confirmed;
             mockRepository
                 .Setup(repository => repository.GetById(request.ReservationId))
                 .ReturnsAsync(existingReservation);
@@ -71,6 +92,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             AccountReservationService service)
         {
             request.ProviderId = null;
+            existingReservation.Status = (short) ReservationStatus.Change;
             mockRepository
                 .Setup(repository => repository.GetById(request.ReservationId))
                 .ReturnsAsync(existingReservation);
