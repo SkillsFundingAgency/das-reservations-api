@@ -1,7 +1,6 @@
 ﻿using System;
 using SFA.DAS.Reservations.Domain.Reservations;
 using TechTalk.SpecFlow.Assist;
-using static System.String;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.ValueComparers
 {

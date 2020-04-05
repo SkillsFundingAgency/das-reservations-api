@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +57,22 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             switch (httpStatusCode)
             {
                 case (int)HttpStatusCode.BadRequest:
-                    TestResults.Result.Should().BeOfType<BadRequestResult>();
+                    var badRequestTypes = new List<Type>
+                    {
+                        typeof(BadRequestResult), 
+                        typeof(BadRequestObjectResult)
+                    };
+                    badRequestTypes.Contains(TestResults.Result.GetType()).Should().BeTrue(
+                        $"actual return type is {TestResults.Result.GetType()}");
+                    break;
+                case (int)HttpStatusCode.OK:
+                    var okTypes = new List<Type>
+                    {
+                        typeof(OkResult), 
+                        typeof(OkObjectResult)
+                    };
+                    okTypes.Contains(TestResults.Result.GetType()).Should().BeTrue(
+                        $"actual return is {TestResults.Result}");
                     break;
                 default:
                     Assert.Fail("http status code not supported");

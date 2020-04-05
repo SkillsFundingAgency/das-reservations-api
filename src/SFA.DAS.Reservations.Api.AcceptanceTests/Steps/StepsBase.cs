@@ -120,7 +120,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
         private void ConfigureCustomValueComparers()
         {
-            Service.Instance.ValueComparers.Register<CustomShortValueComparer>();
+            Service.Instance.ValueComparers.SetDefault<CustomShortValueComparer>();
+            Service.Instance.ValueComparers.SetDefault(new CustomDateTimeComparer(new CustomDateTimeValueRetriever()));
         }
     }
 }

@@ -10,6 +10,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.ValueRetrievers
         {
             if (value == "today")
                 return DateTime.Today;
+            if (value == "utcnow")
+                return DateTime.UtcNow;
 
             var returnValue = DateTime.MinValue;
             DateTime.TryParse(value, out returnValue);

@@ -191,7 +191,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         }
 
         [Then(@"I have the following reservations:")]
-        public void ThenANewReservationIsCreatedWithStatus(Table table)
+        public void ThenIHaveTheFollowingReservations(Table table)
         {
             var dbContext = Services.GetService<ReservationsDataContext>();
 
