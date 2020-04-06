@@ -325,6 +325,14 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Message = notFoundException.Message
                 });
             }
+            catch (InvalidOperationException invalidOperationException)
+            {
+                _logger.LogDebug(invalidOperationException, $"Handled InvalidOperationException, Message:[{invalidOperationException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = invalidOperationException.Message
+                });
+            }
         }
     }
 }

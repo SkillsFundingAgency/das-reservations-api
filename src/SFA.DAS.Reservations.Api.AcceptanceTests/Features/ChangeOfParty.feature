@@ -38,8 +38,7 @@ Scenario: Change employer, non-levy to levy
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
 	| 20                      | 15214       | 2019-07-01 | today        | 1         | Change    | True            |
-		
-@ignore
+
 Scenario: Change employer, levy to non-levy - not supported
 	Given I have the following existing reservation:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |

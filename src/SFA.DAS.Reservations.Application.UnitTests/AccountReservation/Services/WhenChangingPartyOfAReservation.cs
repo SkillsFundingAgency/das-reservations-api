@@ -93,6 +93,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         {
             request.ProviderId = null;
             existingReservation.Status = (short) ReservationStatus.Change;
+            existingReservation.IsLevyAccount = false;
+            newAccountLegalEntity.Account.IsLevy = false;
             mockRepository
                 .Setup(repository => repository.GetById(request.ReservationId))
                 .ReturnsAsync(existingReservation);
@@ -117,6 +119,31 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                         reservation.StartDate == existingReservation.StartDate &&
                         reservation.ExpiryDate == existingReservation.ExpiryDate &&
                         reservation.IsLevyAccount == newAccountLegalEntity.Account.IsLevy)));
+        }
+
+        [Test, RecursiveMoqAutoData]
+        public void And_New_AccountLegalEntityId_Is_Non_Levy_And_Existing_Reservation_Is_Levy_Then_Throws_InvalidOperationException(
+            ChangeOfPartyServiceRequest request,
+            Domain.Entities.Reservation existingReservation,
+            Domain.Entities.AccountLegalEntity newAccountLegalEntity,
+            [Frozen] Mock<IReservationRepository> mockRepository,
+            [Frozen] Mock<IAccountLegalEntitiesRepository> mockAleRepository,
+            AccountReservationService service)
+        {
+            request.ProviderId = null;
+            existingReservation.Status = (short) ReservationStatus.Confirmed;
+            existingReservation.IsLevyAccount = true;
+            newAccountLegalEntity.Account.IsLevy = false;
+            mockRepository
+                .Setup(repository => repository.GetById(request.ReservationId))
+                .ReturnsAsync(existingReservation);
+            mockAleRepository
+                .Setup(repository => repository.Get(request.AccountLegalEntityId.Value))
+                .ReturnsAsync(newAccountLegalEntity);
+
+            var act = new Func<Task>(async () => await service.ChangeOfParty(request));
+
+            act.Should().Throw<InvalidOperationException>();
         }
     }
 }
