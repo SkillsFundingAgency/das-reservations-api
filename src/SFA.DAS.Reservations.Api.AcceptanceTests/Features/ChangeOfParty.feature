@@ -14,7 +14,7 @@ Scenario: Change employer, non-levy to non-levy
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
-	| 2                       | 15214       | 2019-07-01 | today        | 1         | Changed   | False           |
+	| 2                       | 15214       | 2019-07-01 | today        | 1         | Change    | False           |
 
 @ignore
 Scenario: Change employer, levy to levy
@@ -27,7 +27,7 @@ Scenario: Change employer, levy to levy
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 10                      | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
-	| 20                      | 15214       | 2019-07-01 | today        | 1         | Changed   | False           |
+	| 20                      | 15214       | 2019-07-01 | today        | 1         | Change    | False           |
 	
 @ignore
 Scenario: Change employer, non-levy to levy
@@ -40,7 +40,7 @@ Scenario: Change employer, non-levy to levy
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
-	| 20                      | 15214       | 2019-07-01 | today        | 1         | Changed   | True            |
+	| 20                      | 15214       | 2019-07-01 | today        | 1         | Change    | True            |
 
 Scenario: Change employer, levy to non-levy - not supported
 	Given I have the following existing reservation:
@@ -60,7 +60,7 @@ Scenario: Change provider
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
-	| 1                       | 45665       | 2019-07-01 | today        | 1         | 4   | False           |
+	| 1                       | 45665       | 2019-07-01 | today        | 1         | Change    | False           |
 
 Scenario: Reservation deleted
 	Given I have the following existing reservation:
