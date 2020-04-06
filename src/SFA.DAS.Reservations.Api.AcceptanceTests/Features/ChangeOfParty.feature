@@ -50,7 +50,6 @@ Scenario: Change employer, levy to non-levy - not supported
 	When I call change of circumstances
 	Then an http status code of 400 is returned
 	
-@ignore
 Scenario: Change provider
 	Given I have the following existing reservation:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |

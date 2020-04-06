@@ -22,7 +22,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.ValueComparers
         {
             if (DateTime.TryParse(expectedValue, out var expected) == false)
             {
-                if (_dateTimeValueRetriever.GetValue(expectedValue) == DateTime.MinValue)
+                expected = _dateTimeValueRetriever.GetValue(expectedValue);
+                if (expected == DateTime.MinValue)
                 {
                     return false;
                 }
