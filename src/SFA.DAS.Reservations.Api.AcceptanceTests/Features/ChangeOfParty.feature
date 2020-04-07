@@ -8,7 +8,7 @@ Scenario: Change employer, non-levy to non-levy
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
 	And I want to change account legal entity to 2
-	When I call change of circumstances
+	When I call change of party
 	Then an http status code of 200 is returned
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
@@ -20,7 +20,7 @@ Scenario: Change employer, levy to levy
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 10                      | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | True            |
 	And I want to change account legal entity to 20
-	When I call change of circumstances
+	When I call change of party
 	Then an http status code of 200 is returned
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
@@ -32,7 +32,7 @@ Scenario: Change employer, non-levy to levy
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
 	And I want to change account legal entity to 20
-	When I call change of circumstances
+	When I call change of party
 	Then an http status code of 200 is returned
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
@@ -44,7 +44,7 @@ Scenario: Change employer, levy to non-levy - not supported
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 10                      | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | True            |
 	And I want to change account legal entity to 2
-	When I call change of circumstances
+	When I call change of party
 	Then an http status code of 400 is returned
 	
 Scenario: Change provider
@@ -52,7 +52,7 @@ Scenario: Change provider
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | False           |
 	And I want to change provider to 45665
-	When I call change of circumstances
+	When I call change of party
 	Then an http status code of 200 is returned
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
@@ -64,7 +64,7 @@ Scenario: Reservation deleted
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status  | Is Levy Account |
 	| 1                       | 15214       | 2019-07-01 | 2019-01-01   | 1         | Deleted | False           |
 	And I want to change account legal entity to 2
-	When I call change of circumstances
+	When I call change of party
 	Then an http status code of 400 is returned
 
 

@@ -41,8 +41,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             };
         }
 
-        [When("I call change of circumstances")]
-        public async Task WhenICallChangeOfCircumstances()
+        [When("I call change of party")]
+        public async Task WhenICallChangeOfParty()
         {
             var request = TestData.Request as ChangeOfPartyRequest;
 
