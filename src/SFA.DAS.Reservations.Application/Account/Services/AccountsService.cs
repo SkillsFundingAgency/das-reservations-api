@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.Configuration;
 
@@ -9,10 +10,10 @@ namespace SFA.DAS.Reservations.Application.Account.Services
         private readonly IAccountRepository _repository;
         private readonly ReservationsConfiguration _configuration;
 
-        public AccountsService (IAccountRepository repository, ReservationsConfiguration configuration)
+        public AccountsService (IAccountRepository repository, IOptions<ReservationsConfiguration> configuration)
         {
             _repository = repository;
-            _configuration = configuration;
+            _configuration = configuration.Value;
         }
         public async Task<Domain.Account.Account> GetAccount(long accountId)
         {
