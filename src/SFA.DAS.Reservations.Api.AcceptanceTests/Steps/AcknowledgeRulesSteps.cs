@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Given(@"I have upcoming rules")]
         public void GivenIHaveUpcomingRules()
         {
-           var dbContext = Services.GetService<ReservationsDataContext>();
+            var dbContext = Services.GetService<ReservationsDataContext>();
 
             dbContext.GlobalRules.Add(new Domain.Entities.GlobalRule
             {
