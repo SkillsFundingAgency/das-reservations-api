@@ -45,7 +45,11 @@ Scenario: Change employer, levy to non-levy - not supported
 	| 10                      | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | True            |
 	And I want to change account legal entity to 2
 	When I call change of party
-	Then an http status code of 400 is returned
+	Then an http status code of 200 is returned
+	And I have the following reservations:
+	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
+	| 10                      | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | True            |
+	| 2                       | 15214       | 2019-07-01 | today        | 1         | Change    | False           |
 	
 Scenario: Change provider
 	Given I have the following existing reservation:

@@ -79,26 +79,6 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test, MoqAutoData]
-        public async Task And_InvalidOperationException_Then_Returns_Http_Bad_Request(
-            Guid reservationId,
-            ChangeOfPartyRequest request,
-            InvalidOperationException invalidOperationException,
-            [Frozen] Mock<IMediator> mockMediator,
-            ReservationsController controller)
-        {
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.IsAny<ChangeOfPartyCommand>(),
-                    It.IsAny<CancellationToken>()))
-                .ThrowsAsync(invalidOperationException);
-
-            var result = await controller.Change(reservationId, request) as BadRequestObjectResult;
-
-            var model = result.Value as ArgumentErrorViewModel;
-            model.Message.Should().Be(invalidOperationException.Message);
-        }
-
-        [Test, MoqAutoData]
         public async Task Then_Returns_Http_OK_With_New_ReservationId(
             Guid reservationId,
             ChangeOfPartyRequest request,

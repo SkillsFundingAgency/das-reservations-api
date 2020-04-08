@@ -148,11 +148,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             {
                 var newAccountLegalEntity = await _accountLegalEntitiesRepository.Get(request.AccountLegalEntityId.Value);
 
-                if (existingReservation.IsLevyAccount && !newAccountLegalEntity.Account.IsLevy)
-                {
-                    throw new InvalidOperationException("A reservation cannot be changed from levy to non-levy.");
-                }
-                
                 newReservation.AccountId = newAccountLegalEntity.AccountId;
                 newReservation.AccountLegalEntityId = newAccountLegalEntity.AccountLegalEntityId;
                 newReservation.AccountLegalEntityName = newAccountLegalEntity.AccountLegalEntityName;
