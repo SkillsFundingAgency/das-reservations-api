@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using SFA.DAS.Reservations.Domain.Account;
-using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using Account = SFA.DAS.Reservations.Domain.Entities.Account;
 
@@ -17,15 +15,16 @@ namespace SFA.DAS.Reservations.Data.Repository
             _reservationsDataContext = reservationsDataContext;
         }
 
-        public Task<Account> Get(long accountId)
+        public async Task<Account> Get(long accountId)
         {
             try
             {
-                return _reservationsDataContext.Accounts.FirstOrDefaultAsync(e => e.Id == accountId);
+                var account = await _reservationsDataContext.Accounts.FindAsync(accountId);
+                return account;
             }
             catch (InvalidOperationException e)
             {
-                throw new EntityNotFoundException<AccountLegalEntity>(e);
+                throw new EntityNotFoundException<Account>(e);
             }
         }
     }
