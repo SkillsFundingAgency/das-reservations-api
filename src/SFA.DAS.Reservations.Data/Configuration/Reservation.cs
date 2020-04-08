@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.AccountLegalEntityId).HasColumnName(@"AccountLegalEntityId").HasColumnType("bigint");
             builder.Property(x => x.TransferSenderAccountId).HasColumnName(@"TransferSenderAccountId").HasColumnType("bigint");
             builder.Property(x => x.UserId).HasColumnName("UserId").HasColumnType("uniqueidentifier");
-            builder.Property(x => x.UserId).HasColumnName("ClonedReservationId").HasColumnType("uniqueidentifier");
+            builder.Property(x => x.ClonedReservationId).HasColumnName("ClonedReservationId").HasColumnType("uniqueidentifier");
 
             builder.HasOne(c => c.Course).WithMany(c => c.Reservations)
                    .HasForeignKey(c => c.CourseId);
