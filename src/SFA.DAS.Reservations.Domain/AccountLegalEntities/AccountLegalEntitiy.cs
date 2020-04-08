@@ -9,6 +9,7 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
         public string AccountLegalEntityName { get; }
         public long LegalEntityId { get; }
         public long AccountLegalEntityId { get; }
+        public int ReservationLimit { get; }
         public bool AgreementSigned { get; }
         public bool IsLevy { get; }
 
@@ -18,6 +19,7 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
             string accountLegalEntityName, 
             long legalEntityId,
             long accountLegalEntityId, 
+            int reservationLimit,
             bool agreementSigned,
             bool isLevy)
         {
@@ -26,6 +28,7 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
             AccountLegalEntityName = accountLegalEntityName;
             LegalEntityId = legalEntityId;
             AccountLegalEntityId = accountLegalEntityId;
+            ReservationLimit = reservationLimit;
             AgreementSigned = agreementSigned;
             IsLevy = isLevy;
         }

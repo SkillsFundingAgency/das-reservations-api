@@ -33,6 +33,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                 "Test", 
                 2,
                 3, 
+                5,
                 true, 
                 true);
 
