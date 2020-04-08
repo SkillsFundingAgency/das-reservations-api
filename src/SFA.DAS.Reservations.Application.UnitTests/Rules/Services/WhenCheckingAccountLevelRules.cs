@@ -19,7 +19,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         private Mock<IAccountReservationService> _repository;
         private GlobalRulesService _globalRulesService;
         private Domain.Entities.GlobalRule _globalRule;
-        private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
         private Mock<IAccountsService> _accountService;
         private const long ExpectedAccountId = 534542143;
 

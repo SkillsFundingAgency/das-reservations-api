@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Accounts.Queries.GetAccount
 {
     public class WhenGettingAccount
     {
-        [Test, MoqAutoData]
+        [Test, RecursiveMoqAutoData]
         public void And_Fails_Validation_Then_Throws_ValidationException(
             GetAccountQuery query,
             string propertyName,
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Accounts.Queries.GetAccount
             act.Should().Throw<EntityNotFoundException<Domain.Entities.Account>>();
         }
         
-        [Test, MoqAutoData]
+        [Test, RecursiveMoqAutoData]
         public async Task Then_Gets_Account_Details_From_Service(
             GetAccountQuery query,
             Domain.Account.Account account,

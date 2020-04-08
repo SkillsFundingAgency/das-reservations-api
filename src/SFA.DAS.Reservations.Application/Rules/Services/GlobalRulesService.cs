@@ -92,14 +92,8 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
         {
             var account = await _accountService.GetAccount(accountId);
 
-            if (!account.ReservationLimit.HasValue)
-            {
-                return 0;
-            }
+            return account.ReservationLimit;
 
-            var limit = account.ReservationLimit;
-
-            return (int) limit;
         }
 
         private async Task<GlobalRule> CheckAccountReservationLimit(long accountId, bool isLevyReservation = false)

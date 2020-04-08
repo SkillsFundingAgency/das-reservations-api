@@ -23,9 +23,5 @@ namespace SFA.DAS.Reservations.Domain.Account
             ReservationLimit = reservationLimit ?? 0;
         }
 
-        public Account()
-        {
-                
-        }
     }
 }

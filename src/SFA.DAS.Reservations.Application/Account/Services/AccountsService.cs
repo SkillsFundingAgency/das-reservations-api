@@ -24,19 +24,7 @@ namespace SFA.DAS.Reservations.Application.Account.Services
 
         private Domain.Account.Account MapAccount(Domain.Entities.Account account)
         {
-            var reservationLimit = _configuration.MaxNumberOfReservations;
-
-            if (account.ReservationLimit.HasValue)
-            {
-                reservationLimit = account.ReservationLimit.Value;
-            }
-            return new Domain.Account.Account
-            {
-                Id = account.Id,
-                Name = account.Name,
-                IsLevy = account.IsLevy,
-                ReservationLimit = reservationLimit
-            };
+            return new Domain.Account.Account(account, _configuration.MaxNumberOfReservations);
         }
     }
 }
