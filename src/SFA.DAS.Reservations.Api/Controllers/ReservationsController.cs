@@ -295,10 +295,12 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     AccountLegalEntityId = request.AccountLegalEntityId,
                     ProviderId = request.ProviderId
                 });
-                return Ok(new ChangeOfPartyResponse
-                {
-                    ReservationId = result.ReservationId
-                });
+                return Created(
+                    $"api/{ControllerContext.ActionDescriptor.ControllerName}/{result.ReservationId}",
+                    new ChangeOfPartyResponse
+                    {
+                        ReservationId = result.ReservationId
+                    });
             }
             catch (ArgumentException argumentException)
             {

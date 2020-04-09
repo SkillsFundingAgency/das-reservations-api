@@ -5,6 +5,7 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
@@ -79,13 +80,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Returns_Http_OK_With_New_ReservationId(
+        public async Task Then_Returns_Http_Create_With_New_ReservationId(
             Guid reservationId,
             ChangeOfPartyRequest request,
             ChangeOfPartyResult mediatorResult,
+            ControllerActionDescriptor controllerActionDescriptor,
             [Frozen] Mock<IMediator> mockMediator,
             ReservationsController controller)
         {
+            controller.ControllerContext.ActionDescriptor = controllerActionDescriptor;
             mockMediator
                 .Setup(mediator => mediator.Send(
                     It.Is<ChangeOfPartyCommand>(command => 
@@ -95,8 +98,9 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(mediatorResult);
 
-            var result = await controller.Change(reservationId, request) as OkObjectResult;
+            var result = await controller.Change(reservationId, request) as CreatedResult;
 
+            result.Location.Should().Be($"api/{controllerActionDescriptor.ControllerName}/{mediatorResult.ReservationId}");
             var model = result.Value as ChangeOfPartyResponse;
             model.ReservationId.Should().Be(mediatorResult.ReservationId);
         }

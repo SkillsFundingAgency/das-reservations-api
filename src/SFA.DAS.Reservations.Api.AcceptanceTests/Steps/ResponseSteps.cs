@@ -24,23 +24,32 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             switch (httpStatusCode)
             {
-                case (int)HttpStatusCode.BadRequest:
-                    var badRequestTypes = new List<Type>
-                    {
-                        typeof(BadRequestResult), 
-                        typeof(BadRequestObjectResult)
-                    };
-                    badRequestTypes.Contains(TestResults.Result.GetType()).Should().BeTrue(
-                        $"actual return type is {TestResults.Result.GetType()}");
-                    break;
+                // HTTP 200
                 case (int)HttpStatusCode.OK:
                     var okTypes = new List<Type>
                     {
                         typeof(OkResult), 
                         typeof(OkObjectResult)
                     };
-                    okTypes.Contains(TestResults.Result.GetType()).Should().BeTrue(
-                        $"actual return is {TestResults.Result}");
+                    okTypes.Should().Contain(TestResults.Result.GetType());
+                    break;
+                case (int)HttpStatusCode.Created:
+                    var createdTypes = new List<Type>
+                    {
+                        typeof(CreatedResult), 
+                        typeof(CreatedAtActionResult),
+                        typeof(CreatedAtRouteResult)
+                    };
+                    createdTypes.Should().Contain(TestResults.Result.GetType());
+                    break;
+                // HTTP 400
+                case (int)HttpStatusCode.BadRequest:
+                    var badRequestTypes = new List<Type>
+                    {
+                        typeof(BadRequestResult), 
+                        typeof(BadRequestObjectResult)
+                    };
+                    badRequestTypes.Should().Contain(TestResults.Result.GetType());
                     break;
                 default:
                     Assert.Fail("http status code not supported");
