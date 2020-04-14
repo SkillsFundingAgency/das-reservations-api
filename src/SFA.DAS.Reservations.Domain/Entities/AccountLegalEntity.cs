@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SFA.DAS.Common.Domain.Types;
 
 namespace SFA.DAS.Reservations.Domain.Entities
 {

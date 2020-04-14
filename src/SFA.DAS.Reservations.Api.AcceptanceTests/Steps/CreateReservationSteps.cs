@@ -93,7 +93,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             TestData.ReservationId = Guid.NewGuid();
             var dbContext = Services.GetService<ReservationsDataContext>();
 
-            var reservation = new Domain.Entities.Reservation
+            var reservation = table.CreateInstance(() => new Domain.Entities.Reservation
             {
                 Id = TestData.ReservationId,
                 AccountId = 1,
@@ -106,9 +106,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 IsLevyAccount = false,
                 Status = (short) ReservationStatus.Pending,
                 UserId = TestData.UserId
-            };
-
-            table.FillInstance(reservation);
+            });
 
             dbContext.Reservations.Add(reservation);
             dbContext.SaveChanges();
@@ -156,7 +154,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 UserId = TestData.UserId
             };
 
-            TestResults.Result = (controller.Create(reservation).Result) as CreatedResult;
+            TestResults.Result = controller.Create(reservation).Result as CreatedResult;
             
         }
 
@@ -192,5 +190,14 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             
         }
 
+        [Then(@"I have the following reservations:")]
+        public void ThenIHaveTheFollowingReservations(Table table)
+        {
+            var dbContext = Services.GetService<ReservationsDataContext>();
+
+            var reservations = dbContext.Reservations.ToList();
+
+            table.CompareToSet(reservations);
+        }
     }
 }

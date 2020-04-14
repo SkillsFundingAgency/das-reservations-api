@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -57,7 +58,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 .ReturnsAsync(new Domain.Entities.Reservation{Id=_expectedReservationId, AccountId = ExpectedAccountId, Course = _expectedCourse,
                     ProviderId = ExpectedProviderId, AccountLegalEntityId = ExpectedAccountLegalEntityId,TransferSenderAccountId = ExpectedTransferSenderAccountId});
             
-            _accountReservationService = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object, _options.Object, Mock.Of<IReservationIndexRepository>());
+            _accountReservationService = new AccountReservationService(
+                _reservationRepository.Object, 
+                _ruleRepository.Object, 
+                _options.Object, 
+                Mock.Of<IReservationIndexRepository>(),
+                Mock.Of<IAccountLegalEntitiesRepository>());
         }
 
         [Test]
