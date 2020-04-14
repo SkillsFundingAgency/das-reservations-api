@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Extensions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -17,14 +19,20 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         private readonly IRuleRepository _ruleRepository;
         private readonly IOptions<ReservationsConfiguration> _options;
         private readonly IReservationIndexRepository _reservationIndexRepository;
+        private readonly IAccountLegalEntitiesRepository _accountLegalEntitiesRepository;
 
-        public AccountReservationService(IReservationRepository reservationRepository, IRuleRepository ruleRepository,
-            IOptions<ReservationsConfiguration> options, IReservationIndexRepository reservationIndexRepository)
+        public AccountReservationService(
+            IReservationRepository reservationRepository, 
+            IRuleRepository ruleRepository,
+            IOptions<ReservationsConfiguration> options, 
+            IReservationIndexRepository reservationIndexRepository,
+            IAccountLegalEntitiesRepository accountLegalEntitiesRepository)
         {
             _reservationRepository = reservationRepository;
             _ruleRepository = ruleRepository;
             _options = options;
             _reservationIndexRepository = reservationIndexRepository;
+            _accountLegalEntitiesRepository = accountLegalEntitiesRepository;
         }
 
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
@@ -100,6 +108,58 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             await _reservationRepository.CreateAccountReservations(reservations);
 
             return reservations.Select(c=>c.Id).ToList();
+        }
+
+        public async Task<Guid> ChangeOfParty(ChangeOfPartyServiceRequest request)
+        {
+            var existingReservation = await _reservationRepository.GetById(request.ReservationId);
+            if (existingReservation == null)
+            {
+                throw new EntityNotFoundException<Domain.Entities.Reservation>();
+            }
+
+            if (existingReservation.Status != (short)ReservationStatus.Confirmed &&
+                existingReservation.Status != (short)ReservationStatus.Change)
+            {
+                throw new ArgumentException(
+                    "Reservation cannot be changed due to it's status.",
+                    nameof(ChangeOfPartyServiceRequest.ReservationId));
+            }
+
+            var newReservation = new Domain.Entities.Reservation
+            {
+                Id = Guid.NewGuid(),
+                CreatedDate = DateTime.UtcNow,
+                ClonedReservationId = existingReservation.Id,
+                Status = (short)ReservationStatus.Change,
+                StartDate = existingReservation.StartDate,
+                ExpiryDate = existingReservation.ExpiryDate,
+                CourseId = existingReservation.CourseId,
+                ProviderId = existingReservation.ProviderId,
+                AccountId = existingReservation.AccountId,
+                AccountLegalEntityId = existingReservation.AccountLegalEntityId,
+                AccountLegalEntityName = existingReservation.AccountLegalEntityName,
+                IsLevyAccount = existingReservation.IsLevyAccount,
+                TransferSenderAccountId = existingReservation.TransferSenderAccountId,
+                UserId = existingReservation.UserId
+            };
+
+            if (request.AccountLegalEntityId.HasValue)
+            {
+                var newAccountLegalEntity = await _accountLegalEntitiesRepository.Get(request.AccountLegalEntityId.Value);
+
+                newReservation.AccountId = newAccountLegalEntity.AccountId;
+                newReservation.AccountLegalEntityId = newAccountLegalEntity.AccountLegalEntityId;
+                newReservation.AccountLegalEntityName = newAccountLegalEntity.AccountLegalEntityName;
+                newReservation.IsLevyAccount = newAccountLegalEntity.Account.IsLevy;
+            } 
+            else if (request.ProviderId.HasValue)
+            {
+                newReservation.ProviderId = request.ProviderId;
+            }
+
+            await _reservationRepository.CreateAccountReservation(newReservation);
+            return newReservation.Id;
         }
 
         private Domain.Entities.Reservation CreateReservation(long accountId, long accountLegalEntityId, string accountLegalEntityName, long? transferSenderAccountId)

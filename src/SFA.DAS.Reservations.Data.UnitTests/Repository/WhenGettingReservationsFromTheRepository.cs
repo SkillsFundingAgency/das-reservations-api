@@ -82,6 +82,13 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 },
                 new Reservation
                 {
+                    AccountId = 1,
+                    AccountLegalEntityName = "A Team",
+                    Course = new Course {Title = "Accounting", Level = 3},
+                    Status = (int)ReservationStatus.Change
+                },
+                new Reservation
+                {
                     AccountId = 2,
                     AccountLegalEntityName = "A Team",
                     Course = new Course {Title = "Accounting", Level = 1},
@@ -128,6 +135,15 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         }
 
         [Test]
+        public async Task Then_ChangeOfParty_Reservations_Are_Not_Returned()
+        {
+            var actual = await _reservationRepository.GetAccountReservations(1);
+
+            var count = actual.Count(reservation => reservation.Status == (int) ReservationStatus.Change);
+            Assert.AreEqual(0, count);
+        }
+
+        [Test]
         public async Task Then_An_Empty_List_Is_Returned_When_There_Are_No_Records()
         {
             //Act
@@ -136,7 +152,5 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             //Assert
             Assert.IsEmpty(actual);
         }
-
-
     }
 }
