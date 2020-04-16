@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -14,18 +15,18 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
     {
         private readonly IGlobalRuleRepository _repository;
         private readonly IAccountReservationService _reservationService;
-        private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
+        private readonly IAccountsService _accountService;
         private readonly ReservationsConfiguration _options;
 
         public GlobalRulesService(
             IGlobalRuleRepository repository, 
             IOptions<ReservationsConfiguration> options,
             IAccountReservationService reservationService, 
-            IAccountLegalEntitiesService accountLegalEntitiesService)
+            IAccountsService accountService)
         {
             _repository = repository;
             _reservationService = reservationService;
-            _accountLegalEntitiesService = accountLegalEntitiesService;
+            _accountService = accountService;
             _options = options.Value;
         }
 
@@ -89,16 +90,10 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         private async Task<int> GetReservationLimit(long accountId)
         {
-            var accountLimit = await _accountLegalEntitiesService.GetAccountLegalEntities(accountId);
+            var account = await _accountService.GetAccount(accountId);
 
-            if (!accountLimit.Any())
-            {
-                return 0;
-            }
+            return account.ReservationLimit;
 
-            var limit = accountLimit.Max(c => c.ReservationLimit);
-
-            return limit;
         }
 
         private async Task<GlobalRule> CheckAccountReservationLimit(long accountId, bool isLevyReservation = false)

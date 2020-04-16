@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
+using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -41,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _globalRulesService = new GlobalRulesService(_repository.Object, 
                 Mock.Of<IOptions<ReservationsConfiguration>>(), 
                 Mock.Of<IAccountReservationService>(),
-                Mock.Of<IAccountLegalEntitiesService>());
+                Mock.Of<IAccountsService>());
         }
 
         [Test]
