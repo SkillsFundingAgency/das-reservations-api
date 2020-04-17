@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -65,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         {
             var errors = new List<ReservationValidationError>();
 
-            if( reservation.StartDate.HasValue && reservation.ExpiryDate.HasValue && 
+            if(reservation.Status != ReservationStatus.Change && reservation.StartDate.HasValue && reservation.ExpiryDate.HasValue && 
                 (reservation.StartDate > request.StartDate || reservation.ExpiryDate < request.StartDate))
             {
                 var errorMessage = "Training start date must be between the funding reservation dates " +
