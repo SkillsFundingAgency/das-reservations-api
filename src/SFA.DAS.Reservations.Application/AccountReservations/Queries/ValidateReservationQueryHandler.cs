@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
+using Course = SFA.DAS.Reservations.Domain.Entities.Course;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 {
@@ -90,6 +92,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             {
                 errors.Add(new ReservationValidationError(nameof(request.CourseCode),
                     "Selected course cannot be found"));
+
+                return errors;
+            }
+
+            if (course.Type == ApprenticeshipType.Framework)
+            {
+                errors.Add(new ReservationValidationError(nameof(request.CourseCode),
+                "Select an apprenticeship training course standard"));
 
                 return errors;
             }
