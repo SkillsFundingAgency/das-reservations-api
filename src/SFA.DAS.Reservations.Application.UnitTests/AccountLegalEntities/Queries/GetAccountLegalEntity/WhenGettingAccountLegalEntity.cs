@@ -100,7 +100,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             Assert.AreEqual(legalEntityName, actual.LegalEntity.AccountLegalEntityName);
             Assert.AreEqual(legalEntityId, actual.LegalEntity.LegalEntityId);
             Assert.AreEqual(ExpectedAccountLegalEntityId, actual.LegalEntity.AccountLegalEntityId);
-            Assert.AreEqual(reservationLimit, actual.LegalEntity.ReservationLimit);
+            Assert.AreEqual(reservationLimit,actual.LegalEntity.ReservationLimit);
             Assert.AreEqual(agreementSigned, actual.LegalEntity.AgreementSigned);
             Assert.AreEqual(isLevy, actual.LegalEntity.IsLevy);
         }

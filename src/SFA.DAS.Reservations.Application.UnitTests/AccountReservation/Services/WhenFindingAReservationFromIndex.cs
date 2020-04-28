@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
+using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -35,8 +36,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _ruleRepository = new Mock<IRuleRepository>();
             _options = new Mock<IOptions<ReservationsConfiguration>>();
 
-            _service = new AccountReservationService(_reservationRepository.Object, _ruleRepository.Object,
-                _options.Object, _reservationIndexRepository.Object);
+            _service = new AccountReservationService(
+                _reservationRepository.Object, 
+                _ruleRepository.Object,
+                _options.Object, 
+                _reservationIndexRepository.Object,
+                Mock.Of<IAccountLegalEntitiesRepository>());
 
             _expectedSelectedFilter = new SelectedSearchFilters
             {

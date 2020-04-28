@@ -1,10 +1,12 @@
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Account.Services;
 using SFA.DAS.Reservations.Domain.Account;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Accounts.Services
@@ -41,6 +43,27 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Accounts.Services
 
             actual.Should().BeOfType<Domain.Account.Account>();
             account.Should().BeEquivalentTo(actual);
+        }
+
+        [Test, RecursiveMoqAutoData]
+        public async Task Then_If_There_Is_No_Reservation_Limit_On_The_Account_It_Is_Taken_From_Config(
+            Domain.Entities.Account account,
+            int numberOfReservations,
+            [Frozen] Mock<IOptions<ReservationsConfiguration>> configuration,
+            [Frozen] Mock<IAccountRepository> mockRepository
+            )
+        {
+            configuration.Setup(x => x.Value.MaxNumberOfReservations).Returns(numberOfReservations);
+            account.ReservationLimit = null;
+            mockRepository
+                .Setup(repository => repository.Get(account.Id))
+                .ReturnsAsync(account);
+            
+            var service = new AccountsService(mockRepository.Object, configuration.Object);
+            
+            var actual = await service.GetAccount(account.Id);
+
+            actual.ReservationLimit.Should().Be(numberOfReservations);
         }
     }
 }

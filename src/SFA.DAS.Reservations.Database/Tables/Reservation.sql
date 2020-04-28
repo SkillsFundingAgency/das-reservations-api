@@ -13,6 +13,7 @@
     [AccountLegalEntityName] VARCHAR(100) NULL, 
 	[TransferSenderAccountId] BIGINT NULL,
     [UserId] UNIQUEIDENTIFIER NULL, 
+	[ClonedReservationId] UNIQUEIDENTIFIER NULL,
     CONSTRAINT [FK_Reservation_Course] FOREIGN KEY (CourseId) REFERENCES [Course]([CourseId]),
 )
 GO;

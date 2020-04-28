@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOfParty;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
-using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
@@ -279,6 +279,53 @@ namespace SFA.DAS.Reservations.Api.Controllers
             {
                 _logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
                 return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [ProducesResponseType(400)]
+        [Route("api/[controller]/{id}/change")]
+        public async Task<IActionResult> Change(Guid id, ChangeOfPartyRequest request)
+        {
+            try
+            {
+                var result = await _mediator.Send(new ChangeOfPartyCommand
+                {
+                    ReservationId = id,
+                    AccountLegalEntityId = request.AccountLegalEntityId,
+                    ProviderId = request.ProviderId
+                });
+                return Created(
+                    $"api/{ControllerContext.ActionDescriptor.ControllerName}/{result.ReservationId}",
+                    new ChangeOfPartyResponse
+                    {
+                        ReservationId = result.ReservationId
+                    });
+            }
+            catch (ArgumentException argumentException)
+            {
+                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = argumentException.Message,
+                    Params = argumentException.ParamName
+                });
+            }
+            catch (EntityNotFoundException<Domain.Entities.Reservation> notFoundException)
+            {
+                _logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = notFoundException.Message
+                });
+            }
+            catch (EntityNotFoundException<Domain.Entities.AccountLegalEntity> notFoundException)
+            {
+                _logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = notFoundException.Message
+                });
             }
         }
     }

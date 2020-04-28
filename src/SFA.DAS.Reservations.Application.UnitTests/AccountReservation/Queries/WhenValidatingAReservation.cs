@@ -381,6 +381,32 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.AreEqual(nameof(ValidateReservationQuery.CourseCode), error.PropertyName);
             Assert.AreEqual("Select an apprenticeship training course standard", error.Reason);
         }
+        
+        [Test]
+        public async Task Then_Will_Not_Cause_A_Validation_Error_On_Start_Date_If_It_Is_A_Change_Reservation()
+        {
+            //Arrange
+            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(-6);
+            _reservation = new Reservation(time => Task.FromResult(new List<Rule>() as IList<Rule>), ReservationId, 1, false, DateTime.Now, startDate, startDate.AddMonths(3), ReservationStatus.Change, new Domain.Entities.Course(), 1, 1, "Legal Entity", 0, null);            
+            _reservationService
+                .Setup(r => r.GetReservation(It.IsAny<Guid>()))
+                .ReturnsAsync(_reservation);
+            var request = new ValidateReservationQuery
+            {
+                CourseCode = CourseId,
+                ReservationId = ReservationId,
+                StartDate = _reservation.ExpiryDate.Value.AddMonths(1)
+            };
+            
+            
+            //Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+            
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsEmpty(result.Errors);
+        }
+
 
     }
 }

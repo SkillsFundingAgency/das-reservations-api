@@ -30,7 +30,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 var newLegalEntity = new AccountLegalEntity
                 {
                     AccountId = AccountId,
-                    AccountLegalEntityId = AccountLegalEntityId + 1,
+                    AccountLegalEntityId = AccountLegalEntityId + 1000,
                     AccountLegalEntityName = "Test Corp 2",
                     AgreementSigned = false
                 };
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 var newLegalEntity = new AccountLegalEntity
                 {
                     AccountId = AccountId,
-                    AccountLegalEntityId = AccountLegalEntityId + 2,
+                    AccountLegalEntityId = AccountLegalEntityId + 2000,
                     AccountLegalEntityName = "Test Corp 3",
                     AgreementSigned = true
                 };

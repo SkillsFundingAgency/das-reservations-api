@@ -19,7 +19,7 @@ namespace SFA.DAS.Reservations.Domain.AccountLegalEntities
             string accountLegalEntityName, 
             long legalEntityId,
             long accountLegalEntityId, 
-            int reservationLimit, 
+            int reservationLimit,
             bool agreementSigned,
             bool isLevy)
         {

@@ -18,5 +18,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public string AccountLegalEntityName { get; set; }
         public long? TransferSenderAccountId { get; set; }
         public Guid? UserId { get; set; }
+        public Guid? ClonedReservationId { get; set; }
     }
 }

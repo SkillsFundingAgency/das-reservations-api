@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using SFA.DAS.Common.Domain.Types;
+using SFA.DAS.Reservations.Api.AcceptanceTests.ValueComparers;
+using SFA.DAS.Reservations.Api.AcceptanceTests.ValueRetrievers;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.Entities;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
+using TechTalk.SpecFlow.Assist.ValueRetrievers;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
@@ -18,6 +21,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         protected readonly TestData TestData;
         protected readonly TestResults TestResults;
         protected readonly IServiceProvider Services;
+        private readonly ReservationsDataContext _dbContext;
 
         public StepsBase(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
         {
@@ -25,11 +29,37 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             TestResults = testResults;
             Services = serviceProvider;
             UserId = Guid.NewGuid();
+
+            _dbContext = Services.GetService<ReservationsDataContext>();
+        }
+        
+        [BeforeScenario]
+        public void InitialiseTestDatabaseData()
+        {
+            ConfigureCustomValueRetrievers();
+            ConfigureCustomValueComparers();
+
+            ArrangeTestData();
+
+            AddCoursesToDb();
+            AddAccountsToDb();
+            AddAccountLegalEntitiesToDb();
         }
 
+        private void ConfigureCustomValueRetrievers()
+        {
+            Service.Instance.ValueRetrievers.Replace<DateTimeValueRetriever, CustomDateTimeValueRetriever>();
+            Service.Instance.ValueRetrievers.Replace<NullableDateTimeValueRetriever, CustomNullableDateTimeValueRetriever>();
+            Service.Instance.ValueRetrievers.Replace<ShortValueRetriever, CustomShortValueRetriever>();
+        }
 
-        [BeforeScenario()]
-        public void InitialiseTestDatabaseData()
+        private void ConfigureCustomValueComparers()
+        {
+            Service.Instance.ValueComparers.Register<CustomShortValueComparer>();
+            Service.Instance.ValueComparers.Register(new CustomDateTimeComparer(new CustomDateTimeValueRetriever()));
+        }
+
+        private void ArrangeTestData()
         {
             TestData.Course = new Course
             {
@@ -37,7 +67,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 Level = 1,
                 Title = "Tester",
                 ReservationRule = new List<Rule>()
-            };         
+            };           
             
             var framework = new Course
             {
@@ -45,6 +75,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 Level = 1,
                 Title = "Tester",
                 ReservationRule = new List<Rule>()
+            };
+            
+            TestData.Account = new Account
+            {
+                Id = AccountId,
+                Name = "Test Account"
+            };
             };   
 
             TestData.AccountLegalEntity = new AccountLegalEntity
@@ -64,59 +101,84 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             };
             
             TestData.UserId = UserId;
+        }
 
-            var dbContext = Services.GetService<ReservationsDataContext>();
-
-            if (dbContext.Courses.Find(TestData.Course.CourseId) == null)
+        private void AddCoursesToDb()
+        {            if (_dbContext.Courses.Find(TestData.Course.CourseId) == null)
             {
-                dbContext.Courses.Add(TestData.Course);
+                _dbContext.Courses.Add(TestData.Course);
             }
 
-            if (dbContext.Courses.Find(framework.CourseId) == null)
+            if (_dbContext.Courses.Find(framework.CourseId) == null)
             {
-                dbContext.Courses.Add(framework);
-            }
+                _dbContext.Courses.Add(framework);
+            }        {
+        }
 
-            var legalEntity = dbContext.AccountLegalEntities.SingleOrDefault(e => e.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
-            
-            if (legalEntity == null)
+        private void AddAccountsToDb()
+        {
+            var accounts = new List<Account>
             {
-                dbContext.AccountLegalEntities.Add(TestData.AccountLegalEntity);
-
-                dbContext.SaveChanges();
-            }
-
-            var anotherAccountLegalEntity = new AccountLegalEntity
-            {
-                AccountId = AccountId + 1,
-                AccountLegalEntityId = AccountLegalEntityId + 100,
-                AccountLegalEntityName = "Pass Mark Corp",
-                AgreementSigned = true
+                TestData.Account,
+                new Account {Id = AccountId + 1, Name = "Account 2 non-levy"},
+                new Account {Id = AccountId + 10, Name = "Account 11 levy", IsLevy = true},
+                new Account {Id = AccountId + 11, Name = "Account 12 levy", IsLevy = true}
             };
 
-            legalEntity = dbContext.AccountLegalEntities.SingleOrDefault(e => e.AccountLegalEntityId.Equals(anotherAccountLegalEntity.AccountLegalEntityId));
-
-            if (legalEntity == null)
+            foreach (var account in accounts)
             {
-                dbContext.AccountLegalEntities.Add(anotherAccountLegalEntity);
+                if(_dbContext.Accounts.Find(account.Id) != null)
+                    continue;
 
-                dbContext.SaveChanges();
-            }
-
-            TestData.Account = new Account
-            {
-                Id = AccountId,
-                Name = "Test Account"
-            };
-
-            var account = dbContext.Accounts.Find(AccountId);
-
-            if (account == null)
-            {
-                dbContext.Accounts.Add(TestData.Account);
-                dbContext.SaveChanges();
+                _dbContext.Accounts.Add(account);
+                _dbContext.SaveChanges();
             }
         }
 
+        private void AddAccountLegalEntitiesToDb()
+        {
+            var accountLegalEntities = new List<AccountLegalEntity>
+            {
+                TestData.AccountLegalEntity,
+                new AccountLegalEntity
+                {
+                    AccountId = AccountId + 1,
+                    AccountLegalEntityId = 2,
+                    AccountLegalEntityName = "ALE 2 - non levy",
+                    AgreementSigned = true
+                },
+                new AccountLegalEntity
+                {
+                    AccountId = AccountId + 10,
+                    AccountLegalEntityId = 10,
+                    AccountLegalEntityName = "ALE 10 - levy",
+                    AgreementSigned = true,
+                },
+                new AccountLegalEntity
+                {
+                    AccountId = AccountId + 11,
+                    AccountLegalEntityId = 20,
+                    AccountLegalEntityName = "ALE 20 - levy",
+                    AgreementSigned = true
+                },
+                new AccountLegalEntity
+                {
+                    AccountId = AccountId + 1,
+                    AccountLegalEntityId = AccountLegalEntityId + 100,
+                    AccountLegalEntityName = "Pass Mark Corp",
+                    AgreementSigned = true
+                }
+            };
+
+            foreach (var accountLegalEntity in accountLegalEntities)
+            {
+                if(_dbContext.AccountLegalEntities.SingleOrDefault(e => 
+                       e.AccountLegalEntityId.Equals(accountLegalEntity.AccountLegalEntityId)) != null)
+                    continue;
+
+                _dbContext.AccountLegalEntities.Add(accountLegalEntity);
+                _dbContext.SaveChanges();
+            }
+        }
     }
 }

@@ -29,7 +29,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             {
                 Id = 1,
                 Name = "Test",
-                IsLevy = true
+                IsLevy = true,
+                ReservationLimit = 3
             };
             
             _legalEntities = new List<Domain.Entities.AccountLegalEntity>
@@ -41,7 +42,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountLegalEntityId = 2,
                     AccountLegalEntityName = "Test",
                     LegalEntityId = 43,
-                    ReservationLimit = 4,
                     AgreementSigned = false,
                     ProviderPermissions = null,
                     Account = account
@@ -53,7 +53,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
                     AccountLegalEntityId = 3,
                     AccountLegalEntityName = "Test 2",
                     LegalEntityId = 54,
-                    ReservationLimit = 4,
                     AgreementSigned = true,
                     ProviderPermissions = null,
                     Account = account
@@ -89,37 +88,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
 
             //Assert
             Assert.IsAssignableFrom<List<AccountLegalEntity>>(actual);
-            Assert.AreEqual(2,actual.Count);
-            actual.Should().BeEquivalentTo(_legalEntities, options => 
-                options.Excluding(p=>p.ProviderPermissions).Excluding(p=>p.Account));
-        }
-
-        [Test]
-        public async Task Then_If_No_Limit_Has_Been_Set_On_The_Number_Of_Reservations_Then_The_Default_Limit_Is_Used()
-        {
-            //Arrange
-            _repository.Setup(x => x.GetByAccountId(ExpectedAccountId)).ReturnsAsync(new List<Domain.Entities.AccountLegalEntity>
-            {
-                new Domain.Entities.AccountLegalEntity
-                {
-                    Id = Guid.NewGuid(),
-                    AccountId = 1,
-                    AccountLegalEntityId = 1,
-                    AccountLegalEntityName = "Test",
-                    LegalEntityId = 4,
-                    ReservationLimit = null,
-                    Account = new Domain.Entities.Account
-                    {
-                        Id = 1
-                    }
-                }
-            });
-
-            //Act
-            var actual = await _service.GetAccountLegalEntities(ExpectedAccountId);
-
-            //Assert
-            Assert.AreEqual(ExpectedReservationLimit,actual.First().ReservationLimit);
+            Assert.AreEqual(2, actual.Count);
+            actual.Should().BeEquivalentTo(_legalEntities, options =>
+                options.Excluding(p => p.ProviderPermissions).Excluding(p => p.Account));
         }
     }
 }

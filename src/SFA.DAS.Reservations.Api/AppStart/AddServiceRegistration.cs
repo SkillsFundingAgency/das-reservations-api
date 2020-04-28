@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SFA.DAS.Reservations.Application.Account.Services;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Services;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
 using SFA.DAS.Reservations.Application.Courses.Services;
 using SFA.DAS.Reservations.Application.ProviderPermissions.Services;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Data.Repository;
+using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Courses;
@@ -28,7 +30,9 @@ namespace SFA.DAS.Reservations.Api.AppStart
             services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
             services.AddTransient<ICourseRepository, CourseRepository>();
             services.AddTransient<IAccountLegalEntitiesRepository, AccountLegalEntityRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IAccountReservationService, AccountReservationService>();
+            services.AddTransient<IAccountsService, AccountsService>();
             services.AddTransient<IRulesService, RulesService>();
             services.AddTransient<ICourseService, CourseService>();
             services.AddTransient<IGlobalRulesService, GlobalRulesService>();
