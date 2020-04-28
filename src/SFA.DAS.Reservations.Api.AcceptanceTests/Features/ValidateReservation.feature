@@ -44,4 +44,14 @@ And I have the following existing reservation:
 When I validate the reservation against the following commitment data:
 | StartDate  | CourseId |
 | 2019-07-01 | 1        |
-Then validation errors are returned 
+Then validation errors are returned
+	
+Scenario: Validate reservation choosing framework
+Given I have a non levy account
+And I have the following existing reservation:
+	| StartDate  | ExpiryDate | CourseId |
+	| 2019-07-01 | 2019-09-30 | 1        |
+When I validate the reservation against the following commitment data:
+	| StartDate  | CourseId |
+	| 2019-08-01 | 1-1-1    |
+Then validation errors are returned

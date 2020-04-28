@@ -37,7 +37,15 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 Level = 1,
                 Title = "Tester",
                 ReservationRule = new List<Rule>()
-            };           
+            };         
+            
+            var framework = new Course
+            {
+                CourseId = "1-1-1",
+                Level = 1,
+                Title = "Tester",
+                ReservationRule = new List<Rule>()
+            };   
 
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
@@ -62,6 +70,11 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             if (dbContext.Courses.Find(TestData.Course.CourseId) == null)
             {
                 dbContext.Courses.Add(TestData.Course);
+            }
+
+            if (dbContext.Courses.Find(framework.CourseId) == null)
+            {
+                dbContext.Courses.Add(framework);
             }
 
             var legalEntity = dbContext.AccountLegalEntities.SingleOrDefault(e => e.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
