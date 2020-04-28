@@ -24,6 +24,9 @@ namespace SFA.DAS.Reservations.Data.Configuration
             builder.Property(x => x.TransferSenderAccountId).HasColumnName(@"TransferSenderAccountId").HasColumnType("bigint");
             builder.Property(x => x.UserId).HasColumnName("UserId").HasColumnType("uniqueidentifier");
             builder.Property(x => x.ClonedReservationId).HasColumnName("ClonedReservationId").HasColumnType("uniqueidentifier");
+            builder.Property(x => x.ConfirmedDate).HasColumnName("ConfirmedDate").HasColumnType("datetime");
+            builder.Property(x => x.CohortId).HasColumnName("CohortId").HasColumnType("bigint");
+            builder.Property(x => x.DraftApprenticeshipId).HasColumnName("DraftApprenticeshipId").HasColumnType("bigint");
 
             builder.HasOne(c => c.Course).WithMany(c => c.Reservations)
                    .HasForeignKey(c => c.CourseId);

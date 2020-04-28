@@ -14,6 +14,9 @@
 	[TransferSenderAccountId] BIGINT NULL,
     [UserId] UNIQUEIDENTIFIER NULL, 
 	[ClonedReservationId] UNIQUEIDENTIFIER NULL,
+    [ConfirmedDate] DATETIME NULL, 
+    [CohortId] BIGINT NULL, 
+    [DraftApprenticeshipId] BIGINT NULL, 
     CONSTRAINT [FK_Reservation_Course] FOREIGN KEY (CourseId) REFERENCES [Course]([CourseId]),
 )
 GO;

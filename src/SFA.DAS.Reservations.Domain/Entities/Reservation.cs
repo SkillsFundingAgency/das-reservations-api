@@ -19,5 +19,8 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public long? TransferSenderAccountId { get; set; }
         public Guid? UserId { get; set; }
         public Guid? ClonedReservationId { get; set; }
+        public DateTime? ConfirmedDate { get; set; }
+        public long? CohortId { get; set; }
+        public long? DraftApprenticeshipId { get; set; }
     }
 }
