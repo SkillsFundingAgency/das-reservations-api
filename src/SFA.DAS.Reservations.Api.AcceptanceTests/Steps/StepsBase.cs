@@ -22,6 +22,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         protected readonly TestResults TestResults;
         protected readonly IServiceProvider Services;
         private readonly ReservationsDataContext _dbContext;
+        public Course Framework;
 
         public StepsBase(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
         {
@@ -69,7 +70,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 ReservationRule = new List<Rule>()
             };           
             
-            var framework = new Course
+            Framework = new Course
             {
                 CourseId = "1-1-1",
                 Level = 1,
@@ -82,8 +83,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 Id = AccountId,
                 Name = "Test Account"
             };
-            };   
-
+           
             TestData.AccountLegalEntity = new AccountLegalEntity
             {
                 AccountId = AccountId,
@@ -104,15 +104,16 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         }
 
         private void AddCoursesToDb()
-        {            if (_dbContext.Courses.Find(TestData.Course.CourseId) == null)
+        {
+            if (_dbContext.Courses.Find(TestData.Course.CourseId) == null)
             {
                 _dbContext.Courses.Add(TestData.Course);
             }
 
-            if (_dbContext.Courses.Find(framework.CourseId) == null)
+            if (_dbContext.Courses.Find(Framework.CourseId) == null)
             {
-                _dbContext.Courses.Add(framework);
-            }        {
+                _dbContext.Courses.Add(Framework);
+            }
         }
 
         private void AddAccountsToDb()
