@@ -7,6 +7,7 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Exceptions;
@@ -352,8 +353,35 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
 
             Assert.IsNotNull(error);
             Assert.AreEqual(nameof(ValidateReservationQuery.CourseCode), error.PropertyName);
+            Assert.AreEqual("Selected course cannot be found", error.Reason);
         }
 
+        [Test]
+        public async Task Then_Will_Return_Error_Messages_If_Course_Is_A_Framework()
+        {
+            //Arrange
+            var request = new ValidateReservationQuery
+            {
+                CourseCode = CourseId,
+                ReservationId = ReservationId,
+                StartDate = _reservation.StartDate.Value
+            };
+
+            var course = new Course("12-34", "Test Course", "1", DateTime.Today);
+
+            _courseService.Setup(s => s.GetCourseById(It.IsAny<string>())).ReturnsAsync(course);
+
+            //Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            var error = result?.Errors.FirstOrDefault();
+
+            Assert.IsNotNull(error);
+            Assert.AreEqual(nameof(ValidateReservationQuery.CourseCode), error.PropertyName);
+            Assert.AreEqual("Select an apprenticeship training course standard", error.Reason);
+        }
+        
         [Test]
         public async Task Then_Will_Not_Cause_A_Validation_Error_On_Start_Date_If_It_Is_A_Change_Reservation()
         {
@@ -378,5 +406,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             Assert.IsNotNull(result);
             Assert.IsEmpty(result.Errors);
         }
+
+
     }
 }
