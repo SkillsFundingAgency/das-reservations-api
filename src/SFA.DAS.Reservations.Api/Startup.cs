@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using SFA.DAS.Reservations.Api.StartupConfig;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
+using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Reservations.Api.AppStart;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Data;
@@ -44,16 +45,21 @@ namespace SFA.DAS.Reservations.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true)
                 .AddJsonFile("appsettings.development.json",true)
-                .AddEnvironmentVariables()
-                .AddAzureTableStorageConfiguration(
-                    configuration["ConfigurationStorageConnectionString"],
-                    configuration["ConfigNames"],
-                    configuration["Environment"],
-                    configuration["Version"]
-                )
-                .Build();
+                .AddEnvironmentVariables();
+                
+            if (!configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            {
+                config.AddAzureTableStorage(options =>
+                    {
+                        options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
+                        options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                        options.EnvironmentName = configuration["Environment"];
+                        options.PreFixConfigurationKeys = false;
+                    }
+                );
+            }
             
-            Configuration = config;
+            Configuration = config.Build();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
