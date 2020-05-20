@@ -49,7 +49,7 @@ Scenario: Change employer, levy to non-levy
 	And I have the following reservations:
 	| Account Legal Entity Id | Provider Id | Start Date | Created Date | Course Id | Status    | Is Levy Account |
 	| 10                      | 15214       | 2019-07-01 | 2019-01-01   | 1         | Confirmed | True            |
-	| 2                       | 15214       | 2019-07-01 | today        | 1         | Change    | False           |
+	| 2                       | 15214       | 2019-07-01 | today        | 1         | Change    | True           |
 	
 Scenario: Change provider
 	Given I have the following existing reservation:

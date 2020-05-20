@@ -151,7 +151,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 newReservation.AccountId = newAccountLegalEntity.AccountId;
                 newReservation.AccountLegalEntityId = newAccountLegalEntity.AccountLegalEntityId;
                 newReservation.AccountLegalEntityName = newAccountLegalEntity.AccountLegalEntityName;
-                newReservation.IsLevyAccount = newAccountLegalEntity.Account.IsLevy;
+                newReservation.IsLevyAccount = newAccountLegalEntity.Account.IsLevy ? newAccountLegalEntity.Account.IsLevy : existingReservation.IsLevyAccount;
             } 
             else if (request.ProviderId.HasValue)
             {

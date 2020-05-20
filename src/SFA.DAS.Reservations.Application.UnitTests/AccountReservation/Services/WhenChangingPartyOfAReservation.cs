@@ -113,6 +113,44 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         {
             request.ProviderId = null;
             existingReservation.Status = (short) ReservationStatus.Change;
+            existingReservation.IsLevyAccount = false;
+            newAccountLegalEntity.Account.IsLevy = true;
+            mockRepository
+                .Setup(repository => repository.GetById(request.ReservationId))
+                .ReturnsAsync(existingReservation);
+            mockAleRepository
+                .Setup(repository => repository.Get(request.AccountLegalEntityId.Value))
+                .ReturnsAsync(newAccountLegalEntity);
+
+            var newReservationId = await service.ChangeOfParty(request);
+
+            newReservationId.Should().NotBeEmpty();
+            mockRepository
+                .Verify(repository => repository.CreateAccountReservation(
+                    It.Is<Domain.Entities.Reservation>(reservation => 
+                        reservation.Id == newReservationId &&
+                        reservation.Status == (short)ReservationStatus.Change &&
+                        reservation.ClonedReservationId == existingReservation.Id &&
+                        reservation.AccountId == newAccountLegalEntity.AccountId &&
+                        reservation.AccountLegalEntityId == newAccountLegalEntity.AccountLegalEntityId &&
+                        reservation.AccountLegalEntityName == newAccountLegalEntity.AccountLegalEntityName &&
+                        reservation.ProviderId == existingReservation.ProviderId &&
+                        reservation.CourseId == existingReservation.CourseId &&
+                        reservation.StartDate == existingReservation.StartDate &&
+                        reservation.ExpiryDate == existingReservation.ExpiryDate &&
+                        reservation.IsLevyAccount == newAccountLegalEntity.Account.IsLevy)));
+        }
+
+        [Test, RecursiveMoqAutoData]
+        public async Task Then_Only_Updates_The_Levy_Flag_If_Going_From_NonLevy_To_Levy(ChangeOfPartyServiceRequest request,
+            Domain.Entities.Reservation existingReservation,
+            Domain.Entities.AccountLegalEntity newAccountLegalEntity,
+            [Frozen] Mock<IReservationRepository> mockRepository,
+            [Frozen] Mock<IAccountLegalEntitiesRepository> mockAleRepository,
+            AccountReservationService service)
+        {
+            request.ProviderId = null;
+            existingReservation.Status = (short) ReservationStatus.Change;
             existingReservation.IsLevyAccount = true;
             newAccountLegalEntity.Account.IsLevy = false;
             mockRepository
@@ -138,7 +176,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                         reservation.CourseId == existingReservation.CourseId &&
                         reservation.StartDate == existingReservation.StartDate &&
                         reservation.ExpiryDate == existingReservation.ExpiryDate &&
-                        reservation.IsLevyAccount == newAccountLegalEntity.Account.IsLevy)));
+                        reservation.IsLevyAccount)));
         }
     }
 }
