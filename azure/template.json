@@ -226,6 +226,9 @@
           "sqlServerName": {
             "value": "[parameters('sharedSqlServerName')]"
           },
+          "elasticPoolName": {
+            "value": "[parameters('elasticPoolName')]"
+          },
           "databaseSkuName": {
             "value": "[parameters('databaseSkuName')]"
           },
