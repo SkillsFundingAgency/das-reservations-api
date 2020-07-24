@@ -50,6 +50,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         private void ConfigureCustomValueRetrievers()
         {
             Service.Instance.ValueRetrievers.Replace<DateTimeValueRetriever, CustomDateTimeValueRetriever>();
+            Service.Instance.ValueRetrievers.Replace<NullableDateTimeValueRetriever, CustomNullableDateTimeValueRetriever>();
             Service.Instance.ValueRetrievers.Replace<ShortValueRetriever, CustomShortValueRetriever>();
         }
 
