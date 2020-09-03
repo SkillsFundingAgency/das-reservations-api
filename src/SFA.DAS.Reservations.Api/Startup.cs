@@ -29,6 +29,7 @@ using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
 using SFA.DAS.UnitOfWork.Mvc.Extensions;
+using SFA.DAS.Courses.Api.AppStart;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -78,7 +79,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));
             
             services.AddHealthChecks()
-                    .AddSqlServer(config.Value.ConnectionString)
+                    .AddSqlServer(config.Value.ConnectionString) //Need to use AddDbDataContext?
                     .AddCheck<QueueHealthCheck>(
                         "ServiceBus Queue Health",
                         HealthStatus.Unhealthy,
@@ -117,18 +118,8 @@ namespace SFA.DAS.Reservations.Api
             services.AddMediatRValidators();
 
             services.AddServiceRegistration(config);
-            
-            if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
-            {
-                services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
-            }
-            else
-            {
-                services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
-            }
 
-            services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
-            services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
+            services.AddDatabaseRegistration(config.Value, Configuration["Environment"]);
 
             services
                 .AddMvc(o =>

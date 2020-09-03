@@ -1,5 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Data.Configuration;
+using SFA.DAS.Reservations.Domain.Configuration;
+using Microsoft.Data.SqlClient;
 
 namespace SFA.DAS.Reservations.Data
 {
@@ -19,6 +23,8 @@ namespace SFA.DAS.Reservations.Data
 
     public partial class ReservationsDataContext : DbContext, IReservationsDataContext
     {
+        private const string AzureResource = "https://database.windows.net/";
+
         public DbSet<Domain.Entities.Course> Courses { get; set; }
         public DbSet<Domain.Entities.Reservation> Reservations { get; set; }
         public DbSet<Domain.Entities.Rule> Rules { get; set; }
@@ -28,16 +34,38 @@ namespace SFA.DAS.Reservations.Data
         public DbSet<Domain.Entities.ProviderPermission> ProviderPermissions { get; set; }
         public DbSet<Domain.Entities.Account> Accounts { get; set; }
 
+        private readonly ReservationsConfiguration _configuration;
+        private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
+
         public ReservationsDataContext()
         {
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+
+        public ReservationsDataContext(IOptions<ReservationsConfiguration> config, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
         {
-            optionsBuilder.UseLazyLoadingProxies();
+            _configuration = config.Value;
+            _azureServiceTokenProvider = azureServiceTokenProvider;
         }
 
         public ReservationsDataContext(DbContextOptions options) :base(options)
         {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
+
+            if (_configuration == null || _azureServiceTokenProvider == null)
+            {
+                return;
+            }
+
+            var connection = new SqlConnection
+            {
+                ConnectionString = _configuration.ConnectionString,
+                AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+            };
+            optionsBuilder.UseSqlServer(connection);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
