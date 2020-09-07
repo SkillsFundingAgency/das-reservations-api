@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));
             
             services.AddHealthChecks()
-                    .AddSqlServer(config.Value.ConnectionString) //Need to use AddDbDataContext?
+                    .AddDbContextCheck<ReservationsDataContext>()
                     .AddCheck<QueueHealthCheck>(
                         "ServiceBus Queue Health",
                         HealthStatus.Unhealthy,
