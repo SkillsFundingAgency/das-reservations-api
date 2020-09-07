@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Data.Configuration;
 using SFA.DAS.Reservations.Domain.Configuration;
-using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 
 namespace SFA.DAS.Reservations.Data
 {
