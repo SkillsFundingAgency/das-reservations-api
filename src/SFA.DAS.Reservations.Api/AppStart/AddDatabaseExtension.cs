@@ -25,7 +25,7 @@ namespace SFA.DAS.Courses.Api.AppStart
                 services.AddDbContext<ReservationsDataContext>(ServiceLifetime.Transient);
             }
 
-            services.AddTransient<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
+            services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
             services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
 
         }
