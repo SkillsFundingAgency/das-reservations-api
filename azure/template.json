@@ -138,13 +138,13 @@
         },
         "parameters": {
           "appServiceName": {
-            "value": "[parameters('sharedBackEndAppServicePlanName')]"
+            "value": "[variables('appServiceName')]"
           },
           "appServicePlanName": {
-            "value": "[parameters('sharedEnvResourceGroup')]"
+            "value": "[parameters('sharedBackEndAppServicePlanName')]"
           },
           "appServicePlanResourceGroup": {
-            "value": "[resourceGroup().name]"
+            "value": "[parameters('sharedEnvResourceGroup')]"
           },
           "appServiceAppSettings": {
             "value": [
