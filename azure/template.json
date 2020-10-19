@@ -8,7 +8,7 @@
     "serviceName": {
       "type": "string"
     },
-    "appServiceAllowedIPs": {
+    "backendAccessRestrictions": {
       "type": "array",
       "defaultValue": []
     },
@@ -21,6 +21,9 @@
     "sharedBackEndAppServicePlanName": {
       "type": "string"
     },
+    "sharedBackEndSubnetResourceId": {
+        "type": "string"
+    },    
     "sharedSqlServerName": {
       "type": "string"
     },
@@ -146,6 +149,9 @@
           "appServicePlanResourceGroup": {
             "value": "[parameters('sharedEnvResourceGroup')]"
           },
+          "subnetResourceId": {
+            "value": "[parameters('sharedBackEndSubnetResourceId')]"
+          },
           "appServiceAppSettings": {
             "value": [
               {
@@ -185,7 +191,7 @@
             "value": "[reference('app-service-certificate').outputs.certificateThumbprint.value]"
           },
           "ipSecurityRestrictions": {
-            "value": "[parameters('appServiceAllowedIPs')]"
+            "value": "[parameters('backendAccessRestrictions')]"
           }
         }
       }
