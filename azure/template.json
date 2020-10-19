@@ -15,6 +15,12 @@
     "environmentName": {
       "type": "string"
     },
+    "resourceGroupLocation": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
     "sharedEnvResourceGroup": {
       "type": "string"
     },
@@ -74,12 +80,6 @@
     },
     "loggingRedisConnectionString": {
       "type": "securestring"
-    },
-    "tags": {
-      "type": "object"
-    },
-    "resourceGroupLocation": {
-      "type": "string"
     }
   },
   "variables": {
