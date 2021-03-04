@@ -87,6 +87,32 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             dbContext.SaveChanges();
         }
 
+        [Given(@"I have reservation before reservation reset date")]
+        public void GivenIHaveAnExistingReservationWithStatusBeforeReservationResetDate()
+        {
+            TestData.ReservationId = Guid.NewGuid();
+
+            var dbContext = Services.GetService<ReservationsDataContext>();
+
+            var reservation = new Domain.Entities.Reservation
+            {
+                AccountId = 1,
+                AccountLegalEntityId = TestData.AccountLegalEntity.AccountLegalEntityId,
+                AccountLegalEntityName = TestData.AccountLegalEntity.AccountLegalEntityName,
+                CourseId = TestData.Course.CourseId,
+                CreatedDate = DateTime.UtcNow.AddMonths(-1),
+                ExpiryDate = DateTime.UtcNow.AddMonths(2),
+                IsLevyAccount = false,
+                Status = (short)ReservationStatus.Completed,
+                StartDate = DateTime.UtcNow.AddMonths(1),
+                Id = TestData.ReservationId,
+                UserId = TestData.UserId
+            };
+
+            dbContext.Reservations.Add(reservation);
+            dbContext.SaveChanges();
+        }
+
         [Given(@"I have the following existing reservation:")]
         public void GivenIHaveTheFollowingExistingReservation(Table table)
         {

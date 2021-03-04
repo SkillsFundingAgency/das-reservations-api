@@ -111,8 +111,9 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             }
 
             var reservations = await _reservationService.GetAccountReservations(accountId);
+            var validReservationAfterReservationResetCount = reservations.Count(c => !c.IsLevyAccount && !c.IsExpired && c.CreatedDate >= _options.ResetReservationDate);
 
-            if (reservations.Count(c => !c.IsLevyAccount && !c.IsExpired) >= maxNumberOfReservations)
+            if (validReservationAfterReservationResetCount >= maxNumberOfReservations)
             {
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {

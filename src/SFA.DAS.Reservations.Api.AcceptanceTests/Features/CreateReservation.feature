@@ -20,6 +20,13 @@ And I have an existing reservation with status Completed
 When I create a reservation for a course with a start month of July
 Then I have 1 reservation 
 
+Scenario: Reservation limit for non levy employers after reservation reset date
+Given I have a non levy account
+And it has a reservation limit of 1
+And I have reservation before reservation reset date
+When I create a reservation for a course with a start month of July
+Then I have 2 reservation 
+
 Scenario: Reservation limit only applies to non levy
 Given I have a non levy account
 And it has a reservation limit of 1

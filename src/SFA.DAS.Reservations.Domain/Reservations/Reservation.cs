@@ -12,13 +12,13 @@ namespace SFA.DAS.Reservations.Domain.Reservations
     {
         public Reservation(Guid id, long accountId, DateTime? startDate, int expiryPeriodInMonths,
             string accountLegalEntityName, string courseId = null, uint? providerId = null,
-            long accountLegalEntityId = 0, bool isLevyAccount = false, long? transferSenderAccountId = null, Guid? userId = null)
+            long accountLegalEntityId = 0, bool isLevyAccount = false, long? transferSenderAccountId = null, Guid? userId = null, DateTime? createdDate = null)
         {
             Id = id;
             AccountId = accountId;
             StartDate = startDate;
             Status = ReservationStatus.Pending;
-            CreatedDate = DateTime.UtcNow;
+            CreatedDate = createdDate.HasValue? createdDate.Value : DateTime.UtcNow;
             ExpiryDate = GetExpiryDateFromStartDate(expiryPeriodInMonths);
             CourseId = courseId;
             ProviderId = providerId;
