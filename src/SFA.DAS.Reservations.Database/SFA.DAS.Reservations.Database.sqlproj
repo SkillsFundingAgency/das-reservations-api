@@ -62,6 +62,7 @@
     <Folder Include="Tables" />
     <Folder Include="Scripts" />
     <Folder Include="Scripts\PostDeployment" />
+    <Folder Include="Scripts\AdhocScripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Course.sql" />
@@ -74,7 +75,7 @@
     <Build Include="Tables\UserRuleNotification.sql" />
     <Build Include="Tables\ProviderPermission.sql" />
     <Build Include="Tables\Account.sql" />
-    <None Include="Scripts\PostDeployment\SetReservationLimitToNull.sql" />
+    <None Include="Scripts\AdhocScripts\SetReservationLimitToNull.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\PostDeployment\ChangeReservationExpiredDateTime.sql" />
