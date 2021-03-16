@@ -116,7 +116,10 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             }
 
             var reservations = await _reservationService.GetAccountReservations(accountId);
-            _logger.LogDebug("Reset reservation date:" + _options.ResetReservationDate.Value.ToString("dd/MM/yyyy"));
+            _logger.LogDebug("Reset reservation date:" +
+                (_options.ResetReservationDate.HasValue 
+                ? _options.ResetReservationDate.Value.ToString("dd/MM/yyyy")
+                : "no reset reservation date set"));
            var validReservationAfterReservationResetCount = reservations.Count(c => !c.IsLevyAccount && !c.IsExpired && c.CreatedDate >= _options.ResetReservationDate);
 
             _logger.LogDebug("validReservationAfterReservationResetCount:" + validReservationAfterReservationResetCount);
