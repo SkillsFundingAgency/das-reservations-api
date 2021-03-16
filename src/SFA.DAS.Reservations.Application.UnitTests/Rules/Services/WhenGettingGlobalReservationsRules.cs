@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -42,7 +43,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _globalRulesService = new GlobalRulesService(_repository.Object, 
                 Mock.Of<IOptions<ReservationsConfiguration>>(), 
                 Mock.Of<IAccountReservationService>(),
-                Mock.Of<IAccountsService>());
+                Mock.Of<IAccountsService>(),
+                Mock.Of<ILogger<GlobalRulesService>>());
         }
 
         [Test]
