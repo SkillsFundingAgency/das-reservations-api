@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
@@ -17,17 +18,21 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
         private readonly IAccountReservationService _reservationService;
         private readonly IAccountsService _accountService;
         private readonly ReservationsConfiguration _options;
+        ILogger<GlobalRulesService> _logger;
 
         public GlobalRulesService(
             IGlobalRuleRepository repository, 
             IOptions<ReservationsConfiguration> options,
             IAccountReservationService reservationService, 
-            IAccountsService accountService)
+            IAccountsService accountService,
+            ILogger<GlobalRulesService> logger
+            )
         {
             _repository = repository;
             _reservationService = reservationService;
             _accountService = accountService;
             _options = options.Value;
+            _logger = logger;
         }
 
         public async Task<IList<GlobalRule>> GetAllRules()
@@ -111,8 +116,14 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             }
 
             var reservations = await _reservationService.GetAccountReservations(accountId);
+            _logger.LogWarning("Reset reservation date:" +
+                (_options.ResetReservationDate.HasValue 
+                ? _options.ResetReservationDate.Value.ToString("dd/MM/yyyy")
+                : "no reset reservation date set"));
+           var validReservationAfterReservationResetCount = reservations.Count(c => !c.IsLevyAccount && !c.IsExpired && c.CreatedDate >= _options.ResetReservationDate);
 
-            if (reservations.Count(c => !c.IsLevyAccount && !c.IsExpired) >= maxNumberOfReservations)
+            _logger.LogWarning("validReservationAfterReservationResetCount:" + validReservationAfterReservationResetCount);
+            if (validReservationAfterReservationResetCount >= maxNumberOfReservations)
             {
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {
