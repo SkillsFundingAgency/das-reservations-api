@@ -33,8 +33,6 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
                     "The following parameters have failed validation", 
                     validationResult.ValidationDictionary.Select(pair => pair.Key).Aggregate((item1, item2) => $"{item1}, {item2}"));
 
-            var accountLegalEntity = await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
-
             var availableDates = _availableDatesService.GetAvailableDates();
             
             return new GetAvailableDatesResult
