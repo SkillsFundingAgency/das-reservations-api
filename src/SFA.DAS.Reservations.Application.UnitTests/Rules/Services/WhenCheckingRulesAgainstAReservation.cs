@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -23,7 +24,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         private Mock<IOptions<ReservationsConfiguration>> _options;
         private Mock<IAccountReservationService> _reservationRepository;
         private Mock<IAccountsService> _accountsService;
-        
+        private ReservationsConfiguration options;
+
         [SetUp]
         public void Arrange()
         {
@@ -43,14 +45,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _reservationRepository.Setup(x => x.GetAccountReservations(It.IsAny<long>()))
                 .ReturnsAsync(new List<Reservation>());
 
+             options = new ReservationsConfiguration { ResetReservationDate = DateTime.MinValue, ExpiryPeriodInMonths = 1 };
             _options = new Mock<IOptions<ReservationsConfiguration>>();
-            _options.Setup(x => x.Value.ExpiryPeriodInMonths).Returns(1);
+            _options.Setup(x => x.Value).Returns(() => options);
 
             _accountsService = new Mock<IAccountsService>();
             _accountsService.Setup(x => x.GetAccount(It.IsAny<long>()))
                 .ReturnsAsync(new Domain.Account.Account(1,false,"",4));
 
-            _globalRulesService = new GlobalRulesService(_repository.Object, _options.Object, _reservationRepository.Object, _accountsService.Object);
+            _globalRulesService = new GlobalRulesService(_repository.Object, _options.Object, _reservationRepository.Object, _accountsService.Object, Mock.Of<ILogger<GlobalRulesService>>());
         }
 
         [Test]
@@ -191,7 +194,61 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Assert.AreEqual(AccountRestriction.Account,actual.Restriction);
             Assert.AreEqual(GlobalRuleType.ReservationLimit, actual.RuleType);
         }
-        
+
+        [Test]
+        public async Task Then_If_The_Max_Number_Of_Non_Levy_Reservations_Has_Been_Met_Before_Reservation_Reset_Date_Then_The_Rule_Is_Not_Returned()
+        {
+            //Arrange
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            var expectedAccountId = 123;
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
+            options.MaxNumberOfReservations = 1;
+            options.ResetReservationDate = DateTime.UtcNow;
+
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Reservation>
+            {new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", isLevyAccount: true, createdDate: DateTime.UtcNow.AddMonths(-1)),
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", createdDate: DateTime.UtcNow.AddMonths(-1)),
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", createdDate: DateTime.UtcNow.AddMonths(-1))
+            }); ;
+
+            _accountsService.Setup(x => x.GetAccount(expectedAccountId)).ReturnsAsync(
+                new Domain.Account.Account(1, false, "test", 2));
+
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
+
+            //Assert
+            Assert.IsNull(actual);
+        }
+
+        [Test]
+        public async Task Then_If_The_Max_Number_Of_Non_Levy_Reservations_Has_Been_Met_After_Reservation_Reset_Date_Then_The_Rule_Is_Returned()
+        {
+            //Arrange
+            _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
+            var expectedAccountId = 123;
+            var reservation = new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 2, "test");
+            options.MaxNumberOfReservations = 1;
+            options.ResetReservationDate = DateTime.UtcNow;
+
+            _reservationRepository.Setup(x => x.GetAccountReservations(expectedAccountId)).ReturnsAsync(new List<Reservation>
+            {new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", isLevyAccount: true, createdDate: DateTime.UtcNow.AddMonths(-1)),
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", createdDate: DateTime.UtcNow.AddMonths(1)),
+                new Reservation(Guid.NewGuid(), expectedAccountId, DateTime.UtcNow, 3, "Name", createdDate: DateTime.UtcNow.AddMonths(1))
+            }); ;
+
+            _accountsService.Setup(x => x.GetAccount(expectedAccountId)).ReturnsAsync(
+                new Domain.Account.Account(1, false, "test", 2));
+
+            //Act
+            var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
+
+            //Assert
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(AccountRestriction.Account, actual.Restriction);
+            Assert.AreEqual(GlobalRuleType.ReservationLimit, actual.RuleType);
+        }
+
         [Test]
         public async Task Then_If_The_Max_Number_Of_Non_Levy_Reservations_Has_Not_Been_Met_Then_Null_Is_Returned()
         {

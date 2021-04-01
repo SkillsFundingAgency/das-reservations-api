@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -17,6 +18,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
     public class WhenCheckingAccountLevelRules
     {
         private Mock<IAccountReservationService> _repository;
+        private Mock<IOptions<ReservationsConfiguration>> _options;
         private GlobalRulesService _globalRulesService;
         private Domain.Entities.GlobalRule _globalRule;
         private Mock<IAccountsService> _accountService;
@@ -42,7 +44,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             _accountService.Setup(x => x.GetAccount(It.IsAny<long>()))
                 .ReturnsAsync(new Domain.Account.Account(ExpectedAccountId, false, "test", 1));
 
-            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), Mock.Of<IOptions<ReservationsConfiguration>>(), _repository.Object, _accountService.Object);
+            ReservationsConfiguration options = new ReservationsConfiguration { ResetReservationDate = DateTime.MinValue };
+            _options = new Mock<IOptions<ReservationsConfiguration>>();
+            _options.Setup(x => x.Value).Returns(options);
+
+            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), _options.Object, _repository.Object, _accountService.Object, Mock.Of<ILogger<GlobalRulesService>>());
         }
 
         [Test]

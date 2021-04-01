@@ -16,5 +16,6 @@ namespace SFA.DAS.Reservations.Domain.Configuration
         public string ElasticSearchUsername { get; set; }
         public string ElasticSearchPassword { get; set; }
         public string ElasticSearchServerUrl { get; set; }
+        public DateTime? ResetReservationDate { get; set; }
     }
 }
