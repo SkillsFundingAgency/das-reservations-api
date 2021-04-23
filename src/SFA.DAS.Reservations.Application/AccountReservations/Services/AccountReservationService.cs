@@ -215,5 +215,18 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 UserId = reservation.UserId
             };
         }
+
+        public async Task<int> GetRemainingReservations(long accountId, int totalReservationAllowed)
+        {
+            var result = await _reservationRepository.GetAccountReservations(accountId);
+
+            var reservations = result
+                .Select(MapReservation)
+                .Where(c => !c.IsLevyAccount)
+                .ToList();
+
+           var usedReservation = reservations.Where(r => r.CreatedDate >= _options.Value.ResetReservationDate).Count();
+            return totalReservationAllowed - usedReservation;
+        }
     }
 }

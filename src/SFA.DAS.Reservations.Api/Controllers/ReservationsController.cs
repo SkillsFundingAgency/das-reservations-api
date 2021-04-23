@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
+using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.BulkValidate;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOfParty;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
@@ -328,5 +330,97 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 });
             }
         }
+
+        [HttpPost]
+        [Route("/api/[controller]/accounts/{accountLegalEntityId}/bulk-validate")]
+        public async Task<IActionResult> BulkValidate([FromRoute]long accountLegalEntityId, [FromBody]IEnumerable<Reservation> bulkReservation)
+        {
+            var requests = bulkReservation.Select(
+               reservation => new BulkValidateRequest
+               {
+                   AccountId = reservation.AccountId,
+                   StartDate = reservation.StartDate,
+                   CourseId = reservation.CourseId,
+                   ProviderId = reservation.ProviderId,
+                   AccountLegalEntityId = reservation.AccountLegalEntityId,
+                   AccountLegalEntityName = reservation.AccountLegalEntityName,
+                   CreatedDate = DateTime.UtcNow,
+                   IsLevyAccount = reservation.IsLevyAccount,
+                   TransferSenderAccountId = reservation.TransferSenderAccountId,
+                   UserId = reservation.UserId
+               }
+            ).ToList();
+
+            var response = await _mediator.Send(new BulkValidateCommand
+            {
+                AccountId = requests.FirstOrDefault()?.AccountId ?? 0,
+                AccountLegalEntityId = accountLegalEntityId,
+                TransferSenderAccountId = 0,
+                Requests = requests
+            });
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("/api/[controller]/accounts/{accountLegalEntityId}/bulk-validate/reservation")]
+        public async Task<IActionResult> BulkValidateForSingleRecord([FromRoute]long accountLegalEntityId, [FromBody]Reservation reservation)
+        {
+            var reservationRequest = new BulkValidateRequest
+            {
+                AccountId = reservation.AccountId,
+                StartDate = reservation.StartDate,
+                CourseId = reservation.CourseId,
+                ProviderId = reservation.ProviderId,
+                AccountLegalEntityId = reservation.AccountLegalEntityId,
+                AccountLegalEntityName = reservation.AccountLegalEntityName,
+                CreatedDate = DateTime.UtcNow,
+                IsLevyAccount = reservation.IsLevyAccount,
+                TransferSenderAccountId = reservation.TransferSenderAccountId,
+                UserId = reservation.UserId
+            };
+            
+
+            var response = await _mediator.Send(new NonLevyReservationRequestCommand
+            {
+                AccountId = reservation.AccountId ,
+                AccountLegalEntityId = accountLegalEntityId,
+                TransferSenderAccountId = 0,
+                Request = reservationRequest
+            });
+
+            return Ok(response);
+        }
+
+        //[HttpGet]
+        //[Route("/api/[controller]/accounts/{accountLegalEntityId}/bulk-validate")]
+        //public async Task<IActionResult> BulkValidate([FromRoute]long accountLegalEntityId, [FromBody]IEnumerable<Reservation> bulkReservation)
+        //{
+        //    var requests = bulkReservation.Select(
+        //       reservation => new BulkValidateRequest
+        //       {
+        //           AccountId = reservation.AccountId,
+        //           StartDate = reservation.StartDate,
+        //           CourseId = reservation.CourseId,
+        //           ProviderId = reservation.ProviderId,
+        //           AccountLegalEntityId = reservation.AccountLegalEntityId,
+        //           AccountLegalEntityName = reservation.AccountLegalEntityName,
+        //           CreatedDate = DateTime.UtcNow,
+        //           IsLevyAccount = reservation.IsLevyAccount,
+        //           TransferSenderAccountId = reservation.TransferSenderAccountId,
+        //           UserId = reservation.UserId
+        //       }
+        //    ).ToList();
+
+        //    var response = await _mediator.Send(new BulkValidateCommand
+        //    {
+        //        AccountId = requests.FirstOrDefault()?.AccountId ?? 0,
+        //        AccountLegalEntityId = accountLegalEntityId,
+        //        TransferSenderAccountId = 0,
+        //        Requests = requests
+        //    });
+
+        //    return Ok(response);
+        //}
     }
 }

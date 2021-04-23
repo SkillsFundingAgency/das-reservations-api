@@ -70,6 +70,27 @@ namespace SFA.DAS.Reservations.Api.Controllers
         }
 
         [HttpGet]
+        [Route("isLevy/{legalEntityId}")]
+        public async Task<IActionResult> IsLevy(long legalEntityId)
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetAccountLegalEntityQuery { Id = legalEntityId });
+
+                return Ok(response.LegalEntity.IsLevy);
+            }
+            catch (ArgumentException e)
+            {
+                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                return BadRequest(new ArgumentErrorViewModel
+                {
+                    Message = e.Message,
+                    Params = e.ParamName
+                });
+            }
+        }
+
+        [HttpGet]
         [Route("/api/accounts/{accountId}/status")]
         public async Task<IActionResult> GetAccountReservationStatus(long accountId, [FromQuery]long? transferSenderId)
         {
