@@ -44,7 +44,7 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
 
             return new GetAccountReservationStatusResponse
             {
-                CanAutoCreateReservations = accountLegalEntities[0].IsLevy,
+                CanAutoCreateReservations = false,//accountLegalEntities[0].IsLevy,
                 AccountLegalEntityAgreementStatus = accountLegalEntities
                     .ToDictionary(key=>key.AccountLegalEntityId, value => value.AgreementSigned)
             };
