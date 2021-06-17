@@ -79,5 +79,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\PostDeployment\ChangeReservationExpiredDateTime.sql" />
+    <None Include="Scripts\AdhocScripts\RemoveReservationLimitFromAccountLegalEntity.sql" />
   </ItemGroup>
 </Project>
