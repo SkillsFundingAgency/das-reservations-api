@@ -20,6 +20,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
         {
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Reservations.Api")
                 .UseInstallers()
+                .UseErrorQueue("SFA.DAS.Reservations.Api-errors")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
@@ -41,7 +42,6 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             {
                 endpointConfiguration.License(configuration["Reservations:NServiceBusLicense"]);
             }
-            
 
             var endpoint = Endpoint.Start(endpointConfiguration).GetAwaiter().GetResult();
 
