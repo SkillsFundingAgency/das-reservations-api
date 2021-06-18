@@ -76,6 +76,7 @@
     <Build Include="Tables\ProviderPermission.sql" />
     <Build Include="Tables\Account.sql" />
     <None Include="Scripts\AdhocScripts\SetReservationLimitToNull.sql" />
+    <Build Include="Scripts\AdhocScripts\RemoveReservationLimitFromAccountLegalEntity.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\PostDeployment\ChangeReservationExpiredDateTime.sql" />
