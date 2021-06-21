@@ -15,12 +15,14 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
     public static class NServiceBusStartUp
     {
+        private const string EndPointName = "SFA.DAS.Reservations.Api";
+
         public static void StartNServiceBus(this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration, bool configurationIsLocalOrDev)
         {
-            var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Reservations.Api")
+            var endpointConfiguration = new EndpointConfiguration(EndPointName)
                 .UseInstallers()
-                .UseErrorQueue("SFA.DAS.Reservations.Api-errors")
+                .UseErrorQueue($"{EndPointName}-errors")
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
