@@ -81,11 +81,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
         {
             //Arrange
             var legalEntityId = 123;
-            var accountLegalEntityId = 6543;
-            var reservationLimit = 4;
+            var accountLegalEntityId = 6543;            
             var agreementSigned = true;
             var isLevy = false;
-            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, ExpectedAccountId, ExpectedAccountLegalEntityName, legalEntityId, accountLegalEntityId,reservationLimit, agreementSigned, isLevy);
+            var accountLegalEntity = new AccountLegalEntity(Guid.Empty, ExpectedAccountId, ExpectedAccountLegalEntityName, legalEntityId, accountLegalEntityId, agreementSigned, isLevy);
             _service.Setup(x => x.GetAccountLegalEntities(ExpectedAccountId)).ReturnsAsync(new List<AccountLegalEntity> { accountLegalEntity });
 
             //Act
@@ -98,8 +97,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             Assert.AreEqual(legalEntityId, actual.AccountLegalEntities[0].LegalEntityId);
             Assert.AreEqual(accountLegalEntityId, actual.AccountLegalEntities[0].AccountLegalEntityId);
             Assert.AreEqual(agreementSigned, actual.AccountLegalEntities[0].AgreementSigned);
-            Assert.AreEqual(isLevy, actual.AccountLegalEntities[0].IsLevy);
-            Assert.AreEqual(reservationLimit, actual.AccountLegalEntities[0].ReservationLimit);
+            Assert.AreEqual(isLevy, actual.AccountLegalEntities[0].IsLevy);            
         }
     }
 }
