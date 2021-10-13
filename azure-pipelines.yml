@@ -25,10 +25,7 @@ jobs:
   workspace:
     clean: all
   steps:
-  - task: gittools.gitversion-preview.gitversion-task.GitVersion@5
-    displayName: GitVersion
-    inputs:
-      updateAssemblyInfo: true
+  - template: azure-pipelines-templates/build/step/gitversion.yml@das-platform-building-blocks
 
   - task: DotNetCoreCLI@2
     displayName: Restore
