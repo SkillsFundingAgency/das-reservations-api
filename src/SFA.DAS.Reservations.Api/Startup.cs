@@ -117,18 +117,8 @@ namespace SFA.DAS.Reservations.Api
             services.AddMediatRValidators();
 
             services.AddServiceRegistration(config);
-            
-            if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
-            {
-                services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
-            }
-            else
-            {
-                services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
-            }
 
-            services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
-            services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
+            services.AddDatabaseRegistration(config.Value, Configuration["Environment"]);
 
             services
                 .AddMvc(o =>
