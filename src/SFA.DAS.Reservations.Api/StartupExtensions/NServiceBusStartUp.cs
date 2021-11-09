@@ -1,4 +1,6 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.Common;
+using System.Data.SqlClient;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
@@ -16,6 +18,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
     public static class NServiceBusStartUp
     {
         private const string EndPointName = "SFA.DAS.Reservations.Api";
+        private const string AzureResource = "https://database.windows.net/";
 
         public static void StartNServiceBus(this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration, bool configurationIsLocalOrDev)
@@ -26,8 +29,8 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
-                .UseServicesBuilder(serviceProvider)
-                .UseSqlServerPersistence(() => new SqlConnection(configuration["Reservations:ConnectionString"]))
+                .UseServicesBuilder(serviceProvider)                
+                .UseSqlServerPersistence(() => GetConnectionString(configurationIsLocalOrDev, configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
 
             if (configurationIsLocalOrDev)
@@ -50,6 +53,19 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             serviceProvider.AddSingleton(p => endpoint)
                 .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
                 .AddHostedService<NServiceBusHostedService>();
+        }
+
+        private static DbConnection GetConnectionString(bool configurationIsLocalOrDev, string connectionString)
+        {
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+
+            return configurationIsLocalOrDev
+                ? new SqlConnection(connectionString)
+                : new SqlConnection
+                {
+                    ConnectionString = connectionString,
+                    AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+                };
         }
     }
 }
