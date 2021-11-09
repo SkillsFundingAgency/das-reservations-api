@@ -132,7 +132,7 @@ namespace SFA.DAS.Reservations.Api
             if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 services
-                    .AddEntityFramework()
+                    //.AddEntityFramework()
                     .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
                     .AddNServiceBusClientUnitOfWork();
             }
