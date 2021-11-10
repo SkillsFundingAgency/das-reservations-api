@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .AddHostedService<NServiceBusHostedService>();
         }
 
-        private static DbConnection GetConnectionString(bool configurationIsLocalOrDev, string connectionString)
+        public static DbConnection GetConnectionString(bool configurationIsLocalOrDev, string connectionString)
         {
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
 
