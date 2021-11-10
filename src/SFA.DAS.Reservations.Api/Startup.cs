@@ -75,12 +75,9 @@ namespace SFA.DAS.Reservations.Api
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
 
             services.AddElasticSearch(config.Value);
-            services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));
+            services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));           
 
-            var miConfig = NServiceBusStartUp.GetConnectionString(ConfigurationIsLocalOrDev(), config.Value.ConnectionString);
-
-            services.AddHealthChecks()
-                    .AddSqlServer(miConfig.ConnectionString)
+            services.AddHealthChecks()                    
                     .AddCheck<QueueHealthCheck>(
                         "ServiceBus Queue Health",
                         HealthStatus.Unhealthy,
