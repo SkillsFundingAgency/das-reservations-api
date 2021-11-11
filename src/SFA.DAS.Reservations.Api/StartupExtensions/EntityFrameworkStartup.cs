@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NServiceBus.Persistence;
 using SFA.DAS.NServiceBus.SqlServer.Data;
+using SFA.DAS.Reservations.Api.AppStart;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.UnitOfWork.Context;
@@ -28,7 +29,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 }
                 catch (KeyNotFoundException)
                 {
-                    var connection = NServiceBusStartUp.GetConnectionString(configurationIsLocalOrDev, config.Value.ConnectionString);
+                    var connection = AddDatabaseExtension.GetConnectionString(configurationIsLocalOrDev, config.Value.ConnectionString);
                     var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(connection);
                     dbContext = new ReservationsDataContext(optionsBuilder.Options);
                 }

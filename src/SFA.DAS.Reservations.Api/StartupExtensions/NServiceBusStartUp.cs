@@ -1,7 +1,4 @@
-﻿using System.Data.Common;
-using System.Data.SqlClient;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
@@ -11,14 +8,14 @@ using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
+using SFA.DAS.Reservations.Api.AppStart;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 
 namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
     public static class NServiceBusStartUp
     {
-        private const string EndPointName = "SFA.DAS.Reservations.Api";
-        private const string AzureResource = "https://database.windows.net/";
+        private const string EndPointName = "SFA.DAS.Reservations.Api";       
 
         public static void StartNServiceBus(this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration, bool configurationIsLocalOrDev)
@@ -30,7 +27,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
                 .UseServicesBuilder(serviceProvider)                
-                .UseSqlServerPersistence(() => GetConnectionString(configurationIsLocalOrDev, configuration["Reservations:ConnectionString"]))
+                .UseSqlServerPersistence(() => AddDatabaseExtension.GetConnectionString(configurationIsLocalOrDev, configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
 
             if (configurationIsLocalOrDev)
@@ -53,19 +50,6 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             serviceProvider.AddSingleton(p => endpoint)
                 .AddSingleton<IMessageSession>(p => p.GetService<IEndpointInstance>())
                 .AddHostedService<NServiceBusHostedService>();
-        }
-
-        public static DbConnection GetConnectionString(bool configurationIsLocalOrDev, string connectionString)
-        {
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-
-            return configurationIsLocalOrDev
-                ? new SqlConnection(connectionString)
-                : new SqlConnection
-                {
-                    ConnectionString = connectionString,
-                    AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
-                };
         }
     }
 }
