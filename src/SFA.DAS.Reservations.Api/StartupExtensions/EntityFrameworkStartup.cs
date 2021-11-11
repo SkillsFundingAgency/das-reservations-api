@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NServiceBus.Persistence;
 using SFA.DAS.NServiceBus.SqlServer.Data;
 using SFA.DAS.Reservations.Data;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.UnitOfWork.Context;
 using System.Collections.Generic;
 
@@ -10,7 +12,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
     public static class EntityFrameworkStartup
     {
-        public static IServiceCollection AddEntityFramework(this IServiceCollection services, Microsoft.Extensions.Options.IOptions<Domain.Configuration.ReservationsConfiguration> config)
+        public static IServiceCollection AddEntityFramework(this IServiceCollection services, bool configurationIsLocalOrDev, IOptions<ReservationsConfiguration> config)
         {
             return services.AddScoped(p =>
             {
@@ -26,7 +28,8 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 }
                 catch (KeyNotFoundException)
                 {
-                    var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(config.Value.ConnectionString);
+                    var connection = NServiceBusStartUp.GetConnectionString(configurationIsLocalOrDev, config.Value.ConnectionString);
+                    var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(connection);
                     dbContext = new ReservationsDataContext(optionsBuilder.Options);
                 }
 
