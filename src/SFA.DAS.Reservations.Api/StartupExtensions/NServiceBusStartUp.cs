@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
     public static class NServiceBusStartUp
     {
-        private const string EndPointName = "SFA.DAS.Reservations.Api";       
+        private const string EndPointName = "SFA.DAS.Reservations.Api";
 
         public static void StartNServiceBus(this UpdateableServiceProvider serviceProvider,
             IConfiguration configuration, bool configurationIsLocalOrDev)
@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
-                .UseServicesBuilder(serviceProvider)                
+                .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => AddDatabaseExtension.GetConnectionString(configurationIsLocalOrDev, configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
 
