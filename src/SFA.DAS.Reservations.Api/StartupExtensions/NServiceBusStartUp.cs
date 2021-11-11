@@ -29,7 +29,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseMessageConventions()
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
-                .UseServicesBuilder(serviceProvider)                
+                .UseServicesBuilder(serviceProvider)
                 .UseSqlServerPersistence(() => GetConnectionString(configurationIsLocalOrDev, configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
 
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .AddHostedService<NServiceBusHostedService>();
         }
 
-        public static DbConnection GetConnectionString(bool configurationIsLocalOrDev, string connectionString)
+        private static DbConnection GetConnectionString(bool configurationIsLocalOrDev, string connectionString)
         {
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
 
