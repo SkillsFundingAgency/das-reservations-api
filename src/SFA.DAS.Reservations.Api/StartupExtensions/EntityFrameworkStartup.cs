@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NServiceBus.Persistence;
@@ -18,18 +19,19 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             return services.AddScoped(p =>
             {
                 var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 ReservationsDataContext dbContext;
                 try
                 {                    
                     var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
                     var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
-                    var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(sqlStorageSession.Connection);
-                    dbContext = new ReservationsDataContext(optionsBuilder.Options);
+                    var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(sqlStorageSession.Connection);                    
+                    dbContext = new ReservationsDataContext(sqlStorageSession.Connection, config, optionsBuilder.Options, azureServiceTokenProvider, configurationIsLocalOrDev);
                     dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
                 }
                 catch (KeyNotFoundException)
                 {
-                    var connection = AddDatabaseExtension.GetConnectionString(configurationIsLocalOrDev, config.Value.ConnectionString);
+                    var connection = AddDatabaseExtension.GetSqlConnection(configurationIsLocalOrDev, config.Value.ConnectionString);
                     var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(connection);
                     dbContext = new ReservationsDataContext(optionsBuilder.Options);
                 }
