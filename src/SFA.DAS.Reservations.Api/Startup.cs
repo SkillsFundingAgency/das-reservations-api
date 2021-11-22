@@ -76,9 +76,9 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddElasticSearch(config.Value);
             services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));
-            
+
+            services.AddHealthChecks().AddDbContextCheck<ReservationsDataContext>();
             services.AddHealthChecks()
-                    .AddSqlServer(config.Value.ConnectionString)
                     .AddCheck<QueueHealthCheck>(
                         "ServiceBus Queue Health",
                         HealthStatus.Unhealthy,
@@ -142,7 +142,7 @@ namespace SFA.DAS.Reservations.Api
             if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 services
-                    .AddEntityFramework()
+                    .AddEntityFramework(ConfigurationIsLocalOrDev(), config)
                     .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
                     .AddNServiceBusClientUnitOfWork();
             }
@@ -158,8 +158,6 @@ namespace SFA.DAS.Reservations.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReservationsAPI", Version = "v1" });
             });
-
-
         }
 
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
