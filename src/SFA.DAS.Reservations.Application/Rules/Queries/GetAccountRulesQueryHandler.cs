@@ -32,6 +32,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
             var globalRuleResult = await _globalRulesService.GetActiveRules(DateTime.UtcNow);
 
             result.AddRange(globalRuleResult);
+            result = result.Where(r => r?.Exceptions == null || r.Exceptions.All(e => e != request.AccountId)).ToList();
 
             return new GetAccountRulesResult
             {
