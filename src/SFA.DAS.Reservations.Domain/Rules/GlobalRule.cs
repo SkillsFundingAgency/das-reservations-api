@@ -8,6 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
     {
         public long Id { get; }
         public DateTime? ActiveFrom { get; }
+        public DateTime? ActiveTo { get; }
         public GlobalRuleType RuleType { get; }
         public AccountRestriction Restriction { get; }
         public string RuleTypeText => Enum.GetName(typeof(GlobalRuleType), RuleType);
@@ -18,6 +19,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
         {
             Id = globalRule.Id;
             ActiveFrom = globalRule.ActiveFrom;
+            ActiveTo = globalRule.ActiveTo;
             RuleType = (GlobalRuleType)globalRule.RuleType;
             Restriction = (AccountRestriction) globalRule.Restriction;
             UserRuleAcknowledgements = globalRule.UserRuleNotifications?.Select(notification => new UserRuleAcknowledgement(notification));

@@ -71,6 +71,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             Assert.IsNotNull(actualRule);
             Assert.AreEqual(_globalRule.Id, actualRule.Id);
             Assert.AreEqual(_globalRule.ActiveFrom, actualRule.ActiveFrom);
+            Assert.AreEqual(_globalRule.ActiveTo, actualRule.ActiveTo);
             Assert.AreEqual(_globalRule.RuleType, (byte)actualRule.RuleType);
             Assert.AreEqual(_globalRule.Restriction, (byte)actualRule.Restriction);
         }
