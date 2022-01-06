@@ -279,12 +279,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         {
             //Arrange
             _repository.Setup(x => x.FindActive(It.IsAny<DateTime>())).ReturnsAsync(new List<GlobalRule>());
-            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns(0);
+            _options.Setup(x => x.Value.MaxNumberOfReservations).Returns((int?)null);
 
             var expectedAccountId = 123;
 
             _accountsService.Setup(x => x.GetAccount(expectedAccountId)).ReturnsAsync(
-                new Domain.Account.Account(1, false, "test", 0));
+                new Domain.Account.Account(1, false, "test", null));
             var existingReservations = new List<Reservation>();
             for (var i = 0; i<5;i++)
             {
