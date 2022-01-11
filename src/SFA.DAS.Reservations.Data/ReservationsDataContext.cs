@@ -21,6 +21,7 @@ namespace SFA.DAS.Reservations.Data
         DbSet<Domain.Entities.UserRuleNotification> UserRuleNotifications { get; set; }
         DbSet<Domain.Entities.ProviderPermission> ProviderPermissions { get; set; }
         DbSet<Domain.Entities.Account> Accounts { get; set; }
+        DbSet<Domain.Entities.GlobalRuleAccountExemption> GlobalRulesAccountExemption { get; set; }
 
         int SaveChanges();
     }
@@ -38,6 +39,7 @@ namespace SFA.DAS.Reservations.Data
         public DbSet<Domain.Entities.UserRuleNotification> UserRuleNotifications { get; set; }
         public DbSet<Domain.Entities.ProviderPermission> ProviderPermissions { get; set; }
         public DbSet<Domain.Entities.Account> Accounts { get; set; }
+        public DbSet<Domain.Entities.GlobalRuleAccountExemption> GlobalRulesAccountExemption { get; set; }
 
         private readonly ReservationsConfiguration _configuration;
         private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
@@ -101,6 +103,7 @@ namespace SFA.DAS.Reservations.Data
             modelBuilder.ApplyConfiguration(new UserRuleNotification());
             modelBuilder.ApplyConfiguration(new ProviderPermission());
             modelBuilder.ApplyConfiguration(new Account());
+            modelBuilder.ApplyConfiguration(new GlobalRuleAccountExemption());
 
             base.OnModelCreating(modelBuilder);
         }
