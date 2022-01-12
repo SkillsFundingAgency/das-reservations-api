@@ -14,6 +14,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
         public string RuleTypeText => Enum.GetName(typeof(GlobalRuleType), RuleType);
         public string RestrictionText => Enum.GetName(typeof(AccountRestriction), Restriction);
         public IEnumerable<UserRuleAcknowledgement> UserRuleAcknowledgements { get; }
+        public IEnumerable<GlobalRuleAccountExemption> GlobalRuleAccountExemptions { get; }
 
         public GlobalRule(Entities.GlobalRule globalRule)
         {
@@ -23,6 +24,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
             RuleType = (GlobalRuleType)globalRule.RuleType;
             Restriction = (AccountRestriction) globalRule.Restriction;
             UserRuleAcknowledgements = globalRule.UserRuleNotifications?.Select(notification => new UserRuleAcknowledgement(notification));
+            GlobalRuleAccountExemptions = globalRule.GlobalRuleAccountExemptions?.Select(accountExemption => new GlobalRuleAccountExemption(accountExemption));
         }
     }
 }

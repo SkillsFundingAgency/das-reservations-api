@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Data.Configuration
 
             builder.HasOne(c => c.GlobalRule)
                 .WithMany(c => c.GlobalRuleAccountExemptions)
-                .HasForeignKey(c => c.AccountId)
+                .HasForeignKey(c => c.GlobalRuleId)
                 .HasPrincipalKey(c => c.Id);
         }
     }
