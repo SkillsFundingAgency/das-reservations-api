@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
 
             result.AddRange(globalRuleResult);
 
-            result = result.Where(r => !r?.GlobalRuleAccountExemptions?.Any(exemption => exemption.AccountId == request.AccountId) ?? false).ToList();
+            result = result.Where(r => r == null || !r.GlobalRuleAccountExemptions.Any(exemption => exemption.AccountId == request.AccountId)).ToList();
 
             return new GetAccountRulesResult
             {

@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
             RuleType = (GlobalRuleType)globalRule.RuleType;
             Restriction = (AccountRestriction) globalRule.Restriction;
             UserRuleAcknowledgements = globalRule.UserRuleNotifications?.Select(notification => new UserRuleAcknowledgement(notification));
-            GlobalRuleAccountExemptions = globalRule.GlobalRuleAccountExemptions?.Select(accountExemption => new GlobalRuleAccountExemption(accountExemption));
+            GlobalRuleAccountExemptions = globalRule.GlobalRuleAccountExemptions?.Select(accountExemption => new GlobalRuleAccountExemption(accountExemption)) ?? new List<GlobalRuleAccountExemption>();
         }
     }
 }
