@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             return await _context.GlobalRules
                 .Include(x => x.GlobalRuleAccountExemptions)
-                .Where(c => dateFrom >= c.ActiveFrom && (c.ActiveTo == null || dateFrom <= c.ActiveTo)).ToListAsync();
+                .Where(c => dateFrom >= c.ActiveFrom && (c.ActiveTo == null || dateFrom < c.ActiveTo)).ToListAsync();
         }
     }
 }
