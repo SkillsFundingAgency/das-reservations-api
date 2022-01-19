@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             var resultsList = await _repository.FindActive(request.CreatedDate);
 
             resultsList = resultsList
-                .Where(r => r.RuleType != (byte)GlobalRuleType.DynamicPause || r.ActiveTo < request.StartDate)
+                .Where(r => r.RuleType != (byte)GlobalRuleType.DynamicPause || r.ActiveTo > request.StartDate)
                 .Where(r => !r.GlobalRuleAccountExemptions?.Any(e => e.AccountId == request.AccountId) ?? true)
                 .ToList();
 
