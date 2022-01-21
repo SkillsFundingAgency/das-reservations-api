@@ -24,7 +24,8 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<ICollection<GlobalRule>> FindActive(DateTime dateFrom)
         {
-            return await _context.GlobalRules.Where(c => dateFrom >= c.ActiveFrom).ToListAsync();
+            return await _context.GlobalRules
+                .Where(c => dateFrom >= c.ActiveFrom && (c.ActiveTo == null || dateFrom < c.ActiveTo)).ToListAsync();
         }
     }
 }
