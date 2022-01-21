@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public byte Restriction { get; set; }
         public byte RuleType { get; set; }
         public virtual IEnumerable<UserRuleNotification> UserRuleNotifications { get; set; }
+        public virtual ICollection<GlobalRuleAccountExemption> GlobalRuleAccountExemptions { get; set; }
     }
 }

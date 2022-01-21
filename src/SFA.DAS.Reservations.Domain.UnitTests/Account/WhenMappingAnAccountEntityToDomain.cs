@@ -1,4 +1,3 @@
-using AutoFixture.NUnit3;
 using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Testing.AutoFixture;
@@ -19,7 +18,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Account
                 .BeEquivalentTo(accountEntity, 
                     options=>options
                         .Excluding(c=>c.ProviderPermissions)
-                        .Excluding(c=>c.AccountLegalEntities));
+                        .Excluding(c=>c.AccountLegalEntities)
+                        .Excluding(c=>c.GlobalRuleAccountExemptions));
         }
 
         [Test, RecursiveMoqAutoData]

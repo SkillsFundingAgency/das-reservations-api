@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="bf5e7c68-81ae-459f-baaf-e8ee37b94249" ChangeDateTime="01/11/2022 14:57:24">
+    <Property Name="ElementName" Value="[dbo].[GlobalRuleAccountExemption].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[GlobalRuleAccountExemption]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="GlobalRuleId" />
+  </Operation>
+</Operations>
