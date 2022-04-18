@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
@@ -7,10 +8,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNoneLevy;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOfParty;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
+using SFA.DAS.Reservations.Application.BulkUpload.Queries;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
@@ -31,6 +34,19 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             _logger = logger;
             _mediator = mediator;
+        }
+
+        [HttpPost]
+        [ProducesResponseType(400)]
+        [Route("api/[controller]/accounts/Bulk-Create")]
+        public async Task<IActionResult> BulkCreate(BulkCreateReservationsWithNonLevyRequest request)
+        {
+            var response = await _mediator.Send(new BulkCreateReservationsWithNoneLevyCommand
+            {
+                Reservations = request.Reservations
+            });
+
+            return Ok(response);
         }
 
         [HttpGet]
@@ -104,6 +120,8 @@ namespace SFA.DAS.Reservations.Api.Controllers
                 });
             }
         }
+
+       
 
         [HttpGet]
         [ProducesResponseType(400)]
@@ -327,6 +345,30 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Message = notFoundException.Message
                 });
             }
+        }
+
+        [HttpPost]
+        [Route("/api/[controller]/accounts/bulk-validate")]
+        public async Task<IActionResult> BulkValidate([FromBody] IEnumerable<BulkValidateReservationRequest> bulkReservation)
+        {
+            var requests = bulkReservation.Select(
+               reservation => new BulkValidateRequest
+               {
+                   StartDate = reservation.StartDate,
+                   CourseId = reservation.CourseId,
+                   ProviderId = reservation.ProviderId,
+                   AccountLegalEntityId = reservation.AccountLegalEntityId,
+                   TransferSenderAccountId = reservation.TransferSenderAccountId,
+                   UserId = reservation.UserId
+               }
+            ).ToList();
+
+            var response = await _mediator.Send(new BulkValidateCommand
+            {
+                 Requests = requests
+            });
+
+            return Ok(response);
         }
     }
 }
