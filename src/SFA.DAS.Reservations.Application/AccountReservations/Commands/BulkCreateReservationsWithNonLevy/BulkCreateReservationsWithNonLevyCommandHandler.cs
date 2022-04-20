@@ -6,9 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNoneLevy
+namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy
 {
-    public class BulkCreateReservationsWithNonLevyCommandHandler : IRequestHandler<BulkCreateReservationsWithNoneLevyCommand, BulkCreateReservationsWithNoneLevyResult>
+    public class BulkCreateReservationsWithNonLevyCommandHandler : IRequestHandler<BulkCreateReservationsWithNonLevyCommand, BulkCreateReservationsWithNonLevyResult>
     {
         private readonly IMediator _mediator;
 
@@ -17,9 +17,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             _mediator = mediator;
         }
 
-        public async Task<BulkCreateReservationsWithNoneLevyResult> Handle(BulkCreateReservationsWithNoneLevyCommand request, CancellationToken cancellationToken)
+        public async Task<BulkCreateReservationsWithNonLevyResult> Handle(BulkCreateReservationsWithNonLevyCommand request, CancellationToken cancellationToken)
         {
-            var result = new BulkCreateReservationsWithNoneLevyResult();
+            var result = new BulkCreateReservationsWithNonLevyResult();
             var levyAccounts = request.Reservations.Where(x => x.IsLevyAccount).ToList();
             var nonLevyAccounts = request.Reservations.Where(x => !x.IsLevyAccount).ToList();
 

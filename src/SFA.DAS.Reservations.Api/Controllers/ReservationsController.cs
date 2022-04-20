@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
-using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNoneLevy;
+using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOfParty;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
@@ -41,7 +41,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [Route("api/[controller]/accounts/Bulk-Create")]
         public async Task<IActionResult> BulkCreate(BulkCreateReservationsWithNonLevyRequest request)
         {
-            var response = await _mediator.Send(new BulkCreateReservationsWithNoneLevyCommand
+            var response = await _mediator.Send(new BulkCreateReservationsWithNonLevyCommand
             {
                 Reservations = request.Reservations
             });

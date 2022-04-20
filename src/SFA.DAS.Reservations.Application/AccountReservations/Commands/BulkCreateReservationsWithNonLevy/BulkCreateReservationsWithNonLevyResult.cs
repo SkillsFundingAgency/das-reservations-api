@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNoneLevy
+namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy
 {
-    public class BulkCreateReservationsWithNoneLevyResult
+    public class BulkCreateReservationsWithNonLevyResult
     {
         public List<BulkCreateReservationResult> BulkCreateResults { get; set; } = new List<BulkCreateReservationResult>();
     }

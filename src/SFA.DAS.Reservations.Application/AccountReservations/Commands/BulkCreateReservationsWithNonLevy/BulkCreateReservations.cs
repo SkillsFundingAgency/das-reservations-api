@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNoneLevy
+namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy
 {
     public class BulkCreateReservations
     {

@@ -1,4 +1,4 @@
-﻿using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNoneLevy;
+﻿using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy;
 using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Api.Models

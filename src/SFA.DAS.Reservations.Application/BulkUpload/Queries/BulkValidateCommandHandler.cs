@@ -4,13 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
-using SFA.DAS.UnitOfWork.Context;
 
 namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 {
@@ -128,7 +126,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
         {
             var availableStartDates = await _mediator.Send(new GetAvailableDatesQuery { AccountLegalEntityId = accountLegalEntityId });
             var accountFundingRules = (await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId }));
-            var activeRule = accountFundingRules.GlobalRules.Where(r => r != null).OrderBy(x => x.ActiveFrom).FirstOrDefault();
+            var activeRule = accountFundingRules?.GlobalRules?.Where(r => r != null).OrderBy(x => x.ActiveFrom).FirstOrDefault();
 
             // This covers dynamic pause as well.
             var possibleDates = activeRule == null
@@ -137,7 +135,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
             if (startDate.Value < possibleDates.Min())
             {
-                return $@"The start for this learner cannot be before {possibleDates.Max():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.";
+                return $@"The start for this learner cannot be before {possibleDates.Min():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.";
             }
 
             else if(startDate.Value > possibleDates.Max())
@@ -151,17 +149,10 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             return null;
         }
 
-        private async Task<bool> ValidateCourse(string courseId)
-        {
-            var response = await _mediator.Send(new GetCoursesQuery());
-
-            return (response.Courses.Any(x => x.CourseId == courseId));
-        }
-
         private async Task<bool> FailedAccountRuleValidation(long accountId)
         {
             var accountFundingRulesApiResponse = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
-            if (accountFundingRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit))
+            if (accountFundingRulesApiResponse?.GlobalRules?.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) ?? false)
             {
                 return true;
             }
@@ -172,7 +163,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
         private async Task<bool> FailedGlobalRuleValidation()
         {
             var globalRulesApiResponse = await _mediator.Send(new GetRulesQuery());
-            if (globalRulesApiResponse.GlobalRules != null
+            if (globalRulesApiResponse?.GlobalRules != null
                  && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom))
             {
                 return true;
