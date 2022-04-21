@@ -96,7 +96,7 @@ namespace SFA.DAS.Reservations.Api
                 {
                     o.AddPolicy("default", policy =>
                     {
-                        policy.RequireRole = "Default"
+                        policy.RequireRole("Default");
                         policy.RequireAuthenticatedUser();
                     });
                 });
@@ -107,11 +107,7 @@ namespace SFA.DAS.Reservations.Api
                             $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
                         auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                         {
-                            ValidAudiences = new List<string>
-                            {
-                                azureActiveDirectoryConfiguration.Value.Identifier,
-                                azureActiveDirectoryConfiguration.Value.Id
-                            }
+                            ValidAudiences = azureActiveDirectoryConfiguration.Value.Identifier.Split(",")
                         };
                     });
                 services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
