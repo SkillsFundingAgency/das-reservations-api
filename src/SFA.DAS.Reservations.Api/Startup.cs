@@ -44,9 +44,9 @@ namespace SFA.DAS.Reservations.Api
                 .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true)
-                .AddJsonFile("appsettings.development.json",true)
+                .AddJsonFile("appsettings.development.json", true)
                 .AddEnvironmentVariables();
-                
+
             if (!configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 config.AddAzureTableStorage(options =>
@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Api
                     }
                 );
             }
-            
+
             Configuration = config.Build();
         }
 
@@ -70,7 +70,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
             services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
             services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
-            
+
             var serviceProvider = services.BuildServiceProvider();
             var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
 
@@ -82,11 +82,11 @@ namespace SFA.DAS.Reservations.Api
                     .AddCheck<QueueHealthCheck>(
                         "ServiceBus Queue Health",
                         HealthStatus.Unhealthy,
-                        new []{"ready"})
+                        new[] { "ready" })
                     .AddCheck<ElasticSearchHealthCheck>(
                         "Elastic Search Health",
                         HealthStatus.Unhealthy,
-                        new []{"ready"});
+                        new[] { "ready" });
 
             if (!ConfigurationIsLocalOrDev())
             {
@@ -94,7 +94,11 @@ namespace SFA.DAS.Reservations.Api
                     serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
                 services.AddAuthorization(o =>
                 {
-                    o.AddPolicy("default", policy => { policy.RequireAuthenticatedUser(); });
+                    o.AddPolicy("default", policy =>
+                    {
+                        policy.RequireRole = "Default"
+                        policy.RequireAuthenticatedUser();
+                    });
                 });
                 services.AddAuthentication(auth => { auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
                     .AddJwtBearer(auth =>
@@ -117,7 +121,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddMediatRValidators();
 
             services.AddServiceRegistration(config);
-            
+
             if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
@@ -183,7 +187,7 @@ namespace SFA.DAS.Reservations.Api
 
             app.UseUnitOfWork();
             app.UseHealthChecks();
-            
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
