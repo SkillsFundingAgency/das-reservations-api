@@ -40,5 +40,18 @@ namespace SFA.DAS.Reservations.Data.Repository
                 throw new EntityNotFoundException<AccountLegalEntity>(e);
             }
         }
+
+        public async Task<AccountLegalEntity> GetByLegalEntityId(long legalEntityId)
+        {
+            try
+            {
+                return await _reservationsDataContext.AccountLegalEntities
+                    .SingleAsync(entity => entity.LegalEntityId == legalEntityId);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new EntityNotFoundException<AccountLegalEntity>(e);
+            }
+        }
     }
 }

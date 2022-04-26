@@ -39,52 +39,56 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             var result = new BulkValidationResults();
             result.ValidationErrors = new List<BulkValidation>();
 
-            var groups = bulkRequest.Requests.GroupBy(x => x.AccountLegalEntityId);
+            // Only run validation for valid agreement ids - which have values.
+            var validAgreementIds = bulkRequest.Requests.Where(x => x.AccountLegalEntityId.HasValue);
+
+            var groups = validAgreementIds.GroupBy(x => x.AccountLegalEntityId.Value);
 
             foreach (var group in groups)
             {
                 AccountLegalEntity accountLegalEntity = await GetAccountLegalEntity(group.Key);
-                if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy)
+                if (accountLegalEntity != null)
                 {
-                    if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
+                    if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy)
                     {
-                        result.ValidationErrors.Add(new BulkValidation { Reason = $"The employer has reached their reservations limit. Contact the employer.", RowNumber = group.First().RowNumber });
-                    }
-                    else if (await FailedGlobalRuleValidation())
-                    {
-                        result.ValidationErrors.Add(new BulkValidation { Reason = "Failed global rule validation", RowNumber = group.First().RowNumber });
-                        return result;
-                    }
-                    else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
-                    {
-                        result.ValidationErrors.Add(new BulkValidation { Reason = "Reservation Paused", RowNumber = group.First().RowNumber });
-                        return result;
+                        if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
+                        {
+                            result.ValidationErrors.Add(new BulkValidation { Reason = $"The employer has reached their reservations limit. Contact the employer.", RowNumber = group.First().RowNumber });
+                        }
+                        else if (await FailedGlobalRuleValidation())
+                        {
+                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed global rule validation", RowNumber = group.First().RowNumber });
+                            return result;
+                        }
+                        else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
+                        {
+                            result.ValidationErrors.Add(new BulkValidation { Reason = "Reservation Paused", RowNumber = group.First().RowNumber });
+                            return result;
+                        }
                     }
                 }
             }
 
-            foreach (var validateRequest in bulkRequest.Requests)
+            foreach (var validateRequest in validAgreementIds)
             {
                 var accountLegalEntity =
-                   await GetAccountLegalEntity(validateRequest.AccountLegalEntityId);
-              
-                if (accountLegalEntity == null)
-                {
-                    throw new InvalidOperationException("No account found");
-                }
+                   await GetAccountLegalEntity(validateRequest.AccountLegalEntityId.Value);
 
-                if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy)
+                if (accountLegalEntity != null)
                 {
-                    var dateFailureError = await FailedStartDateValidation(validateRequest.StartDate, validateRequest.AccountLegalEntityId, accountLegalEntity.AccountId);
-                    if (!string.IsNullOrWhiteSpace(dateFailureError))
+                    if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy)
                     {
-                        result.ValidationErrors.Add(new BulkValidation { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
-                    }
+                        var dateFailureError = await FailedStartDateValidation(validateRequest.StartDate, validateRequest.AccountLegalEntityId.Value, accountLegalEntity.AccountId);
+                        if (!string.IsNullOrWhiteSpace(dateFailureError))
+                        {
+                            result.ValidationErrors.Add(new BulkValidation { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
+                        }
 
-                    var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
-                    if (reservationRule != null)
-                    {
-                        result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
+                        var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
+                        if (reservationRule != null)
+                        {
+                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
+                        }
                     }
                 }
             }
