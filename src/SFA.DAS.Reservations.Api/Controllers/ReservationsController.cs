@@ -359,7 +359,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
                    ProviderId = reservation.ProviderId,
                    AccountLegalEntityId = reservation.AccountLegalEntityId,
                    TransferSenderAccountId = reservation.TransferSenderAccountId,
-                   UserId = reservation.UserId
+                   UserId = reservation.UserId,
+                   CreatedDate = DateTime.UtcNow,
+                   RowNumber = reservation.RowNumber
                }
             ).ToList();
 

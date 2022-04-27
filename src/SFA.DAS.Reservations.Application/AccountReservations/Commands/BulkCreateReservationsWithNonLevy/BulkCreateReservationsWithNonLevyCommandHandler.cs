@@ -27,17 +27,19 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
         public async Task<BulkCreateReservationsWithNonLevyResult> Handle(BulkCreateReservationsWithNonLevyCommand request, CancellationToken cancellationToken)
         {
             var result = new BulkCreateReservationsWithNonLevyResult();
-            if (request.Reservations.All(x => x.AccountLegalEntityId.HasValue))
+
+            var bulkValidationResults = await Validate(request);
+            result.ValidationErrors = bulkValidationResults.ValidationErrors.ToList();
+            if (result.ValidationErrors.Count == 0 
+                && request.Reservations.All(
+                    x => x.AccountLegalEntityId.HasValue 
+                    && !string.IsNullOrWhiteSpace(x.CourseId) 
+                    && x.ProviderId.HasValue && x.StartDate.HasValue))
             {
-                var bulkValidationResults = await Validate(request);
-                result.ValidationErrors = bulkValidationResults.ValidationErrors.ToList();
-                if (result.ValidationErrors.Count == 0)
-                {
-                    var levyAccounts = await GetLevyAccounts(request.Reservations);
-                    var nonLevyAccounts = await GetNonLevyAccounts(request.Reservations);
-                    result.BulkCreateResults.AddRange(await CreateReservationsForLevyAccounts(levyAccounts));
-                    result.BulkCreateResults.AddRange(await CreateReservationForNonLevyAccounts(nonLevyAccounts));
-                }
+                var levyAccounts = await GetLevyAccounts(request.Reservations);
+                var nonLevyAccounts = await GetNonLevyAccounts(request.Reservations);
+                result.BulkCreateResults.AddRange(await CreateReservationsForLevyAccounts(levyAccounts));
+                result.BulkCreateResults.AddRange(await CreateReservationForNonLevyAccounts(nonLevyAccounts));
             }
 
             return result;

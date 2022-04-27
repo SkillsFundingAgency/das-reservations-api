@@ -74,7 +74,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                 var accountLegalEntity =
                    await GetAccountLegalEntity(validateRequest.AccountLegalEntityId.Value);
 
-                if (accountLegalEntity != null)
+                if (accountLegalEntity != null && validateRequest.StartDate.HasValue && validateRequest.ProviderId.HasValue && !string.IsNullOrWhiteSpace(validateRequest.CourseId))
                 {
                     if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy)
                     {
@@ -84,6 +84,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                             result.ValidationErrors.Add(new BulkValidation { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
                         }
 
+                        // calling legacy service, we may be able to remove this, but will need to investigate further.
                         var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
                         if (reservationRule != null)
                         {
