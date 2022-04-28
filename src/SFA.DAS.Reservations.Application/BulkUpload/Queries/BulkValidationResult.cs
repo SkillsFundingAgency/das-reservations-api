@@ -4,7 +4,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 {
     public class BulkValidationResults
     {
-        public ICollection<BulkValidation> ValidationErrors { get; set; }
+        public ICollection<BulkValidation> ValidationErrors { get; set; } = new List<BulkValidation>();
     }
 
     public class BulkValidation

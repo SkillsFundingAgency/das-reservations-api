@@ -6,7 +6,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 {
     public class BulkValidateCommand : IRequest<BulkValidationResults>
     {
-        public List<BulkValidateRequest> Requests { get; set; }
+        public List<BulkValidateRequest> Requests { get; set; } = new List<BulkValidateRequest>();
     }
 
     public class BulkValidateRequest
