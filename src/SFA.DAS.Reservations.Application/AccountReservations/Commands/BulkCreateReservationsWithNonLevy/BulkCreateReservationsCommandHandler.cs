@@ -11,20 +11,20 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy
 {
-    public class BulkCreateReservationsWithNonLevyCommandHandler : IRequestHandler<BulkCreateReservationsWithNonLevyCommand, BulkCreateReservationsWithNonLevyResult>
+    public class BulkCreateReservationsCommandHandler : IRequestHandler<BulkCreateReservationsCommand, BulkCreateReservationsWithNonLevyResult>
     {
         private readonly IMediator _mediator;
         private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities;
         private IAccountLegalEntitiesService _accountLegalEntitiesService;
 
-        public BulkCreateReservationsWithNonLevyCommandHandler(IMediator mediator, IAccountLegalEntitiesService accountLegalEntitiesService)
+        public BulkCreateReservationsCommandHandler(IMediator mediator, IAccountLegalEntitiesService accountLegalEntitiesService)
         {
             _mediator = mediator;
             _cachedAccountLegalEntities = new Dictionary<long, AccountLegalEntity>();
             _accountLegalEntitiesService = accountLegalEntitiesService;
         }
 
-        public async Task<BulkCreateReservationsWithNonLevyResult> Handle(BulkCreateReservationsWithNonLevyCommand request, CancellationToken cancellationToken)
+        public async Task<BulkCreateReservationsWithNonLevyResult> Handle(BulkCreateReservationsCommand request, CancellationToken cancellationToken)
         {
             var result = new BulkCreateReservationsWithNonLevyResult();
 
@@ -45,13 +45,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             return result;
         }
 
-        private async Task<List<BulkCreateReservations>> GetLevyAccounts(List<BulkCreateReservations> reservations)
+        private async Task<List<BulkCreateReservation>> GetLevyAccounts(List<BulkCreateReservation> reservations)
         {
-            List<BulkCreateReservations> levyAccounts = new List<BulkCreateReservations>();
+            List<BulkCreateReservation> levyAccounts = new List<BulkCreateReservation>();
             foreach (var reservation in reservations)
             {
                 var account = await  GetAccountLegalEntity(reservation.AccountLegalEntityId.Value);
-                if (account.IsLevy)
+                if (account.IsLevy || reservation.TransferSenderAccountId.HasValue)
                 {
                     levyAccounts.Add(reservation);
                 }
@@ -60,13 +60,13 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             return levyAccounts;
         }
 
-        private async Task<List<BulkCreateReservations>> GetNonLevyAccounts(List<BulkCreateReservations> reservations)
+        private async Task<List<BulkCreateReservation>> GetNonLevyAccounts(List<BulkCreateReservation> reservations)
         {
-            List<BulkCreateReservations> nonLevyAccounts = new List<BulkCreateReservations>();
+            List<BulkCreateReservation> nonLevyAccounts = new List<BulkCreateReservation>();
             foreach (var reservation in reservations)
             {
                 var account = await GetAccountLegalEntity(reservation.AccountLegalEntityId.Value);
-                if (!account.IsLevy)
+                if (!account.IsLevy && !reservation.TransferSenderAccountId.HasValue)
                 {
                     nonLevyAccounts.Add(reservation);
                 }
@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             return nonLevyAccounts;
         }
 
-        private async Task<BulkValidationResults> Validate(BulkCreateReservationsWithNonLevyCommand request)
+        private async Task<BulkValidationResults> Validate(BulkCreateReservationsCommand request)
         {
             var validateRequests = request.Reservations.Select(x => (BulkValidateRequest)x).ToList();
             var bulkValidationResults = await _mediator.Send(new BulkValidateCommand
@@ -85,7 +85,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             return bulkValidationResults;
         }
 
-        private async Task<List<BulkCreateReservationResult>> CreateReservationForNonLevyAccounts(List<BulkCreateReservations> nonLevyAccounts)
+        private async Task<List<BulkCreateReservationResult>> CreateReservationForNonLevyAccounts(List<BulkCreateReservation> nonLevyAccounts)
         {
             List<BulkCreateReservationResult> results = new List<BulkCreateReservationResult>();
             foreach (var nonLevyEntity in nonLevyAccounts)
@@ -116,7 +116,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             return results;
         }
 
-        private async Task<List<BulkCreateReservationResult>> CreateReservationsForLevyAccounts(List<BulkCreateReservations> levyAccounts)
+        private async Task<List<BulkCreateReservationResult>> CreateReservationsForLevyAccounts(List<BulkCreateReservation> levyAccounts)
         {
             List<BulkCreateReservationResult> results = new List<BulkCreateReservationResult>();
             var levyGroupedByAccountLegalEntities = levyAccounts.GroupBy(x => new { x.AccountLegalEntityId, x.TransferSenderAccountId });

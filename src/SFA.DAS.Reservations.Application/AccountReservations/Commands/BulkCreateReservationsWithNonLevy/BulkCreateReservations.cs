@@ -3,7 +3,7 @@ using System;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy
 {
-    public class BulkCreateReservations
+    public class BulkCreateReservation
     {
         public Guid Id { get; set; }
         public DateTime? StartDate { get; set; }
@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
         public int RowNumber { get; set; }
 
 
-        public static implicit operator BulkValidateRequest(BulkCreateReservations response)
+        public static implicit operator BulkValidateRequest(BulkCreateReservation response)
         {
             var legalEntityId = response.AccountLegalEntityId.HasValue ? response.AccountLegalEntityId.Value : 0;
          
@@ -24,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             {
                 CourseId = response.CourseId,
                 AccountLegalEntityId = legalEntityId,
-                ProviderId = (uint)response.ProviderId,
+                ProviderId = response.ProviderId,
                 RowNumber = response.RowNumber,
                 StartDate = response.StartDate,
                 TransferSenderAccountId = response.TransferSenderAccountId,

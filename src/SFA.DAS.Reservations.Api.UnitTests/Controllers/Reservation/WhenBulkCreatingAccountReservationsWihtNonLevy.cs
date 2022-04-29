@@ -19,19 +19,19 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
         private Mock<IMediator> _mediator;
         private Mock<HttpContext> _httpContext;
         private BulkCreateReservationsWithNonLevyResult _bulkCreateAccountReservationsResult;
-        private BulkCreateReservationsWithNonLevyRequest _bulkReservation;
+        private BulkCreateReservationsRequest _bulkReservation;
 
         [SetUp]
         public void Arrange()
         {
             var fixture = new AutoFixture.Fixture();
-            _bulkReservation = fixture.Create<BulkCreateReservationsWithNonLevyRequest>();
+            _bulkReservation = fixture.Create<BulkCreateReservationsRequest>();
 
             _bulkCreateAccountReservationsResult = fixture.Create<BulkCreateReservationsWithNonLevyResult>();
            
             
             _mediator = new Mock<IMediator>();
-            _mediator.Setup(x => x.Send(It.Is<BulkCreateReservationsWithNonLevyCommand>(c =>
+            _mediator.Setup(x => x.Send(It.Is<BulkCreateReservationsCommand>(c =>
                        c.Reservations == _bulkReservation.Reservations),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_bulkCreateAccountReservationsResult);
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.BulkCreate(_bulkReservation);
 
             //Assert
-            _mediator.Verify(m => m.Send(It.IsAny<BulkCreateReservationsWithNonLevyCommand>(),
+            _mediator.Verify(m => m.Send(It.IsAny<BulkCreateReservationsCommand>(),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
     }

@@ -39,9 +39,9 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [HttpPost]
         [ProducesResponseType(400)]
         [Route("api/[controller]/accounts/Bulk-Create")]
-        public async Task<IActionResult> BulkCreate(BulkCreateReservationsWithNonLevyRequest request)
+        public async Task<IActionResult> BulkCreate(BulkCreateReservationsRequest request)
         {
-            var response = await _mediator.Send(new BulkCreateReservationsWithNonLevyCommand
+            var response = await _mediator.Send(new BulkCreateReservationsCommand
             {
                 Reservations = request.Reservations
             });

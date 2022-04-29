@@ -16,8 +16,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 {
     public class WhenCreatingANewReservation
     {
-        private BulkCreateReservationsWithNonLevyCommand _command;
-        private BulkCreateReservationsWithNonLevyCommandHandler _handler;
+        private BulkCreateReservationsCommand _command;
+        private BulkCreateReservationsCommandHandler _handler;
         private BulkCreateAccountReservationsResult _levyResult;
         private CreateAccountReservationResult _nonLevyResult;
         private CancellationToken _cancellationToken;
@@ -38,7 +38,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _levyResult = fixture.Create<BulkCreateAccountReservationsResult>();
             _nonLevyResult = fixture.Create<CreateAccountReservationResult>();
 
-            _command = fixture.Create<BulkCreateReservationsWithNonLevyCommand>();
+            _command = fixture.Create<BulkCreateReservationsCommand>();
 
             _mediator.Setup(x => x.Send(It.IsAny<BulkCreateAccountReservationsCommand>(), _cancellationToken)).ReturnsAsync(_levyResult);
             _mediator.Setup(x => x.Send(It.IsAny<CreateAccountReservationCommand>(), _cancellationToken)).ReturnsAsync(_nonLevyResult);
@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
 
             _mediator.Setup(x => x.Send(It.IsAny<BulkValidateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(() => new BulkValidationResults());
 
-            _handler = new BulkCreateReservationsWithNonLevyCommandHandler(_mediator.Object, _accountLegalEntitiesService.Object);
+            _handler = new BulkCreateReservationsCommandHandler(_mediator.Object, _accountLegalEntitiesService.Object);
         }
 
         [Test]
@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Arrange
             _nonLevyResult.Rule = null;
             _nonLevyResult.AgreementSigned = true;
-
+            _command.Reservations.ForEach(x => { x.AccountLegalEntityId = 1; x.TransferSenderAccountId = null; });
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(It.IsAny<long>())).ReturnsAsync((long accountLegalEntityId) =>
                                      new AccountLegalEntity(Guid.NewGuid(), 1, "account legal entity name", 2, accountLegalEntityId, true, false));
 
@@ -101,6 +101,24 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 _command.Reservations.All(x => result.BulkCreateResults.Single(y => y.ULN == nonLevyEntity.ULN && y.ReservationId != Guid.Empty) != null);
             });
             
+        }
+
+        [Test]
+        public async Task Then_Levy_Reservations_Are_Created_For_Non_Levy_Employer_When_TransferId_Is_Not_Null()
+        {
+            //Arrange
+            _nonLevyResult.Rule = null;
+            _nonLevyResult.AgreementSigned = true;
+            _command.Reservations.ForEach(x => { x.AccountLegalEntityId = 1; x.TransferSenderAccountId = 1; });
+            _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(It.IsAny<long>())).ReturnsAsync((long accountLegalEntityId) =>
+                                     new AccountLegalEntity(Guid.NewGuid(), 1, "account legal entity name", 2, accountLegalEntityId, true, false));
+
+            //Act
+            BulkCreateReservationsWithNonLevyResult result = await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            _mediator.Verify(x => x.Send(It.Is<BulkCreateAccountReservationsCommand>(y => y.AccountLegalEntityId == 1 && y.TransferSenderAccountId == 1), _cancellationToken), Times.Once);
+            _command.Reservations.All(x => result.BulkCreateResults.Single(y => y.ULN == x.ULN && y.ReservationId != Guid.Empty) != null);
         }
     }
 }

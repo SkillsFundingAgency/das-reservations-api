@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Api.Models
 {
-    public class BulkCreateReservationsWithNonLevyRequest
+    public class BulkCreateReservationsRequest
     {
-        public List<BulkCreateReservations> Reservations { get; set; }
+        public List<BulkCreateReservation> Reservations { get; set; }
     }
 }

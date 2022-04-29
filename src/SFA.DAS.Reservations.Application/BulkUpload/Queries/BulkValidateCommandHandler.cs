@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                         }
                         else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
                         {
-                            result.ValidationErrors.Add(new BulkValidation { Reason = "Reservation Paused", RowNumber = group.First().RowNumber });
+                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed account rule validation", RowNumber = group.First().RowNumber });
                             return result;
                         }
                     }
