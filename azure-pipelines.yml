@@ -7,6 +7,8 @@ trigger:
 variables:
   - name: buildConfiguration
     value: 'release'
+  - name: DACPACSolutionBaseName
+    value: SFA.DAS.Reservations.Database
 
 resources:
   repositories:
@@ -20,4 +22,7 @@ stages:
 - stage: Build
   jobs:
   - template: pipeline-templates/job/code-build.yml
-  - template: pipeline-templates/job/dacpac-build.yml
+  - template: azure-pipelines-templates/build/job/dacpac-template.yml@das-platform-building-blocks
+    parameters:
+      SolutionBaseName: $(DACPACSolutionBaseName)
+      SqlProjectPath: src/$(DACPACSolutionBaseName)/$(DACPACSolutionBaseName).sqlproj
