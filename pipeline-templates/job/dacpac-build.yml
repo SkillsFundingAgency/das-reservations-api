@@ -10,7 +10,7 @@ jobs:
     displayName: Build DACPAC
     inputs:
       solution: src/SFA.DAS.Reservations.Database/SFA.DAS.Reservations.Database.sqlproj
-      platform: any cpu
+      platform: anycpu
       configuration: $(buildConfiguration)
       msbuildArgs: /p:PackageLocation="$(build.artifactstagingdirectory)/publish"
   - task: CopyFiles@2
@@ -20,7 +20,7 @@ jobs:
         src/**/*.dacpac
       targetFolder: $(build.artifactstagingdirectory)/publish
   - task: PublishPipelineArtifact@1
-    displayName: Publish Artifact - ReservationsApi
+    displayName: Publish Artifact - ReservationsDatabase
     inputs:
       targetPath: $(build.artifactstagingdirectory)/publish
       artifactName: ReservationsApiDacpacArtifact
