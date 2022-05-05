@@ -91,7 +91,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
             var result = await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            Assert.AreEqual(1, result.ValidationErrors.Count);
+            Assert.AreEqual(3, result.ValidationErrors.Count);
             Assert.AreEqual("The employer has reached their <b>reservations limit</b>. Contact the employer.", result.ValidationErrors.First().Reason);
         }
 

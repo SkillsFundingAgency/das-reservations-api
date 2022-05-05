@@ -58,17 +58,17 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                     {
                         if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
                         {
-                            result.ValidationErrors.Add(new BulkValidation { Reason = $"The employer has reached their <b>reservations limit</b>. Contact the employer.", RowNumber = group.First().RowNumber });
+                            AddErrorForAllRows(result, group, "The employer has reached their <b>reservations limit</b>. Contact the employer.");
                             return result;
                         }
                         else if (await FailedGlobalRuleValidation())
                         {
-                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed global rule validation", RowNumber = group.First().RowNumber });
+                            AddErrorForAllRows(result, group, "Failed global rule validation");
                             return result;
                         }
                         else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
                         {
-                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed account rule validation", RowNumber = group.First().RowNumber });
+                            AddErrorForAllRows(result, group, "Failed account rule validation");
                             return result;
                         }
                     }
@@ -102,6 +102,14 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             }
 
             return result;
+        }
+
+        private static void AddErrorForAllRows(BulkValidationResults result, IGrouping<long, BulkValidateRequest> group, string error)
+        {
+            foreach (var row in group)
+            {
+                result.ValidationErrors.Add(new BulkValidation { Reason = error, RowNumber = row.RowNumber });
+            }
         }
 
         private IReservationRequest GetBulkCheckReservationAgainRule(BulkValidateRequest validateRequest, AccountLegalEntity accountLegalEntity)
