@@ -94,9 +94,6 @@ namespace SFA.DAS.Reservations.Api
                 var azureActiveDirectoryConfiguration =
                     serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
 
-                var validAudiences = azureActiveDirectoryConfiguration.Value.Identifier.Split(",").ToList();
-                validAudiences.Add(azureActiveDirectoryConfiguration.Value.Id);
-
                 services.AddAuthorization(o =>
                 {
                     o.AddPolicy("default", policy => { policy.RequireAuthenticatedUser(); });
@@ -108,7 +105,7 @@ namespace SFA.DAS.Reservations.Api
                             $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
                         auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                         {
-                            ValidAudiences = validAudiences
+                            ValidAudiences = azureActiveDirectoryConfiguration.Value.Identifier.Split(",")
                         };
                     });
                 services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
