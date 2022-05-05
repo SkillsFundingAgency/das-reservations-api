@@ -1,12 +1,14 @@
 ﻿using AutoFixture;
 using AutoFixture.Kernel;
 using MediatR;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.BulkUpload.Queries;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using System;
@@ -32,6 +34,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
         private GetAvailableDatesResult _getAvailableDatesResult;
         private GetAccountRulesResult _getAccountRulesResult;
         private GetRulesResult _getRulesResult;
+        private Mock<IOptions<ReservationsConfiguration>> _configuration;
 
         [SetUp]
         public void Setup()
@@ -46,9 +49,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
             {
                 AvailableDates = new List<AvailableDateStartWindow>()
                 {
-                    new AvailableDateStartWindow { StartDate = DateTime.UtcNow.AddMonths(-1), EndDate = DateTime.UtcNow.AddMonths(4) },
-                    new AvailableDateStartWindow { StartDate = DateTime.UtcNow, EndDate = DateTime.UtcNow.AddMonths(5) },
-                    new AvailableDateStartWindow { StartDate = DateTime.UtcNow.AddMonths(1), EndDate = DateTime.UtcNow.AddMonths(6) }
+                    new AvailableDateStartWindow { StartDate = DateTime.UtcNow.AddMonths(-1), EndDate = DateTime.UtcNow.AddMonths(2) },
+                    new AvailableDateStartWindow { StartDate = DateTime.UtcNow, EndDate = DateTime.UtcNow.AddMonths(3) },
+                    new AvailableDateStartWindow { StartDate = DateTime.UtcNow.AddMonths(1), EndDate = DateTime.UtcNow.AddMonths(4) }
                 }
             };
             _getAccountRulesResult = new GetAccountRulesResult();
@@ -72,7 +75,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
             _mediator.Setup(x => x.Send(It.IsAny<GetAccountRulesQuery>(), _cancellationToken)).ReturnsAsync(() => _getAccountRulesResult);
             _mediator.Setup(x => x.Send(It.IsAny<GetRulesQuery>(), _cancellationToken)).ReturnsAsync(() => _getRulesResult);
 
-            _handler = new BulkValidateCommandHandler(_accountReservationService.Object, Mock.Of<IGlobalRulesService>(), _accountLegalEntitiesService.Object, _accountService.Object, _mediator.Object);
+            _configuration = new Mock<IOptions<ReservationsConfiguration>>();
+            _configuration.Setup(x => x.Value).Returns(new ReservationsConfiguration { ExpiryPeriodInMonths = 2 });
+
+            _handler = new BulkValidateCommandHandler(_accountReservationService.Object, Mock.Of<IGlobalRulesService>(), _accountLegalEntitiesService.Object, _accountService.Object, _mediator.Object, _configuration.Object);
         }
 
         [Test]
@@ -107,17 +113,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
         public async Task Fails_Validation_when_Apprenticeshp_StartDate_Is_After_Reservation_window()
         {
             //Setup
-            _command.Requests.First().StartDate = DateTime.UtcNow.AddMonths(2);
+            _command.Requests.First().StartDate = DateTime.UtcNow.AddMonths(5);
 
             //Act
             var result = await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            var currentDate = DateTime.UtcNow;
-            var maxDate = _getAvailableDatesResult.AvailableDates.Select(x => x.StartDate).Max();
-            var monthsInAdvance = ((currentDate.Year - maxDate.Year) * 12) + currentDate.Month - maxDate.Month;
             Assert.AreEqual(1, result.ValidationErrors.Count);
-            Assert.AreEqual($"The start for this learner cannot be after {_getAvailableDatesResult.AvailableDates.Select(x => x.StartDate).Max():dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {monthsInAdvance} months in advance.", result.ValidationErrors.First().Reason);
+            Assert.AreEqual($"The start for this learner cannot be after {_getAvailableDatesResult.AvailableDates.Select(x => x.EndDate).Max():dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {_configuration.Object.Value.ExpiryPeriodInMonths} months in advance.", result.ValidationErrors.First().Reason);
         }
     }
 
