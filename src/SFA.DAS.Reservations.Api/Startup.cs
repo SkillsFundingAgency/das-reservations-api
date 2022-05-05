@@ -96,7 +96,10 @@ namespace SFA.DAS.Reservations.Api
 
                 services.AddAuthorization(o =>
                 {
-                    o.AddPolicy("default", policy => { policy.RequireAuthenticatedUser(); });
+                    o.AddPolicy("default", policy => {
+                        policy.RequireRole("Default");
+                        policy.RequireAuthenticatedUser(); 
+                    });
                 });
                 services.AddAuthentication(auth => { auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
                     .AddJwtBearer(auth =>
