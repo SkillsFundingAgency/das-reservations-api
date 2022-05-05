@@ -86,7 +86,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
 
             //Assert
             Assert.AreEqual(1, result.ValidationErrors.Count);
-            Assert.AreEqual("The employer has reached their reservations limit. Contact the employer.", result.ValidationErrors.First().Reason);
+            Assert.AreEqual("The employer has reached their <b>reservations limit</b>. Contact the employer.", result.ValidationErrors.First().Reason);
         }
 
         [Test]

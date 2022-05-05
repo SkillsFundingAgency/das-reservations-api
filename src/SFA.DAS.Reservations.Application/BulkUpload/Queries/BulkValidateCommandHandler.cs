@@ -53,7 +53,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                     {
                         if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
                         {
-                            result.ValidationErrors.Add(new BulkValidation { Reason = $"The employer has reached their reservations limit. Contact the employer.", RowNumber = group.First().RowNumber });
+                            result.ValidationErrors.Add(new BulkValidation { Reason = $"The employer has reached their <b>reservations limit</b>. Contact the employer.", RowNumber = group.First().RowNumber });
                         }
                         else if (await FailedGlobalRuleValidation())
                         {
