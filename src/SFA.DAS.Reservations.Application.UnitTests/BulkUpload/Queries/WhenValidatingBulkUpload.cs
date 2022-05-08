@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.Kernel;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -78,7 +79,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
             _configuration = new Mock<IOptions<ReservationsConfiguration>>();
             _configuration.Setup(x => x.Value).Returns(new ReservationsConfiguration { ExpiryPeriodInMonths = 2 });
 
-            _handler = new BulkValidateCommandHandler(_accountReservationService.Object, Mock.Of<IGlobalRulesService>(), _accountLegalEntitiesService.Object, _accountService.Object, _mediator.Object, _configuration.Object);
+            _handler = new BulkValidateCommandHandler(_accountReservationService.Object, Mock.Of<IGlobalRulesService>(), _accountLegalEntitiesService.Object, _accountService.Object, _mediator.Object, _configuration.Object, Mock.Of<ILogger<BulkValidateCommandHandler>>());
         }
 
         [Test]

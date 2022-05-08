@@ -171,7 +171,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 .Where(c => !c.IsLevyAccount)
                 .ToList();
 
-            var usedReservation = reservations.Where(r => r.CreatedDate >= _options.Value.ResetReservationDate).Count();
+            var usedReservation = reservations.Where(r => r.CreatedDate >= _options.Value.ResetReservationDate && !r.IsExpired).Count();
             return totalReservationAllowed - usedReservation;
         }
 
