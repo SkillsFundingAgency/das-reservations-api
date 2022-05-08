@@ -83,7 +83,6 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                                     if (!string.IsNullOrWhiteSpace(dateFailureError))
                                     {
                                         result.ValidationErrors.Add(new BulkValidation { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
-                                        return result;
                                     }
                                     else
                                     {
