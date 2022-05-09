@@ -1,5 +1,4 @@
-﻿using SFA.DAS.Reservations.Application.BulkUpload.Queries;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy
@@ -7,7 +6,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
     public class BulkCreateReservationsWithNonLevyResult
     {
         public List<BulkCreateReservationResult> BulkCreateResults { get; set; } = new List<BulkCreateReservationResult>();
-        public List<BulkValidation> ValidationErrors { get; set; } = new List<BulkValidation>();
     }
 
     public class BulkCreateReservationResult

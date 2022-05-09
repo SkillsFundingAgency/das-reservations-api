@@ -28,10 +28,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
         {
             var result = new BulkCreateReservationsWithNonLevyResult();
 
-            var bulkValidationResults = await Validate(request);
-            result.ValidationErrors = bulkValidationResults.ValidationErrors.ToList();
-            if (result.ValidationErrors.Count == 0 
-                && request.Reservations.All(
+            if (request.Reservations.All(
                     x => x.AccountLegalEntityId.HasValue 
                     && !string.IsNullOrWhiteSpace(x.CourseId) 
                     && x.ProviderId.HasValue && x.StartDate.HasValue))

@@ -97,7 +97,6 @@ namespace SFA.DAS.Reservations.Api
                 services.AddAuthorization(o =>
                 {
                     o.AddPolicy("default", policy => {
-                        policy.RequireRole("Default");
                         policy.RequireAuthenticatedUser(); 
                     });
                 });
