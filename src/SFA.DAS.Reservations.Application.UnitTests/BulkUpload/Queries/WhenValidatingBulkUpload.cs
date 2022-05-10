@@ -118,10 +118,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
 
             //Act
             var result = await _handler.Handle(_command, _cancellationToken);
+            var possibleEndDate = _getAvailableDatesResult.AvailableDates.Select(x => x.StartDate).Max();
+            var maxDate = new DateTime(possibleEndDate.Year, possibleEndDate.Month, DateTime.DaysInMonth(possibleEndDate.Year, possibleEndDate.Month));
 
             //Assert
             Assert.AreEqual(1, result.ValidationErrors.Count);
-            Assert.AreEqual($"The start for this learner cannot be after {_getAvailableDatesResult.AvailableDates.Select(x => x.EndDate).Max():dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {_configuration.Object.Value.ExpiryPeriodInMonths} months in advance.", result.ValidationErrors.First().Reason);
+            Assert.AreEqual($"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {_configuration.Object.Value.ExpiryPeriodInMonths} months in advance.", result.ValidationErrors.First().Reason);
         }
     }
 

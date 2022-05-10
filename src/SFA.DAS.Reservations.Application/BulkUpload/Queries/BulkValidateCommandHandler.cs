@@ -168,9 +168,8 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             }
 
             var possibleStartDates = possibleDates?.Select(x => x.StartDate)?.OrderBy(model => model);
-            var possibleEndDates = possibleDates?.Select(x => x.EndDate)?.OrderBy(model => model);
 
-            if (possibleStartDates == null || !possibleStartDates.Any() || possibleEndDates == null || !possibleEndDates.Any())
+            if (possibleStartDates == null || !possibleStartDates.Any())
             {
                 return "No reservation dates found for account";
             }
@@ -178,7 +177,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             {
                 return $@"The start for this learner cannot be before {possibleStartDates.Min():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.";
             }
-            else if (startDate.Value > possibleEndDates.Max())
+            else if (startDate.Value > possibleStartDates.Max())
             {
                 var expiryPeriodInMonths = _configuration.ExpiryPeriodInMonths;
 
@@ -189,7 +188,8 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                     expiryMonths = 12;
                 }
 
-                var maxDate = possibleEndDates.Max();
+                var possibleEndDate = possibleStartDates.Max();
+                var maxDate = new DateTime(possibleEndDate.Year, possibleEndDate.Month, DateTime.DaysInMonth(possibleEndDate.Year, possibleEndDate.Month));
                 return $@"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {expiryMonths} months in advance.";
             }
 
