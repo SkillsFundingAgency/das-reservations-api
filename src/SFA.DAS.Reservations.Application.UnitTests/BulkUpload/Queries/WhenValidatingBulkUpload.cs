@@ -140,6 +140,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
                 return fixture.Build<BulkValidateRequest>()
                     .With(x => x.StartDate, DateTime.UtcNow)
                     .With(x => x.AccountLegalEntityId, 1)
+                    .With(x => x.TransferSenderAccountId, (long?) null)
                     .Create();
             }
 

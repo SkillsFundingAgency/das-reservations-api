@@ -51,14 +51,14 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             // Only run validation for valid agreement ids - which have values.
             var validAgreementIds = bulkRequest.Requests.Where(x => x.AccountLegalEntityId.HasValue);
 
-            var groups = validAgreementIds.GroupBy(x => x.AccountLegalEntityId.Value);
+            var groups = validAgreementIds.GroupBy(x => new {AccountLegalEntityId =  x.AccountLegalEntityId.Value, x.TransferSenderAccountId });
 
             foreach (var group in groups)
             {
-                AccountLegalEntity accountLegalEntity = await GetAccountLegalEntity(group.Key);
+                AccountLegalEntity accountLegalEntity = await GetAccountLegalEntity(group.Key.AccountLegalEntityId);
                 if (accountLegalEntity != null)
                 {
-                    if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy)
+                    if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy && !group.Key.TransferSenderAccountId.HasValue)
                     {
                         if (await FailedGlobalRuleValidation())
                         {
@@ -104,7 +104,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             return result;
         }
 
-        private static void AddErrorForAllRows(BulkValidationResults result, IGrouping<long, BulkValidateRequest> group, string error)
+        private void AddErrorForAllRows(BulkValidationResults result, IGrouping<object, BulkValidateRequest> group, string error)
         {
             foreach (var row in group)
             {
