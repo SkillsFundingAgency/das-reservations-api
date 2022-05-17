@@ -29,6 +29,7 @@ using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
 using SFA.DAS.UnitOfWork.Mvc.Extensions;
+using System.Linq;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -92,6 +93,7 @@ namespace SFA.DAS.Reservations.Api
             {
                 var azureActiveDirectoryConfiguration =
                     serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
+
                 services.AddAuthorization(o =>
                 {
                     o.AddPolicy("default", policy =>
