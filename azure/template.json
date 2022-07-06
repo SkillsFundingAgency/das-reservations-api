@@ -85,6 +85,10 @@
     },
     "loggingRedisConnectionString": {
       "type": "securestring"
+    },
+    "utcValue": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyMMddHHmmss')]"
     }
   },
   "variables": {
@@ -106,7 +110,7 @@
     },
     {
       "apiVersion": "2020-10-01",
-      "name": "app-service-plan",
+      "name": "[concat('app-service-plan-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
@@ -134,7 +138,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "reservations-api-subnet",
+      "name": "[concat('reservations-api-subnet-', parameters('utcValue'))]",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
       "properties": {
         "mode": "Incremental",
@@ -163,7 +167,7 @@
     },
     {
       "apiVersion": "2021-04-01",
-      "name": "reservations-api-sql-firewall-rule",
+      "name": "[concat('reservations-api-sql-firewall-rule-', parameters('utcValue'))]",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
       "type": "Microsoft.Resources/deployments",
       "properties": {
@@ -177,14 +181,14 @@
             "value": "[parameters('sharedSQLServerName')]"
           },
           "subnetResourceIdList": {
-            "value": "[createArray(reference('reservations-api-subnet').outputs.SubnetResourceId.value)]"
+            "value": "[createArray(reference(concat('reservations-api-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value)]"
           }
         }
       }
     },
     {
       "apiVersion": "2020-10-01",
-      "name": "app-service-certificate",
+      "name": "[concat('app-service-certificate-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
@@ -211,7 +215,7 @@
     },
     {
       "apiVersion": "2020-10-01",
-      "name": "application-insights",
+      "name": "[concat('application-insights-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
@@ -235,7 +239,7 @@
     },
     {
       "apiVersion": "2020-10-01",
-      "name": "app-service",
+      "name": "[concat('app-service-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
@@ -255,7 +259,7 @@
             "value": "[variables('resourceGroupName')]"
           },
           "subnetResourceId": {
-            "value": "[reference('reservations-api-subnet').outputs.subnetResourceId.value]"
+            "value": "[reference(concat('reservations-api-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
           },
           "appServiceAppSettings": {
             "value": {
@@ -278,7 +282,7 @@
                 },
                 {
                   "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                  "value": "[reference('application-insights').outputs.InstrumentationKey.value]"
+                  "value": "[reference(concat('application-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                 },
                 {
                   "name": "ASPNETCORE_ENVIRONMENT",
@@ -295,7 +299,7 @@
             "value": "[parameters('customHostname')]"
           },
           "certificateThumbprint": {
-            "value": "[reference('app-service-certificate').outputs.certificateThumbprint.value]"
+            "value": "[reference(concat('app-service-certificate-', parameters('utcValue'))).outputs.certificateThumbprint.value]"
           },
           "ipSecurityRestrictions": {
             "value": "[parameters('appServiceAllowedIPs')]"
@@ -308,7 +312,7 @@
     },
     {
       "apiVersion": "2020-10-01",
-      "name": "sql-database",
+      "name": "[concat('sql-database-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
       "properties": {
@@ -347,7 +351,7 @@
     },
     {
       "apiVersion": "2020-10-01",
-      "name": "[concat('role-assignments-', copyIndex())]",
+      "name": "[concat('role-assignments-', parameters('utcValue'), '-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
       "properties": {
@@ -358,7 +362,7 @@
         },
         "parameters": {
           "principalId": {
-            "value": "[createArray(reference('app-service').outputs.managedServiceIdentityId.value, reference('app-service').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
+            "value": "[createArray(reference(concat('app-service-', parameters('utcValue'))).outputs.managedServiceIdentityId.value, reference(concat('app-service-', parameters('utcValue'))).outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
           },
           "assignmentType": {
             "value": "ServiceBusOwner"
