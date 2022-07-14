@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Account;
-using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -119,16 +118,16 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                 return null;
             }
 
-            var reservations = await _reservationService.GetAccountReservations(accountId);
+            var remainingReservations = await _reservationService.GetRemainingReservations(accountId, maxNumberOfReservations.Value);
+
             _logger.LogWarning("Reset reservation date:" +
                 (_options.ResetReservationDate.HasValue 
                 ? _options.ResetReservationDate.Value.ToString("dd/MM/yyyy")
                 : "no reset reservation date set"));
-           var validReservationAfterReservationResetCount = reservations.Count(c => !c.IsLevyAccount && !c.IsExpired && c.CreatedDate >= _options.ResetReservationDate);
 
-            _logger.LogWarning("validReservationAfterReservationResetCount:" + validReservationAfterReservationResetCount);
-            if (validReservationAfterReservationResetCount >= maxNumberOfReservations)
+            if (remainingReservations <= 0)
             {
+                _logger.LogWarning($"Account: {accountId} has {remainingReservations} remainingReservations");
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {
                     Id = 0,
