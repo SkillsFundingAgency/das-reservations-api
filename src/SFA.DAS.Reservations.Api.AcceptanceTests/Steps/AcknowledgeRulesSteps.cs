@@ -25,15 +25,18 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             var dbContext = Services.GetService<ReservationsDataContext>();
 
-            dbContext.GlobalRules.Add(new Domain.Entities.GlobalRule
+            if (dbContext.GlobalRules!= null && dbContext.GlobalRules.Count(x => x.Id == 1) == 0)
             {
-                Id = 1,
-                RuleType = (byte)GlobalRuleType.FundingPaused,
-                ActiveFrom = DateTime.UtcNow.AddMonths(1),
-                ActiveTo = DateTime.UtcNow.AddMonths(2),
-                Restriction = (byte)AccountRestriction.All,
-            });
-            dbContext.SaveChanges();
+                dbContext.GlobalRules.Add(new Domain.Entities.GlobalRule
+                {
+                    Id = 1,
+                    RuleType = (byte)GlobalRuleType.FundingPaused,
+                    ActiveFrom = DateTime.UtcNow.AddMonths(1),
+                    ActiveTo = DateTime.UtcNow.AddMonths(2),
+                    Restriction = (byte)AccountRestriction.All,
+                });
+                dbContext.SaveChanges();
+            }
         }
 
         [Given(@"there is a restriction for non-levy accounts")]

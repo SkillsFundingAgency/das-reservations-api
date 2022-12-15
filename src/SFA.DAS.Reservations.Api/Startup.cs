@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Authentication;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +27,7 @@ using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
 using SFA.DAS.UnitOfWork.Mvc.Extensions;
-using System.Linq;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -117,6 +115,7 @@ namespace SFA.DAS.Reservations.Api
 
             services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
             services.AddMediatRValidators();
+            services.AddLogging();
 
             services.AddServiceRegistration(config);
 
@@ -133,7 +132,7 @@ namespace SFA.DAS.Reservations.Api
             services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
 
             services
-                .AddMvc(o =>
+                .AddControllersWithViews(o =>
                 {
                     if (!ConfigurationIsLocalOrDev())
                     {
@@ -171,7 +170,7 @@ namespace SFA.DAS.Reservations.Api
         }
 
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (ConfigurationIsLocalOrDev())
             {
@@ -185,13 +184,16 @@ namespace SFA.DAS.Reservations.Api
 
             app.UseUnitOfWork();
             app.UseHealthChecks();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "api/{controller=Reservation}/{action=Index}/{id?}");
-            });
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "api/{controller=Reservation}/{action=Index}/{id?}");
+            //});
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

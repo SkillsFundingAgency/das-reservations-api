@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
-using System.Data.SqlClient;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Data.SqlClient;
 
 namespace SFA.DAS.Reservations.Api.AppStart
 {
