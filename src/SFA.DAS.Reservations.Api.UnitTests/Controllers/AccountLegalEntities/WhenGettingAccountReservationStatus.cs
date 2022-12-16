@@ -25,7 +25,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             long accountId,
             ArgumentException argumentException,
             [Frozen] Mock<IMediator> mockMediator,
-            AccountLegalEntitiesController controller)
+            [NoAutoProperties] AccountLegalEntitiesController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -46,7 +46,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             long accountId,
             EntityNotFoundException<AccountLegalEntity> notFoundException,
             [Frozen] Mock<IMediator> mockMediator,
-            AccountLegalEntitiesController controller)
+             [NoAutoProperties] AccountLegalEntitiesController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -64,7 +64,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             long accountId,
             GetAccountReservationStatusResponse response,
             [Frozen] Mock<IMediator> mockMediator,
-            AccountLegalEntitiesController controller)
+             [NoAutoProperties] AccountLegalEntitiesController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
@@ -85,7 +85,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             long? transferSenderAccountId,
             GetAccountReservationStatusResponse response,
             [Frozen] Mock<IMediator> mockMediator,
-            AccountLegalEntitiesController controller)
+             [NoAutoProperties] AccountLegalEntitiesController controller)
         {
             mockMediator
                 .Setup(mediator => mediator.Send(
