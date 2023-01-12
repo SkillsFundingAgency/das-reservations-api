@@ -188,13 +188,6 @@ namespace SFA.DAS.Reservations.Api
             app.UseAuthorization();
             app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
 
-            //app.UseMvc(routes =>
-            //{
-            //    routes.MapRoute(
-            //        name: "default",
-            //        template: "api/{controller=Reservation}/{action=Index}/{id?}");
-            //});
-
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

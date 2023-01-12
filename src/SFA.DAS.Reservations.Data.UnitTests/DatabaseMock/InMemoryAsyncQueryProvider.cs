@@ -40,12 +40,6 @@ namespace SFA.DAS.Reservations.Data.UnitTests.DatabaseMock
             return Task.FromResult(this.Execute(expression));
         }
 
-        //public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
-        //{
-
-        //    return Task.FromResult(this.Execute<TResult>(expression)).ToAsyncEnumerable();
-        //}
-
         public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
             return Task.FromResult(this.Execute<TResult>(expression));

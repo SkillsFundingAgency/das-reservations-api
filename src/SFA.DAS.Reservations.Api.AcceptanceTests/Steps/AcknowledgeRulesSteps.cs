@@ -36,7 +36,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             dbContext.SaveChanges();
         }
         
-
         [Given(@"there is a restriction for non-levy accounts")]
         public void GivenThereIsARestrictionForNon_LevyAccounts()
         {
@@ -53,13 +52,11 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             dbContext.SaveChanges();
         }
 
-
         [When(@"I acknowledge a rule as being read as a provider")]
         public void WhenIAcknowledgeARuleAsBeingRead()
         {
             MarkRuleAsRead(ProviderId.ToString());
         }
-
 
         [When(@"I acknowledge a rule as being read as a employer")]
         public void WhenIAcknowledgeARuleAsBeingReadAsAEmployer()
@@ -82,7 +79,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 TypeOfRule = RuleType.GlobalRule
             }).Wait();
         }
-
 
         [Then(@"it is not returned in the list of upcoming rules for the (.*)")]
         public void ThenItIsNotReturnedInTheListOfUpcomingRules(string type)
