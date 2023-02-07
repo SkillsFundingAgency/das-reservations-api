@@ -29,7 +29,7 @@
     <PackageReference Include="SFA.DAS.UnitOfWork.Mvc" Version="9.0.10" />
     <PackageReference Include="SFA.DAS.UnitOfWork.NServiceBus" Version="9.0.10" />
     <PackageReference Include="SFA.DAS.UnitOfWork.SqlServer" Version="7.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.2.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.0" />
   </ItemGroup>
 
