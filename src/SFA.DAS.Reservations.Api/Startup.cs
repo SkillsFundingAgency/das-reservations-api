@@ -159,6 +159,7 @@ namespace SFA.DAS.Reservations.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReservationsAPI", Version = "v1" });
             });
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
