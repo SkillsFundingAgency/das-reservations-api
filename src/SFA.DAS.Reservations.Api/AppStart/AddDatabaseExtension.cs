@@ -8,17 +8,25 @@ namespace SFA.DAS.Reservations.Api.AppStart
     {
         private const string AzureResource = "https://database.windows.net/";
 
-        public static DbConnection GetSqlConnection(bool configurationIsLocalOrDev, string connectionString)
+        public static DbConnection GetSqlConnection(string connectionString)
         {
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+            bool useManagedIdentity = !connectionStringBuilder.IntegratedSecurity && string.IsNullOrEmpty(connectionStringBuilder.UserID);
 
-            return configurationIsLocalOrDev
-                ? new SqlConnection(connectionString)
-                : new SqlConnection
+            if (useManagedIdentity)
+            {
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+
+                return new SqlConnection
                 {
                     ConnectionString = connectionString,
                     AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
                 };
-        }      
+            }
+            else
+            {
+                return new SqlConnection(connectionString);
+            }
+        }
     }
 }

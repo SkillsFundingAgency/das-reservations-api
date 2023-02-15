@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
                 .UseServicesBuilder(serviceProvider)
-                .UseSqlServerPersistence(() => AddDatabaseExtension.GetSqlConnection(configurationIsLocalOrDev, configuration["Reservations:ConnectionString"]))
+                .UseSqlServerPersistence(() => AddDatabaseExtension.GetSqlConnection(configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
 
             if (configurationIsLocalOrDev)

@@ -26,7 +26,6 @@ using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
-using SFA.DAS.UnitOfWork.Mvc.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace SFA.DAS.Reservations.Api
@@ -143,7 +142,7 @@ namespace SFA.DAS.Reservations.Api
             if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 services
-                    .AddEntityFramework(ConfigurationIsLocalOrDev(), config)
+                    .AddEntityFramework(config)
                     .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
                     .AddNServiceBusClientUnitOfWork();
             }
@@ -182,7 +181,6 @@ namespace SFA.DAS.Reservations.Api
                 app.UseAuthentication();
             }
 
-            app.UseUnitOfWork();
             app.UseHealthChecks();
             app.UseRouting();
             app.UseAuthorization();
