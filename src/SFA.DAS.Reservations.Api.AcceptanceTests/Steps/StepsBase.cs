@@ -45,6 +45,12 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             AddCoursesToDb();
             AddAccountsToDb();
             AddAccountLegalEntitiesToDb();
+         }
+
+        [AfterScenario]
+        public void DisposeTestDatabaseData()
+        {
+            _dbContext.Database.EnsureDeleted(); 
         }
 
         private void ConfigureCustomValueRetrievers()

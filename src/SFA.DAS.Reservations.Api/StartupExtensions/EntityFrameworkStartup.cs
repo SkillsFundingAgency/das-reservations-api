@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
     public static class EntityFrameworkStartup
     {
-        public static IServiceCollection AddEntityFramework(this IServiceCollection services, bool configurationIsLocalOrDev, IOptions<ReservationsConfiguration> config)
+        public static IServiceCollection AddEntityFramework(this IServiceCollection services, IOptions<ReservationsConfiguration> config)
         {
             return services.AddScoped(p =>
             {
@@ -26,12 +26,12 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                     var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
                     var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
                     var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(sqlStorageSession.Connection);                    
-                    dbContext = new ReservationsDataContext(sqlStorageSession.Connection, config, optionsBuilder.Options, azureServiceTokenProvider, configurationIsLocalOrDev);
+                    dbContext = new ReservationsDataContext(sqlStorageSession.Connection, config, optionsBuilder.Options, azureServiceTokenProvider);
                     dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
                 }
                 catch (KeyNotFoundException)
                 {
-                    var connection = AddDatabaseExtension.GetSqlConnection(configurationIsLocalOrDev, config.Value.ConnectionString);
+                    var connection = AddDatabaseExtension.GetSqlConnection(config.Value.ConnectionString);
                     var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(connection);
                     dbContext = new ReservationsDataContext(optionsBuilder.Options);
                 }

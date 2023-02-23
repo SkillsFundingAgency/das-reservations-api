@@ -10,15 +10,15 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
+using SFA.DAS.Reservations.Api.UnitTests.Controllers.Customisations;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOfParty;
 using SFA.DAS.Reservations.Domain.Exceptions;
-using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
     public class WhenChangingAReservation
     {
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task And_Fails_Validation_Then_Returns_Http_Bad_Request(
             Guid reservationId,
             ChangeOfPartyRequest request,
@@ -39,7 +39,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             model.Params.Should().Be(argumentException.ParamName);
         }
 
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task And_Reservation_Not_Found_Then_Returns_Http_Bad_Request(
             Guid reservationId,
             ChangeOfPartyRequest request,
@@ -59,7 +59,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             model.Message.Should().Be(notFoundException.Message);
         }
 
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task And_AccountLegalEntity_Not_Found_Then_Returns_Http_Bad_Request(
             Guid reservationId,
             ChangeOfPartyRequest request,
@@ -79,7 +79,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             model.Message.Should().Be(notFoundException.Message);
         }
 
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task Then_Returns_Http_Create_With_New_ReservationId(
             Guid reservationId,
             ChangeOfPartyRequest request,

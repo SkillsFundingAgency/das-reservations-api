@@ -6,12 +6,12 @@ using SFA.DAS.Reservations.Domain.Configuration;
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Rule = SFA.DAS.Reservations.Data.Configuration.Rule;
 
 namespace SFA.DAS.Reservations.Data
 {
-    public interface IReservationsDataContext 
+    public interface IReservationsDataContext
     {
         DbSet<Domain.Entities.Course> Courses { get; set; }
         DbSet<Domain.Entities.Reservation> Reservations { get; set; }
@@ -28,7 +28,7 @@ namespace SFA.DAS.Reservations.Data
 
     public partial class ReservationsDataContext : DbContext, IReservationsDataContext
     {
-        private const string AzureResource = "https://database.windows.net/";        
+        private const string AzureResource = "https://database.windows.net/";
         private readonly IDbConnection _connection;
 
         public DbSet<Domain.Entities.Course> Courses { get; set; }
@@ -43,24 +43,22 @@ namespace SFA.DAS.Reservations.Data
 
         private readonly ReservationsConfiguration _configuration;
         private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
-        private readonly bool _configurationIsLocalOrDev;
 
         public ReservationsDataContext()
         {
-        }       
+        }
 
-        public ReservationsDataContext(IDbConnection connection, IOptions<ReservationsConfiguration> configuration, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider, bool configurationIsLocalOrDev) : base(options)
+        public ReservationsDataContext(IDbConnection connection, IOptions<ReservationsConfiguration> configuration, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
         {
             _configuration = configuration.Value;
             _azureServiceTokenProvider = azureServiceTokenProvider;
-            _configurationIsLocalOrDev = configurationIsLocalOrDev;
             _connection = connection;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies();
-           
+
             if (_connection != null)
             {
                 optionsBuilder.UseSqlServer(_connection as DbConnection);
@@ -72,40 +70,44 @@ namespace SFA.DAS.Reservations.Data
                     return;
                 }
 
-                var connection = _configurationIsLocalOrDev
-                  ? new SqlConnection(_configuration.ConnectionString)
-                  : new SqlConnection
-                  {
-                      ConnectionString = _configuration.ConnectionString,
-                      AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
-                  };
+                var connectionStringBuilder = new SqlConnectionStringBuilder(_configuration.ConnectionString);
+                bool useManagedIdentity = !connectionStringBuilder.IntegratedSecurity && string.IsNullOrEmpty(connectionStringBuilder.UserID);
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                
+                var connection = useManagedIdentity
+                    ? new SqlConnection
+                    {
+                        ConnectionString = _configuration.ConnectionString,
+                        AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+                    }
+                    : new SqlConnection(_configuration.ConnectionString);
 
-                optionsBuilder.UseSqlServer(connection, options =>
-                     options.EnableRetryOnFailure(
-                         5,
-                         TimeSpan.FromSeconds(20),
-                         null
-                     ));
-            }
-        }
-
-        public ReservationsDataContext(DbContextOptions options) :base(options)
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ApplyConfiguration(new Course());
-            modelBuilder.ApplyConfiguration(new Reservation());
-            modelBuilder.ApplyConfiguration(new Rule());
-            modelBuilder.ApplyConfiguration(new GlobalRule());
-            modelBuilder.ApplyConfiguration(new AccountLegalEntity());
-            modelBuilder.ApplyConfiguration(new UserRuleNotification());
-            modelBuilder.ApplyConfiguration(new ProviderPermission());
-            modelBuilder.ApplyConfiguration(new Account());
-            modelBuilder.ApplyConfiguration(new GlobalRuleAccountExemption());
-
-            base.OnModelCreating(modelBuilder);
+            optionsBuilder.UseSqlServer(connection, options =>
+                 options.EnableRetryOnFailure(
+                     5,
+                     TimeSpan.FromSeconds(20),
+                     null
+                 ));
         }
     }
+
+    public ReservationsDataContext(DbContextOptions options) : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new Course());
+        modelBuilder.ApplyConfiguration(new Reservation());
+        modelBuilder.ApplyConfiguration(new Rule());
+        modelBuilder.ApplyConfiguration(new GlobalRule());
+        modelBuilder.ApplyConfiguration(new AccountLegalEntity());
+        modelBuilder.ApplyConfiguration(new UserRuleNotification());
+        modelBuilder.ApplyConfiguration(new ProviderPermission());
+        modelBuilder.ApplyConfiguration(new Account());
+        modelBuilder.ApplyConfiguration(new GlobalRuleAccountExemption());
+
+        base.OnModelCreating(modelBuilder);
+    }
+}
 }
