@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
-using Microsoft.AspNetCore.Authentication;
+using System.Linq;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +14,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using SFA.DAS.Reservations.Api.StartupConfig;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.NServiceBus.Features.ClientOutbox.Data;
 using SFA.DAS.Reservations.Api.AppStart;
+using SFA.DAS.Reservations.Api.StartupConfig;
+using SFA.DAS.Reservations.Api.StartupExtensions;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Data;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
-using SFA.DAS.Reservations.Api.StartupExtensions;
 using SFA.DAS.Reservations.Infrastructure.DevConfiguration;
 using SFA.DAS.Reservations.Infrastructure.HealthCheck;
 using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using SFA.DAS.UnitOfWork.Mvc.Extensions;
 
 namespace SFA.DAS.Reservations.Api
 {
@@ -169,12 +172,21 @@ namespace SFA.DAS.Reservations.Api
             if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
             {
                 serviceProvider.StartNServiceBus(Configuration, ConfigurationIsLocalOrDev());
+
+                // Replacing ClientOutboxPersisterV2 with a local version to fix unit of work issue due to propogating Task up the chain rathert than awaiting on DB Command.
+                // not clear why this fixes the issue. Attempted to make the change in SFA.DAS.Nservicebus.SqlServer however it conflicts when upgraded with SFA.DAS.UnitOfWork.Nservicebus
+                // which would require upgrading to NET6 to resolve.
+                var serviceDescriptor = serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
+                serviceProvider.Remove(serviceDescriptor);
+                serviceProvider.AddScoped<IClientOutboxStorageV2, AppStart.ClientOutboxPersisterV2>();
             }
         }
 
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseUnitOfWork();
+
             if (ConfigurationIsLocalOrDev())
             {
                 app.UseDeveloperExceptionPage();

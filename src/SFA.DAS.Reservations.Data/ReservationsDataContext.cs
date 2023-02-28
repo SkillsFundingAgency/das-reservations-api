@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Rule = SFA.DAS.Reservations.Data.Configuration.Rule;
+using System.Diagnostics;
 
 namespace SFA.DAS.Reservations.Data
 {
@@ -58,6 +59,7 @@ namespace SFA.DAS.Reservations.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies();
+            optionsBuilder.LogTo(message => Debug.WriteLine(message));
 
             if (_connection != null)
             {
