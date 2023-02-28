@@ -1,14 +1,13 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System;
+using System.Data;
+using System.Data.Common;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Data.Configuration;
 using SFA.DAS.Reservations.Domain.Configuration;
-using System;
-using System.Data;
-using System.Data.Common;
-using Microsoft.Data.SqlClient;
 using Rule = SFA.DAS.Reservations.Data.Configuration.Rule;
-using System.Diagnostics;
 
 namespace SFA.DAS.Reservations.Data
 {
@@ -59,7 +58,6 @@ namespace SFA.DAS.Reservations.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies();
-            optionsBuilder.LogTo(message => Debug.WriteLine(message));
 
             if (_connection != null)
             {
