@@ -39,13 +39,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             })};
             _globalRules = new List<GlobalRule>();
             _globalRuleService.Setup(x => x.GetAccountRules(ExpectedAccountId)).ReturnsAsync(_accountGlobalRules);
-            _globalRuleService.Setup(x=>x.GetActiveRules(It.IsAny<DateTime>())).ReturnsAsync(_globalRules);
+            _globalRuleService.Setup(x => x.GetActiveRules(It.IsAny<DateTime>())).ReturnsAsync(_globalRules);
 
             _validator = new Mock<IValidator<GetAccountRulesQuery>>();
             _validator.Setup(x => x.ValidateAsync(It.IsAny<GetAccountRulesQuery>()))
                 .ReturnsAsync(new ValidationResult());
 
-            _handler = new GetAccountRulesQueryHandler(_globalRuleService.Object,_validator.Object);
+            _handler = new GetAccountRulesQueryHandler(_globalRuleService.Object, _validator.Object);
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             //Arrange
             _validator
                 .Setup(x => x.ValidateAsync(It.Is<GetAccountRulesQuery>(c => c.AccountId.Equals(ExpectedAccountId))))
-                .ReturnsAsync(new ValidationResult {ValidationDictionary = new Dictionary<string, string> {{"", ""}}});
+                .ReturnsAsync(new ValidationResult { ValidationDictionary = new Dictionary<string, string> { { "", "" } } });
 
             //Act Assert
             Assert.ThrowsAsync<ArgumentException>(() => _handler.Handle(_query, _cancellationToken));
@@ -69,7 +69,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             //Assert
             Assert.IsAssignableFrom<GetAccountRulesResult>(actual);
         }
-        
+
         [Test]
         public async Task Then_If_There_Are_Global_Rules_Theses_Are_The_Only_Rules_Returned_In_The_Response()
         {
@@ -102,6 +102,40 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             _globalRuleService.Verify(x => x.GetActiveRules(It.IsAny<DateTime>()), Times.Once);
             Assert.IsNotNull(actual.GlobalRules);
             Assert.AreEqual(2, actual.GlobalRules.Count);
+        }
+
+        [Test]
+        public async Task Then_Global_Rules_Where_AccountId_Is_Exempt_Are_Filtered_Out()
+        {
+            //Arrange
+            _globalRules = new List<GlobalRule>
+            {
+                new GlobalRule(new Domain.Entities.GlobalRule
+                {
+                    Id = 10,
+                    RuleType = (byte)GlobalRuleType.DynamicPause,
+                    Restriction = (byte)AccountRestriction.NonLevy,
+                    GlobalRuleAccountExemptions = new List<Domain.Entities.GlobalRuleAccountExemption>
+                    {
+                        new Domain.Entities.GlobalRuleAccountExemption
+                        {
+                            GlobalRuleId = 10,
+                            AccountId = ExpectedAccountId
+                        }
+                    }
+                })
+            };
+
+            _globalRuleService.Setup(x => x.GetActiveRules(It.IsAny<DateTime>())).ReturnsAsync(_globalRules);
+
+            //Act
+            var actual = await _handler.Handle(_query, _cancellationToken);
+
+            //Assert
+            _globalRuleService.Verify(x => x.GetAccountRules(ExpectedAccountId), Times.Once);
+            _globalRuleService.Verify(x => x.GetActiveRules(It.IsAny<DateTime>()), Times.Once);
+            Assert.IsNotNull(actual.GlobalRules);
+            Assert.AreEqual(1, actual.GlobalRules.Count);
         }
     }
 }

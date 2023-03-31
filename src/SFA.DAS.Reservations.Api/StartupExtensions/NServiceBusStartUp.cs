@@ -1,5 +1,4 @@
-﻿using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
@@ -9,6 +8,7 @@ using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
 using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 using SFA.DAS.NServiceBus.Hosting;
 using SFA.DAS.NServiceBus.SqlServer.Configuration;
+using SFA.DAS.Reservations.Api.AppStart;
 using SFA.DAS.UnitOfWork.NServiceBus.Configuration;
 
 namespace SFA.DAS.Reservations.Api.StartupExtensions
@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 .UseNewtonsoftJsonSerializer()
                 .UseOutbox(true)
                 .UseServicesBuilder(serviceProvider)
-                .UseSqlServerPersistence(() => new SqlConnection(configuration["Reservations:ConnectionString"]))
+                .UseSqlServerPersistence(() => AddDatabaseExtension.GetSqlConnection(configuration["Reservations:ConnectionString"]))
                 .UseUnitOfWork();
 
             if (configurationIsLocalOrDev)

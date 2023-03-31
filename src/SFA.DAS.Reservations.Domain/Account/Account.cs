@@ -5,9 +5,9 @@ namespace SFA.DAS.Reservations.Domain.Account
         public long Id { get ;  }
         public bool IsLevy { get ;  }
         public string Name { get ;  }
-        public int ReservationLimit { get;  }
+        public int? ReservationLimit { get;  }
 
-        public Account(Domain.Entities.Account account, int globalReservationLimit)
+        public Account(Domain.Entities.Account account, int? globalReservationLimit)
         {
             Id = account.Id;
             IsLevy = account.IsLevy;
@@ -20,7 +20,7 @@ namespace SFA.DAS.Reservations.Domain.Account
             Id = id;
             IsLevy = isLevy;
             Name = name;
-            ReservationLimit = reservationLimit ?? 0;
+            ReservationLimit = reservationLimit;
         }
 
     }

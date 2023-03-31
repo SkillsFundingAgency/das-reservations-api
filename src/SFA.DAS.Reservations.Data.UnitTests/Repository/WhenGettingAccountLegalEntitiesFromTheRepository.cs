@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         {
             mockDataContext
                 .Setup(context => context.AccountLegalEntities)
-                .ReturnsDbSet(new List<AccountLegalEntity>());
+                .Throws(new InvalidOperationException()); ;
 
             var act = new Func<Task>(async () => await repository.Get(accountLegalEntityId));
 

@@ -8,7 +8,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.Account;
-using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -23,6 +22,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
         private Domain.Entities.GlobalRule _globalRule;
         private Mock<IAccountsService> _accountService;
         private const long ExpectedAccountId = 534542143;
+        private const int ReservationLimit = 1;
 
         [SetUp]
         public void Arrange()
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 "Name")});
             _accountService = new Mock<IAccountsService>();
             _accountService.Setup(x => x.GetAccount(It.IsAny<long>()))
-                .ReturnsAsync(new Domain.Account.Account(ExpectedAccountId, false, "test", 1));
+                .ReturnsAsync(new Domain.Account.Account(ExpectedAccountId, false, "test", ReservationLimit));
 
             ReservationsConfiguration options = new ReservationsConfiguration { ResetReservationDate = DateTime.MinValue };
             _options = new Mock<IOptions<ReservationsConfiguration>>();
@@ -58,7 +58,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.GetAccountRules(ExpectedAccountId);
 
             //Assert
-            _repository.Verify(x => x.GetAccountReservations(ExpectedAccountId),Times.Once);
+            _repository.Verify(x => x.GetRemainingReservations(ExpectedAccountId, ReservationLimit),Times.Once);
             Assert.IsNotNull(actual);
         }
 

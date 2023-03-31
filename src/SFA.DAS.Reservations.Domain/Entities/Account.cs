@@ -8,6 +8,7 @@ namespace SFA.DAS.Reservations.Domain.Entities
         public string Name { get; set; } 
         public bool IsLevy { get; set; }
         public virtual ICollection<ProviderPermission> ProviderPermissions { get; set; }
+        public virtual ICollection<GlobalRuleAccountExemption> GlobalRuleAccountExemptions { get; set; }
         public virtual ICollection<AccountLegalEntity> AccountLegalEntities { get; set; }
         public int? ReservationLimit { get; set; }
     }

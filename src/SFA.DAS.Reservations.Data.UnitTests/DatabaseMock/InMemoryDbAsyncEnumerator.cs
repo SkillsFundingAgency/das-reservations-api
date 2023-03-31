@@ -42,5 +42,20 @@ namespace SFA.DAS.Reservations.Data.UnitTests.DatabaseMock
             }
         }
 
+        public ValueTask<bool> MoveNextAsync()
+        {
+            return new ValueTask<bool>(this.innerEnumerator.MoveNext());
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            if (!this.disposed)
+            {
+                this.innerEnumerator.Dispose();
+                this.disposed = true;
+            }
+
+            return new ValueTask();
+        }
     }
 }
