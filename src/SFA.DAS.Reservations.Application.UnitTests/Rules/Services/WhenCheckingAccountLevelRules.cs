@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.Account;
-using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -17,10 +17,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
     public class WhenCheckingAccountLevelRules
     {
         private Mock<IAccountReservationService> _repository;
+        private Mock<IOptions<ReservationsConfiguration>> _options;
         private GlobalRulesService _globalRulesService;
         private Domain.Entities.GlobalRule _globalRule;
         private Mock<IAccountsService> _accountService;
         private const long ExpectedAccountId = 534542143;
+        private const int ReservationLimit = 1;
 
         [SetUp]
         public void Arrange()
@@ -40,9 +42,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
                 "Name")});
             _accountService = new Mock<IAccountsService>();
             _accountService.Setup(x => x.GetAccount(It.IsAny<long>()))
-                .ReturnsAsync(new Domain.Account.Account(ExpectedAccountId, false, "test", 1));
+                .ReturnsAsync(new Domain.Account.Account(ExpectedAccountId, false, "test", ReservationLimit));
 
-            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), Mock.Of<IOptions<ReservationsConfiguration>>(), _repository.Object, _accountService.Object);
+            ReservationsConfiguration options = new ReservationsConfiguration { ResetReservationDate = DateTime.MinValue };
+            _options = new Mock<IOptions<ReservationsConfiguration>>();
+            _options.Setup(x => x.Value).Returns(options);
+
+            _globalRulesService = new GlobalRulesService(Mock.Of<IGlobalRuleRepository>(), _options.Object, _repository.Object, _accountService.Object, Mock.Of<ILogger<GlobalRulesService>>());
         }
 
         [Test]
@@ -52,7 +58,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.GetAccountRules(ExpectedAccountId);
 
             //Assert
-            _repository.Verify(x => x.GetAccountReservations(ExpectedAccountId),Times.Once);
+            _repository.Verify(x => x.GetRemainingReservations(ExpectedAccountId, ReservationLimit),Times.Once);
             Assert.IsNotNull(actual);
         }
 

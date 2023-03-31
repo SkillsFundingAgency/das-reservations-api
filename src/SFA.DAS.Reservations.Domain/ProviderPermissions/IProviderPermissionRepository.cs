@@ -5,6 +5,6 @@ namespace SFA.DAS.Reservations.Domain.ProviderPermissions
 {
     public interface IProviderPermissionRepository
     {
-        Task<IList<Domain.Entities.ProviderPermission>> GetByProviderId(uint ukPrn);
+        Task<IList<ProviderPermission>> GetAllowedNonLevyPermissionsForProvider(uint ukPrn);
     }
 }

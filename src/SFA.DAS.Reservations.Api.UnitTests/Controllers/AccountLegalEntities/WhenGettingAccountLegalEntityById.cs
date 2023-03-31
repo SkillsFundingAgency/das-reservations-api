@@ -32,8 +32,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                 1, 
                 "Test", 
                 2,
-                3, 
-                5,
+                3,                
                 true, 
                 true);
 
@@ -81,7 +80,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
             var actualError = result.Value as ArgumentErrorViewModel;
             Assert.IsNotNull(actualError);
-            Assert.AreEqual($"{expectedValidationMessage}{Environment.NewLine}Parameter name: {expectedParam}", actualError.Message);
+            Assert.AreEqual($"{expectedValidationMessage} (Parameter '{expectedParam}')", actualError.Message);
             Assert.AreEqual(expectedParam, actualError.Params);
         }
     }

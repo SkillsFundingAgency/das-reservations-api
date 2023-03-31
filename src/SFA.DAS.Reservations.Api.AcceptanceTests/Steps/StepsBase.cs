@@ -45,12 +45,18 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             AddCoursesToDb();
             AddAccountsToDb();
             AddAccountLegalEntitiesToDb();
+         }
+
+        [AfterScenario]
+        public void DisposeTestDatabaseData()
+        {
+            _dbContext.Database.EnsureDeleted(); 
         }
 
         private void ConfigureCustomValueRetrievers()
         {
             Service.Instance.ValueRetrievers.Replace<DateTimeValueRetriever, CustomDateTimeValueRetriever>();
-            Service.Instance.ValueRetrievers.Replace<NullableDateTimeValueRetriever, CustomNullableDateTimeValueRetriever>();
+            Service.Instance.ValueRetrievers.Replace<CustomNullableDateTimeValueRetriever, CustomNullableDateTimeValueRetriever>();
             Service.Instance.ValueRetrievers.Replace<ShortValueRetriever, CustomShortValueRetriever>();
         }
 

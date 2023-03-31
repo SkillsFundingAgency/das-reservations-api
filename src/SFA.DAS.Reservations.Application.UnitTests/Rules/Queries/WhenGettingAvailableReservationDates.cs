@@ -42,20 +42,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
         }
 
         [Test, MoqAutoData]
-        public async Task Then_Gets_Account_Id(
-            GetAvailableDatesQuery query,
-            [Frozen] ValidationResult validationResult,
-            [Frozen] Mock<IAccountLegalEntitiesService> mockAleService,
-            GetAvailableDatesQueryHandler handler)
-        {
-            validationResult.ValidationDictionary.Clear();
-
-            await handler.Handle(query, CancellationToken.None);
-
-            mockAleService.Verify(service => service.GetAccountLegalEntity(query.AccountLegalEntityId), Times.Once);
-        }
-
-        [Test, MoqAutoData]
         public async Task Then_The_Available_Dates_Service_Is_Called_And_Dates_Returned(
             GetAvailableDatesQuery query,
             [Frozen] ValidationResult validationResult,

@@ -9,16 +9,16 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
+using SFA.DAS.Reservations.Api.UnitTests.Controllers.Customisations;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation;
 using SFA.DAS.Reservations.Domain.Exceptions;
-using SFA.DAS.Testing.AutoFixture;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
     [TestFixture]
     public class WhenDeletingAReservation
     {
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task And_ArgumentException_Then_Returns_BadRequest(
             Guid reservationId,
             bool employerDeleted,
@@ -42,7 +42,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             error.Params.Should().Be(argumentException.ParamName);
         }
 
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task And_EntityNotFoundException_Then_Returns_Gone(
             Guid reservationId,
             bool employerDeleted,
@@ -62,7 +62,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             result.StatusCode.Should().Be(410);
         }
 
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task And_InvalidOperationException_Then_Returns_BadRequest(
             Guid reservationId,
             bool employerDeleted,
@@ -82,7 +82,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             result.StatusCode.Should().Be(400);
         }
 
-        [Test, MoqAutoData]
+        [Test, DomainAutoData]
         public async Task And_No_Error_Then_Returns_Ok(
             Guid reservationId,
             bool employerDeleted,

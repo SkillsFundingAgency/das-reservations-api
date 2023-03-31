@@ -10,10 +10,10 @@ namespace SFA.DAS.Reservations.Application.ProviderPermissions.Queries
 {
     public class GetAccountLegalEntitiesForProviderQueryHandler : IRequestHandler<GetAccountLegalEntitiesForProviderQuery, GetAccountLegalEntitiesForProviderResponse>
     {
-        private readonly IProviderPermissionService _service;
+        private readonly IProviderPermissionRepository _service;
         private readonly IValidator<GetAccountLegalEntitiesForProviderQuery> _validator;
 
-        public GetAccountLegalEntitiesForProviderQueryHandler (IProviderPermissionService service, IValidator<GetAccountLegalEntitiesForProviderQuery> validator)
+        public GetAccountLegalEntitiesForProviderQueryHandler (IProviderPermissionRepository service, IValidator<GetAccountLegalEntitiesForProviderQuery> validator)
         {
             _service = service;
             _validator = validator;
@@ -27,7 +27,7 @@ namespace SFA.DAS.Reservations.Application.ProviderPermissions.Queries
                 throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var permissions = await _service.GetPermissionsByProviderId(request.ProviderId);
+            var permissions = await _service.GetAllowedNonLevyPermissionsForProvider(request.ProviderId);
             
             return new GetAccountLegalEntitiesForProviderResponse
             {

@@ -162,6 +162,23 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
             return newReservation.Id;
         }
 
+        public async Task<int> GetRemainingReservations(long accountId, int totalReservationAllowed)
+        {
+            var result = await _reservationRepository.GetAccountReservations(accountId);
+
+            var usedReservation = result
+                .Count(r => !r.IsLevyAccount
+                    && r.CreatedDate >= _options.Value.ResetReservationDate
+                    && IsNotExpired(r));
+
+            return totalReservationAllowed - usedReservation;
+        }
+
+        private static bool IsNotExpired(Domain.Entities.Reservation r)
+        {
+            return !(r.Status == (short)ReservationStatus.Pending && r.ExpiryDate < DateTime.UtcNow);
+        }
+
         private Domain.Entities.Reservation CreateReservation(long accountId, long accountLegalEntityId, string accountLegalEntityName, long? transferSenderAccountId)
         {
             return new Domain.Entities.Reservation
