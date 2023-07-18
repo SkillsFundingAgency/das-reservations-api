@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Infrastructure.AzureServiceBus
         public async Task<bool> IsQueueHealthy(string queueName)
         {
             var connectionString = new ServiceBusConnectionStringBuilder(_configuration.NServiceBusConnectionString);
-            var tokenProvider = TokenProvider.CreateManagedServiceIdentityTokenProvider();
+            var tokenProvider = TokenProvider.CreateManagedIdentityTokenProvider();
             var client = new ManagementClient(connectionString, tokenProvider);
 
             if (!await client.QueueExistsAsync(queueName))
