@@ -139,7 +139,7 @@ public class Startup
                 {
                     o.Filters.Add(new AuthorizeFilter("default"));
                 }
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            });
 
         if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
         {
