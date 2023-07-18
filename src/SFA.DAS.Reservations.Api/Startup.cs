@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,7 +12,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
-using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.NServiceBus.Features.ClientOutbox.Data;
 using SFA.DAS.Reservations.Api.AppStart;
 using SFA.DAS.Reservations.Api.StartupConfig;
@@ -37,28 +35,7 @@ public class Startup
 
     public Startup(IConfiguration configuration)
     {
-        _configuration = configuration;
-
-        var config = new ConfigurationBuilder()
-            .AddConfiguration(configuration)
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", true)
-            .AddJsonFile("appsettings.development.json", true)
-            .AddEnvironmentVariables();
-
-        if (!configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
-        {
-            config.AddAzureTableStorage(options =>
-                {
-                    options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
-                    options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-                    options.EnvironmentName = configuration["Environment"];
-                    options.PreFixConfigurationKeys = false;
-                }
-            );
-        }
-
-        _configuration = config.Build();
+        _configuration = configuration.BuildDasConfiguration();
     }
 
     public void ConfigureServices(IServiceCollection services)
