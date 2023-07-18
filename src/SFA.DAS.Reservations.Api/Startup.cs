@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,11 +33,11 @@ namespace SFA.DAS.Reservations.Api;
 
 public class Startup
 {
-    private IConfiguration Configuration { get; }
+    private readonly IConfiguration _configuration;
 
     public Startup(IConfiguration configuration)
     {
-        Configuration = configuration;
+        _configuration = configuration;
 
         var config = new ConfigurationBuilder()
             .AddConfiguration(configuration)
@@ -59,23 +58,23 @@ public class Startup
             );
         }
 
-        Configuration = config.Build();
+        _configuration = config.Build();
     }
 
-    // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddOptions();
-        services.Configure<ReservationsConfiguration>(Configuration.GetSection("Reservations"));
+        services.Configure<ReservationsConfiguration>(_configuration.GetSection("Reservations"));
         services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
-        services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
+        services.Configure<AzureActiveDirectoryConfiguration>(_configuration.GetSection("AzureAd"));
         services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
 
-        var serviceProvider = services.BuildServiceProvider();
-        var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
+        var config = _configuration
+            .GetSection("Reservations")
+            .Get<ReservationsConfiguration>();
 
-        services.AddElasticSearch(config.Value);
-        services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));
+        services.AddElasticSearch(config);
+        services.AddSingleton(new ReservationsApiEnvironment(_configuration["Environment"]));
 
         services.AddHealthChecks().AddDbContextCheck<ReservationsDataContext>();
         services.AddHealthChecks()
@@ -90,8 +89,9 @@ public class Startup
 
         if (!ConfigurationIsLocalOrDev())
         {
-            var azureActiveDirectoryConfiguration =
-                serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
+            var azureActiveDirectoryConfiguration = _configuration
+                .GetSection("AzureAd")
+                .Get<AzureActiveDirectoryConfiguration>();
 
             services.AddAuthorization(o =>
             {
@@ -105,32 +105,35 @@ public class Startup
                 .AddJwtBearer(auth =>
                 {
                     auth.Authority =
-                        $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
+                        $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Tenant}";
                     auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
-                        ValidAudiences = azureActiveDirectoryConfiguration.Value.Identifier.Split(",")
+                        ValidAudiences = azureActiveDirectoryConfiguration.Identifier.Split(",")
                     };
                 });
             services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
         }
 
-        services.AddMediatR(x=> x.RegisterServicesFromAssembly(typeof(GetAccountReservationsQueryHandler).Assembly));
+        services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(GetAccountReservationsQueryHandler).Assembly));
         services.AddMediatRValidators();
         services.AddLogging();
 
         services.AddServiceRegistration(config);
 
-        if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+        if (_configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
         {
-            services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
+            services.AddDbContext<ReservationsDataContext>(options =>
+                options.UseInMemoryDatabase("SFA.DAS.Reservations"));
         }
         else
         {
-            services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
+            services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.ConnectionString));
         }
 
-        services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
-        services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
+        services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider =>
+            provider.GetService<ReservationsDataContext>());
+        services.AddTransient(provider =>
+            new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
 
         services
             .AddControllersWithViews(o =>
@@ -141,7 +144,7 @@ public class Startup
                 }
             });
 
-        if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+        if (!_configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
         {
             services
                 .AddEntityFramework(config)
@@ -154,13 +157,13 @@ public class Startup
             services.AddTransient<IUnitOfWorkManager, DevUnitOfWorkManager>();
         }
 
-        services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+        services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReservationsAPI", Version = "v1" });
         });
-            
+
         services
             .AddControllers()
             .AddNewtonsoftJson();
@@ -168,19 +171,20 @@ public class Startup
 
     public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
     {
-        if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+        if (_configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
         {
-            serviceProvider.StartNServiceBus(Configuration, ConfigurationIsLocalOrDev());
-
-            // Replacing ClientOutboxPersisterV2 with a local version to fix unit of work issue due to propogating Task up the chain rathert than awaiting on DB Command.
-            // not clear why this fixes the issue. Attempted to make the change in SFA.DAS.Nservicebus.SqlServer however it conflicts when upgraded with SFA.DAS.UnitOfWork.Nservicebus
-            // which would require upgrading to NET6 to resolve.
-            var serviceDescriptor = serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
-            serviceProvider.Remove(serviceDescriptor);
-            serviceProvider.AddScoped<IClientOutboxStorageV2, AppStart.ClientOutboxPersisterV2>();
+            return;
         }
-    }
+        
+        serviceProvider.StartNServiceBus(_configuration, ConfigurationIsLocalOrDev());
 
+        // Replacing ClientOutboxPersisterV2 with a local version to fix unit of work issue due to propogating Task up the chain rathert than awaiting on DB Command.
+        // not clear why this fixes the issue. Attempted to make the change in SFA.DAS.Nservicebus.SqlServer however it conflicts when upgraded with SFA.DAS.UnitOfWork.Nservicebus
+        // which would require upgrading to NET6 to resolve.
+        var serviceDescriptor =  serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
+        serviceProvider.Remove(serviceDescriptor);
+        serviceProvider.AddScoped<IClientOutboxStorageV2, AppStart.ClientOutboxPersisterV2>();
+    }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
@@ -211,7 +215,7 @@ public class Startup
 
     private bool ConfigurationIsLocalOrDev()
     {
-        return Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-               Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
+        return _configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+               _configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
     }
 }
