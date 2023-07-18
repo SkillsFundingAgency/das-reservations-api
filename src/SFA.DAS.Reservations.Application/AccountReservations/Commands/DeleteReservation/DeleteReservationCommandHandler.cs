@@ -26,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
             _context = context;
         }
 
-        public async Task<Unit> Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
+        public async Task Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateAsync(command);
             if (!validationResult.IsValid())
@@ -55,8 +55,6 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
             await _reservationService.DeleteReservation(command.ReservationId);
             
             _context.AddEvent(deletedEvent);
-
-            return Unit.Value;
         }
     }
 }
