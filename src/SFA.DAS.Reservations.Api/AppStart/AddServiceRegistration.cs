@@ -17,34 +17,33 @@ using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Infrastructure.AzureServiceBus;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 
-namespace SFA.DAS.Reservations.Api.AppStart
-{
-    public static class AddServiceExtension
-    {
-        public static void AddServiceRegistration(this IServiceCollection services, IOptions<ReservationsConfiguration> config)
-        {
-            services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
-            services.AddTransient<IReservationRepository, ReservationRepository>();
-            services.AddTransient<IRuleRepository, RuleRepository>();
-            services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
-            services.AddTransient<ICourseRepository, CourseRepository>();
-            services.AddTransient<IAccountLegalEntitiesRepository, AccountLegalEntityRepository>();
-            services.AddTransient<IAccountRepository, AccountRepository>();
-            services.AddTransient<IAccountReservationService, AccountReservationService>();
-            services.AddTransient<IAccountsService, AccountsService>();
-            services.AddTransient<IRulesService, RulesService>();
-            services.AddTransient<ICourseService, CourseService>();
-            services.AddTransient<IGlobalRulesService, GlobalRulesService>();
-            services.AddTransient<IAvailableDatesService, AvailableDatesService>();
-            services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
-            services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
-            services.AddTransient<IAzureQueueService, AzureQueueService>();
-            services.AddTransient<IReservationIndexRepository, ReservationIndexRepository>();
-            services.AddTransient<IProviderPermissionRepository, ProviderPermissionRepository>();
+namespace SFA.DAS.Reservations.Api.AppStart;
 
-            services.AddSingleton<ICurrentDateTime>(config.Value.CurrentDateTime.HasValue
-                ? new CurrentDateTime(config.Value.CurrentDateTime)
-                : new CurrentDateTime());
-        }
+public static class AddServiceExtension
+{
+    public static void AddServiceRegistration(this IServiceCollection services, ReservationsConfiguration config)
+    {
+        services.AddTransient<IUserRuleAcknowledgementRepository, UserRuleAcknowledgementRepository>();
+        services.AddTransient<IReservationRepository, ReservationRepository>();
+        services.AddTransient<IRuleRepository, RuleRepository>();
+        services.AddTransient<IGlobalRuleRepository, GlobalRuleRepository>();
+        services.AddTransient<ICourseRepository, CourseRepository>();
+        services.AddTransient<IAccountLegalEntitiesRepository, AccountLegalEntityRepository>();
+        services.AddTransient<IAccountRepository, AccountRepository>();
+        services.AddTransient<IAccountReservationService, AccountReservationService>();
+        services.AddTransient<IAccountsService, AccountsService>();
+        services.AddTransient<IRulesService, RulesService>();
+        services.AddTransient<ICourseService, CourseService>();
+        services.AddTransient<IGlobalRulesService, GlobalRulesService>();
+        services.AddTransient<IAvailableDatesService, AvailableDatesService>();
+        services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
+        services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
+        services.AddTransient<IAzureQueueService, AzureQueueService>();
+        services.AddTransient<IReservationIndexRepository, ReservationIndexRepository>();
+        services.AddTransient<IProviderPermissionRepository, ProviderPermissionRepository>();
+
+        services.AddSingleton<ICurrentDateTime>(config.CurrentDateTime.HasValue
+            ? new CurrentDateTime(config.CurrentDateTime)
+            : new CurrentDateTime());
     }
 }

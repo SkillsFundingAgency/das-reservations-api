@@ -1,12 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +12,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NServiceBus.ObjectBuilder.MSDependencyInjection;
-using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.NServiceBus.Features.ClientOutbox.Data;
 using SFA.DAS.Reservations.Api.AppStart;
 using SFA.DAS.Reservations.Api.StartupConfig;
@@ -31,189 +27,172 @@ using SFA.DAS.UnitOfWork.EntityFrameworkCore.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
 using SFA.DAS.UnitOfWork.Mvc.Extensions;
 
-namespace SFA.DAS.Reservations.Api
+namespace SFA.DAS.Reservations.Api;
+
+public class Startup
 {
-    public class Startup
+    private readonly IConfiguration _configuration;
+
+    public Startup(IConfiguration configuration)
     {
-        private IConfiguration Configuration { get; }
+        _configuration = configuration.BuildDasConfiguration();
+    }
 
-        public Startup(IConfiguration configuration)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddOptions();
+        services.Configure<ReservationsConfiguration>(_configuration.GetSection("Reservations"));
+        services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
+        services.Configure<AzureActiveDirectoryConfiguration>(_configuration.GetSection("AzureAd"));
+        services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
+
+        var config = _configuration
+            .GetSection("Reservations")
+            .Get<ReservationsConfiguration>();
+
+        services.AddElasticSearch(config);
+        services.AddSingleton(new ReservationsApiEnvironment(_configuration["Environment"]));
+
+        services.AddHealthChecks().AddDbContextCheck<ReservationsDataContext>();
+        services.AddHealthChecks()
+            .AddCheck<QueueHealthCheck>(
+                "ServiceBus Queue Health",
+                HealthStatus.Unhealthy,
+                new[] { "ready" })
+            .AddCheck<ElasticSearchHealthCheck>(
+                "Elastic Search Health",
+                HealthStatus.Unhealthy,
+                new[] { "ready" });
+
+        if (!ConfigurationIsLocalOrDev())
         {
-            Configuration = configuration;
+            var azureActiveDirectoryConfiguration = _configuration
+                .GetSection("AzureAd")
+                .Get<AzureActiveDirectoryConfiguration>();
 
-            var config = new ConfigurationBuilder()
-                .AddConfiguration(configuration)
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", true)
-                .AddJsonFile("appsettings.development.json", true)
-                .AddEnvironmentVariables();
-
-            if (!configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+            services.AddAuthorization(o =>
             {
-                config.AddAzureTableStorage(options =>
-                    {
-                        options.ConfigurationKeys = configuration["ConfigNames"].Split(",");
-                        options.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-                        options.EnvironmentName = configuration["Environment"];
-                        options.PreFixConfigurationKeys = false;
-                    }
-                );
-            }
-
-            Configuration = config.Build();
-        }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddOptions();
-            services.Configure<ReservationsConfiguration>(Configuration.GetSection("Reservations"));
-            services.AddSingleton(cfg => cfg.GetService<IOptions<ReservationsConfiguration>>().Value);
-            services.Configure<AzureActiveDirectoryConfiguration>(Configuration.GetSection("AzureAd"));
-            services.AddSingleton(cfg => cfg.GetService<IOptions<AzureActiveDirectoryConfiguration>>().Value);
-
-            var serviceProvider = services.BuildServiceProvider();
-            var config = serviceProvider.GetService<IOptions<ReservationsConfiguration>>();
-
-            services.AddElasticSearch(config.Value);
-            services.AddSingleton(new ReservationsApiEnvironment(Configuration["Environment"]));
-
-            services.AddHealthChecks().AddDbContextCheck<ReservationsDataContext>();
-            services.AddHealthChecks()
-                    .AddCheck<QueueHealthCheck>(
-                        "ServiceBus Queue Health",
-                        HealthStatus.Unhealthy,
-                        new[] { "ready" })
-                    .AddCheck<ElasticSearchHealthCheck>(
-                        "Elastic Search Health",
-                        HealthStatus.Unhealthy,
-                        new[] { "ready" });
-
-            if (!ConfigurationIsLocalOrDev())
-            {
-                var azureActiveDirectoryConfiguration =
-                    serviceProvider.GetService<IOptions<AzureActiveDirectoryConfiguration>>();
-
-                services.AddAuthorization(o =>
+                o.AddPolicy("default", policy =>
                 {
-                    o.AddPolicy("default", policy =>
-                    {
-                        policy.RequireRole("Default");
-                        policy.RequireAuthenticatedUser();
-                    });
+                    policy.RequireRole("Default");
+                    policy.RequireAuthenticatedUser();
                 });
-                services.AddAuthentication(auth => { auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
-                    .AddJwtBearer(auth =>
-                    {
-                        auth.Authority =
-                            $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Value.Tenant}";
-                        auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                        {
-                            ValidAudiences = azureActiveDirectoryConfiguration.Value.Identifier.Split(",")
-                        };
-                    });
-                services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
-            }
-
-            services.AddMediatR(typeof(GetAccountReservationsQueryHandler).Assembly);
-            services.AddMediatRValidators();
-            services.AddLogging();
-
-            services.AddServiceRegistration(config);
-
-            if (Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
-            {
-                services.AddDbContext<ReservationsDataContext>(options => options.UseInMemoryDatabase("SFA.DAS.Reservations"));
-            }
-            else
-            {
-                services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.Value.ConnectionString));
-            }
-
-            services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
-            services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
-
-            services
-                .AddControllersWithViews(o =>
+            });
+            services.AddAuthentication(auth => { auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
+                .AddJwtBearer(auth =>
                 {
-                    if (!ConfigurationIsLocalOrDev())
+                    auth.Authority =
+                        $"https://login.microsoftonline.com/{azureActiveDirectoryConfiguration.Tenant}";
+                    auth.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
-                        o.Filters.Add(new AuthorizeFilter("default"));
-                    }
-                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                        ValidAudiences = azureActiveDirectoryConfiguration.Identifier.Split(",")
+                    };
+                });
+            services.AddSingleton<IClaimsTransformation, AzureAdScopeClaimTransformation>();
+        }
 
-            if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
-            {
-                services
-                    .AddEntityFramework(config)
-                    .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
-                    .AddNServiceBusClientUnitOfWork();
-            }
-            else
-            {
-                services.AddTransient<IUnitOfWorkContext, DevUnitOfWorkContext>();
-                services.AddTransient<IUnitOfWorkManager, DevUnitOfWorkManager>();
-            }
+        services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(GetAccountReservationsQueryHandler).Assembly));
+        services.AddMediatRValidators();
+        services.AddLogging();
 
-            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+        services.AddServiceRegistration(config);
 
-            services.AddSwaggerGen(c =>
+        if (_configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+        {
+            services.AddDbContext<ReservationsDataContext>(options =>
+                options.UseInMemoryDatabase("SFA.DAS.Reservations"));
+        }
+        else
+        {
+            services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.ConnectionString));
+        }
+
+        services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider =>
+            provider.GetService<ReservationsDataContext>());
+        services.AddTransient(provider =>
+            new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
+
+        services
+            .AddControllersWithViews(o =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReservationsAPI", Version = "v1" });
+                if (!ConfigurationIsLocalOrDev())
+                {
+                    o.Filters.Add(new AuthorizeFilter("default"));
+                }
             });
-            
+
+        if (!_configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
+        {
             services
-                .AddControllers()
-                .AddNewtonsoftJson();
+                .AddEntityFramework(config)
+                .AddEntityFrameworkUnitOfWork<ReservationsDataContext>()
+                .AddNServiceBusClientUnitOfWork();
         }
-
-        public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
+        else
         {
-            if (!Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
-            {
-                serviceProvider.StartNServiceBus(Configuration, ConfigurationIsLocalOrDev());
-
-                // Replacing ClientOutboxPersisterV2 with a local version to fix unit of work issue due to propogating Task up the chain rathert than awaiting on DB Command.
-                // not clear why this fixes the issue. Attempted to make the change in SFA.DAS.Nservicebus.SqlServer however it conflicts when upgraded with SFA.DAS.UnitOfWork.Nservicebus
-                // which would require upgrading to NET6 to resolve.
-                var serviceDescriptor = serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
-                serviceProvider.Remove(serviceDescriptor);
-                serviceProvider.AddScoped<IClientOutboxStorageV2, AppStart.ClientOutboxPersisterV2>();
-            }
+            services.AddTransient<IUnitOfWorkContext, DevUnitOfWorkContext>();
+            services.AddTransient<IUnitOfWorkManager, DevUnitOfWorkManager>();
         }
 
+        services.AddApplicationInsightsTelemetry(_configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        services.AddSwaggerGen(c =>
         {
-            app.UseUnitOfWork();
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "ReservationsAPI", Version = "v1" });
+        });
 
-            if (ConfigurationIsLocalOrDev())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-                app.UseAuthentication();
-            }
+        services
+            .AddControllers()
+            .AddNewtonsoftJson();
+    }
 
-            app.UseHealthChecks();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReservationsAPI");
-                c.RoutePrefix = string.Empty;
-            });
-        }
-
-        private bool ConfigurationIsLocalOrDev()
+    public void ConfigureContainer(UpdateableServiceProvider serviceProvider)
+    {
+        if (_configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase))
         {
-            return Configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   Configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
+            return;
         }
+        
+        serviceProvider.StartNServiceBus(_configuration, ConfigurationIsLocalOrDev());
+
+        // Replacing ClientOutboxPersisterV2 with a local version to fix unit of work issue due to propogating Task up the chain rathert than awaiting on DB Command.
+        // not clear why this fixes the issue. Attempted to make the change in SFA.DAS.Nservicebus.SqlServer however it conflicts when upgraded with SFA.DAS.UnitOfWork.Nservicebus
+        // which would require upgrading to NET6 to resolve.
+        var serviceDescriptor =  serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
+        serviceProvider.Remove(serviceDescriptor);
+        serviceProvider.AddScoped<IClientOutboxStorageV2, AppStart.ClientOutboxPersisterV2>();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        app.UseUnitOfWork();
+
+        if (ConfigurationIsLocalOrDev())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+        else
+        {
+            app.UseHsts();
+            app.UseAuthentication();
+        }
+
+        app.UseHealthChecks();
+        app.UseRouting();
+        app.UseAuthorization();
+        app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
+
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReservationsAPI");
+            c.RoutePrefix = string.Empty;
+        });
+    }
+
+    private bool ConfigurationIsLocalOrDev()
+    {
+        return _configuration["Environment"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+               _configuration["Environment"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
     }
 }

@@ -14,7 +14,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
     public static class EntityFrameworkStartup
     {
-        public static IServiceCollection AddEntityFramework(this IServiceCollection services, IOptions<ReservationsConfiguration> config)
+        public static IServiceCollection AddEntityFramework(this IServiceCollection services, ReservationsConfiguration config)
         {
             return services.AddScoped(p =>
             {
@@ -31,7 +31,7 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                 }
                 catch (KeyNotFoundException)
                 {
-                    var connection = AddDatabaseExtension.GetSqlConnection(config.Value.ConnectionString);
+                    var connection = AddDatabaseExtension.GetSqlConnection(config.ConnectionString);
                     var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(connection);
                     dbContext = new ReservationsDataContext(optionsBuilder.Options);
                 }

@@ -48,9 +48,9 @@ namespace SFA.DAS.Reservations.Data
         {
         }
 
-        public ReservationsDataContext(IDbConnection connection, IOptions<ReservationsConfiguration> configuration, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
+        public ReservationsDataContext(IDbConnection connection, ReservationsConfiguration configuration, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
         {
-            _configuration = configuration.Value;
+            _configuration = configuration;
             _azureServiceTokenProvider = azureServiceTokenProvider;
             _connection = connection;
         }
