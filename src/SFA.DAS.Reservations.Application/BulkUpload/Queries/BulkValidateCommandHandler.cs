@@ -24,14 +24,14 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
         private readonly IMediator _mediator;
         private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities;
         private readonly ReservationsConfiguration _configuration;
-        private ILogger<BulkValidateCommandHandler> _logger;
+        private readonly ILogger<BulkValidateCommandHandler> _logger;
 
         public BulkValidateCommandHandler(IAccountReservationService accountReservationService,
             IGlobalRulesService globalRulesService,
-            IAccountLegalEntitiesService accountLegalEntitiesService, IAccountsService accountsService
-            , IMediator mediator
-            , IOptions<ReservationsConfiguration> options
-            , ILogger<BulkValidateCommandHandler> logger)
+            IAccountLegalEntitiesService accountLegalEntitiesService, IAccountsService accountsService,
+            IMediator mediator,
+            IOptions<ReservationsConfiguration> options,
+            ILogger<BulkValidateCommandHandler> logger)
         {
             _accountReservationService = accountReservationService;
             _globalRulesService = globalRulesService;
@@ -45,8 +45,10 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
         public async Task<BulkValidationResults> Handle(BulkValidateCommand bulkRequest, CancellationToken cancellationToken)
         {
-            var result = new BulkValidationResults();
-            result.ValidationErrors = new List<BulkValidation>();
+            var result = new BulkValidationResults
+            {
+                ValidationErrors = new List<BulkValidation>()
+            };
 
             // Only run validation for valid agreement ids - which have values.
             var validAgreementIds = bulkRequest.Requests.Where(x => x.AccountLegalEntityId.HasValue);
@@ -55,47 +57,61 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
             foreach (var group in groups)
             {
-                AccountLegalEntity accountLegalEntity = await GetAccountLegalEntity(group.Key.AccountLegalEntityId);
-                if (accountLegalEntity != null)
+                var accountLegalEntity = await GetAccountLegalEntity(group.Key.AccountLegalEntityId);
+
+                if (accountLegalEntity == null)
                 {
-                    if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy && !group.Key.TransferSenderAccountId.HasValue)
+                    continue;
+                }
+
+                if (!accountLegalEntity.AgreementSigned || accountLegalEntity.IsLevy ||
+                    group.Key.TransferSenderAccountId.HasValue)
+                {
+                    continue;
+                }
+                
+                if (await FailedGlobalRuleValidation())
+                {
+                    AddErrorForAllRows(result, group, "Failed global rule validation");
+                    return result;
+                }
+
+                if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
+                {
+                    AddErrorForAllRows(result, group, "The employer has reached their <b>reservations limit</b>. Contact the employer.");
+                }
+                else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
+                {
+                    AddErrorForAllRows(result, group, "Reservation failed for account.");
+                }
+                else
+                {
+                    foreach (var validateRequest in group)
                     {
-                        if (await FailedGlobalRuleValidation())
+                        if (accountLegalEntity == null || !validateRequest.StartDate.HasValue ||
+                            !validateRequest.ProviderId.HasValue ||
+                            string.IsNullOrWhiteSpace(validateRequest.CourseId))
                         {
-                            AddErrorForAllRows(result, group, "Failed global rule validation");
-                            return result;
+                            continue;
                         }
-                        else if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
+                        
+                        var dateFailureError = await FailedStartDateValidation(validateRequest.StartDate, validateRequest.AccountLegalEntityId.Value, accountLegalEntity.AccountId);
+                        
+                        if (!string.IsNullOrWhiteSpace(dateFailureError))
                         {
-                            AddErrorForAllRows(result, group, "The employer has reached their <b>reservations limit</b>. Contact the employer.");
-                        }
-                        else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
-                        {
-                            AddErrorForAllRows(result, group, "Reservation failed for account.");
+                            result.ValidationErrors.Add(new BulkValidation { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
                         }
                         else
                         {
-                            foreach (var validateRequest in group)
+                            // calling legacy service, we may be able to remove this, but will need to investigate further.
+                            var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
+                            if (reservationRule == null)
                             {
-                                if (accountLegalEntity != null && validateRequest.StartDate.HasValue && validateRequest.ProviderId.HasValue && !string.IsNullOrWhiteSpace(validateRequest.CourseId))
-                                {
-                                    var dateFailureError = await FailedStartDateValidation(validateRequest.StartDate, validateRequest.AccountLegalEntityId.Value, accountLegalEntity.AccountId);
-                                    if (!string.IsNullOrWhiteSpace(dateFailureError))
-                                    {
-                                        result.ValidationErrors.Add(new BulkValidation { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
-                                    }
-                                    else
-                                    {
-                                        // calling legacy service, we may be able to remove this, but will need to investigate further.
-                                        var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
-                                        if (reservationRule != null)
-                                        {
-                                            _logger.LogInformation("Failed reservation rule for reason : " + reservationRule.RuleTypeText);
-                                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
-                                        }
-                                    }
-                                }
+                                continue;
                             }
+                            
+                            _logger.LogInformation("Failed reservation rule for reason : " + reservationRule.RuleTypeText);
+                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
                         }
                     }
                 }
@@ -104,7 +120,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             return result;
         }
 
-        private void AddErrorForAllRows(BulkValidationResults result, IGrouping<object, BulkValidateRequest> group, string error)
+        private static void AddErrorForAllRows(BulkValidationResults result, IGrouping<object, BulkValidateRequest> group, string error)
         {
             foreach (var row in group)
             {
@@ -112,7 +128,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             }
         }
 
-        private IReservationRequest GetBulkCheckReservationAgainRule(BulkValidateRequest validateRequest, AccountLegalEntity accountLegalEntity)
+        private static IReservationRequest GetBulkCheckReservationAgainRule(BulkValidateRequest validateRequest, AccountLegalEntity accountLegalEntity)
         {
             return new BulkCheckReservationAgainRule
             {
@@ -151,7 +167,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             }
 
             var response = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
-            var activeRule = response?.GlobalRules?.Where(r => r != null)?.OrderBy(x => x.ActiveFrom)?.FirstOrDefault();
+            var activeRule = response?.GlobalRules?.Where(r => r != null)?.MinBy(x => x.ActiveFrom);
 
             if (activeRule != null)
             {
@@ -173,11 +189,13 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             {
                 return "No reservation dates found for account";
             }
-            else if (startDate.Value < possibleStartDates.Min())
+
+            if (startDate.Value < possibleStartDates.Min())
             {
-                return $@"The start for this learner cannot be before {possibleStartDates.Min():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.";
+                return $"The start for this learner cannot be before {possibleStartDates.Min():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.";
             }
-            else if (startDate.Value > possibleStartDates.Max())
+           
+            if (startDate.Value > possibleStartDates.Max())
             {
                 var expiryPeriodInMonths = _configuration.ExpiryPeriodInMonths;
 
@@ -190,7 +208,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
                 var possibleEndDate = possibleStartDates.Max();
                 var maxDate = new DateTime(possibleEndDate.Year, possibleEndDate.Month, DateTime.DaysInMonth(possibleEndDate.Year, possibleEndDate.Month));
-                return $@"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {expiryMonths} months in advance.";
+                return $"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {expiryMonths} months in advance.";
             }
 
             return null;
@@ -226,12 +244,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             var reservationLimit = account.ReservationLimit;
             var remainingReservation = await _accountReservationService.GetRemainingReservations(accountId, reservationLimit ?? 0);
 
-            if (remainingReservation < numberOfNewReservation)
-            {
-                return true;
-            }
-
-            return false;
+            return remainingReservation < numberOfNewReservation;
         }
 
         public class BulkCheckReservationAgainRule : IReservationRequest
