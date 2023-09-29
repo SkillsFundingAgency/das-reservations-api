@@ -25,13 +25,15 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
         private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities;
         private readonly ReservationsConfiguration _configuration;
         private readonly ILogger<BulkValidateCommandHandler> _logger;
+        private readonly ICurrentDateTime _currentDateTime;
 
         public BulkValidateCommandHandler(IAccountReservationService accountReservationService,
             IGlobalRulesService globalRulesService,
             IAccountLegalEntitiesService accountLegalEntitiesService, IAccountsService accountsService,
             IMediator mediator,
             IOptions<ReservationsConfiguration> options,
-            ILogger<BulkValidateCommandHandler> logger)
+            ILogger<BulkValidateCommandHandler> logger,
+            ICurrentDateTime currentDateTime)
         {
             _accountReservationService = accountReservationService;
             _globalRulesService = globalRulesService;
@@ -41,6 +43,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             _cachedAccountLegalEntities = new Dictionary<long, AccountLegalEntity>();
             _configuration = options.Value;
             _logger = logger;
+            _currentDateTime = currentDateTime;
         }
 
         public async Task<BulkValidationResults> Handle(BulkValidateCommand bulkRequest, CancellationToken cancellationToken)
@@ -88,9 +91,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                 {
                     foreach (var validateRequest in group)
                     {
-                        if (accountLegalEntity == null || !validateRequest.StartDate.HasValue ||
-                            !validateRequest.ProviderId.HasValue ||
-                            string.IsNullOrWhiteSpace(validateRequest.CourseId))
+                        if (accountLegalEntity == null || !validateRequest.StartDate.HasValue || !validateRequest.ProviderId.HasValue || string.IsNullOrWhiteSpace(validateRequest.CourseId))
                         {
                             continue;
                         }
@@ -110,7 +111,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                                 continue;
                             }
                             
-                            _logger.LogInformation("Failed reservation rule for reason : " + reservationRule.RuleTypeText);
+                            _logger.LogInformation("Failed reservation rule for reason : {Reason}.", reservationRule.RuleTypeText);
                             result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
                         }
                     }
@@ -165,7 +166,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             {
                 return "No available dates for reservation found";
             }
-
+            
             var response = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
             var activeRule = response?.GlobalRules?.Where(r => r != null)?.MinBy(x => x.ActiveFrom);
 
@@ -173,7 +174,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             {
                 _logger.LogInformation($"Found an active rule {activeRule.RuleTypeText} for accountId {accountId} with ActiveTo is {activeRule.ActiveTo?.ToString() ?? "Null"}");
             }
-
+            
             var possibleDates = activeRule == null
                  ? availableDates.AvailableDates.OrderBy(x => x.StartDate)
                  : availableDates.AvailableDates.Where(x => x.StartDate >= activeRule.ActiveTo).Select(x => x).OrderBy(x => x.StartDate);
@@ -189,12 +190,20 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             {
                 return "No reservation dates found for account";
             }
+            
+            var previousMonthDate = _currentDateTime.GetDate().AddMonths(-1);
+            var firstDateOfPreviousMonth = new DateTime(previousMonthDate.Year, previousMonthDate.Month, 1);
+            
+            if (startDate.Value < firstDateOfPreviousMonth)
+            {
+                return $"The start date cannot be before {firstDateOfPreviousMonth:dd/MM/yyyy}. You can only backdate a reservation for 1 month.";
+            }
 
             if (startDate.Value < possibleStartDates.Min())
             {
                 return $"The start for this learner cannot be before {possibleStartDates.Min():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.";
             }
-           
+            
             if (startDate.Value > possibleStartDates.Max())
             {
                 var expiryPeriodInMonths = _configuration.ExpiryPeriodInMonths;
@@ -210,7 +219,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                 var maxDate = new DateTime(possibleEndDate.Year, possibleEndDate.Month, DateTime.DaysInMonth(possibleEndDate.Year, possibleEndDate.Month));
                 return $"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {expiryMonths} months in advance.";
             }
-
+            
             return null;
         }
 
