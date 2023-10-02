@@ -42,7 +42,6 @@ public static class AddServiceExtension
         services.AddTransient<IReservationIndexRepository, ReservationIndexRepository>();
         services.AddTransient<IProviderPermissionRepository, ProviderPermissionRepository>();
 
-
         services.AddSingleton<ICurrentDateTime>(config.CurrentDateTime.HasValue
             ? new CurrentDateTime(config.CurrentDateTime)
             : new CurrentDateTime());
