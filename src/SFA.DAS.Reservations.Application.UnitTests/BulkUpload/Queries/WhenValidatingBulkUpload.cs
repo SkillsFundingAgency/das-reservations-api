@@ -134,22 +134,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
             Assert.AreEqual(1, result.ValidationErrors.Count);
             Assert.AreEqual($"The start date cannot be before {firstDateOfPreviousMonth:dd/MM/yyyy}. You can only backdate a reservation for 1 month.", result.ValidationErrors.First().Reason);
         }
-
-        [Test]
-        public async Task Fails_Validation_when_Apprenticeship_StartDate_Is_Before_Reservation_window()
-        {
-            //Setup
-            _command.Requests.First().StartDate = _referenceDate.AddMonths(-1);
-
-            //Act
-            var result = await _handler.Handle(_command, _cancellationToken);
-
-            //Assert
-            Assert.AreEqual(1, result.ValidationErrors.Count);
-            Assert.AreEqual($"The start for this learner cannot be before {_getAvailableDatesResult.AvailableDates.Select(x => x.StartDate).Min():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.",
-                result.ValidationErrors.First().Reason);
-        }
-
+        
         [Test]
         public async Task Fails_Validation_when_Apprenticeship_StartDate_Is_After_Reservation_window()
         {
