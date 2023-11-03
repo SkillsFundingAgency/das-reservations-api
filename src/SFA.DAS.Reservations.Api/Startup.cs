@@ -107,10 +107,8 @@ public class Startup
             services.AddDbContext<ReservationsDataContext>(options => options.UseSqlServer(config.ConnectionString));
         }
 
-        services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider =>
-            provider.GetService<ReservationsDataContext>());
-        services.AddTransient(provider =>
-            new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
+        services.AddScoped<IReservationsDataContext, ReservationsDataContext>(provider => provider.GetService<ReservationsDataContext>());
+        services.AddTransient(provider => new Lazy<ReservationsDataContext>(provider.GetService<ReservationsDataContext>()));
 
         services
             .AddControllersWithViews(o =>

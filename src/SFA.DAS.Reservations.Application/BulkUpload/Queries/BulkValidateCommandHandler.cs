@@ -24,14 +24,16 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
         private readonly IMediator _mediator;
         private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities;
         private readonly ReservationsConfiguration _configuration;
-        private ILogger<BulkValidateCommandHandler> _logger;
+        private readonly ILogger<BulkValidateCommandHandler> _logger;
+        private readonly ICurrentDateTime _currentDateTime;
 
         public BulkValidateCommandHandler(IAccountReservationService accountReservationService,
             IGlobalRulesService globalRulesService,
-            IAccountLegalEntitiesService accountLegalEntitiesService, IAccountsService accountsService
-            , IMediator mediator
-            , IOptions<ReservationsConfiguration> options
-            , ILogger<BulkValidateCommandHandler> logger)
+            IAccountLegalEntitiesService accountLegalEntitiesService, IAccountsService accountsService,
+            IMediator mediator,
+            IOptions<ReservationsConfiguration> options,
+            ILogger<BulkValidateCommandHandler> logger,
+            ICurrentDateTime currentDateTime)
         {
             _accountReservationService = accountReservationService;
             _globalRulesService = globalRulesService;
@@ -41,61 +43,78 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             _cachedAccountLegalEntities = new Dictionary<long, AccountLegalEntity>();
             _configuration = options.Value;
             _logger = logger;
+            _currentDateTime = currentDateTime;
         }
 
         public async Task<BulkValidationResults> Handle(BulkValidateCommand bulkRequest, CancellationToken cancellationToken)
         {
-            var result = new BulkValidationResults();
-            result.ValidationErrors = new List<BulkValidation>();
+            var result = new BulkValidationResults
+            {
+                ValidationErrors = new List<BulkValidation>()
+            };
 
             // Only run validation for valid agreement ids - which have values.
             var validAgreementIds = bulkRequest.Requests.Where(x => x.AccountLegalEntityId.HasValue);
 
-            var groups = validAgreementIds.GroupBy(x => new {AccountLegalEntityId =  x.AccountLegalEntityId.Value, x.TransferSenderAccountId });
+            var groups = validAgreementIds.GroupBy(x => new { AccountLegalEntityId = x.AccountLegalEntityId.Value, x.TransferSenderAccountId });
 
             foreach (var group in groups)
             {
-                AccountLegalEntity accountLegalEntity = await GetAccountLegalEntity(group.Key.AccountLegalEntityId);
-                if (accountLegalEntity != null)
+                var accountLegalEntity = await GetAccountLegalEntity(group.Key.AccountLegalEntityId);
+
+                if (accountLegalEntity == null)
                 {
-                    if (accountLegalEntity.AgreementSigned && !accountLegalEntity.IsLevy && !group.Key.TransferSenderAccountId.HasValue)
+                    continue;
+                }
+
+                if (!accountLegalEntity.AgreementSigned || accountLegalEntity.IsLevy ||
+                    group.Key.TransferSenderAccountId.HasValue)
+                {
+                    continue;
+                }
+
+                if (await FailedGlobalRuleValidation())
+                {
+                    AddErrorForAllRows(result, group, "Failed global rule validation");
+                    return result;
+                }
+
+                if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
+                {
+                    AddErrorForAllRows(result, group,
+                        "The employer has reached their <b>reservations limit</b>. Contact the employer.");
+                }
+                else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
+                {
+                    AddErrorForAllRows(result, group, "Reservation failed for account.");
+                }
+                else
+                {
+                    foreach (var validateRequest in group)
                     {
-                        if (await FailedGlobalRuleValidation())
+                        if (accountLegalEntity == null || !validateRequest.StartDate.HasValue || !validateRequest.ProviderId.HasValue || string.IsNullOrWhiteSpace(validateRequest.CourseId))
                         {
-                            AddErrorForAllRows(result, group, "Failed global rule validation");
-                            return result;
+                            continue;
                         }
-                        else if (await ApprenticeshipCountExceedsRemainingReservations(accountLegalEntity.AccountId, group.Count()))
+
+                        var dateFailureError = await FailedStartDateValidation(validateRequest.StartDate, validateRequest.AccountLegalEntityId.Value, accountLegalEntity.AccountId);
+
+                        if (!string.IsNullOrWhiteSpace(dateFailureError))
                         {
-                            AddErrorForAllRows(result, group, "The employer has reached their <b>reservations limit</b>. Contact the employer.");
-                        }
-                        else if (await FailedAccountRuleValidation(accountLegalEntity.AccountId))
-                        {
-                            AddErrorForAllRows(result, group, "Reservation failed for account.");
+                            result.ValidationErrors.Add(new BulkValidation
+                                { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
                         }
                         else
                         {
-                            foreach (var validateRequest in group)
+                            // calling legacy service, we may be able to remove this, but will need to investigate further.
+                            var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
+                            if (reservationRule == null)
                             {
-                                if (accountLegalEntity != null && validateRequest.StartDate.HasValue && validateRequest.ProviderId.HasValue && !string.IsNullOrWhiteSpace(validateRequest.CourseId))
-                                {
-                                    var dateFailureError = await FailedStartDateValidation(validateRequest.StartDate, validateRequest.AccountLegalEntityId.Value, accountLegalEntity.AccountId);
-                                    if (!string.IsNullOrWhiteSpace(dateFailureError))
-                                    {
-                                        result.ValidationErrors.Add(new BulkValidation { Reason = dateFailureError, RowNumber = validateRequest.RowNumber });
-                                    }
-                                    else
-                                    {
-                                        // calling legacy service, we may be able to remove this, but will need to investigate further.
-                                        var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
-                                        if (reservationRule != null)
-                                        {
-                                            _logger.LogInformation("Failed reservation rule for reason : " + reservationRule.RuleTypeText);
-                                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
-                                        }
-                                    }
-                                }
+                                continue;
                             }
+
+                            _logger.LogInformation("Failed reservation rule for reason : {Reason}.", reservationRule.RuleTypeText);
+                            result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
                         }
                     }
                 }
@@ -104,7 +123,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             return result;
         }
 
-        private void AddErrorForAllRows(BulkValidationResults result, IGrouping<object, BulkValidateRequest> group, string error)
+        private static void AddErrorForAllRows(BulkValidationResults result, IGrouping<object, BulkValidateRequest> group, string error)
         {
             foreach (var row in group)
             {
@@ -112,7 +131,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             }
         }
 
-        private IReservationRequest GetBulkCheckReservationAgainRule(BulkValidateRequest validateRequest, AccountLegalEntity accountLegalEntity)
+        private static IReservationRequest GetBulkCheckReservationAgainRule(BulkValidateRequest validateRequest, AccountLegalEntity accountLegalEntity)
         {
             return new BulkCheckReservationAgainRule
             {
@@ -151,7 +170,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             }
 
             var response = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
-            var activeRule = response?.GlobalRules?.Where(r => r != null)?.OrderBy(x => x.ActiveFrom)?.FirstOrDefault();
+            var activeRule = response?.GlobalRules?.Where(r => r != null)?.MinBy(x => x.ActiveFrom);
 
             if (activeRule != null)
             {
@@ -159,8 +178,9 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             }
 
             var possibleDates = activeRule == null
-                 ? availableDates.AvailableDates.OrderBy(x => x.StartDate)
-                 : availableDates.AvailableDates.Where(x => x.StartDate >= activeRule.ActiveTo).Select(x => x).OrderBy(x => x.StartDate);
+                ? availableDates.AvailableDates.OrderBy(x => x.StartDate)
+                : availableDates.AvailableDates.Where(x => x.StartDate >= activeRule.ActiveTo).Select(x => x)
+                    .OrderBy(x => x.StartDate);
 
             if (possibleDates == null || !possibleDates.Any())
             {
@@ -173,11 +193,16 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             {
                 return "No reservation dates found for account";
             }
-            else if (startDate.Value < possibleStartDates.Min())
+
+            var previousMonthDate = _currentDateTime.GetDate().AddMonths(-1);
+            var firstDayOfPreviousMonth = new DateTime(previousMonthDate.Year, previousMonthDate.Month, 1);
+            
+            if (startDate.Value < firstDayOfPreviousMonth)
             {
-                return $@"The start for this learner cannot be before {possibleStartDates.Min():dd/MM/yyyy} (first month of the window). You cannot backdate reserve funding.";
+                return $"The start date cannot be before {firstDayOfPreviousMonth:dd/MM/yyyy}. You can only backdate a reservation for 1 month.";
             }
-            else if (startDate.Value > possibleStartDates.Max())
+
+            if (startDate.Value > possibleStartDates.Max())
             {
                 var expiryPeriodInMonths = _configuration.ExpiryPeriodInMonths;
 
@@ -190,7 +215,8 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
                 var possibleEndDate = possibleStartDates.Max();
                 var maxDate = new DateTime(possibleEndDate.Year, possibleEndDate.Month, DateTime.DaysInMonth(possibleEndDate.Year, possibleEndDate.Month));
-                return $@"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {expiryMonths} months in advance.";
+                
+                return $"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {expiryMonths} months in advance.";
             }
 
             return null;
@@ -210,8 +236,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
         private async Task<bool> FailedGlobalRuleValidation()
         {
             var globalRulesApiResponse = await _mediator.Send(new GetRulesQuery());
-            if (globalRulesApiResponse?.GlobalRules != null
-                 && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom))
+            if (globalRulesApiResponse?.GlobalRules != null && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom))
             {
                 return true;
             }
@@ -226,37 +251,32 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
             var reservationLimit = account.ReservationLimit;
             var remainingReservation = await _accountReservationService.GetRemainingReservations(accountId, reservationLimit ?? 0);
 
-            if (remainingReservation < numberOfNewReservation)
-            {
-                return true;
-            }
-
-            return false;
+            return remainingReservation < numberOfNewReservation;
         }
 
-        public class BulkCheckReservationAgainRule : IReservationRequest
+        private class BulkCheckReservationAgainRule : IReservationRequest
         {
-            public Guid Id {get; set;}
+            public Guid Id { get; init; }
 
-            public long AccountId {get; set;}
+            public long AccountId { get; init; }
 
-            public DateTime? StartDate {get; set;}
+            public DateTime? StartDate { get; init; }
 
-            public string CourseId {get; set;}
+            public string CourseId { get; init; }
 
-            public uint? ProviderId {get; set;}
+            public uint? ProviderId { get; init; }
 
-            public long AccountLegalEntityId {get; set;}
+            public long AccountLegalEntityId { get; init; }
 
-            public string AccountLegalEntityName {get; set;}
+            public string AccountLegalEntityName { get; init; }
 
-            public bool IsLevyAccount {get; set;}
+            public bool IsLevyAccount { get; init; }
 
-            public DateTime CreatedDate {get; set;}
+            public DateTime CreatedDate { get; init; }
 
-            public long? TransferSenderAccountId {get; set;}
+            public long? TransferSenderAccountId { get; init; }
 
-            public Guid? UserId {get; set;}
+            public Guid? UserId { get; init; }
         }
     }
 }
