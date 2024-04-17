@@ -6,5 +6,6 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
     public class GetAvailableDatesResult
     {
         public IEnumerable<AvailableDateStartWindow> AvailableDates { get; set; }
+        public AvailableDateStartWindow PreviousMonth { get; set; }
     }
 }
