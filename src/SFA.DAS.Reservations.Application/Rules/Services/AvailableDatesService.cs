@@ -26,18 +26,5 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                 _configuration.AvailableDatesMaxDate)
                 .Dates;
         }
-
-        public AvailableDateStartWindow GetPreviousMonth()
-        {
-            var previousMonth = _currentDateTime.GetDate().AddMonths(-1);
-            var nextMonth = previousMonth.AddMonths(2);
-            var nextMonthLastDay = DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month);
-
-            return new()
-            {
-                StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
-                EndDate = new DateTime(nextMonth.Year, nextMonth.Month, nextMonthLastDay)
-            };
-        }
     }
 }

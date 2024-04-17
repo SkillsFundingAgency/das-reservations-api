@@ -34,12 +34,10 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
                     validationResult.ValidationDictionary.Select(pair => pair.Key).Aggregate((item1, item2) => $"{item1}, {item2}"));
 
             var availableDates = _availableDatesService.GetAvailableDates();
-            var previousMonth = _availableDatesService.GetPreviousMonth();
 
             return new GetAvailableDatesResult
             {
-                AvailableDates = availableDates,
-                PreviousMonth = previousMonth
+                AvailableDates = availableDates
             };
         }
     }

@@ -30,14 +30,19 @@ namespace SFA.DAS.Reservations.Domain.Rules
                 Dates =  new List<AvailableDateStartWindow>();
                 return;
             }
+
+            var availableDates = new List<AvailableDateStartWindow>();
+
+            if (minStartDate is null & maxStartDate is null)
+            {
+                availableDates.Add(GetPreviousMonth(dateTimeNow));
+            }
             
-            var availableDates = new List<AvailableDateStartWindow>
-            {               
-                new() {
-                    StartDate = new DateTime(startDate.Year, startDate.Month, 1),
-                    EndDate = new DateTime(twoMonthsFromNow.Year, twoMonthsFromNow.Month, lastDayOfTheMonth)
-                }
-            };
+            availableDates.Add(new()
+            {
+                StartDate = new DateTime(startDate.Year, startDate.Month, 1),
+                EndDate = new DateTime(twoMonthsFromNow.Year, twoMonthsFromNow.Month, lastDayOfTheMonth)
+            });
 
             for (var i = 1; i < expiryMonths; i++)
             {
@@ -65,5 +70,18 @@ namespace SFA.DAS.Reservations.Domain.Rules
         }
 
         public IList<AvailableDateStartWindow> Dates { get; }
+
+        private AvailableDateStartWindow GetPreviousMonth(DateTime dateTimeNow)
+        {
+            var previousMonth = dateTimeNow.AddMonths(-1);
+            var expiryMonth = previousMonth.AddMonths(2);
+            var nextMonthLastDay = DateTime.DaysInMonth(expiryMonth.Year, expiryMonth.Month);
+
+            return new()
+            {
+                StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
+                EndDate = new DateTime(expiryMonth.Year, expiryMonth.Month, nextMonthLastDay)
+            };
+        }
     }
 }

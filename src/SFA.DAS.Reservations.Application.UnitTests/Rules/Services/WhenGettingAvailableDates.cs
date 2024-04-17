@@ -36,29 +36,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             //Assert
             actualDates.Should().BeEquivalentTo(expectedDates);
         }
-
-         [Test, MoqAutoData]
-        public void Then_Uses_PreviousMonth(
-            [Frozen]Mock<ICurrentDateTime> currentDateTime,
-            Mock<IOptions<ReservationsConfiguration>> mockOptions
-            )
-        {
-            currentDateTime.Setup(x => x.GetDate()).Returns(DateTime.UtcNow);
-            var config = mockOptions.Object.Value;
-            
-            var availableDatesService = new AvailableDatesService(mockOptions.Object, currentDateTime.Object);
-          
-            //Act
-            var actualDate = availableDatesService.GetPreviousMonth();
-            var previousMonth = DateTime.UtcNow.AddMonths(-1);
-            var nextMonth = DateTime.UtcNow.AddMonths(1);
-
-            //Assert
-            actualDate.Should().NotBeNull();
-            actualDate.StartDate.Day.Should().Be(1);
-            actualDate.StartDate.Month.Should().Be(previousMonth.Month);
-            actualDate.EndDate.Month.Should().Be(nextMonth.Month);
-        }
         
         [Test, MoqAutoData]
         public void Then_Uses_The_Date_From_The_Current_Date_Service(

@@ -59,9 +59,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             mockDatesService
                 .Setup(x => x.GetAvailableDates())
                 .Returns(availableDateStartWindows);
-            mockDatesService
-                .Setup(x => x.GetPreviousMonth())
-                .Returns(previousMonth);
 
             //Act
             var actual = await handler.Handle(query, CancellationToken.None);
@@ -69,7 +66,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             //Assert
             Assert.IsAssignableFrom<GetAvailableDatesResult>(actual);
             Assert.AreSame(availableDateStartWindows, actual.AvailableDates);
-            Assert.AreSame(previousMonth, actual.PreviousMonth);
         }
     }
 }

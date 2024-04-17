@@ -48,16 +48,24 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Then(@"I should get available dates back")]
         public void ThenIShouldGetStandardAvailableDatesBack()
         {
-            Assert.AreEqual(6, _availableDatesResult.AvailableDates.Count());
-
+            _availableDatesResult.AvailableDates.Count().Should().Be(7);
+            
             var expectedDates = GetExpectedDates(DefaultAvailableDatesMonthCount, DateTime.Now,  DateTime.MaxValue);
-
+            
             _availableDatesResult.AvailableDates.Should().BeEquivalentTo(expectedDates);
         }
 
         private static IEnumerable<AvailableDateStartWindow> GetExpectedDates(int expectedMonthCount, DateTime minDate, DateTime maxDate)
         {
             var expectedDates = new List<AvailableDateStartWindow>();
+
+            var previousMonth = minDate.AddMonths(-1);
+            expectedDates.Add(new AvailableDateStartWindow
+            {
+                StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
+                EndDate = new DateTime(previousMonth.AddMonths(2).Year, previousMonth.AddMonths(2).Month,
+                    DateTime.DaysInMonth(previousMonth.AddMonths(2).Year, previousMonth.AddMonths(2).Month))
+            });
 
             for (var index = 0; index < expectedMonthCount; index++)
             {
