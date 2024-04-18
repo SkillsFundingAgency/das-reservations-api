@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
             var availableDates = new List<AvailableDateStartWindow>();
 
-            if (minStartDate is null & maxStartDate is null)
+            if (minStartDate is null && maxStartDate is null)
             {
                 availableDates.Add(GetPreviousMonth(dateTimeNow));
             }
@@ -71,7 +71,7 @@ namespace SFA.DAS.Reservations.Domain.Rules
 
         public IList<AvailableDateStartWindow> Dates { get; }
 
-        private AvailableDateStartWindow GetPreviousMonth(DateTime dateTimeNow)
+        private static AvailableDateStartWindow GetPreviousMonth(DateTime dateTimeNow)
         {
             var previousMonth = dateTimeNow.AddMonths(-1);
             var expiryMonth = previousMonth.AddMonths(2);
