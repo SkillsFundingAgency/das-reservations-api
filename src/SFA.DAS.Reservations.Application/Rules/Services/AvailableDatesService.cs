@@ -21,7 +21,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
             return new AvailableDates(
                 _currentDateTime.GetDate(),
                 _configuration.NumberOfAvailableDates,
-                _configuration.AvailableDatesMinDate, 
+                _configuration.AvailableDatesMinDate,
                 _configuration.AvailableDatesMaxDate)
                 .Dates;
         }

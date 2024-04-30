@@ -6,7 +6,6 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.Rules.Queries;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -46,6 +45,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             GetAvailableDatesQuery query,
             [Frozen] ValidationResult validationResult,
             AccountLegalEntity accountLegalEntity,
+            AvailableDateStartWindow previousMonth,
             List<AvailableDateStartWindow> availableDateStartWindows,
             [Frozen] Mock<IAccountLegalEntitiesService> mockAleService,
             [Frozen] Mock<IAvailableDatesService> mockDatesService,
