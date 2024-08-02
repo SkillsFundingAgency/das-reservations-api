@@ -77,7 +77,7 @@
     "customHostname": {
       "type": "string"
     },
-    "keyvaultCertificateName": {
+    "keyVaultCertificateName": {
       "type": "string"
     },
     "sharedKeyVaultName": {
@@ -101,7 +101,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2021-04-01",
       "name": "[variables('resourceGroupName')]",
       "type": "Microsoft.Resources/resourceGroups",
       "location": "[parameters('resourceGroupLocation')]",
@@ -109,10 +109,10 @@
       "properties": {}
     },
     {
-      "apiVersion": "2020-10-01",
-      "name": "[concat('app-service-plan-', parameters('utcValue'))]",
-      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "[concat('-app-service-plan-', parameters('utcValue'))]",
       "resourceGroup": "[variables('resourceGroupName')]",
+      "type": "Microsoft.Resources/deployments",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -136,9 +136,9 @@
       ]
     },
     {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2021-04-01",
       "name": "[concat('reservations-api-subnet-', parameters('utcValue'))]",
+      "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
       "properties": {
         "mode": "Incremental",
@@ -178,7 +178,7 @@
         },
         "parameters": {
           "serverName": {
-            "value": "[parameters('sharedSQLServerName')]"
+            "value": "[parameters('sharedSqlServerName')]"
           },
           "subnetResourceIdList": {
             "value": "[createArray(reference(concat('reservations-api-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value)]"
@@ -187,7 +187,7 @@
       }
     },
     {
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2021-04-01",
       "name": "[concat('app-service-certificate-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
@@ -199,7 +199,7 @@
         },
         "parameters": {
           "keyVaultCertificateName": {
-            "value": "[parameters('keyvaultCertificateName')]"
+            "value": "[parameters('keyVaultCertificateName')]"
           },
           "keyVaultName": {
             "value": "[parameters('sharedKeyVaultName')]"
@@ -214,7 +214,7 @@
       ]
     },
     {
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2021-04-01",
       "name": "[concat('application-insights-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
@@ -230,6 +230,9 @@
           },
           "attachedService": {
             "value": "[variables('appServiceName')]"
+          },
+          "logAnalyticsWorkspaceId": {
+            "value": "[resourceId(parameters('logAnalyticsSubscriptionId'),parameters('sharedManagementResourceGroup'),'Microsoft.OperationalInsights/workspaces',parameters('logAnalyticsWorkspaceName'))]"
           }
         }
       },
@@ -238,7 +241,7 @@
       ]
     },
     {
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2021-04-01",
       "name": "[concat('app-service-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[variables('resourceGroupName')]",
@@ -311,7 +314,7 @@
       ]
     },
     {
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2021-04-01",
       "name": "[concat('sql-database-', parameters('utcValue'))]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
@@ -350,7 +353,7 @@
       }
     },
     {
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2021-04-01",
       "name": "[concat('role-assignments-', parameters('utcValue'), '-', copyIndex())]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
