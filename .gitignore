@@ -274,3 +274,4 @@ App.Debug.config
 /src/.learningtransport/SFA.DAS.Reservations.Api/.bodies/*.*
 /src/.learningtransport/SFA.DAS.Reservations.Api/.delayed/**/*.*
 /src/.learningtransport/**/*.*
+*.ncrunchsolution

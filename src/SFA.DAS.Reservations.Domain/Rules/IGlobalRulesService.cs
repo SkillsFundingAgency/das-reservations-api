@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Domain.Rules
         Task<IList<GlobalRule>> GetActiveRules(DateTime fromDate);
         Task<GlobalRule> CheckReservationAgainstRules(IReservationRequest request);
         Task<IList<GlobalRule>> GetAccountRules(long accountId);
+        Task<bool> HasReachedReservationLimit(long accountId, bool isLevyReservation = false);
     }
 }

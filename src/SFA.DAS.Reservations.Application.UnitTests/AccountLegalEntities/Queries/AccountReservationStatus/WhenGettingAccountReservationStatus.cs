@@ -7,12 +7,15 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountReservationStatus;
+using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using Entities = SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Testing.AutoFixture;
 using ValidationResult = SFA.DAS.Reservations.Domain.Validation.ValidationResult;
+using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Queries.AccountReservationStatus
 {
@@ -44,6 +47,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             List<AccountLegalEntity> accountLegalEntities,
             [Frozen] ValidationResult validationResult,
             [Frozen] Mock<IAccountLegalEntitiesService> mockService,
+            [Frozen] Mock<IAccountsService> mockAccountsService,
             GetAccountReservationStatusQueryHandler handler)
         {
             validationResult.ValidationDictionary.Clear();
@@ -51,6 +55,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             mockService
                 .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
                 .ReturnsAsync(new List<AccountLegalEntity>());
+            mockAccountsService.Setup(x => x.GetAccount(It.IsAny<long>()))
+                .ReturnsAsync(new Domain.Account.Account(new Entities.Account(), 100));
 
             var act = new Func<Task>(async () => await handler.Handle(query, CancellationToken.None));
 
@@ -64,6 +70,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             List<AccountLegalEntity> accountLegalEntities,
             [Frozen] ValidationResult validationResult,
             [Frozen] Mock<IAccountLegalEntitiesService> mockService,
+            [Frozen] Mock<IAccountsService> mockAccountsService,
             GetAccountReservationStatusQueryHandler handler)
         {
             validationResult.ValidationDictionary.Clear();
@@ -71,32 +78,93 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             mockService
                 .Setup(service => service.GetAccountLegalEntities(transferSenderAccountId))
                 .ReturnsAsync(accountLegalEntities);
+            mockAccountsService.Setup(x => x.GetAccount(It.IsAny<long>()))
+                .ReturnsAsync(new Domain.Account.Account(new Entities.Account(), 100));
 
             var result = await handler.Handle(query, CancellationToken.None);
 
             result.CanAutoCreateReservations.Should().Be(accountLegalEntities[0].IsLevy);
-
         }
 
         [Test, MoqAutoData]
         public async Task Then_Gets_Account_Details_From_Service(
             GetAccountReservationStatusQuery query,
             List<AccountLegalEntity> accountLegalEntities,
+            int maxReservations,
             [Frozen] ValidationResult validationResult,
             [Frozen] Mock<IAccountLegalEntitiesService> mockService,
+            [Frozen] Mock<IAccountsService> mockAccountsService,
             GetAccountReservationStatusQueryHandler handler)
         {
+            var accountDetails = new Entities.Account();
             validationResult.ValidationDictionary.Clear();
             query.TransferSenderAccountId = null;
             mockService
                 .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
                 .ReturnsAsync(accountLegalEntities);
+            mockAccountsService.Setup(x => x.GetAccount(It.IsAny<long>())).ReturnsAsync(new Domain.Account.Account(accountDetails, maxReservations));
 
             var result = await handler.Handle(query, CancellationToken.None);
 
             var accountLegalEntity = accountLegalEntities[0];
             result.CanAutoCreateReservations.Should().Be(accountLegalEntity.IsLevy);
             result.AccountLegalEntityAgreementStatus[accountLegalEntity.AccountLegalEntityId].Should().Be(accountLegalEntity.AgreementSigned);
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Gets_Reservations_Limit_Reached_From_Service(
+            GetAccountReservationStatusQuery query,
+            List<AccountLegalEntity> accountLegalEntities,
+            [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IAccountLegalEntitiesService> mockService,
+            [Frozen] Mock<IAccountsService> mockAccountsService,
+            [Frozen] Mock<IGlobalRulesService> mockGlobalRulesService,
+            GetAccountReservationStatusQueryHandler handler)
+        {
+            var accountDetails = new Entities.Account();
+            validationResult.ValidationDictionary.Clear();
+            query.TransferSenderAccountId = null;
+            mockService
+                .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
+                .ReturnsAsync(accountLegalEntities);
+            mockAccountsService.Setup(x => x.GetAccount(It.IsAny<long>())).ReturnsAsync(new Domain.Account.Account(accountDetails, 100));
+
+            mockGlobalRulesService
+                .Setup(x => x.HasReachedReservationLimit(query.AccountId, accountLegalEntities[0].IsLevy))
+                .ReturnsAsync(true);
+
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            result.HasReachedReservationsLimit.Should().BeTrue();
+        }
+
+        [Test, MoqAutoData]
+        public async Task Then_Gets_Calculates_Reservations_Pending_Status_From_Service(
+            GetAccountReservationStatusQuery query,
+            List<AccountLegalEntity> accountLegalEntities,
+            [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IAccountLegalEntitiesService> mockService,
+            [Frozen] Mock<IAccountsService> mockAccountsService,
+            [Frozen] Mock<IAccountReservationService> mockAccountReservationsService,
+            [Frozen] Mock<IGlobalRulesService> mockGlobalRulesService,
+            GetAccountReservationStatusQueryHandler handler)
+        {
+            var accountDetails = new Entities.Account();
+            validationResult.ValidationDictionary.Clear();
+            query.TransferSenderAccountId = null;
+            mockService
+                .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
+                .ReturnsAsync(accountLegalEntities);
+            mockAccountsService.Setup(x => x.GetAccount(It.IsAny<long>())).ReturnsAsync(new Domain.Account.Account(accountDetails, 10));
+            mockAccountReservationsService.Setup(x => x.GetRemainingReservations(It.IsAny<long>(), 10)).ReturnsAsync(0);
+
+            mockGlobalRulesService
+                .Setup(x => x.HasReachedReservationLimit(query.AccountId, accountLegalEntities[0].IsLevy))
+                .ReturnsAsync(true);
+
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            result.HasPendingReservations.Should().BeFalse();
         }
     }
 }
