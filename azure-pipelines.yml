@@ -50,10 +50,10 @@ stages:
     parameters:
       SolutionBaseName: $(SolutionBaseName)
       BuildConfiguration: $(BuildConfiguration)
-  - template: azure-pipelines-templates/build/job/dacpaccs-template.yml@das-platform-building-blocks
+  - template: azure-pipelines-templates/build/job/dacpac-template.yml@das-platform-building-blocks
     parameters:
       SolutionBaseName: $(SolutionBaseName)
-      DatabaseProjectPath: src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.csproj
+      SqlProjectPath: src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.sqlproj
 
 - stage: Deploy_AT
   dependsOn: Build

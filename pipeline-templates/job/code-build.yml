@@ -37,7 +37,7 @@ jobs:
       OverWrite: true
 
   - task: PublishPipelineArtifact@1
-    displayName: Publish Build Artifact
+    displayName: Publish Build Artifact - - DasReservationApi
     inputs:
       targetPath: $(build.artifactstagingdirectory)/publish
       artifactName: ${{ parameters.SolutionBaseName }}
