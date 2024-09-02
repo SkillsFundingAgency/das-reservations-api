@@ -49,7 +49,8 @@ jobs:
             StorageAccountResourceGroup: $(SharedEnvResourceGroup)
             TargetFileName: '*.schema.json'
             TableName: Configuration
-            ConfigurationSecrets: {} # remove this if there are no secrets that need to be mapped for config
+            ConfigurationSecrets: 
+             NServiceBusLicense: $(NServiceBusLicense)
         - template: azure-pipelines-templates/deploy/step/sql-dacpac-deploy.yml@das-platform-building-blocks
           parameters:
             AzureSubscription: ${{ parameters.ServiceConnection }}
