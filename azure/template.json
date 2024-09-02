@@ -76,7 +76,7 @@
       },
       "aspInstances": {
           "type": "int",
-          "defaultValue": 1
+          "defaultValue": 2
       },
       "nonASETier": {
           "type": "string",
