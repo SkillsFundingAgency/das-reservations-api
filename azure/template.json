@@ -198,7 +198,7 @@
             "apiVersion": "2021-04-01",
             "name": "[concat('app-service-certificate-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[parameters('resourceGroupName')]",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -267,7 +267,7 @@
                         "value": "[variables('appServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[parameters('resourceGroupName')]"
+                        "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
                         "value": "[reference(concat('reservations-api-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
