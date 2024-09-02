@@ -1,3 +1,4 @@
+#REMEMBER: set the ApproveProdOverrideBlockOnPossibleDataLoss pipeline variable when connecting this pipeline, see Approve-SqlDacpacDeploymentDataLoss.ps1 docs for more info.
 parameters:
 - name: OverrideBlockOnPossibleDataLoss
   displayName: Add /p:BlockOnPossibleDataLoss=false argument to DACPAC deployment
@@ -11,16 +12,17 @@ trigger:
       - "master"
 
 variables:
-  - name: buildConfiguration
-    value: 'release'
-  - name: DACPACSolutionBaseName
-    value: SFA.DAS.Reservations.Database
-  - group: RELEASE Management Resources
-  - group: RELEASE das-reservations-api
-  - name: SolutionBaseName
-    value: SFA.DAS.Reservations
-  - name: Deploy
-    value: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.Reason'], 'Manual'), eq(variables['Build.Reason'], 'PullRequest'))]
+- name: SolutionBaseName
+  value: SFA.DAS.CandidateAccount
+- name: BuildConfiguration
+  value: release
+- name: BuildPlatform
+  value: any cpu
+- group: RELEASE Management Resources
+- group: RELEASE das-reservations-api
+- name: Deploy
+  value: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.Reason'], 'Manual'), eq(variables['Build.Reason'], 'PullRequest'))]
+
 
 resources:
   repositories:
@@ -45,11 +47,13 @@ stages:
 - stage: Build
   jobs:
   - template: pipeline-templates/job/code-build.yml
-  - template: azure-pipelines-templates/build/job/dacpac-template.yml@das-platform-building-blocks
     parameters:
-      SolutionBaseName: $(DACPACSolutionBaseName)
-      SqlProjectPath: src/$(DACPACSolutionBaseName)/$(DACPACSolutionBaseName).sqlproj
-
+      SolutionBaseName: $(SolutionBaseName)
+      BuildConfiguration: $(BuildConfiguration)
+  - template: azure-pipelines-templates/build/job/dacpaccs-template.yml@das-platform-building-blocks
+    parameters:
+      SolutionBaseName: $(SolutionBaseName)
+      DatabaseProjectPath: src/$(SolutionBaseName).Database/$(SolutionBaseName).Database.csproj
 
 - stage: Deploy_AT
   dependsOn: Build
@@ -59,6 +63,7 @@ stages:
   - group: DevTest Management Resources
   - group: AT DevTest Shared Resources
   - group: AT das-reservations-api
+  
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
@@ -66,7 +71,7 @@ stages:
       SolutionBaseName: $(SolutionBaseName)
       ServiceConnection: SFA-DAS-DevTest-ARM
       OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss  }}
-      
+
 - stage: Deploy_TEST
   dependsOn: Build
   displayName: Deploy to TEST
@@ -78,8 +83,9 @@ stages:
   - template: pipeline-templates/job/deploy.yml
     parameters:
       Environment: TEST
+      SolutionBaseName: $(SolutionBaseName)
       ServiceConnection: SFA-DAS-DevTest-ARM
-      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss }}
+      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss  }}
 
 - stage: Deploy_TEST2
   dependsOn: Build
@@ -92,8 +98,9 @@ stages:
   - template: pipeline-templates/job/deploy.yml
     parameters:
       Environment: TEST2
+      SolutionBaseName: $(SolutionBaseName)
       ServiceConnection: SFA-DAS-DevTest-ARM
-      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss }}
+      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss  }}
 
 - stage: Deploy_PP
   dependsOn: Build
@@ -106,22 +113,24 @@ stages:
   - template: pipeline-templates/job/deploy.yml
     parameters:
       Environment: PP
+      SolutionBaseName: $(SolutionBaseName)
       ServiceConnection: SFA-DIG-PreProd-ARM
-      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss }}
+      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss  }}
 
 - stage: Deploy_PROD
   dependsOn: Build
   displayName: Deploy to PROD
   variables:
-  - group: Prod Management Resources
-  - group: Prod Shared Resources
+  - group: PROD Management Resources
+  - group: PROD Shared Resources
   - group: PROD das-reservations-api
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
       Environment: PROD
+      SolutionBaseName: $(SolutionBaseName)
       ServiceConnection: SFA-DIG-Prod-ARM
-      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss }}
+      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss  }}
 
 - stage: Deploy_MO
   dependsOn: Build
@@ -134,8 +143,9 @@ stages:
   - template: pipeline-templates/job/deploy.yml
     parameters:
       Environment: MO
+      SolutionBaseName: $(SolutionBaseName)
       ServiceConnection: SFA-ASM-ModelOffice-ARM
-      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss }}
+      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss  }}
 
 - stage: Deploy_DEMO
   dependsOn: Build
@@ -148,5 +158,6 @@ stages:
   - template: pipeline-templates/job/deploy.yml
     parameters:
       Environment: DEMO
+      SolutionBaseName: $(SolutionBaseName)
       ServiceConnection: SFA-DAS-DevTest-ARM
-      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss }}
+      OverrideBlockOnPossibleDataLoss: ${{ parameters.OverrideBlockOnPossibleDataLoss  }}
