@@ -107,7 +107,6 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
         private async Task<int?> GetReservationLimit(long accountId)
         {
             var account = await _accountService.GetAccount(accountId);
-
             return account.ReservationLimit;
         }
 
