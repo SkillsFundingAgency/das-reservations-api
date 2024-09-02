@@ -44,6 +44,9 @@
       "sharedSQLServerName": {
           "type": "string"
       },
+      "sharedServiceBusName": {
+        "type": "string"
+      },
       "elasticPoolName": {
           "type": "string",
           "defaultValue": ""
@@ -360,6 +363,34 @@
                   }
               }
           }
+      },
+      {
+        "apiVersion": "2020-10-01",
+        "name": "[concat('role-assignments-', parameters('utcValue'), '-', copyIndex())]",
+        "type": "Microsoft.Resources/deployments",
+        "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "principalId": {
+              "value": "[createArray(reference(concat('app-service-', parameters('utcValue'))).outputs.managedServiceIdentityId.value, reference(concat('app-service-', parameters('utcValue'))).outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
+            },
+            "assignmentType": {
+              "value": "ServiceBusOwner"
+            },
+            "resourceName": {
+              "value": "[parameters('sharedServiceBusName')]"
+            }
+          }
+        },
+        "copy": {
+          "name": "role-assignments",
+          "count": 2
+        }
       }
   ],
   "outputs": {
