@@ -322,8 +322,7 @@
                 }
             },
             "dependsOn": [
-                "[variables('resourceGroupName')]",
-                "[concat(variables('apiAppServiceName'), '-app-service-plan-', parameters('utcValue'))]"
+                "[variables('resourceGroupName')]"
             ]
         },
         {
