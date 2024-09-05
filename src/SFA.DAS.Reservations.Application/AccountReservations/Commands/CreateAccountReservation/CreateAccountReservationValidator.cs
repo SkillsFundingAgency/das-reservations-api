@@ -72,7 +72,5 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
 
             return validationResult;
         }
-
-
     }
 }
