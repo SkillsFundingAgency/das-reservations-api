@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 using SFA.DAS.Reservations.Domain.Courses;
-using SFA.DAS.Reservations.Infrastructure.Configuration;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands.CreateReservation
 {
@@ -15,15 +12,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
     {
         private CreateAccountReservationValidator _validator;
         private Mock<ICourseService> _courseService;
-        private CurrentDateTime _currentDateTime;
 
         [SetUp]
         public void Arrange()
         {
             _courseService = new Mock<ICourseService>();
-            _currentDateTime = new CurrentDateTime(new DateTime(2019, 8, 8));
 
-            _validator = new CreateAccountReservationValidator(_courseService.Object, _currentDateTime);
+            _validator = new CreateAccountReservationValidator(_courseService.Object);
 
             _courseService.Setup(s => s.GetCourseById("1"))
                 .ReturnsAsync(new Course(new Domain.Entities.Course()));
@@ -66,7 +61,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             Assert.IsFalse(actual.IsValid());
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("Id has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountId has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("StartDate has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountLegalEntityName has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountLegalEntityId has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("CourseId has not been supplied"));
@@ -80,7 +74,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 Id = Guid.NewGuid(),
                 AccountId = 5432,
-                StartDate = _currentDateTime.GetDate(),
                 AccountLegalEntityName = "TestName",
                 AccountLegalEntityId = 1,
                 CourseId = "1"
@@ -99,7 +92,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 Id = Guid.NewGuid(),
                 AccountId = 1,
-                StartDate = _currentDateTime.GetDate(),
                 CourseId = "1",
                 AccountLegalEntityId = 1,
                 AccountLegalEntityName = "TestName"
@@ -140,7 +132,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 Id=Guid.NewGuid(),
                 AccountId = 1,
                 AccountLegalEntityId = 1,
-                StartDate = _currentDateTime.GetDate(),
                 CourseId = "2",
                 AccountLegalEntityName = "TestName"
             });
@@ -165,55 +156,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Assert
             Assert.IsTrue(actual.IsValid());
             Assert.AreEqual(0, actual.ValidationDictionary.Count);
-        }
-
-        [TestCase(-2)]
-        [TestCase(3)]
-        public async Task Then_If_The_Command_Is_For_A_NonLevy_Reservation_The_Start_Date_Must_Not_Be_Outside_This_Range(int monthsToAdd)
-        {
-            var startDate = _currentDateTime.GetDate().AddMonths(monthsToAdd);
-            var firstOfMonthStartDate = new DateTime(startDate.Year, startDate.Month, 1);
-
-            //Act
-            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand
-            {
-                Id = Guid.NewGuid(),
-                AccountId = 5432,
-                AccountLegalEntityId = 1,
-                AccountLegalEntityName = "Apple & co",
-                IsLevyAccount = false,
-                StartDate = firstOfMonthStartDate,
-                CourseId = "1",
-            });
-
-            //Assert
-            actual.IsValid().Should().BeFalse();
-            actual.ValidationDictionary.Count.Should().Be(1);
-            actual.ValidationDictionary.First().Value.Should()
-                .StartWith("Training start date must be between the funding reservation dates");
-        }
-
-        [TestCase(-1)]
-        //[TestCase(2)]
-        public async Task Then_If_The_Command_Is_For_A_NonLevy_Reservation_The_Start_Date_Must_Be_Within_This_Range(int monthsToAdd)
-        {
-            var startDate = _currentDateTime.GetDate().AddMonths(monthsToAdd);
-            var firstOfMonthStartDate = new DateTime(startDate.Year, startDate.Month, 1);
-
-            //Act
-            var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand
-            {
-                Id = Guid.NewGuid(),
-                AccountId = 5432,
-                AccountLegalEntityId = 1,
-                AccountLegalEntityName = "Apple & co",
-                IsLevyAccount = false,
-                StartDate = firstOfMonthStartDate,
-                CourseId = "1",
-            });
-
-            //Assert
-            actual.IsValid().Should().BeTrue();
         }
     }
 }

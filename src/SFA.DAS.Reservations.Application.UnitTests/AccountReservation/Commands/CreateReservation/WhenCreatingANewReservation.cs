@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
+using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Messages;
 using SFA.DAS.UnitOfWork.Context;
 using AccountLegalEntity = SFA.DAS.Reservations.Domain.AccountLegalEntities.AccountLegalEntity;
@@ -36,6 +38,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         private Mock<IUnitOfWorkContext> _unitOfWork;
         private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
         private AccountLegalEntity _expectedAccountLegalEntity;
+        private CurrentDateTime _currentDateTime;
 
         [SetUp]
         public void Arrange()
@@ -83,8 +86,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 .ReturnsAsync(_expectedAccountLegalEntity);
 
             _unitOfWork = new Mock<IUnitOfWorkContext>();
+            _currentDateTime = new CurrentDateTime();
 
-            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object, _unitOfWork.Object, _accountLegalEntitiesService.Object);
+            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object, _unitOfWork.Object, _accountLegalEntitiesService.Object, _currentDateTime);
         }
 
         [Test]
@@ -238,7 +242,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _accountReservationsService
                 .Setup(x => x.CreateAccountReservation(_command))
                 .ReturnsAsync(_reservationCreated);
-            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object, _unitOfWork.Object, _accountLegalEntitiesService.Object);
+            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object, _unitOfWork.Object, _accountLegalEntitiesService.Object, _currentDateTime);
 
             //Act
             await _handler.Handle(_command, _cancellationToken);
@@ -264,6 +268,61 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             //Assert
             Assert.AreEqual(_reservationCreated, actual.Reservation);
             Assert.IsTrue(actual.AgreementSigned);
+        }
+
+        [Test]
+        public async Task Then_If_The_Command_Is_For_A_NonLevy_Reservation_The_Start_Date_Must_Be_Present()
+        {
+            var expectedErrorMessage = "You must enter a start date to reserve new funding";
+            _command.StartDate = null;
+
+            var act = async () => await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            act.Should().Throw<StartDateException>().WithMessage(expectedErrorMessage);
+        }
+
+        [Test]
+        public async Task Then_If_The_Command_Is_For_A_NonLevy_Reservation_The_Start_Date_Must_Not_Be_MinDate()
+        {
+            var expectedErrorMessage = "You must enter a start date to reserve new funding";
+            _command.StartDate = DateTime.MinValue;
+
+            var act = async () => await _handler.Handle(_command, _cancellationToken);
+
+            //Assert
+            act.Should().Throw<StartDateException>().WithMessage(expectedErrorMessage);
+        }
+
+        [TestCase(-2)]
+        [TestCase(3)]
+        public async Task Then_If_The_Command_Is_For_A_NonLevy_Reservation_The_Start_Date_Must_Not_Be_Outside_This_Range(int monthsToAdd)
+        {
+            var validFromDate = _currentDateTime.GetDate().AddMonths(-1).ToString("MM yyyy");
+            var validToDate = _currentDateTime.GetDate().AddMonths(2).ToString("MM yyyy");
+            var expectedErrorMessage = $"Training start date must be between the funding reservation dates {validFromDate} to {validToDate}";
+
+            var startDate = _currentDateTime.GetDate().AddMonths(monthsToAdd);
+            var firstOfMonthStartDate = new DateTime(startDate.Year, startDate.Month, 1);
+            _command.StartDate = firstOfMonthStartDate;
+
+            var act = async () => await _handler.Handle(_command, _cancellationToken);
+                
+            //Assert
+            act.Should().Throw<StartDateException>().WithMessage(expectedErrorMessage);
+        }
+
+        [TestCase(-1)]
+        [TestCase(2)]
+        public async Task Then_If_The_Command_Is_For_A_NonLevy_Reservation_The_Start_Date_Must_Be_Within_This_Range(int monthsToAdd)
+        {
+            var startDate = _currentDateTime.GetDate().AddMonths(monthsToAdd);
+            var firstOfMonthStartDate = new DateTime(startDate.Year, startDate.Month, 1);
+            _command.StartDate = firstOfMonthStartDate;
+
+            var result = await _handler.Handle(_command, _cancellationToken);
+
+            result.Reservation.Should().NotBeNull();
         }
     }
 }

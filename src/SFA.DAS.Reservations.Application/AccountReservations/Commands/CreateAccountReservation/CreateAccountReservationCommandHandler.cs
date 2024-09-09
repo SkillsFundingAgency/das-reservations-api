@@ -3,8 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
+using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 using SFA.DAS.Reservations.Domain.Validation;
@@ -20,16 +21,18 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
         private readonly IGlobalRulesService _globalRulesService;
         private readonly IUnitOfWorkContext _context;
         private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
+        private readonly ICurrentDateTime _currentDateTime;
 
         public CreateAccountReservationCommandHandler(IAccountReservationService accountReservationService,
             IValidator<CreateAccountReservationCommand> validator, IGlobalRulesService globalRulesService,
-            IUnitOfWorkContext context, IAccountLegalEntitiesService accountLegalEntitiesService)
+            IUnitOfWorkContext context, IAccountLegalEntitiesService accountLegalEntitiesService, ICurrentDateTime currentDateTime)
         {
             _accountReservationService = accountReservationService;
             _validator = validator;
             _globalRulesService = globalRulesService;
             _context = context;
             _accountLegalEntitiesService = accountLegalEntitiesService;
+            _currentDateTime = currentDateTime;
         }
 
         public async Task<CreateAccountReservationResult> Handle(CreateAccountReservationCommand request, CancellationToken cancellationToken)
@@ -42,6 +45,8 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                     "The following parameters have failed validation", 
                     validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
+
+            ValidateStartDate(request);
 
             var globalRule = await _globalRulesService.CheckReservationAgainstRules(request);
 
@@ -131,6 +136,26 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                 Reservation = reservation,
                 AgreementSigned = true
             };
+        }
+
+        private void ValidateStartDate(CreateAccountReservationCommand item)
+        {
+            if (item.IsLevyAccount)
+                return;
+
+            if (!item.StartDate.HasValue || item.StartDate.Value == DateTime.MinValue)
+                throw new StartDateException("You must enter a start date to reserve new funding");
+
+            var currentDate = _currentDateTime.GetDate();
+            var currentFirstOfTheMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+            var validFromDate = currentDate.AddMonths(-1).ToString("MM yyyy");
+            var validToDate = currentDate.AddMonths(2).ToString("MM yyyy");
+            var errorMessage = $"Training start date must be between the funding reservation dates {validFromDate} to {validToDate}";
+            var startDate = item.StartDate.Value;
+            if (currentFirstOfTheMonth.AddMonths(-1) > startDate || currentFirstOfTheMonth.AddMonths(2) < startDate)
+            {
+                throw new StartDateException(errorMessage);
+            }
         }
     }
 }
