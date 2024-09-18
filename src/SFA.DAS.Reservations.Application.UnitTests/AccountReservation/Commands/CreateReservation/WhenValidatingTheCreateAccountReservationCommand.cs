@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
@@ -18,7 +19,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             _courseService = new Mock<ICourseService>();
 
-            _validator = new CreateAccountReservationValidator(_courseService.Object);
+            _validator = new CreateAccountReservationValidator(_courseService.Object, Mock.Of<ILogger<CreateAccountReservationValidator>>());
 
             _courseService.Setup(s => s.GetCourseById("1"))
                 .ReturnsAsync(new Course(new Domain.Entities.Course()));
