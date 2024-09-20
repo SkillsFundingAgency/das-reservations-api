@@ -12,9 +12,6 @@ using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
-    
-    
-
     [Binding]
     public class CreateReservationSteps : StepsBase
     {

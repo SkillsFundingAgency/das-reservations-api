@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
@@ -18,7 +19,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             _courseService = new Mock<ICourseService>();
 
-            _validator = new CreateAccountReservationValidator(_courseService.Object);
+            _validator = new CreateAccountReservationValidator(_courseService.Object, Mock.Of<ILogger<CreateAccountReservationValidator>>());
 
             _courseService.Setup(s => s.GetCourseById("1"))
                 .ReturnsAsync(new Course(new Domain.Entities.Course()));
@@ -61,7 +62,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             Assert.IsFalse(actual.IsValid());
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("Id has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountId has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("StartDate has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountLegalEntityName has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountLegalEntityId has not been supplied"));
             Assert.IsTrue(actual.ValidationDictionary.ContainsValue("CourseId has not been supplied"));
@@ -75,7 +75,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 Id = Guid.NewGuid(),
                 AccountId = 5432,
-                StartDate = DateTime.UtcNow,
                 AccountLegalEntityName = "TestName",
                 AccountLegalEntityId = 1,
                 CourseId = "1"
@@ -94,7 +93,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             {
                 Id = Guid.NewGuid(),
                 AccountId = 1,
-                StartDate = DateTime.Now,
                 CourseId = "1",
                 AccountLegalEntityId = 1,
                 AccountLegalEntityName = "TestName"
@@ -135,7 +133,6 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
                 Id=Guid.NewGuid(),
                 AccountId = 1,
                 AccountLegalEntityId = 1,
-                StartDate = DateTime.Now,
                 CourseId = "2",
                 AccountLegalEntityName = "TestName"
             });
