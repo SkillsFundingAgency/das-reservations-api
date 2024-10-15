@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SFA.DAS.Reservations.Data.UnitTests.Extensions
+﻿namespace SFA.DAS.Reservations.Data.UnitTests.Extensions
 {
     public static class StringExtensions
     {

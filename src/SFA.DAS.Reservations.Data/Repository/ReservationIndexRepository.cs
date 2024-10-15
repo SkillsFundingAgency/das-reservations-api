@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SFA.DAS.Reservations.Domain.Reservations;
 using System.Linq;
 using System.Text;

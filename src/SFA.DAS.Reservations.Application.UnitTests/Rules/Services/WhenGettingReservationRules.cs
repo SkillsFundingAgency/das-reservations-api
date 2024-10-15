@@ -6,7 +6,6 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.Entities;
-using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
