@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Moq;
 using NUnit.Framework;
@@ -73,8 +74,8 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
 
             //Assert
             azureQueueService.Verify(x => x.IsQueueHealthy(expectedQueueName), Times.Once);
-            Assert.AreEqual(HealthStatus.Healthy, actual.Status);
-            Assert.IsFalse(actual.Data.ContainsKey("QueuesInError"));
+            actual.Status.Should().Be(HealthStatus.Healthy);
+            actual.Data.Should().ContainKey("QueuesInError");
         }
 
 
@@ -106,9 +107,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
 
             //Assert
             azureQueueService.Verify(x => x.IsQueueHealthy(expectedQueueName), Times.Once);
-            Assert.AreEqual(HealthStatus.Degraded, actual.Status);
-            Assert.IsTrue(actual.Data.ContainsKey("QueuesInError"));
-            Assert.AreEqual("test.queue, test.queue2", actual.Data["QueuesInError"]);
+            actual.Status.Should().Be(HealthStatus.Degraded);
+            actual.Data.Should().ContainKey("QueuesInError");
+            actual.Data["QueuesInError"].Should().Be("test.queue, test.queue2");
         }
 
         [Test, MoqAutoData]
@@ -138,9 +139,9 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
 
             //Assert
             azureQueueService.Verify(x => x.IsQueueHealthy(expectedQueueName), Times.Once);
-            Assert.AreEqual(HealthStatus.Unhealthy, actual.Status);
-            Assert.IsTrue(actual.Data.ContainsKey("QueuesInError"));
-            Assert.AreEqual("test.queue, test.queue2, test.queue3", actual.Data["QueuesInError"]);
+            actual.Status.Should().Be(HealthStatus.Unhealthy);
+            actual.Data.Should().ContainKey("QueuesInError");
+            actual.Data["QueuesInError"].Should().Be("test.queue, test.queue2, test.queue3");
         }
 
 
@@ -165,7 +166,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
 
             //Assert
             azureQueueService.Verify(x => x.IsQueueHealthy(expectedQueueName), Times.Once);
-            Assert.AreEqual(HealthStatus.Unhealthy, actual.Status);
+            actual.Status.Should().Be(HealthStatus.Unhealthy);
         }
 
 
@@ -190,7 +191,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
 
             //Assert
             azureQueueService.Verify(x => x.IsQueueHealthy(expectedQueueName), Times.Once);
-            Assert.AreEqual(HealthStatus.Unhealthy, actual.Status);
+            actual.Status.Should().Be(HealthStatus.Unhealthy);
         }
 
     }

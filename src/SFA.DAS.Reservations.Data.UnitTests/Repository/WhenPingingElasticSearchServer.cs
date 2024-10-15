@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -63,7 +64,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var result = await _repository.PingAsync();
 
             //Assert
-            Assert.IsTrue(result);
+            result.Should().BeTrue();
         }
 
         [Test]
@@ -83,7 +84,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var result = await _repository.PingAsync();
 
             //Assert
-            Assert.IsFalse(result);
+            result.Should().BeFalse();
         }
     }
 }
