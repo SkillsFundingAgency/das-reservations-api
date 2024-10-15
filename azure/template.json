@@ -84,9 +84,6 @@
       "sharedKeyVaultName": {
         "type": "string"
       },
-      "loggingRedisConnectionString": {
-        "type": "securestring"
-      },
       "utcValue": {
         "type": "string",
         "defaultValue": "[utcNow('yyMMddHHmmss')]"
@@ -288,10 +285,6 @@
                   {
                     "name": "ASPNETCORE_ENVIRONMENT",
                     "value": "[toUpper(parameters('environmentName'))]"
-                  },
-                  {
-                    "name": "LoggingRedisConnectionString",
-                    "value": "[parameters('loggingRedisConnectionString')]"
                   }
                 ]
               }
