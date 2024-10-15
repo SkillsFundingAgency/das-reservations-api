@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -75,19 +76,18 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Then(@"the active course is returned")]
         public void ThenTheActiveCourseIsReturned()
         {
-            Assert.IsNotNull(_collectedCourses);
-            Assert.IsNotEmpty(_collectedCourses);
-            Assert.AreEqual(1, _collectedCourses.Count);
-            Assert.AreEqual(TestData.Course.CourseId, _collectedCourses.First().CourseId);
-            Assert.AreEqual(TestData.Course.Title, _collectedCourses.First().Title);
-            Assert.AreEqual(TestData.Course.Level.ToString(), _collectedCourses.First().Level);
+            _collectedCourses.Should().NotBeNullOrEmpty();
+            _collectedCourses.Should().HaveCount(1);
+            _collectedCourses[0].CourseId.Should().Be(TestData.Course.CourseId);
+            _collectedCourses[0].Title.Should().Be(TestData.Course.Title);
+            _collectedCourses[0].Level.Should().Be(TestData.Course.Level.ToString());
         }
 
         [Then(@"no courses are returned")]
         public void ThenNoCoursesAreReturned()
         {
-            Assert.IsNotNull(_collectedCourses);
-            Assert.IsEmpty(_collectedCourses);
+            _collectedCourses.Should().NotBeNull();
+            _collectedCourses.Should().BeEmpty();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -13,7 +14,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     [Binding]
     public class BulkCreateSteps : StepsBase
     {
-        private long _reservationCount;
+        private int _reservationCount;
         private long? _transferSenderId = null;
 
         public BulkCreateSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
@@ -44,7 +45,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Then(@"(.*) levy reservations are created")]
         public void ThenLevyReservationsAreCreated(int expectedReservations)
         {
-            Assert.AreEqual(expectedReservations, _reservationCount);
+            expectedReservations.Should().Be(_reservationCount);
         }
 
         [Then(@"the transfer id is added to the (.*) reservations")]
@@ -56,7 +57,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
                 c.TransferSenderAccountId.Equals(_transferSenderId) &&
                 c.AccountLegalEntityId.Equals(AccountLegalEntityId) && c.IsLevyAccount);
 
-            Assert.AreEqual(expectedReservations, reservations);
+            expectedReservations.Should().Be(reservations);
         }
 
     }

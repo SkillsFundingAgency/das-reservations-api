@@ -49,9 +49,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .Setup(context => context.Reservations.FindAsync(reservationId))
                 .ReturnsAsync((Reservation)null);
 
-            var act = new Func<Task>(async () => await repository.DeleteAccountReservation(reservationId));
+            var act = async () => await repository.DeleteAccountReservation(reservationId);
 
-            act.Should().Throw<EntityNotFoundException<Reservation>>();
+            act.Should().ThrowAsync<EntityNotFoundException<Reservation>>();
         }
 
         [Test, RecursiveMoqAutoData]
@@ -66,9 +66,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .Setup(context => context.Reservations.FindAsync(reservationId))
                 .ReturnsAsync(reservations[0]);
 
-            var act = new Func<Task>(async () => await repository.DeleteAccountReservation(reservationId));
+            var act = async () => await repository.DeleteAccountReservation(reservationId);
 
-            act.Should().Throw<InvalidOperationException>()
+            act.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage($"This reservation cannot be deleted");
         }
     }

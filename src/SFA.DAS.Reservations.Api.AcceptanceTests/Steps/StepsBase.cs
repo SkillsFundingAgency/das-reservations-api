@@ -16,7 +16,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
     {
         protected const long AccountId = 1;
         protected const long AccountLegalEntityId = 1;
-        protected const uint ProviderId = 15214;
+        protected const int ProviderId = 15214;
         protected Guid UserId;
         protected readonly TestData TestData;
         protected readonly TestResults TestResults;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -76,8 +77,10 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Then(@"all legal entities for my account are returned")]
         public void ThenAllLegalEntitiesForMyAccountAreReturned()
         {
-            Assert.True(TestResults.AccountLegalEntities.All(ale => ale.AccountId.Equals(TestData.AccountLegalEntity.AccountId)));
-
+            TestResults.AccountLegalEntities
+                .All(ale => ale.AccountId.Equals(TestData.AccountLegalEntity.AccountId))
+                .Should()
+                .BeTrue();
         }
 
     }
