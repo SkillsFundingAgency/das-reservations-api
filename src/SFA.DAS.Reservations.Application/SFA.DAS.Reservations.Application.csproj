@@ -11,7 +11,7 @@
     <None Remove="UserRuleNotification\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="12.4.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="NuGet.Common" Version="6.10.1" />
     <PackageReference Include="NuGet.Protocol" Version="6.10.1" />
     <PackageReference Include="SFA.DAS.UnitOfWork" Version="9.0.28" />

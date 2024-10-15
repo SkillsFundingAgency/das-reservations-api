@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 
@@ -18,7 +19,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
             
             //Assert
             var expectedType = isStandard ? ApprenticeshipType.Standard : ApprenticeshipType.Framework;
-            Assert.AreEqual(expectedType, actualApprenticeship.Type);
+            actualApprenticeship.Type.Should().Be(expectedType);
         }
         
     }

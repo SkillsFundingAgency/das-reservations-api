@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -16,7 +17,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new UserRuleAcknowledgement(expectedUkPrn.ToString(), 1,RuleType.GlobalRule);
 
             //Assert
-            Assert.AreEqual(expectedUkPrn, actual.UkPrn);
+            actual.UkPrn.Should().Be(expectedUkPrn);
         }
 
         [Test]
@@ -29,7 +30,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new UserRuleAcknowledgement(expectedUserId.ToString(), 1, RuleType.GlobalRule);
 
             //Assert
-            Assert.AreEqual(expectedUserId,actual.UserId);
+            actual.UserId.Should().Be(expectedUserId);
         }
 
         [TestCase(1)]
@@ -45,11 +46,11 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             //Assert
             if (((RuleType) ruleType).Equals(RuleType.GlobalRule))
             {
-                Assert.AreEqual(expectedRuleId,actual.GlobalRuleId);
+                actual.GlobalRuleId.Should().Be(expectedRuleId);
             }
             if (((RuleType)ruleType).Equals(RuleType.CourseRule))
             {
-                Assert.AreEqual(expectedRuleId, actual.CourseRuleId);
+                actual.CourseRuleId.Should().Be(expectedRuleId);
             }
         }
     }
