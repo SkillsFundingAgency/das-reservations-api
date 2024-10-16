@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 
@@ -30,9 +31,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var result = await _validator.ValidateAsync(_query);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.IsValid());
-            Assert.IsEmpty(result.ValidationDictionary);
+            result.Should().NotBeNull();
+            result.IsValid().Should().BeTrue();
+            result.ValidationDictionary.Should().BeEmpty();
         }
 
         [Test]
@@ -45,9 +46,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var result = await _validator.ValidateAsync(_query);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsFalse(result.IsValid());
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(_query.ReservationId)));
+            result.Should().NotBeNull();
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.Should().ContainKey(nameof(_query.ReservationId));
         }
 
         [Test]
@@ -60,24 +61,24 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var result = await _validator.ValidateAsync(_query);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsFalse(result.IsValid());
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(_query.CourseCode)));
+            result.Should().NotBeNull();
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.Should().ContainKey(nameof(_query.CourseCode));
         }
 
         [Test]
         public async Task ThenWillThrowErrorIfTrainingStartDateIsInvalid()
         {
             //Arrange
-            _query.StartDate = default(DateTime);
+            _query.StartDate = default;
 
             //Act
             var result = await _validator.ValidateAsync(_query);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsFalse(result.IsValid());
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(_query.StartDate)));
+            result.Should().NotBeNull();
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.Should().ContainKey(nameof(_query.StartDate));
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -47,13 +48,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             var actual = await _rulesController.GetAvailableDates(_accountLegalEntityId);
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualRules = result.Value as GetAvailableDatesResult;
-            Assert.AreEqual(_datesResult.AvailableDates, actualRules.AvailableDates);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var actualRules = result.Value.Should().BeOfType<GetAvailableDatesResult>().Subject;
+            actualRules.AvailableDates.Should().BeEquivalentTo(_datesResult.AvailableDates);
+
         }
 
         [Test, AutoData]
@@ -66,28 +69,36 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
                 .Throws(notFoundException);
 
             var actual = await _rulesController.GetAvailableDates(_accountLegalEntityId) as ObjectResult;
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)actual.StatusCode);
-            var actualError = actual.Value as ArgumentErrorViewModel;
-            Assert.AreEqual(notFoundException.Message, actualError.Message);
-            Assert.AreEqual("accountLegalEntityId", actualError.Params);
+            actual.Should().NotBeNull();
+            actual.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = actual.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be(notFoundException.Message);
+            actualError.Params.Should().Be("accountLegalEntityId");
+
         }
 
         [Test, AutoData]
         public async Task And_ArgumentException_Then_Returns_Error(
             ArgumentException argumentException)
         {
+            // Arrange
             _mediator.Setup(x => x.Send(
                     It.IsAny<GetAvailableDatesQuery>(),
                     It.IsAny<CancellationToken>()))
                 .Throws(argumentException);
 
+            // Act
             var actual = await _rulesController.GetAvailableDates(_accountLegalEntityId) as ObjectResult;
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)actual.StatusCode);
-            var actualError = actual.Value as ArgumentErrorViewModel;
-            Assert.AreEqual(argumentException.Message, actualError.Message);
-            Assert.AreEqual("accountLegalEntityId", actualError.Params);
+            
+            // Assert
+            actual.Should().NotBeNull();
+            actual.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = actual.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be(argumentException.Message);
+            actualError.Params.Should().Be("accountLegalEntityId");
+
         }
     }
 }

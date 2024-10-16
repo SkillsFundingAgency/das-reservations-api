@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -58,8 +59,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _reservationRepository.GetById(_expectedReservationId);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(ExpectedAccountId, actual.AccountId);
+            actual.Should().NotBeNull();
+            actual.AccountId.Should().Be(ExpectedAccountId);
         }
 
         [Test]
@@ -69,7 +70,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _reservationRepository.GetById(Guid.NewGuid());
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
     }
 }

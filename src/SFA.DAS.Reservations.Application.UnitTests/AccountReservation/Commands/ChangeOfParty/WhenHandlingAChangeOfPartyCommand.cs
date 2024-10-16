@@ -23,9 +23,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         {
             validationResult.AddError(propertyName);
 
-            var act = new Func<Task>(async () => await handler.Handle(command, CancellationToken.None));
+            var act = async () => await handler.Handle(command, CancellationToken.None);
 
-            act.Should().Throw<ArgumentException>()
+            act.Should().ThrowAsync<ArgumentException>()
                 .WithMessage($"The following parameters have failed validation*{propertyName}*");
         }
 

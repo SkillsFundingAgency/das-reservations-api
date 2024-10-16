@@ -32,9 +32,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
                 .Setup(validator => validator.ValidateAsync(It.IsAny<GetAccountReservationStatusQuery>()))
                 .ReturnsAsync(validationResult);
 
-            var act = new Func<Task>(async () => await handler.Handle(query, CancellationToken.None));
+            var act = async () => await handler.Handle(query, CancellationToken.None);
 
-            act.Should().Throw<ArgumentException>()
+            act.Should().ThrowAsync<ArgumentException>()
                 .WithMessage($"*{propertyName}*");
         }
 
@@ -52,9 +52,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
                 .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
                 .ReturnsAsync(new List<AccountLegalEntity>());
 
-            var act = new Func<Task>(async () => await handler.Handle(query, CancellationToken.None));
+            var act = async () => await handler.Handle(query, CancellationToken.None);
 
-            act.Should().Throw<EntityNotFoundException<Entities.AccountLegalEntity>>();
+            act.Should().ThrowAsync<EntityNotFoundException<Entities.AccountLegalEntity>>();
         }
 
         [Test, MoqAutoData]

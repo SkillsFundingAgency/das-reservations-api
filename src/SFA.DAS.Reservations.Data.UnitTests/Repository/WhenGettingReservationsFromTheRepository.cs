@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -121,7 +122,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _reservationRepository.GetAccountReservations(1);
 
             //Assert
-            Assert.AreEqual(6, actual.Count);
+            actual.Should().HaveCount(6);
         }
 
         [Test]
@@ -130,7 +131,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _reservationRepository.GetAccountReservations(1);
 
             var deletedCount = actual.Count(reservation => reservation.Status == (int) ReservationStatus.Deleted);
-            Assert.AreEqual(0, deletedCount);
+            deletedCount.Should().Be(0);
         }
 
         [Test]
@@ -139,7 +140,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _reservationRepository.GetAccountReservations(1);
 
             var count = actual.Count(reservation => reservation.Status == (int) ReservationStatus.Change);
-            Assert.AreEqual(0, count);
+            count.Should().Be(0);
         }
 
         [Test]
@@ -149,7 +150,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _reservationRepository.GetAccountReservations(3);
 
             //Assert
-            Assert.IsEmpty(actual);
+            actual.Should().BeEmpty();
         }
     }
 }

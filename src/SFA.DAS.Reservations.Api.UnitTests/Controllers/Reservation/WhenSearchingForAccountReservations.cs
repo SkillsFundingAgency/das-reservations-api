@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -95,15 +96,16 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, null, null);
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualReservations = result.Value as FindAccountReservationsResult;
-            Assert.AreEqual(_accountReservationsResult.Reservations, actualReservations.Reservations);
-            Assert.AreEqual(_accountReservationsResult.NumberOfRecordsFound, actualReservations.NumberOfRecordsFound);
-            Assert.AreEqual(_accountReservationsResult.Filters, actualReservations.Filters);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var actualReservations = result.Value.Should().BeOfType<FindAccountReservationsResult>().Subject;
+            actualReservations.Reservations.Should().BeEquivalentTo(_accountReservationsResult.Reservations);
+            actualReservations.NumberOfRecordsFound.Should().Be(_accountReservationsResult.NumberOfRecordsFound);
+            actualReservations.Filters.Should().BeEquivalentTo(_accountReservationsResult.Filters);
         }
 
         [Test]
@@ -119,13 +121,12 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.Search(0, "test", null, null, null);
 
             //Assert
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
-            var actualError = result.Value as ArgumentErrorViewModel;
-            Assert.IsNotNull(actualError);
-            Assert.AreEqual($"{expectedValidationMessage} (Parameter '{expectedParam}')", actualError.Message);
-            Assert.AreEqual(expectedParam, actualError.Params);
+            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = result.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
+            actualError.Params.Should().Be(expectedParam);
         }
     }
 }

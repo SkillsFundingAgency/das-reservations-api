@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -52,21 +53,23 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             var actual = await _accountLegalEntitiesController.GetByAccountLegalEntityId(ExpectedLegalEntityId);
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualAccountLegalEntity = result.Value as AccountLegalEntity;
-            Assert.AreEqual(_accountLegalEntityResult.LegalEntity, actualAccountLegalEntity);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var actualAccountLegalEntity = result.Value.Should().BeOfType<AccountLegalEntity>().Subject;
+            actualAccountLegalEntity.Should().BeEquivalentTo(_accountLegalEntityResult.LegalEntity);
+
         }
 
         [Test]
         public async Task Then_If_A_Validation_Error_Occurs_A_Bad_Request_Is_Returned_With_Errors()
         {
             //Arrange
-            var expectedValidationMessage = "The following parameters have failed validation";
-            var expectedParam = "Id";
+            const string expectedValidationMessage = "The following parameters have failed validation";
+            const string expectedParam = "Id";
             _mediator.Setup(x => x.Send(It.IsAny<GetAccountLegalEntityQuery>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new ArgumentException(expectedValidationMessage, expectedParam));
 
@@ -74,13 +77,13 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             var actual = await _accountLegalEntitiesController.GetByAccountLegalEntityId(0);
 
             //Assert
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
-            var actualError = result.Value as ArgumentErrorViewModel;
-            Assert.IsNotNull(actualError);
-            Assert.AreEqual($"{expectedValidationMessage} (Parameter '{expectedParam}')", actualError.Message);
-            Assert.AreEqual(expectedParam, actualError.Params);
+            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = result.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
+            actualError.Params.Should().Be(expectedParam);
+
         }
     }
 }

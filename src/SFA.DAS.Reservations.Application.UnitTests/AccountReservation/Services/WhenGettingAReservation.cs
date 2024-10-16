@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -59,7 +60,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             //Assert
             _reservationRepository.Verify(x => x.GetById(_expectedReservationId));
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
         [Test]
@@ -69,18 +70,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             var actual = await _service.GetReservation(_expectedReservationId);
 
             //Act
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(_expectedReservation.Id, actual.Id);
-            Assert.AreEqual(_expectedReservation.AccountId, actual.AccountId);
-            Assert.AreEqual(_expectedReservation.StartDate, actual.StartDate);
-            Assert.AreEqual(_expectedReservation.ExpiryDate, actual.ExpiryDate);
-            Assert.AreEqual(_expectedReservation.CreatedDate, actual.CreatedDate);
-            Assert.AreEqual(_expectedReservation.IsLevyAccount, actual.IsLevyAccount);
-            Assert.AreEqual(_expectedReservation.Status, (short)actual.Status);
-            Assert.AreEqual(_expectedReservation.AccountLegalEntityName, actual.AccountLegalEntityName);
-            Assert.AreEqual(_expectedReservation.TransferSenderAccountId, actual.TransferSenderAccountId);
-            Assert.AreEqual(_expectedReservation.UserId, actual.UserId);
-            
+            actual.Should().NotBeNull();
+            actual.Id.Should().Be(_expectedReservation.Id);
+            actual.AccountId.Should().Be(_expectedReservation.AccountId);
+            actual.StartDate.Should().Be(_expectedReservation.StartDate);
+            actual.ExpiryDate.Should().Be(_expectedReservation.ExpiryDate);
+            actual.CreatedDate.Should().Be(_expectedReservation.CreatedDate);
+            actual.IsLevyAccount.Should().Be(_expectedReservation.IsLevyAccount);
+            actual.Status.Should().Be((ReservationStatus)_expectedReservation.Status);
+            actual.AccountLegalEntityName.Should().Be(_expectedReservation.AccountLegalEntityName);
+            actual.TransferSenderAccountId.Should().Be(_expectedReservation.TransferSenderAccountId);
+            actual.UserId.Should().Be(_expectedReservation.UserId);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             var actual = await _service.GetReservation(Guid.NewGuid());
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
     }
 }

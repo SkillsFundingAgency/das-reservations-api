@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -83,7 +84,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             //Assert
             _reservationRepository.Verify(x=>x.GetAccountReservations(ExpectedAccountId));
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
         [Test]
@@ -93,7 +94,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             var actual = await _service.GetAccountReservations(ExpectedAccountId);
 
             //Assert
-            Assert.AreEqual(1, actual.Count);
+            actual.Should().HaveCount(1);
         }
 
         [Test]
@@ -104,17 +105,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
             //Act
             var actualReservation = actual.FirstOrDefault();
-            Assert.IsNotNull(actualReservation);
-            Assert.AreEqual(_expectedReservation.Id, actualReservation.Id);
-            Assert.AreEqual(_expectedReservation.AccountId, actualReservation.AccountId);
-            Assert.AreEqual(_expectedReservation.StartDate, actualReservation.StartDate);
-            Assert.AreEqual(_expectedReservation.ExpiryDate, actualReservation.ExpiryDate);
-            Assert.AreEqual(_expectedReservation.CreatedDate, actualReservation.CreatedDate);
-            Assert.AreEqual(_expectedReservation.IsLevyAccount, actualReservation.IsLevyAccount);
-            Assert.AreEqual(_expectedReservation.Status, (short)actualReservation.Status);
-            Assert.AreEqual(_expectedReservation.Course.CourseId, actualReservation.Course.CourseId);
-            Assert.AreEqual(_expectedReservation.Course.Title, actualReservation.Course.Title);
-            Assert.AreEqual(_expectedReservation.Course.Level.ToString(), actualReservation.Course.Level);
+            actualReservation.Should().NotBeNull();
+            actualReservation.Id.Should().Be(_expectedReservation.Id);
+            actualReservation.AccountId.Should().Be(_expectedReservation.AccountId);
+            actualReservation.StartDate.Should().Be(_expectedReservation.StartDate);
+            actualReservation.ExpiryDate.Should().Be(_expectedReservation.ExpiryDate);
+            actualReservation.CreatedDate.Should().Be(_expectedReservation.CreatedDate);
+            actualReservation.IsLevyAccount.Should().Be(_expectedReservation.IsLevyAccount);
+            actualReservation.Status.Should().Be((ReservationStatus)_expectedReservation.Status);
+            actualReservation.Course.CourseId.Should().Be(_expectedReservation.Course.CourseId);
+            actualReservation.Course.Title.Should().Be(_expectedReservation.Course.Title);
+            actualReservation.Course.Level.Should().Be(_expectedReservation.Course.Level.ToString());
+
         }
     }
 }

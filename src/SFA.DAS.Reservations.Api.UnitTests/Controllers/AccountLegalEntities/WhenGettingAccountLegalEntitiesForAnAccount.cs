@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -40,13 +41,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             var actual = await _accountLegalEntitiesController.GetByAccountId(ExpectedAccountId);
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualAccountLegalEntities = result.Value as List<Domain.AccountLegalEntities.AccountLegalEntity>;
-            Assert.AreEqual(_accountLegalEntitiesResponse.AccountLegalEntities, actualAccountLegalEntities);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var actualAccountLegalEntities = result.Value.Should().BeOfType<List<Domain.AccountLegalEntities.AccountLegalEntity>>().Subject;
+            actualAccountLegalEntities.Should().BeEquivalentTo(_accountLegalEntitiesResponse.AccountLegalEntities);
+
         }
 
         [Test]
@@ -62,13 +65,13 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
             var actual = await _accountLegalEntitiesController.GetByAccountId(0);
 
             //Assert
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
-            var actualError = result.Value as ArgumentErrorViewModel;
-            Assert.IsNotNull(actualError);
-            Assert.AreEqual($"{expectedValidationMessage} (Parameter '{expectedParam}')", actualError.Message);
-            Assert.AreEqual(expectedParam, actualError.Params);
+            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = result.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
+            actualError.Params.Should().Be(expectedParam);
+
         }
     }
 }
