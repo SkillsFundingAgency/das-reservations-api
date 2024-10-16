@@ -279,7 +279,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var act = async () => await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            act.Should().ThrowAsync<StartDateException>().WithMessage(expectedErrorMessage);
+            await act.Should().ThrowAsync<StartDateException>().WithMessage(expectedErrorMessage);
         }
 
         [Test]
@@ -291,7 +291,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var act = async () => await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            act.Should().ThrowAsync<StartDateException>().WithMessage(expectedErrorMessage);
+            await act.Should().ThrowAsync<StartDateException>().WithMessage(expectedErrorMessage);
         }
 
         [TestCase(-2)]
@@ -309,7 +309,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var act = async () => await _handler.Handle(_command, _cancellationToken);
                 
             //Assert
-            act.Should().ThrowAsync<StartDateException>().WithMessage(expectedErrorMessage);
+            await act.Should().ThrowAsync<StartDateException>().WithMessage(expectedErrorMessage);
         }
 
         [TestCase(-1)]

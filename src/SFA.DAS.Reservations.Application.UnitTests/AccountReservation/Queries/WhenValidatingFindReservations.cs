@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 
@@ -22,10 +23,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var actual = await _validator.ValidateAsync(new FindAccountReservationsQuery());
 
             //Assert
-            Assert.IsFalse(actual.IsValid());
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("ProviderId has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("PageNumber has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("PageItemCount has not been supplied"));
+            actual.IsValid().Should().BeFalse();
+            actual.ValidationDictionary.Should().ContainValue("ProviderId has not been supplied");
+            actual.ValidationDictionary.Should().ContainValue("PageNumber has not been supplied");
+            actual.ValidationDictionary.Should().ContainValue("PageItemCount has not been supplied");
         }
 
         [Test]
@@ -41,7 +42,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             });
 
             //Assert
-            Assert.IsTrue(actual.IsValid());
+            actual.IsValid().Should().BeTrue();
         }
     }
 }
