@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -49,7 +50,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             });
 
             //Assert
-            Assert.AreEqual(expected, actual.IsValid());
+            actual.IsValid().Should().Be(expected);
         }
 
         [Test]
@@ -59,12 +60,12 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var actual = await _validator.ValidateAsync(new CreateAccountReservationCommand());
 
             //Assert
-            Assert.IsFalse(actual.IsValid());
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("Id has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountId has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountLegalEntityName has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountLegalEntityId has not been supplied"));
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("CourseId has not been supplied"));
+            actual.IsValid().Should().BeFalse();
+            actual.ValidationDictionary.Should().ContainValue("Id has not been supplied");
+            actual.ValidationDictionary.Should().ContainValue("AccountId has not been supplied");
+            actual.ValidationDictionary.Should().ContainValue("AccountLegalEntityName has not been supplied");
+            actual.ValidationDictionary.Should().ContainValue("AccountLegalEntityId has not been supplied");
+            actual.ValidationDictionary.Should().ContainValue("CourseId has not been supplied");
         }
 
         [Test]
@@ -81,8 +82,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             });
 
             //Assert
-            Assert.IsTrue(actual.IsValid());
-            Assert.AreEqual(0, actual.ValidationDictionary.Count);
+            actual.IsValid().Should().BeTrue();
+            actual.ValidationDictionary.Should().HaveCount(0);
         }
 
         [Test]
@@ -99,7 +100,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             });
 
             //Assert
-            Assert.IsTrue(actual.IsValid());
+            actual.IsValid().Should().BeTrue();
         }
 
         [Test]
@@ -138,8 +139,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             });
 
             //Assert
-            Assert.IsFalse(actual.IsValid());
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("Course with CourseId cannot be found"));
+            actual.IsValid().Should().BeFalse();
+            actual.ValidationDictionary.Should().ContainValue("Course with CourseId cannot be found");
         }
 
         [Test]
@@ -155,8 +156,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             });
 
             //Assert
-            Assert.IsTrue(actual.IsValid());
-            Assert.AreEqual(0, actual.ValidationDictionary.Count);
+            actual.IsValid().Should().BeFalse();
+            actual.ValidationDictionary.Should().HaveCount(0);
         }
     }
 }

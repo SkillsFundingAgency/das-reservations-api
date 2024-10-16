@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
@@ -62,7 +63,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsAssignableFrom<GetReservationResponse>(actual);
+            actual.Should().BeAssignableTo<GetReservationResponse>();
         }
 
         [Test]
@@ -82,8 +83,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsNotNull(actual.Reservation);
-            Assert.AreEqual(12345, actual.Reservation.AccountId);
+            actual.Reservation.Should().NotBeNull();
+            actual.Reservation.AccountId.Should().Be(12345);
         }
     }
 }

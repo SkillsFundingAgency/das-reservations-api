@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Kernel;
+using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -113,9 +114,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
             var result = await _handler.Handle(_command, _cancellationToken);
 
             //Assert
-            Assert.AreEqual(3, result.ValidationErrors.Count);
-            Assert.AreEqual("The employer has reached their <b>reservations limit</b>. Contact the employer.",
-                result.ValidationErrors.First().Reason);
+            result.ValidationErrors.Should().HaveCount(3);
+            result.ValidationErrors.First().Reason.Should()
+                .Be("The employer has reached their <b>reservations limit</b>. Contact the employer.");
         }
 
         [Test]
@@ -131,8 +132,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
             var previousMonthDate = _referenceDate.AddMonths(-1);
             var firstDateOfPreviousMonth = new DateTime(previousMonthDate.Year, previousMonthDate.Month, 1);
 
-            Assert.AreEqual(1, result.ValidationErrors.Count);
-            Assert.AreEqual($"The start date cannot be before {firstDateOfPreviousMonth:dd/MM/yyyy}. You can only backdate a reservation for 1 month.", result.ValidationErrors.First().Reason);
+            result.ValidationErrors.Should().HaveCount(1);
+            result.ValidationErrors.First().Reason.Should()
+                .Be($"The start date cannot be before {firstDateOfPreviousMonth:dd/MM/yyyy}. You can only backdate a reservation for 1 month.");
         }
         
         [Test]
@@ -148,10 +150,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.BulkUpload.Queries
                 DateTime.DaysInMonth(possibleEndDate.Year, possibleEndDate.Month));
 
             //Assert
-            Assert.AreEqual(1, result.ValidationErrors.Count);
-            Assert.AreEqual(
-                $"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {_configuration.Object.Value.ExpiryPeriodInMonths} months in advance.",
-                result.ValidationErrors.First().Reason);
+            result.ValidationErrors.Should().HaveCount(1);
+            result.ValidationErrors.First().Reason.Should().Be(
+                $"The start for this learner cannot be after {maxDate:dd/MM/yyyy} (last month of the window) You cannot reserve funding more than {_configuration.Object.Value.ExpiryPeriodInMonths} months in advance.");
         }
     }
 

@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
     public class WhenChangingPartyOfAReservation
     {
         [Test, MoqAutoData]
-        public void And_Reservation_Not_Found_Then_Throws_EntityNotFoundException(
+        public async Task And_Reservation_Not_Found_Then_Throws_EntityNotFoundException(
             ChangeOfPartyServiceRequest request,
             [Frozen] Mock<IReservationRepository> mockRepository,
             AccountReservationService service)
@@ -24,13 +24,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 .Setup(repository => repository.GetById(request.ReservationId))
                 .ReturnsAsync((Domain.Entities.Reservation) null);
 
-            var act = new Func<Task>(async () => await service.ChangeOfParty(request));
+            var act = async () => await service.ChangeOfParty(request);
 
-            act.Should().Throw<EntityNotFoundException<Domain.Entities.Reservation>>();
+            await act.Should().ThrowAsync<EntityNotFoundException<Domain.Entities.Reservation>>();
         }
 
         [Test, RecursiveMoqAutoData]
-        public void And_Reservation_Completed_Status_Then_Throws_ArgumentException(
+        public async Task And_Reservation_Completed_Status_Then_Throws_ArgumentException(
             ChangeOfPartyServiceRequest request,
             Domain.Entities.Reservation existingReservation,
             [Frozen] Mock<IReservationRepository> mockRepository,
@@ -41,16 +41,16 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 .Setup(repository => repository.GetById(request.ReservationId))
                 .ReturnsAsync(existingReservation);
 
-            var act = new Func<Task>(async () => await service.ChangeOfParty(request));
+            var act = async () => await service.ChangeOfParty(request);
 
-            act.Should().Throw<ArgumentException>()
+            await act.Should().ThrowAsync<ArgumentException>()
                 .Where(exception => 
                     exception.ParamName == nameof(ChangeOfPartyServiceRequest.ReservationId) &&
                     exception.Message.StartsWith("Reservation cannot be changed due to it's status."));
         }
 
         [Test, RecursiveMoqAutoData]
-        public void And_Reservation_Deleted_Status_Then_Throws_ArgumentException(
+        public async Task And_Reservation_Deleted_Status_Then_Throws_ArgumentException(
             ChangeOfPartyServiceRequest request,
             Domain.Entities.Reservation existingReservation,
             [Frozen] Mock<IReservationRepository> mockRepository,
@@ -61,9 +61,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 .Setup(repository => repository.GetById(request.ReservationId))
                 .ReturnsAsync(existingReservation);
 
-            var act = new Func<Task>(async () => await service.ChangeOfParty(request));
+            var act = async () => await service.ChangeOfParty(request);
 
-            act.Should().Throw<ArgumentException>()
+            await act.Should().ThrowAsync<ArgumentException>()
                 .Where(exception => 
                     exception.ParamName == nameof(ChangeOfPartyServiceRequest.ReservationId) &&
                     exception.Message.StartsWith("Reservation cannot be changed due to it's status."));

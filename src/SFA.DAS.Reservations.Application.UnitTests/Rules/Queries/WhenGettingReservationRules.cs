@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Queries;
@@ -49,7 +50,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsAssignableFrom<GetRulesResult>(actual);
+            actual.Should().BeAssignableTo<GetRulesResult>();
         }
 
         [Test]
@@ -72,8 +73,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsNotNull(actual.Rules);
-            Assert.AreEqual(ExpectedReservationRuleId, actual.Rules[0].Id);
+            actual.Rules.Should().NotBeNull();
+            actual.Rules[0].Id.Should().Be(ExpectedReservationRuleId);
         }
 
         [Test]
@@ -98,10 +99,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             //Assert
             _globalRuleService.Verify(x=>x.GetAllRules(), Times.Once);
             
-            Assert.IsNotNull(actual.GlobalRules);
-            _service.Verify(x=>x.GetRules(),Times.Never);
-            Assert.IsNull(actual.Rules);
-            Assert.AreEqual(ExpectedReservationGlobalRuleId, actual.GlobalRules[0].Id);
+            actual.GlobalRules.Should().NotBeNull();
+            _service.Verify(x => x.GetRules(), Times.Never);
+            actual.Rules.Should().BeNull();
+            actual.GlobalRules[0].Id.Should().Be(ExpectedReservationGlobalRuleId);
         }
     }
 }

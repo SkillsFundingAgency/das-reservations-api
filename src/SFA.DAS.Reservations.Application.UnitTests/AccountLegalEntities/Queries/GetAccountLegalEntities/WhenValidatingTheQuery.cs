@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
 
@@ -21,8 +22,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var actual = await _validator.ValidateAsync(new GetAccountLegalEntitiesQuery());
 
             //Assert
-            Assert.IsFalse(actual.IsValid());
-            Assert.IsTrue(actual.ValidationDictionary.ContainsValue("AccountId has not been supplied"));
+            actual.IsValid().Should().BeFalse();
+            actual.ValidationDictionary.Should().ContainValue("AccountId has not been supplied");
         }
 
         [Test]
@@ -32,7 +33,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var actual = await _validator.ValidateAsync(new GetAccountLegalEntitiesQuery { AccountId = 99432 });
 
             //Assert
-            Assert.IsTrue(actual.IsValid());
+            actual.IsValid().Should().BeTrue();
         }
     }
 }
