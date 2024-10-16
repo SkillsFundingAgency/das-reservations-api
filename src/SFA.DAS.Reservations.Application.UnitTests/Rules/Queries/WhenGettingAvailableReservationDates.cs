@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -18,7 +19,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
     public class WhenGettingAvailableReservationDates
     {
         [Test, MoqAutoData]
-        public void And_Query_Invalid_Then_Throws_InvalidArgumentException(
+        public async Task And_Query_Invalid_Then_Throws_InvalidArgumentException(
             GetAvailableDatesQuery query,
             ValidationResult validationResult,
             string propertyName,
@@ -35,9 +36,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
 
             var act = new Func<Task>(async ()  => await handler.Handle(query, CancellationToken.None));
 
-            act.Should().Throw<ArgumentException>()
-                .WithMessage("The following parameters have failed validation*")
-                .Which.ParamName.Should().Contain(propertyName);
+            var ex = await act.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("The following parameters have failed validation*");
+                
+            ex.Subject.Single().ParamName.Should().Contain(propertyName);
         }
 
         [Test, MoqAutoData]
@@ -64,8 +66,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             var actual = await handler.Handle(query, CancellationToken.None);
 
             //Assert
-            Assert.IsAssignableFrom<GetAvailableDatesResult>(actual);
-            Assert.AreSame(availableDateStartWindows, actual.AvailableDates);
+            actual.AvailableDates.Should().BeEquivalentTo(availableDateStartWindows);
         }
     }
 }

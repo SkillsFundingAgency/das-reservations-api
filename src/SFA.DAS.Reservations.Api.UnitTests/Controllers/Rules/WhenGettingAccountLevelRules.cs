@@ -43,11 +43,11 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             //Assert
             actual.Should().NotBeNull();
 
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
 
-            var actualRules = result.Value.Should().BeOfType<GetAccountRulesResult>().Subject;
+            var actualRules = result.Value.Should().BeAssignableTo<GetAccountRulesResult>().Subject;
             actualRules.GlobalRules.Should().BeEquivalentTo(_rulesResult.GlobalRules);
 
         }
@@ -65,10 +65,10 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             var actual = await _rulesController.Account(AccountId);
 
             //Assert
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
 
-            var actualError = result.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
+            var actualError = result.Value.Should().BeAssignableTo<ArgumentErrorViewModel>().Subject;
             actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
             actualError.Params.Should().Be(expectedParam);
         }

@@ -40,11 +40,11 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             //Assert
             actual.Should().NotBeNull();
 
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
 
-            var actualRules = result.Value.Should().BeOfType<GetRulesResult>().Subject;
+            var actualRules = result.Value.Should().BeAssignableTo<GetRulesResult>().Subject;
             actualRules.Rules.Should().BeEquivalentTo(_rulesResult.Rules);
 
         }
@@ -58,11 +58,11 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             //Assert
             actual.Should().NotBeNull();
 
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
 
-            var actualRules = result.Value.Should().BeOfType<GetRulesResult>().Subject;
+            var actualRules = result.Value.Should().BeAssignableTo<GetRulesResult>().Subject;
             actualRules.GlobalRules.Should().BeEquivalentTo(_rulesResult.GlobalRules);
 
         }

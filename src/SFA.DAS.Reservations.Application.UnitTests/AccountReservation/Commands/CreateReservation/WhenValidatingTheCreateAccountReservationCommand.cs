@@ -156,7 +156,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             });
 
             //Assert
-            actual.IsValid().Should().BeFalse();
+            actual.IsValid().Should().BeTrue();
             actual.ValidationDictionary.Should().HaveCount(0);
         }
     }

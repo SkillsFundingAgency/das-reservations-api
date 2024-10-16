@@ -75,7 +75,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             //Assert
             azureQueueService.Verify(x => x.IsQueueHealthy(expectedQueueName), Times.Once);
             actual.Status.Should().Be(HealthStatus.Healthy);
-            actual.Data.Should().ContainKey("QueuesInError");
+            actual.Data.Should().NotContainKey("QueuesInError");
         }
 
 

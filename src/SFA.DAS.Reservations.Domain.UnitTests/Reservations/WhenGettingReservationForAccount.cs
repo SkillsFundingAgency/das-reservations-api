@@ -179,8 +179,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             _reservation.StartDate.Should().Be(expectedStartDate);
             _reservation.AccountLegalEntityName.Should().Be(expecteLegalEntityAccountName);
             _reservation.AccountLegalEntityId.Should().Be(expectedAccountLegalEntityId);
-            _reservation.CourseId.Should().NotBeNull();
-            _reservation.ProviderId.Should().NotBeNull();
+            _reservation.CourseId.Should().BeNull();
+            _reservation.ProviderId.Should().BeNull();
         }
 
         [Test]

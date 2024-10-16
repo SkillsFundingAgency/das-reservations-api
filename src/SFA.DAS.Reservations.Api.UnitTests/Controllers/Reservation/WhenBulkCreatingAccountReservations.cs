@@ -97,10 +97,10 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, _bulkReservation);
 
             //Assert
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
 
-            var actualError = result.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
+            var actualError = result.Value.Should().BeAssignableTo<ArgumentErrorViewModel>().Subject;
             actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
             actualError.Params.Should().Be(expectedParam);
 

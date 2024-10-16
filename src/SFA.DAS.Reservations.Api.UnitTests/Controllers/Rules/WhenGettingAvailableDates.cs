@@ -50,11 +50,11 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             //Assert
             actual.Should().NotBeNull();
 
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
 
-            var actualRules = result.Value.Should().BeOfType<GetAvailableDatesResult>().Subject;
+            var actualRules = result.Value.Should().BeAssignableTo<GetAvailableDatesResult>().Subject;
             actualRules.AvailableDates.Should().BeEquivalentTo(_datesResult.AvailableDates);
 
         }

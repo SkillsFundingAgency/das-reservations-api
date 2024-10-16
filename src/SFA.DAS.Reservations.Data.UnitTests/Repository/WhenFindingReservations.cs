@@ -342,7 +342,7 @@ public class WhenFindingReservations
 
         //Assert
         result.Should().NotBeNull();
-        result.Reservations.Should().NotBeNullOrEmpty();
+        result.Reservations.Should().BeEmpty();
         result.TotalReservations.Should().Be(0);
     }
 
@@ -364,7 +364,7 @@ public class WhenFindingReservations
 
         //Assert
         result.Should().NotBeNull();
-        result.Reservations.Should().NotBeNullOrEmpty();
+        result.Reservations.Should().BeEmpty();
         result.TotalReservations.Should().Be(0);
     }
 

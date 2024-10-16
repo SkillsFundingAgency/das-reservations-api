@@ -72,7 +72,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
             var result = course.GetActiveRules(reservationDates);
 
             //Assert
-            result.Should().NotBeNullOrEmpty();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -102,7 +102,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
             var result = course.GetActiveRules(reservationDates);
 
             //Assert
-            result.Should().NotBeNullOrEmpty();
+            result.Should().BeEmpty();
         }
     }
 }

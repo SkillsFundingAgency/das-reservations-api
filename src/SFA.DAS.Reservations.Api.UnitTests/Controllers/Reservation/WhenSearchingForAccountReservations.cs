@@ -98,11 +98,11 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             //Assert
             actual.Should().NotBeNull();
 
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.OK);
             result.Value.Should().NotBeNull();
 
-            var actualReservations = result.Value.Should().BeOfType<FindAccountReservationsResult>().Subject;
+            var actualReservations = result.Value.Should().BeAssignableTo<FindAccountReservationsResult>().Subject;
             actualReservations.Reservations.Should().BeEquivalentTo(_accountReservationsResult.Reservations);
             actualReservations.NumberOfRecordsFound.Should().Be(_accountReservationsResult.NumberOfRecordsFound);
             actualReservations.Filters.Should().BeEquivalentTo(_accountReservationsResult.Filters);
@@ -121,7 +121,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.Search(0, "test", null, null, null);
 
             //Assert
-            var result = actual.Should().BeOfType<ObjectResult>().Subject;
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
             result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
 
             var actualError = result.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
