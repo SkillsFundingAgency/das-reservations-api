@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -39,8 +40,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         {
             var result = ((OkObjectResult)TestData.ActualResult).Value as List<Domain.ProviderPermissions.ProviderPermission>;
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count);
+            result.Should().NotBeNull();
+            result.Should().HaveCount(1);
         }
         
     }

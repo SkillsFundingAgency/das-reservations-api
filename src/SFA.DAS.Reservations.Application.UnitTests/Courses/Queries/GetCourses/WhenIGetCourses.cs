@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Courses.Queries.GetCourses;
@@ -55,7 +56,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Courses.Queries.GetCourses
             var response = await _handler.Handle(_query, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(_expectedCourses, response.Courses);
+            response.Courses.Should().BeEquivalentTo(_expectedCourses);
         }
     }
 }

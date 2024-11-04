@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -55,10 +56,10 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _globalRulesRepository.GetAll();
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(2, actual.Count);
-            Assert.IsTrue(actual.Contains(_activeRule));
-            Assert.IsTrue(actual.Contains(_futureRule));
+            actual.Should().NotBeNull();
+            actual.Should().HaveCount(2);
+            actual.Should().Contain(_activeRule);
+            actual.Should().Contain(_futureRule);
         }
     }
 }

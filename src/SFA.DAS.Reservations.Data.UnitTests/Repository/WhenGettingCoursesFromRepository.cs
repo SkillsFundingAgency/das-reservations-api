@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -86,12 +87,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             var result = (await _courseRepository.GetCourses()).ToList();
 
-            Assert.IsTrue(result.Count == 3);
-            Assert.IsTrue(result.Contains(_activeCourse1));
-            Assert.IsTrue(result.Contains(_activeCourse2));
-            Assert.IsTrue(result.Contains(_activeCourse3));
-            Assert.IsFalse(result.Contains(_expiredCourse1));
-            Assert.IsFalse(result.Contains(_expiredCourse2));
+            result.Should().HaveCount(3);
+            result.Should().Contain(_activeCourse1);
+            result.Should().Contain(_activeCourse2);
+            result.Should().Contain(_activeCourse3);
+            result.Should().NotContain(_expiredCourse1);
+            result.Should().NotContain(_expiredCourse2);
         }
 
         [Test]
@@ -99,8 +100,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         {
             var result = (await _courseRepository.GetCourses()).ToList();
 
-            Assert.IsFalse(result.Contains(_frameworkCourse));
+            result.Should().NotContain(_frameworkCourse);
         }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
@@ -31,8 +32,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
             var reservation = dbContext.Reservations.SingleOrDefault(r => r.Id.Equals(TestData.ReservationId));
 
-            Assert.IsNotNull(reservation?.Status);
-            Assert.AreEqual(ReservationStatus.Deleted, (ReservationStatus) reservation.Status);
+            reservation.Should().NotBeNull();
+            ((ReservationStatus)reservation.Status).Should().Be(ReservationStatus.Deleted);
         }
 
         [Then(@"the reservation should not be deleted")]
@@ -42,8 +43,8 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
             var reservation = dbContext.Reservations.SingleOrDefault(r => r.Id.Equals(TestData.ReservationId));
 
-            Assert.IsNotNull(reservation?.Status);
-            Assert.AreNotEqual(ReservationStatus.Deleted, (ReservationStatus) reservation.Status);
+            reservation.Should().NotBeNull();
+            ((ReservationStatus)reservation.Status).Should().NotBe(ReservationStatus.Deleted);
         }
     }
 }

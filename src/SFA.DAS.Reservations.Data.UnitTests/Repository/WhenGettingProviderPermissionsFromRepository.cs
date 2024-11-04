@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -28,8 +29,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await repository.GetAllowedNonLevyPermissionsForProvider(ukPrn);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(2, actual.Count);
+            actual.Should().NotBeNull();
+            actual.Should().HaveCount(2);
         }
 
         [Test]
@@ -50,8 +51,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await repository.GetAllowedNonLevyPermissionsForProvider(ukPrn);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(2, actual.Count);
+            actual.Should().NotBeNull();
+            actual.Should().HaveCount(2);
         }
 
         [Test]
@@ -72,8 +73,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await repository.GetAllowedNonLevyPermissionsForProvider(ukPrn);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(2, actual.Count);
+            actual.Should().NotBeNull();
+            actual.Should().HaveCount(2);
         }
 
         [Test]
@@ -94,8 +95,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await repository.GetAllowedNonLevyPermissionsForProvider(ukPrn);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(2, actual.Count);
+            actual.Should().NotBeNull();
+            actual.Should().HaveCount(2);
         }
 
         [Test]
@@ -116,8 +117,8 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await repository.GetAllowedNonLevyPermissionsForProvider(ukPrn);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(2, actual.Count);
+            actual.Should().NotBeNull();
+            actual.Should().HaveCount(2);
         }
 
         private ProviderPermission CreatePermission(uint ukPrn, bool setAccount = true, bool isLevy = false, bool setAccountLegalEntity = true, bool canCreateCohort = true)

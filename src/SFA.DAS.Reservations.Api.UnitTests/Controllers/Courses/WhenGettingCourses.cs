@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -37,14 +38,14 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Courses
             var actual = await _coursesController.GetAll();
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
+            actual.Should().NotBeNull();
 
-            var viewModel = result.Value as CoursesViewModel;
-            Assert.AreEqual(_coursesResponse.Courses,viewModel?.Courses);
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var viewModel = result.Value.Should().BeOfType<CoursesViewModel>().Subject;
+            viewModel.Courses.Should().BeEquivalentTo(_coursesResponse.Courses);
         }
     }
 }

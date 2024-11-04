@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SFA.DAS.Reservations.Domain.Configuration
+﻿namespace SFA.DAS.Reservations.Domain.Configuration
 {
     public class ReservationsApiEnvironment
     {

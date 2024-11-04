@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
@@ -60,8 +61,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _userRuleAcknowledgementService.CreateUserRuleAcknowledgement(createUserRuleNotification);
 
             //Assert
-            Assert.IsAssignableFrom<UserRuleAcknowledgement>(actual);
-            Assert.AreEqual(_expectedUserId, actual.UserId);
+            actual.Should().BeAssignableTo<UserRuleAcknowledgement>();
+            actual.UserId.Should().Be(_expectedUserId);
         }   
     }
 }

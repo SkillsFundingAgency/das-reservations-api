@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntity;
@@ -64,7 +65,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsAssignableFrom<GetAccountLegalEntityResult>(actual);
+            actual.Should().BeAssignableTo<GetAccountLegalEntityResult>();
         }
 
         [Test]
@@ -94,13 +95,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsNotNull(actual.LegalEntity);
-            Assert.AreEqual(accountId, actual.LegalEntity.AccountId);
-            Assert.AreEqual(legalEntityName, actual.LegalEntity.AccountLegalEntityName);
-            Assert.AreEqual(legalEntityId, actual.LegalEntity.LegalEntityId);
-            Assert.AreEqual(ExpectedAccountLegalEntityId, actual.LegalEntity.AccountLegalEntityId);
-            Assert.AreEqual(agreementSigned, actual.LegalEntity.AgreementSigned);
-            Assert.AreEqual(isLevy, actual.LegalEntity.IsLevy);
+            actual.LegalEntity.Should().NotBeNull();
+            actual.LegalEntity.AccountId.Should().Be(accountId);
+            actual.LegalEntity.AccountLegalEntityName.Should().Be(legalEntityName);
+            actual.LegalEntity.LegalEntityId.Should().Be(legalEntityId);
+            actual.LegalEntity.AccountLegalEntityId.Should().Be(ExpectedAccountLegalEntityId);
+            actual.LegalEntity.AgreementSigned.Should().Be(agreementSigned);
+            actual.LegalEntity.IsLevy.Should().Be(isLevy);
+
         }
     }
 }

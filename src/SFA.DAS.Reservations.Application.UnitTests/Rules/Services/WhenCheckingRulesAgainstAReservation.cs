@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -67,7 +68,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
 
@@ -81,7 +82,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
         [Test]
@@ -104,7 +105,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
 
         [Test]
@@ -122,7 +123,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
 
         [Test]
@@ -153,7 +154,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
         [Test]
@@ -193,9 +194,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(AccountRestriction.Account,actual.Restriction);
-            Assert.AreEqual(GlobalRuleType.ReservationLimit, actual.RuleType);
+            actual.Should().NotBeNull();
+            actual.Restriction.Should().Be(AccountRestriction.Account);
+            actual.RuleType.Should().Be(GlobalRuleType.ReservationLimit);
         }
 
         [Test]
@@ -216,7 +217,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
 
         [Test]
@@ -242,9 +243,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(AccountRestriction.Account, actual.Restriction);
-            Assert.AreEqual(GlobalRuleType.ReservationLimit, actual.RuleType);
+            actual.Should().NotBeNull();
+            actual.Restriction.Should().Be(AccountRestriction.Account);
+            actual.RuleType.Should().Be(GlobalRuleType.ReservationLimit);
         }
 
         [Test]
@@ -263,7 +264,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
 
         [Test]
@@ -290,8 +291,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNull(actual);
-            
+            actual.Should().BeNull();
         }
 
         [Test]
@@ -316,7 +316,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
 
         [Test]
@@ -340,7 +340,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.CheckReservationAgainstRules(reservation);
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
 
         [Test]

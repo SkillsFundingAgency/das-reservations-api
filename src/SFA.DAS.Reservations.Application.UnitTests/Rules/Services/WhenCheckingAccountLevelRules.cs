@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -59,7 +60,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 
             //Assert
             _repository.Verify(x => x.GetRemainingReservations(ExpectedAccountId, ReservationLimit),Times.Once);
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
         [Test]
@@ -69,13 +70,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.GetAccountRules(ExpectedAccountId);
 
             //Assert
-            Assert.IsAssignableFrom<List<GlobalRule>>(actual);
-            Assert.IsNotEmpty(actual);
+            actual.Should().BeAssignableTo<List<GlobalRule>>();
+            actual.Should().NotBeEmpty();
             var actualRule = actual.FirstOrDefault();
-            Assert.IsNotNull(actualRule);
-            Assert.AreEqual(_globalRule.Id, actualRule.Id);
-            Assert.AreEqual(_globalRule.RuleType, (byte)actualRule.RuleType);
-            Assert.AreEqual(_globalRule.Restriction, (byte)actualRule.Restriction);
+            actualRule.Should().NotBeNull();
+            actualRule.Id.Should().Be(_globalRule.Id);
+            actualRule.RuleType.Should().Be((GlobalRuleType)_globalRule.RuleType);
+            actualRule.Restriction.Should().Be((AccountRestriction)_globalRule.Restriction);
+
         }
     }
 }

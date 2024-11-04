@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Services;
@@ -74,7 +73,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         [Test, MoqAutoData]
         public async Task Then_The_List_Of_Created_Reservation_Ids_Are_Returned(
             [Frozen]Mock<IReservationRepository> repository,
-            uint numberOfReservations,
+            int numberOfReservations,
             long accountLegalEntityId,
             long accountId,
             string accountLegalEntityName,
@@ -82,10 +81,10 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         )
         {
             //Act
-            var actual = await service.BulkCreateAccountReservation(numberOfReservations, accountLegalEntityId, accountId, accountLegalEntityName, null);
+            var actual = await service.BulkCreateAccountReservation((uint)numberOfReservations, accountLegalEntityId, accountId, accountLegalEntityName, null);
 
             //Assert
-            Assert.AreEqual(numberOfReservations, actual.Count);
+            actual.Should().HaveCount(numberOfReservations);
         }
     }
 }

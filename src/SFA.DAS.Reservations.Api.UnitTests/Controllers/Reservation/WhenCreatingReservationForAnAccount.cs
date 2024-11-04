@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -102,14 +103,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     ), 
                 It.IsAny<CancellationToken>()), Times.Once);
 
-            Assert.IsNotNull(actual);
-            var result = actual as CreatedResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.Created, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualReservations = result.Value as Domain.Reservations.Reservation;
-            Assert.AreEqual(_accountReservationsResult.Reservation, actualReservations);
-            Assert.AreEqual($"api/reservations/{_expectedReservationId}", result.Location);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeOfType<CreatedResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.Created);
+            result.Value.Should().NotBeNull();
+
+            var actualReservations = result.Value.Should().BeOfType<Domain.Reservations.Reservation>().Subject;
+            actualReservations.Should().BeEquivalentTo(_accountReservationsResult.Reservation);
+            result.Location.Should().Be($"api/reservations/{_expectedReservationId}");
         }
 
         [Test]
@@ -125,13 +127,12 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.Create(new Api.Models.Reservation());
 
             //Assert
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
-            var actualError = result.Value as ArgumentErrorViewModel;
-            Assert.IsNotNull(actualError);
-            Assert.AreEqual($"{expectedValidationMessage} (Parameter '{expectedParam}')", actualError.Message);
-            Assert.AreEqual(expectedParam, actualError.Params);
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = result.Value.Should().BeAssignableTo<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
+            actualError.Params.Should().Be(expectedParam);
         }
 
         [Test]
@@ -151,11 +152,12 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.Create(new Api.Models.Reservation());
 
             //Assert
-            var result = actual as UnprocessableEntityObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, (HttpStatusCode)result.StatusCode);
-            var errors = result.Value as SerializableError;
-            Assert.IsNotNull(errors?.FirstOrDefault());
+            var result = actual.Should().BeOfType<UnprocessableEntityObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.UnprocessableEntity);
+
+            var errors = result.Value.Should().BeOfType<SerializableError>().Subject;
+            errors.Should().NotBeNull();
+            errors.FirstOrDefault().Should().NotBeNull();
         }
 
         [Test]
@@ -175,11 +177,12 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.Create(new Api.Models.Reservation());
 
             //Assert
-            var result = actual as UnprocessableEntityObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.UnprocessableEntity, (HttpStatusCode)result.StatusCode);
-            var errors = result.Value as SerializableError;
-            Assert.IsNotNull(errors?.FirstOrDefault());
+            var result = actual.Should().BeOfType<UnprocessableEntityObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.UnprocessableEntity);
+
+            var errors = result.Value.Should().BeOfType<SerializableError>().Subject;
+            errors.Should().NotBeNull();
+            errors.FirstOrDefault().Should().NotBeNull();
         }
     }
 }

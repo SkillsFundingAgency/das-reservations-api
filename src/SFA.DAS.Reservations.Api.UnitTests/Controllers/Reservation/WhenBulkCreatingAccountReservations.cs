@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -71,14 +72,16 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
                     command.TransferSenderAccountId.Equals(ExpectedTransferSenderId)),
                 It.IsAny<CancellationToken>()), Times.Once);
 
-            Assert.IsNotNull(actual);
-            var result = actual as CreatedResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.Created, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualReservations = result.Value as BulkCreateAccountReservationsResult;
-            Assert.IsNotNull(actualReservations?.ReservationIds);
-            Assert.AreEqual(ExpectedReservationCount, actualReservations.ReservationIds.ToList().Count);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeOfType<CreatedResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.Created);
+            result.Value.Should().NotBeNull();
+
+            var actualReservations = result.Value.Should().BeOfType<BulkCreateAccountReservationsResult>().Subject;
+            actualReservations.ReservationIds.Should().NotBeNull();
+            actualReservations.ReservationIds.Should().HaveCount(ExpectedReservationCount);
+
         }
 
         [Test]
@@ -94,13 +97,13 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             var actual = await _reservationsController.BulkCreate(ExpectedAccountLegalEntityId, _bulkReservation);
 
             //Assert
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
-            var actualError = result.Value as ArgumentErrorViewModel;
-            Assert.IsNotNull(actualError);
-            Assert.AreEqual($"{expectedValidationMessage} (Parameter '{expectedParam}')", actualError.Message);
-            Assert.AreEqual(expectedParam, actualError.Params);
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = result.Value.Should().BeAssignableTo<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
+            actualError.Params.Should().Be(expectedParam);
+
         }
 
         [Test]
@@ -116,8 +119,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 
             //Assert
             var result = actual as NotFoundResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.NotFound, (HttpStatusCode)result.StatusCode);
+            result.Should().NotBeNull();
+            result.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
         }
     }
 }

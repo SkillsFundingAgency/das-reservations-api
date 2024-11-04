@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -57,21 +57,20 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _globalRulesRepository.FindActive(_fromDate);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(1, actual.Count);
-            Assert.IsTrue(actual.Contains(_activeRule));
+            actual.Should().NotBeNull();
+            actual.Count.Should().Be(1);
+            actual.Should().Contain(_activeRule);
         }
 
         [Test]
         public async Task Then_If_There_Are_No_Active_Rules_Then_An_Empty_List_Is_Returned()
         {
             //Act
+            _fromDate = DateTime.Today;
             var actual = await _globalRulesRepository.FindActive(_fromDate);
 
             //Assert
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(1, actual.Count);
-            Assert.IsTrue(actual.Contains(_activeRule));
+            actual.Should().BeEmpty();
         }
     }
 }

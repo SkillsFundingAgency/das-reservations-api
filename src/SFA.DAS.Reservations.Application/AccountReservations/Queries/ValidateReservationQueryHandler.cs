@@ -9,7 +9,6 @@ using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
-using Course = SFA.DAS.Reservations.Domain.Entities.Course;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 {

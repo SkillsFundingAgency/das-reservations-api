@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using NLog.Web;
 using SFA.DAS.NServiceBus.Configuration.MicrosoftDependencyInjection;
 
 namespace SFA.DAS.Reservations.Api;
@@ -16,6 +15,5 @@ public class Program
         WebHost.CreateDefaultBuilder(args)
             .UseApplicationInsights()
             .UseNServiceBusContainer()
-            .UseStartup<Startup>()
-            .UseNLog();
+            .UseStartup<Startup>();
 }

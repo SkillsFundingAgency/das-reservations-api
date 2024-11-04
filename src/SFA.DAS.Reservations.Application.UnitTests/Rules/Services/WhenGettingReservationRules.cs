@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.Entities;
-using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
@@ -50,7 +50,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 
             //Assert
             _ruleRepository.Verify(x => x.GetReservationRules(It.Is<DateTime>(c=>c.ToShortDateString().Equals(DateTime.UtcNow.ToShortDateString()))));
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
         [Test]
@@ -60,19 +60,18 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _service.GetRules();
 
             //Act
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
             var actualRule = actual.FirstOrDefault();
-            Assert.IsNotNull(actualRule);
-            Assert.AreEqual(_rule.Id, actualRule.Id);
-            Assert.AreEqual(_rule.ActiveFrom, actualRule.ActiveFrom);
-            Assert.AreEqual(_rule.ActiveTo, actualRule.ActiveTo);
-            Assert.AreEqual(_rule.CourseId, actualRule.CourseId);
-            Assert.AreEqual(_rule.CreatedDate, actualRule.CreatedDate);
-            Assert.AreEqual((AccountRestriction)_rule.Restriction, actualRule.Restriction);
-            Assert.AreEqual(_rule.Course.CourseId, actualRule.Course.CourseId);
-            Assert.AreEqual(_rule.Course.Level.ToString(), actualRule.Course.Level);
-            Assert.AreEqual(_rule.Course.Title, actualRule.Course.Title);
-            
+            actualRule.Id.Should().Be(_rule.Id);
+            actualRule.ActiveFrom.Should().Be(_rule.ActiveFrom);
+            actualRule.ActiveTo.Should().Be(_rule.ActiveTo);
+            actualRule.CourseId.Should().Be(_rule.CourseId);
+            actualRule.CreatedDate.Should().Be(_rule.CreatedDate);
+            actualRule.Restriction.Should().Be((AccountRestriction)_rule.Restriction);
+            actualRule.Course.Should().NotBeNull();
+            actualRule.Course.CourseId.Should().Be(_rule.Course.CourseId);
+            actualRule.Course.Level.Should().Be(_rule.Course.Level.ToString());
+            actualRule.Course.Title.Should().Be(_rule.Course.Title);
         }
     }
 }

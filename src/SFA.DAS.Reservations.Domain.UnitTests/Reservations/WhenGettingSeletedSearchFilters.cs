@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Reservations;
 
@@ -19,7 +20,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var result = filters.HasFilters;
 
             //Assert
-            Assert.IsTrue(result);
+            result.Should().BeTrue();
         }
 
         [Test]
@@ -35,7 +36,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var result = filters.HasFilters;
 
             //Assert
-            Assert.IsTrue(result);
+            result.Should().BeTrue();
         }
 
         [Test]
@@ -51,7 +52,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var result = filters.HasFilters;
 
             //Assert
-            Assert.IsTrue(result);
+            result.Should().BeTrue();
         }
 
         [Test]
@@ -64,7 +65,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             var result = filters.HasFilters;
 
             //Assert
-            Assert.IsFalse(result);
+            result.Should().BeFalse();
         }
     }
 }

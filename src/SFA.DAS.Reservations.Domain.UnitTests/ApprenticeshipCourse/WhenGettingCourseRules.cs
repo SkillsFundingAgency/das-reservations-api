@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
@@ -39,12 +40,10 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
             var result = course.GetActiveRules(reservationDates);
 
             //Assert
-
-            Assert.IsNotNull(result);
+            result.Should().NotBeNull();
 
             var rules = result as Rule[] ?? result.ToArray();
-
-            Assert.AreEqual(expectedRuleCount, rules.Length);
+            rules.Length.Should().Be(expectedRuleCount);
         }
 
         [Test]
@@ -61,20 +60,19 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
             
             var course = new Course("1", "Test", "1", DateTime.Today);
 
-            var unactiveRule = new Rule
+            var inactiveRule = new Rule
             {
                 ActiveFrom = DateTime.Now.AddDays(-2),
                 ActiveTo = DateTime.Now.AddDays(-4)
             };
 
-            course.Rules.Add(unactiveRule);
+            course.Rules.Add(inactiveRule);
 
             //Act
             var result = course.GetActiveRules(reservationDates);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsEmpty(result);
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -91,21 +89,20 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
            
             var course = new Course("1", "Test", "1", DateTime.Today);
 
-            var unactiveRule = new Rule
+            var inactiveRule = new Rule
             {
                 CreatedDate = DateTime.Now,
                 ActiveFrom = DateTime.Now.AddDays(5),
                 ActiveTo = DateTime.Now.AddDays(15)
             };
 
-            course.Rules.Add(unactiveRule);
+            course.Rules.Add(inactiveRule);
 
             //Act
             var result = course.GetActiveRules(reservationDates);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsEmpty(result);
+            result.Should().BeEmpty();
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
@@ -58,7 +59,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var account = await _accountsRepository.Get(ExpectedAccountId);
             
             //Assert
-            Assert.IsNotNull(account);
+            account.Should().NotBeNull();
         }
 
         [Test]

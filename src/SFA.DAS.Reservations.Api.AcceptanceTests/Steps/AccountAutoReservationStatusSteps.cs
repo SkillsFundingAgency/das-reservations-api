@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Data;
@@ -58,13 +58,13 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Then(@"I am allowed to auto create reservations")]
         public void ThenIAmAllowedToAutoCreateReservations()
         {
-            Assert.True(_canAutoCreateReservations);
+            _canAutoCreateReservations.Should().BeTrue();
         }
         
         [Then(@"I am not allowed to auto create reservations")]
         public void ThenIAmNotAllowedToAutoCreateReservations()
         {
-            Assert.False(_canAutoCreateReservations);
+            _canAutoCreateReservations.Should().BeFalse();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Commands.CreateUserRuleAcknowledgement;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -31,8 +32,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.IsValid());
+            result.Should().NotBeNull();
+            result.IsValid().Should().BeTrue();
         }
 
         [Test]
@@ -50,12 +51,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsFalse(result.IsValid());
-            Assert.AreEqual(3, result.ValidationDictionary.Count);
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.Id)));
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.RuleId)));
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule)));
+            result.Should().NotBeNull();
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.Count.Should().Be(3);
+            result.ValidationDictionary.Should().ContainKey(nameof(CreateUserRuleAcknowledgementCommand.Id));
+            result.ValidationDictionary.Should().ContainKey(nameof(CreateUserRuleAcknowledgementCommand.RuleId));
+            result.ValidationDictionary.Should().ContainKey(nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule));
+
         }
 
         [Test]
@@ -68,12 +70,14 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Commands
             var result = await _validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsFalse(result.IsValid());
-            Assert.AreEqual(3, result.ValidationDictionary.Count);
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.Id)));
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.RuleId)));
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule)));
+            result.Should().NotBeNull();
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.Should().HaveCount(3);
+            result.ValidationDictionary.Should().ContainKeys(
+                nameof(CreateUserRuleAcknowledgementCommand.Id),
+                nameof(CreateUserRuleAcknowledgementCommand.RuleId),
+                nameof(CreateUserRuleAcknowledgementCommand.TypeOfRule)
+            );
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
 
@@ -17,7 +18,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var result = await validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsTrue(result.IsValid());
+            result.IsValid().Should().BeTrue();
         }
 
         [Test]
@@ -31,9 +32,9 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var result = await validator.ValidateAsync(command);
 
             //Assert
-            Assert.IsFalse(result.IsValid());
-            Assert.AreEqual(1, result.ValidationDictionary.Count);
-            Assert.IsTrue(result.ValidationDictionary.ContainsKey(nameof(command.ReservationCount)));
+            result.IsValid().Should().BeFalse();
+            result.ValidationDictionary.Should().HaveCount(1);
+            result.ValidationDictionary.Should().ContainKey(nameof(command.ReservationCount));
         }
     }
 }
