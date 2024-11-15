@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.UnitTests.DatabaseMock;
@@ -60,7 +61,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _ruleRepository.GetReservationRules(dateFrom);
 
             //Assert
-            Assert.AreEqual(1, actual.Count);
+            actual.Should().HaveCount(1);
         }
         
         [Test]
@@ -73,7 +74,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _ruleRepository.GetReservationRules(dateFrom);
 
             //Assert
-            Assert.AreEqual(2, actual.Count);
+            actual.Should().HaveCount(2);
         }
 
 
@@ -84,7 +85,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _ruleRepository.GetReservationRules(DateTime.UtcNow.AddYears(5));//, DateTime.UtcNow.AddYears(5).AddMonths(6)
 
             //Assert
-            Assert.IsEmpty(actual);
+            actual.Should().BeEmpty();
         }
     }
 }

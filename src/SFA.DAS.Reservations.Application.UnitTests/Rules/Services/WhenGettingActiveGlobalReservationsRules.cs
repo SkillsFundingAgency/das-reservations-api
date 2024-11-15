@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Services;
 using SFA.DAS.Reservations.Domain.Account;
-using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -55,7 +55,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
 
             //Assert
             _repository.Verify(x => x.FindActive(It.Is<DateTime>(c => c.ToShortDateString().Equals(DateTime.UtcNow.ToShortDateString()))));
-            Assert.IsNotNull(actual);
+            actual.Should().NotBeNull();
         }
 
         [Test]
@@ -65,14 +65,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Services
             var actual = await _globalRulesService.GetActiveRules(DateTime.UtcNow);
 
             //Assert
-            Assert.IsAssignableFrom<List<Domain.Rules.GlobalRule>>(actual);
-            Assert.IsNotEmpty(actual);
-            var actualRule = actual.FirstOrDefault();
-            Assert.IsNotNull(actualRule);
-            Assert.AreEqual(_globalRule.Id, actualRule.Id);
-            Assert.AreEqual(_globalRule.ActiveFrom, actualRule.ActiveFrom);
-            Assert.AreEqual(_globalRule.RuleType, (byte)actualRule.RuleType);
-            Assert.AreEqual(_globalRule.Restriction, (byte)actualRule.Restriction);
+            var actualList = actual.Should().BeAssignableTo<List<Domain.Rules.GlobalRule>>().Subject;
+            actualList.Should().NotBeEmpty();
+
+            var actualRule = actualList.FirstOrDefault();
+            actualRule.Should().NotBeNull();
+            actualRule.Id.Should().Be(_globalRule.Id);
+            actualRule.ActiveFrom.Should().Be(_globalRule.ActiveFrom);
+            actualRule.RuleType.Should().Be((GlobalRuleType)_globalRule.RuleType);
+            actualRule.Restriction.Should().Be((AccountRestriction)_globalRule.Restriction);
         }
     }
 }

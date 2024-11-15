@@ -25,14 +25,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Accounts.Queries.GetAccount
             [Frozen] Mock<IAccountsService> mockService,
             GetAccountQueryHandler handler)
         {
+            // Arrange
             validationResult.AddError(propertyName);
             mockValidator
                 .Setup(validator => validator.ValidateAsync(It.IsAny<GetAccountQuery>()))
                 .ReturnsAsync(validationResult);
 
-            var act = new Func<Task>(async () => await handler.Handle(query, CancellationToken.None));
+            // Act
+            var act = async () => await handler.Handle(query, CancellationToken.None);
 
-            act.Should().Throw<ArgumentException>()
+            // Assert
+            act.Should().ThrowAsync<ArgumentException>()
                 .WithMessage($"*{propertyName}*");
         }
 
@@ -43,14 +46,17 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Accounts.Queries.GetAccount
             [Frozen] Mock<IAccountsService> mockService,
             GetAccountQueryHandler handler)
         {
+            // Arrange
             validationResult.ValidationDictionary.Clear();
             mockService
                 .Setup(service => service.GetAccount(It.IsAny<long>()))
                 .ReturnsAsync((Domain.Account.Account)null);
 
-            var act = new Func<Task>(async () => await handler.Handle(query, CancellationToken.None));
+            // Act
+            var act = async () => await handler.Handle(query, CancellationToken.None);
 
-            act.Should().Throw<EntityNotFoundException<Domain.Entities.Account>>();
+            // Assert
+            act.Should().ThrowAsync<EntityNotFoundException<Domain.Entities.Account>>();
         }
         
         [Test, RecursiveMoqAutoData]

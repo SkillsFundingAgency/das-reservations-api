@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Data.Repository;
-using SFA.DAS.Reservations.Data.UnitTests.DatabaseMock;
 using SFA.DAS.Reservations.Domain.Entities;
 
 namespace SFA.DAS.Reservations.Data.UnitTests.Repository
@@ -20,27 +20,29 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
         [SetUp]
         public void Arrange()
         {
-           _courses = new List<Course>
-           {
-              new Course
+           _courses =
+           [
+               new()
                {
                    CourseId = "1",
                    Title = "Course 1",
                    Level = 1
                },
-               new Course
+
+               new()
                {
                    CourseId = "2",
                    Title = "Course 2",
                    Level = 2
                },
-               new Course
+
+               new()
                {
                    CourseId = "3",
                    Title = "Course 3",
                    Level = 3
                }
-           };
+           ];
 
             _reservationsDataContext = new Mock<IReservationsDataContext>();
             _reservationsDataContext.Setup(x => x.Courses.FindAsync(ExpectedCourseId))
@@ -56,9 +58,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _courseRepository.GetCourseById("2");
 
             //Assert
-            Assert.AreEqual("2", actual.CourseId);
-            Assert.AreEqual("Course 2", actual.Title);
-            Assert.AreEqual(2, actual.Level);
+            actual.CourseId.Should().Be("2");
+            actual.Title.Should().Be("Course 2");
+            actual.Level.Should().Be(2);
         }
 
         [Test]
@@ -68,7 +70,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _courseRepository.GetCourseById("5");
 
             //Assert
-           Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
     }
 }

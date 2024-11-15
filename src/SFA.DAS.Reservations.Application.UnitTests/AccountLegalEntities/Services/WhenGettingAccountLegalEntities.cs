@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
@@ -76,8 +75,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
 
             //Assert
             _repository.Verify(x=>x.GetByAccountId(ExpectedAccountId), Times.Once);
-            Assert.IsNotNull(actual);
-            Assert.IsNotEmpty(actual);
+            actual.Should().NotBeNullOrEmpty();
         }
 
         [Test]
@@ -87,10 +85,11 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Servic
             var actual = await _service.GetAccountLegalEntities(ExpectedAccountId);
 
             //Assert
-            Assert.IsAssignableFrom<List<AccountLegalEntity>>(actual);
-            Assert.AreEqual(2, actual.Count);
-            actual.Should().BeEquivalentTo(_legalEntities, options =>
-                options.Excluding(p => p.ProviderPermissions).Excluding(p => p.Account));
+            actual
+                .Should()
+                .BeEquivalentTo(_legalEntities, options => options
+                    .Excluding(p => p.ProviderPermissions)
+                    .Excluding(p => p.Account));
         }
     }
 }

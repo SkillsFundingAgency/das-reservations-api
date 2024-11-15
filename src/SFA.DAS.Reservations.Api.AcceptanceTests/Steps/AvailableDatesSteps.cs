@@ -5,9 +5,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Reservations.Data;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Rules;
 using TechTalk.SpecFlow;
 
@@ -48,9 +48,10 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
         [Then(@"I should get available dates back")]
         public void ThenIShouldGetStandardAvailableDatesBack()
         {
+            var currentDateTime = Services.GetService<ICurrentDateTime>();
             _availableDatesResult.AvailableDates.Count().Should().Be(7);
             
-            var expectedDates = GetExpectedDates(DefaultAvailableDatesMonthCount, DateTime.Now,  DateTime.MaxValue);
+            var expectedDates = GetExpectedDates(DefaultAvailableDatesMonthCount, currentDateTime.GetDate(),  DateTime.MaxValue);
             
             _availableDatesResult.AvailableDates.Should().BeEquivalentTo(expectedDates);
         }

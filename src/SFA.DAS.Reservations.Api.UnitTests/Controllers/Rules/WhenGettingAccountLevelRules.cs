@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -40,13 +41,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             var actual = await _rulesController.Account(AccountId);
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualRules = result.Value as GetAccountRulesResult;
-            Assert.AreEqual(_rulesResult.GlobalRules, actualRules.GlobalRules);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var actualRules = result.Value.Should().BeAssignableTo<GetAccountRulesResult>().Subject;
+            actualRules.GlobalRules.Should().BeEquivalentTo(_rulesResult.GlobalRules);
+
         }
 
         [Test]
@@ -62,13 +65,12 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             var actual = await _rulesController.Account(AccountId);
 
             //Assert
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.BadRequest, (HttpStatusCode)result.StatusCode);
-            var actualError = result.Value as ArgumentErrorViewModel;
-            Assert.IsNotNull(actualError);
-            Assert.AreEqual($"{expectedValidationMessage} (Parameter '{expectedParam}')", actualError.Message);
-            Assert.AreEqual(expectedParam, actualError.Params);
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+            var actualError = result.Value.Should().BeAssignableTo<ArgumentErrorViewModel>().Subject;
+            actualError.Message.Should().Be($"{expectedValidationMessage} (Parameter '{expectedParam}')");
+            actualError.Params.Should().Be(expectedParam);
         }
     }
 }

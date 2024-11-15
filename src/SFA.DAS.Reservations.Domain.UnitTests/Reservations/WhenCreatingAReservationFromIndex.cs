@@ -24,6 +24,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             //Assert
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
+                       .Excluding(x => x.Status)
                        .Excluding(x => x.ReservationId)
                        .Excluding(x => x.CourseDescription)
                        .Excluding(x => x.CourseId)
@@ -32,7 +33,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
                        .Excluding(x => x.IndexedProviderId));
 
             reservation.Id.Should().Be(index.ReservationId);
-
+            reservation.Status.Should().Be((ReservationStatus)index.Status);
             reservation.Course.CourseId.Should().Be(index.CourseId);
             reservation.Course.Title.Should().Be(index.CourseTitle);
             reservation.Course.Level.Should().Be(index.CourseLevel.ToString());
@@ -54,6 +55,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             //Assert
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
+                    .Excluding(x => x.Status)
                     .Excluding(x => x.ReservationId)
                     .Excluding(x => x.CourseDescription)
                     .Excluding(x => x.CourseId)
@@ -61,11 +63,11 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
                     .Excluding(x => x.CourseLevel)
                     .Excluding(x => x.IndexedProviderId));
 
+            reservation.Status.Should().Be((ReservationStatus)index.Status);
             reservation.Id.Should().Be(index.ReservationId);
 
             reservation.Course.Should().BeNull();
         }
-
         
         [Test]
         public void ThenWillNotPopulatedCourseIfTitleDoNotExist()
@@ -83,6 +85,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             //Assert
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
+                    .Excluding(x => x.Status)
                     .Excluding(x => x.ReservationId)
                     .Excluding(x => x.CourseDescription)
                     .Excluding(x => x.CourseId)
@@ -91,7 +94,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
                     .Excluding(x => x.IndexedProviderId));
 
             reservation.Id.Should().Be(index.ReservationId);
-
+            reservation.Status.Should().Be((ReservationStatus)index.Status);
             reservation.Course.Should().BeNull();
         }
 
@@ -113,12 +116,14 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Reservations
             reservation.Should().BeEquivalentTo(index, options => 
                 options.Excluding(x => x.Id)
                     .Excluding(x => x.ReservationId)
+                    .Excluding(x => x.Status)
                     .Excluding(x => x.CourseDescription)
                     .Excluding(x => x.CourseId)
                     .Excluding(x => x.CourseTitle)
                     .Excluding(x => x.CourseLevel)
                     .Excluding(x => x.IndexedProviderId));
 
+            reservation.Status.Should().Be((ReservationStatus)index.Status);
             reservation.Id.Should().Be(index.ReservationId);
 
             reservation.Course.Should().BeNull();

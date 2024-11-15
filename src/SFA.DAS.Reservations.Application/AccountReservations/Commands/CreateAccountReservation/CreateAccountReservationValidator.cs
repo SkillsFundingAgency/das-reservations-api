@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Validation;
 
@@ -8,10 +9,12 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
     public class CreateAccountReservationValidator : IValidator<CreateAccountReservationCommand>
     {
         private readonly ICourseService _courseService;
+        private readonly ILogger<CreateAccountReservationValidator> _logger;
 
-        public CreateAccountReservationValidator(ICourseService courseService)
+        public CreateAccountReservationValidator(ICourseService courseService, ILogger<CreateAccountReservationValidator> logger)
         {
             _courseService = courseService;
+            _logger = logger;
         }
 
         public async Task<ValidationResult> ValidateAsync(CreateAccountReservationCommand item)
@@ -42,12 +45,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                 {
                     validationResult.AddError(nameof(item.CourseId));
                 }
-                if (!item.StartDate.HasValue || item.StartDate == DateTime.MinValue)
-                {
-                    validationResult.AddError(nameof(item.StartDate));
-                }
                 if (validationResult.IsValid() && await _courseService.GetCourseById(item.CourseId) == null)
                 {
+                    _logger.LogInformation("CourseId {0} cannot be found", item.CourseId);
                     validationResult.AddError(nameof(item.CourseId), "Course with CourseId cannot be found");
                 }
             }

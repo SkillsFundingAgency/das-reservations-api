@@ -52,7 +52,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Courses.Services
             var actual = await _service.GetCourseById("12");
 
             //Assert
-            Assert.IsNull(actual);
+            actual.Should().BeNull();
         }
     }
 }

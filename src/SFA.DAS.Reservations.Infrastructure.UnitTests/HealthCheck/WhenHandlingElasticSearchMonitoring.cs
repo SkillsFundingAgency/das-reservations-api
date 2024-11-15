@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Moq;
 using NUnit.Framework;
@@ -58,7 +59,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             var result = await handler.CheckHealthAsync(healthCheckContext, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(HealthStatus.Healthy, result.Status);
+            result.Status.Should().Be(HealthStatus.Healthy);
         }
 
          [Test, MoqAutoData]
@@ -74,8 +75,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             var result = await handler.CheckHealthAsync(healthCheckContext, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(HealthStatus.Unhealthy, result.Status);
-
+            result.Status.Should().Be(HealthStatus.Unhealthy);
             repository.Verify(r => r.GetCurrentReservationIndex(), Times.Never);
         }
 
@@ -98,7 +98,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             var result = await handler.CheckHealthAsync(healthCheckContext, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(HealthStatus.Degraded, result.Status);
+            result.Status.Should().Be(HealthStatus.Degraded);
         }
 
         [Test, MoqAutoData]
@@ -115,7 +115,7 @@ namespace SFA.DAS.Reservations.Infrastructure.UnitTests.HealthCheck
             var result = await handler.CheckHealthAsync(healthCheckContext, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(HealthStatus.Unhealthy, result.Status);
+            result.Status.Should().Be(HealthStatus.Unhealthy);
         }
         
     }

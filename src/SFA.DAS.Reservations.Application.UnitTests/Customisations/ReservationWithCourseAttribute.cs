@@ -4,6 +4,7 @@ using AutoFixture;
 using AutoFixture.Kernel;
 using AutoFixture.NUnit3;
 using SFA.DAS.Reservations.Domain.Reservations;
+using MethodInvoker = AutoFixture.Kernel.MethodInvoker;
 
 namespace SFA.DAS.Reservations.Application.UnitTests.Customisations
 {

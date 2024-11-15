@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -39,13 +38,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             var actual = await _rulesController.All();
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualRules = result.Value as GetRulesResult;
-            Assert.AreEqual(_rulesResult.Rules, actualRules.Rules);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var actualRules = result.Value.Should().BeAssignableTo<GetRulesResult>().Subject;
+            actualRules.Rules.Should().BeEquivalentTo(_rulesResult.Rules);
+
         }
 
         [Test]
@@ -55,13 +56,15 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             var actual = await _rulesController.All();
 
             //Assert
-            Assert.IsNotNull(actual);
-            var result = actual as ObjectResult;
-            Assert.IsNotNull(result?.StatusCode);
-            Assert.AreEqual(HttpStatusCode.OK, (HttpStatusCode)result.StatusCode);
-            Assert.IsNotNull(result.Value);
-            var actualRules = result.Value as GetRulesResult;
-            Assert.AreEqual(_rulesResult.GlobalRules, actualRules.GlobalRules);
+            actual.Should().NotBeNull();
+
+            var result = actual.Should().BeAssignableTo<ObjectResult>().Subject;
+            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            result.Value.Should().NotBeNull();
+
+            var actualRules = result.Value.Should().BeAssignableTo<GetRulesResult>().Subject;
+            actualRules.GlobalRules.Should().BeEquivalentTo(_rulesResult.GlobalRules);
+
         }
     }
 }

@@ -119,9 +119,13 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     Params = e.ParamName
                 });
             }
+            catch (StartDateException e)
+            {
+                var modelStateDictionary = new ModelStateDictionary();
+                modelStateDictionary.AddModelError("StartDate", e.Message);
+                return UnprocessableEntity(modelStateDictionary);
+            }
         }
-
-       
 
         [HttpGet]
         [ProducesResponseType(400)]

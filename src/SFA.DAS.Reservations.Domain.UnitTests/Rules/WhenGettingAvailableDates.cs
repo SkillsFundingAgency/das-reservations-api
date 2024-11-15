@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Domain.Rules;
 
@@ -23,17 +24,18 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
         public void Then_The_Available_Dates_Are_Returned_Based_On_The_Configurable_Months_Allowed()
         {
             // Arrange
-            var numberOfAvailableDatesIncludingPreviousMonth = ExpectedExpiryPeriod + 1;
+            const int numberOfAvailableDatesIncludingPreviousMonth = ExpectedExpiryPeriod + 1;
             var previousMonthDate = DateTime.UtcNow.AddMonths(-1);
             
             // Act
             var actual = new AvailableDates(DateTime.UtcNow, ExpectedExpiryPeriod);
 
             // Assert
-            Assert.AreEqual(numberOfAvailableDatesIncludingPreviousMonth, actual.Dates.Count);
-            Assert.AreEqual(previousMonthDate.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
-            Assert.AreEqual(DateTime.UtcNow.AddMonths(ExpectedExpiryPeriod - 1).ToString("MMyyyy"), actual.Dates.Last().StartDate.ToString("MMyyyy"));
-            Assert.AreEqual(previousMonthDate.AddMonths(2).ToString("MMyyyy"), actual.Dates.First().EndDate.ToString("MMyyyy"));
+            actual.Dates.Count.Should().Be(numberOfAvailableDatesIncludingPreviousMonth);
+            actual.Dates.First().StartDate.ToString("MMyyyy").Should().Be(previousMonthDate.ToString("MMyyyy"));
+            actual.Dates.Last().StartDate.ToString("MMyyyy").Should().Be(DateTime.UtcNow.AddMonths(ExpectedExpiryPeriod - 1).ToString("MMyyyy"));
+            actual.Dates.First().EndDate.ToString("MMyyyy").Should().Be(previousMonthDate.AddMonths(2).ToString("MMyyyy"));
+
         }
 
         [Test]
@@ -43,7 +45,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow, minStartDate: _expectedMinStartDate);
 
             //Assert
-            Assert.AreEqual(_expectedMinStartDate.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
+            actual.Dates.First().StartDate.ToString("MMyyyy").Should().Be(_expectedMinStartDate.ToString("MMyyyy"));
         }
 
         [Test]
@@ -53,10 +55,9 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow, maxStartDate:_expectedMaxStartDate);
 
             //Assert
-            Assert.AreEqual(4, actual.Dates.Count);
-            Assert.AreEqual(DateTime.UtcNow.ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
-            Assert.AreEqual(_expectedMaxStartDate.ToString("MMyyyy"), actual.Dates.Last().StartDate.ToString("MMyyyy"));
-
+            actual.Dates.Count.Should().Be(4);
+            actual.Dates.First().StartDate.ToString("MMyyyy").Should().Be(DateTime.UtcNow.ToString("MMyyyy"));
+            actual.Dates.Last().StartDate.ToString("MMyyyy").Should().Be(_expectedMaxStartDate.ToString("MMyyyy"));
         }
 
         [Test]
@@ -66,7 +67,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow, minStartDate: DateTime.UtcNow, maxStartDate: DateTime.UtcNow);
 
             //Assert
-            Assert.AreEqual(1, actual.Dates.Count);
+            actual.Dates.Count.Should().Be(1);
         }
 
         [Test]
@@ -76,7 +77,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow, minStartDate: DateTime.UtcNow, expiryPeriodInMonths:1);
 
             //Assert
-            Assert.AreEqual(1, actual.Dates.Count);
+            actual.Dates.Count.Should().Be(1);
         }
 
         [Test]
@@ -89,10 +90,10 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow);
 
             //Assert
-            var expectedMonthsIncludingPrevious = expiryDefault + 1;
-            Assert.AreEqual(expectedMonthsIncludingPrevious, actual.Dates.Count);
-            Assert.AreEqual(DateTime.UtcNow.AddMonths(-1).ToString("MMyyyy"), actual.Dates.First().StartDate.ToString("MMyyyy"));
-            Assert.AreEqual(DateTime.UtcNow.AddMonths(expiryDefault - 1).ToString("MMyyyy"), actual.Dates.Last().StartDate.ToString("MMyyyy"));
+            const int expectedMonthsIncludingPrevious = expiryDefault + 1;
+            actual.Dates.Count.Should().Be(expectedMonthsIncludingPrevious);
+            actual.Dates.First().StartDate.ToString("MMyyyy").Should().Be(DateTime.UtcNow.AddMonths(-1).ToString("MMyyyy"));
+            actual.Dates.Last().StartDate.ToString("MMyyyy").Should().Be(DateTime.UtcNow.AddMonths(expiryDefault - 1).ToString("MMyyyy"));
         }
 
         [Test]
@@ -102,7 +103,10 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow);
 
             //Assert
-            Assert.IsTrue(actual.Dates.All(c => (c.EndDate.Year - c.StartDate.Year) * 12 + c.EndDate.Month - c.StartDate.Month == 2));
+            actual.Dates
+                .All(c => (c.EndDate.Year - c.StartDate.Year) * 12 + c.EndDate.Month - c.StartDate.Month == 2)
+                .Should()
+                .BeTrue();
         }
 
         [Test]
@@ -112,8 +116,8 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow);
 
             //Assert
-            Assert.IsTrue(actual.Dates.All(c=>c.StartDate.Day.Equals(1)));
-            Assert.IsTrue(actual.Dates.All(c=>c.EndDate.Day.Equals(DateTime.DaysInMonth(c.EndDate.Year,c.EndDate.Month))));
+            actual.Dates.All(c => c.StartDate.Day.Equals(1)).Should().BeTrue();
+            actual.Dates.All(c=>c.EndDate.Day.Equals(DateTime.DaysInMonth(c.EndDate.Year,c.EndDate.Month))).Should().BeTrue();
         }
 
         [Test]
@@ -123,7 +127,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Rules
             var actual = new AvailableDates(DateTime.UtcNow,20);
 
             //Actual
-            Assert.AreEqual(13,actual.Dates.Count);
+            actual.Dates.Count.Should().Be(13);
         }
     }
 }

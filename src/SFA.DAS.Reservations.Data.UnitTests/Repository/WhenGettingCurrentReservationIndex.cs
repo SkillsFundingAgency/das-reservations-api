@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -53,9 +54,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var index = await _repository.GetCurrentReservationIndex();
 
             //Assert
-            Assert.AreEqual(Guid.Parse("41444ccb-9687-4d3a-b0d5-295f3c35b153"), index.Id);
-            Assert.AreEqual("test", index.Name);
-            Assert.AreEqual(new DateTime(2019, 11, 6, 15, 0, 0), index.DateCreated);
+            index.Id.Should().Be(Guid.Parse("41444ccb-9687-4d3a-b0d5-295f3c35b153"));
+            index.Name.Should().Be("test");
+            index.DateCreated.Should().Be(new DateTime(2019, 11, 6, 15, 0, 0));
         }
 
         [Test]
@@ -77,7 +78,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var index = await _repository.GetCurrentReservationIndex();
 
             //Assert
-            Assert.IsNull(index);
+            index.Should().BeNull();
         }
     }
 }

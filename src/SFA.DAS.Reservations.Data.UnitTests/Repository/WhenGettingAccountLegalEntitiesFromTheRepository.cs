@@ -67,9 +67,9 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _legalEntityRepository.GetByAccountId(1);
 
             //Assert
-            Assert.IsAssignableFrom<List<AccountLegalEntity>>(actual);
-            Assert.IsNotEmpty(actual);
-            Assert.AreEqual(3, actual.Count);
+            actual.Should().BeAssignableTo<List<AccountLegalEntity>>();
+            actual.Should().NotBeEmpty();
+            actual.Count.Should().Be(3);
         }
 
         [Test]
@@ -79,11 +79,11 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
             var actual = await _legalEntityRepository.GetByAccountId(3);
 
             //Assert
-            Assert.IsEmpty(actual);
+            actual.Should().BeEmpty();
         }
         
         [Test, MoqAutoData]
-        public void And_ALE_Not_Found_Then_Throws_Exception(
+        public async Task And_ALE_Not_Found_Then_Throws_Exception(
             long accountLegalEntityId,
             [Frozen] Mock<IReservationsDataContext> mockDataContext,
             AccountLegalEntityRepository repository)
@@ -92,10 +92,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 .Setup(context => context.AccountLegalEntities)
                 .Throws(new InvalidOperationException()); ;
 
-            var act = new Func<Task>(async () => await repository.Get(accountLegalEntityId));
+            var act = async () => await repository.Get(accountLegalEntityId);
 
-            act.Should().Throw<EntityNotFoundException<AccountLegalEntity>>()
-                .WithInnerException<InvalidOperationException>();
+            act
+                .Should()
+                .ThrowAsync<EntityNotFoundException<AccountLegalEntity>>()
+                .WithInnerException(typeof(InvalidOperationException));
         }
     }
 }

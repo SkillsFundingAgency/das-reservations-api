@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SFA.DAS.UnitOfWork;
 using SFA.DAS.UnitOfWork.Context;
 using SFA.DAS.UnitOfWork.Managers;
 

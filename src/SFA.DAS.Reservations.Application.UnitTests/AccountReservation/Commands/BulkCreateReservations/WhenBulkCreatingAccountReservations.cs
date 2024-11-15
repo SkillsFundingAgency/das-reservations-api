@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateAccountReservations;
@@ -79,7 +80,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var result = await handler.Handle(command, CancellationToken.None);
 
             //Assert
-            Assert.AreEqual(createdReservationIds, result.ReservationIds);
+            result.ReservationIds.Should().BeEquivalentTo(createdReservationIds);
         }
 
         [Test, MoqAutoData]
@@ -100,7 +101,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var actualException = Assert.ThrowsAsync<Exception>(() => handler.Handle(command, CancellationToken.None));
 
             //Assert
-            Assert.AreEqual(expectedException, actualException);
+            actualException.Should().Be(expectedException);
         }
     }
 }

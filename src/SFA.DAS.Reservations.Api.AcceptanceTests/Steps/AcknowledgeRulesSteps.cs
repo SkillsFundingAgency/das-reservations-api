@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -92,12 +93,12 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
             if (type.Equals("provider", StringComparison.CurrentCultureIgnoreCase))
             {
-                Assert.AreEqual(ProviderId, userRuleAcknowledgement.UkPrn);
+                userRuleAcknowledgement.UkPrn.Should().Be(ProviderId);
             }
 
             if (type.Equals("employer", StringComparison.CurrentCultureIgnoreCase))
             {
-                Assert.AreEqual(UserId, userRuleAcknowledgement.UserId);
+                userRuleAcknowledgement.UserId.Should().Be(UserId);
             }
         }
     }

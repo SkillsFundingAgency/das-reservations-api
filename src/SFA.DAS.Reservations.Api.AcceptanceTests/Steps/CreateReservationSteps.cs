@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -12,9 +13,6 @@ using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
-    
-    
-
     [Binding]
     public class CreateReservationSteps : StepsBase
     {
@@ -195,14 +193,14 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
             var reservation = dbContext.Reservations.SingleOrDefault(r => r.CourseId == TestData.Course.CourseId && 
                                                                           r.AccountLegalEntityId.Equals(TestData.AccountLegalEntity.AccountLegalEntityId));
 
-            Assert.IsNotNull(reservation);
-            Assert.IsTrue(reservation.StartDate.HasValue);
-            Assert.AreEqual(month, reservation.StartDate.Value.Month);
-            Assert.AreEqual(TestData.IsLevyAccount, reservation.IsLevyAccount);
-            Assert.AreEqual(TestData.UserId, reservation.UserId);
+            reservation.Should().NotBeNull();
+            reservation.StartDate.Should().HaveValue();
+            reservation.StartDate.Value.Month.Should().Be(month);
+            reservation.IsLevyAccount.Should().Be(TestData.IsLevyAccount);
+            reservation.UserId.Should().Be(TestData.UserId);
             var actual = TestResults.Result as CreatedResult;
-            Assert.IsNotNull(actual);
-            Assert.AreEqual($"api/Reservations/{TestData.ReservationId}",actual.Location);
+            actual.Should().NotBeNull();
+            actual.Location.Should().Be($"api/Reservations/{TestData.ReservationId}");
         }
 
         [Then(@"I have (.*) reservation")]
@@ -212,7 +210,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 
             var reservation = dbContext.Reservations.Count();
 
-            Assert.AreEqual(reservationCount,reservation);
+            reservation.Should().Be(reservationCount);
             
         }
 

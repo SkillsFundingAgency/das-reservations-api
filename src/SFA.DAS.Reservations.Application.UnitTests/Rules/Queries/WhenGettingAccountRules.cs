@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.Rules.Queries;
@@ -67,7 +68,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsAssignableFrom<GetAccountRulesResult>(actual);
+            actual.Should().BeAssignableTo<GetAccountRulesResult>();
         }
 
         [Test]
@@ -78,8 +79,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
 
             //Assert
             _globalRuleService.Verify(x => x.GetAccountRules(ExpectedAccountId), Times.Once);
-            Assert.IsNotNull(actual.GlobalRules);
-            Assert.AreEqual(ExpectedAccountReservationGlobalRuleId, actual.GlobalRules[0].Id);
+            actual.GlobalRules.Should().NotBeNull();
+            actual.GlobalRules[0].Id.Should().Be(ExpectedAccountReservationGlobalRuleId);
         }
 
         [Test]
@@ -100,8 +101,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             //Assert
             _globalRuleService.Verify(x => x.GetAccountRules(ExpectedAccountId), Times.Once);
             _globalRuleService.Verify(x => x.GetActiveRules(It.IsAny<DateTime>()), Times.Once);
-            Assert.IsNotNull(actual.GlobalRules);
-            Assert.AreEqual(2, actual.GlobalRules.Count);
+            actual.GlobalRules.Should().NotBeNull();
+            actual.GlobalRules.Should().HaveCount(2);
         }
 
         [Test]
@@ -134,8 +135,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.Rules.Queries
             //Assert
             _globalRuleService.Verify(x => x.GetAccountRules(ExpectedAccountId), Times.Once);
             _globalRuleService.Verify(x => x.GetActiveRules(It.IsAny<DateTime>()), Times.Once);
-            Assert.IsNotNull(actual.GlobalRules);
-            Assert.AreEqual(1, actual.GlobalRules.Count);
+            actual.GlobalRules.Should().NotBeNull();
+            actual.GlobalRules.Should().HaveCount(1);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -43,8 +44,8 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
                 c => c.Id.Equals(_command.Id) &&
                      c.RuleId.Equals(_command.RuleId) &&
                      c.TypeOfRule.Equals(_command.TypeOfRule)), It.IsAny<CancellationToken>()), Times.Once);
-
-            Assert.IsNotNull(result);
+            
+            result.Should().NotBeNull();
         }
 
         [Test]
@@ -62,7 +63,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Rules
             var actualException = Assert.ThrowsAsync<Exception>(() => _rulesController.AcknowledgeRuleAsRead(_command));
 
             //Assert
-            Assert.AreEqual(expectedException, actualException);
+            actualException.Should().Be(expectedException);
         }
     }
 }

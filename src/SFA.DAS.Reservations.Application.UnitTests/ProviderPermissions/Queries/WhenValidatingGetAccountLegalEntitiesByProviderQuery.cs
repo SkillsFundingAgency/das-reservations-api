@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using FluentAssertions;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.ProviderPermissions.Queries;
 
@@ -27,8 +28,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Queries
             var actual = await _validator.ValidateAsync(request);
             
             //Assert
-            Assert.IsFalse(actual.IsValid());
-            Assert.IsTrue(actual.ValidationDictionary.ContainsKey(nameof(request.ProviderId)));
+            actual.IsValid().Should().BeFalse();
+            actual.ValidationDictionary.Should().ContainKey(nameof(request.ProviderId));
         }
 
         [Test]
@@ -44,7 +45,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Queries
             var actual = await _validator.ValidateAsync(request);
             
             //Assert
-            Assert.IsTrue(actual.IsValid());
+            actual.IsValid().Should().BeTrue();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
@@ -119,13 +120,13 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries
             var result = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(_expectedSearchResults, result.Reservations);
-            Assert.AreEqual(ExpectedSearchResultTotal, result.NumberOfRecordsFound);
-            Assert.AreEqual(ExpectedTotalReservationsForProvider, result.TotalReservationsForProvider);
-            Assert.AreEqual(_expectedCourseFilters, result.Filters.CourseFilters);
-            Assert.AreEqual(_expectedAccountLegalEntityFilters, result.Filters.EmployerFilters);
-            Assert.AreEqual(_expectedStartDateFilters, result.Filters.StartDateFilters);
+            result.Should().NotBeNull();
+            result.Reservations.Should().BeEquivalentTo(_expectedSearchResults);
+            result.NumberOfRecordsFound.Should().Be(ExpectedSearchResultTotal);
+            result.TotalReservationsForProvider.Should().Be(ExpectedTotalReservationsForProvider);
+            result.Filters.CourseFilters.Should().BeEquivalentTo(_expectedCourseFilters);
+            result.Filters.EmployerFilters.Should().BeEquivalentTo(_expectedAccountLegalEntityFilters);
+            result.Filters.StartDateFilters.Should().BeEquivalentTo(_expectedStartDateFilters);
         }
     }
 }

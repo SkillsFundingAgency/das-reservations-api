@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Common.Domain.Types;
 using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Validation;
@@ -63,7 +63,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsAssignableFrom<GetAccountLegalEntitiesResponse>(actual);
+            actual.Should().BeAssignableTo<GetAccountLegalEntitiesResponse>();
         }
 
         [Test]
@@ -91,13 +91,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
             var actual = await _handler.Handle(_query, _cancellationToken);
 
             //Assert
-            Assert.IsNotNull(actual.AccountLegalEntities);
-            Assert.AreEqual(ExpectedAccountId, actual.AccountLegalEntities[0].AccountId);
-            Assert.AreEqual(ExpectedAccountLegalEntityName, actual.AccountLegalEntities[0].AccountLegalEntityName);
-            Assert.AreEqual(legalEntityId, actual.AccountLegalEntities[0].LegalEntityId);
-            Assert.AreEqual(accountLegalEntityId, actual.AccountLegalEntities[0].AccountLegalEntityId);
-            Assert.AreEqual(agreementSigned, actual.AccountLegalEntities[0].AgreementSigned);
-            Assert.AreEqual(isLevy, actual.AccountLegalEntities[0].IsLevy);            
+            actual.AccountLegalEntities.Should().NotBeNull();
+            var firstEntity = actual.AccountLegalEntities[0];
+
+            firstEntity.AccountId.Should().Be(ExpectedAccountId);
+            firstEntity.AccountLegalEntityName.Should().Be(ExpectedAccountLegalEntityName);
+            firstEntity.LegalEntityId.Should().Be(legalEntityId);
+            firstEntity.AccountLegalEntityId.Should().Be(accountLegalEntityId);
+            firstEntity.AgreementSigned.Should().Be(agreementSigned);
+            firstEntity.IsLevy.Should().Be(isLevy);
         }
     }
 }

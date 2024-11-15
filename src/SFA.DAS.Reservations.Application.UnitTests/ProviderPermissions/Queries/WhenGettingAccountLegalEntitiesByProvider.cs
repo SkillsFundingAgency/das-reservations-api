@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.Reservations.Application.ProviderPermissions.Queries;
@@ -59,7 +60,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.ProviderPermissions.Queries
 
             //Assert
             repository.Verify(x => x.GetAllowedNonLevyPermissionsForProvider(query.ProviderId), Times.Once);
-            Assert.IsNotNull(actual.ProviderPermissions);
+            actual.ProviderPermissions.Should().NotBeNull();
         }
 
         [Test, MoqAutoData]

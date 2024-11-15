@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.Account
             var actual = new Domain.Account.Account(accountEntity, globalReservationLimit);
             
             //Assert
-            Assert.AreEqual(globalReservationLimit,actual.ReservationLimit);
+            actual.ReservationLimit.Should().Be(globalReservationLimit);
         }
     }
 }

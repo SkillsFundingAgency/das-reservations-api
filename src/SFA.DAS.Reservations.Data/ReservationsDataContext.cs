@@ -4,7 +4,6 @@ using System.Data.Common;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Data.Configuration;
 using SFA.DAS.Reservations.Domain.Configuration;
 using Rule = SFA.DAS.Reservations.Data.Configuration.Rule;
