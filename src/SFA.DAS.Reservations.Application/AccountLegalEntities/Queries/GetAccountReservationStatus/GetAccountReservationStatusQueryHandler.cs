@@ -60,7 +60,7 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
             return new GetAccountReservationStatusResponse
             {
                 CanAutoCreateReservations = accountLegalEntities[0].IsLevy,
-                HasReachedReservationsLimit = await _rulesService.HasReachedReservationLimit(accountId, accountLegalEntities[0].IsLevy),
+                HasReachedReservationsLimit = await _rulesService.HasReachedReservationLimit(accountId, account.IsLevy),
                 HasPendingReservations = await _accountReservationService.GetRemainingReservations(accountId, account.ReservationLimit ?? 0) > 0,
                 AccountLegalEntityAgreementStatus = accountLegalEntities
                     .ToDictionary(key=>key.AccountLegalEntityId, value => value.AgreementSigned)
