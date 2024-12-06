@@ -57,11 +57,14 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
                 throw new EntityNotFoundException<Domain.Entities.AccountLegalEntity>();
             }
 
+            var accountReservations = await _accountReservationService.GetAccountReservations(accountId);
+            var numOfPendingReservations = accountReservations.Count(x => !x.IsExpired && x.Status == ReservationStatus.Pending);
+
             return new GetAccountReservationStatusResponse
             {
                 CanAutoCreateReservations = account.IsLevy,
                 HasReachedReservationsLimit = await _rulesService.HasReachedReservationLimit(accountId, account.IsLevy),
-                HasPendingReservations = await _accountReservationService.GetRemainingReservations(accountId, account.ReservationLimit ?? 0) > 0,
+                HasPendingReservations = numOfPendingReservations > 0,
                 AccountLegalEntityAgreementStatus = accountLegalEntities
                     .ToDictionary(key=>key.AccountLegalEntityId, value => value.AgreementSigned)
             };

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -142,6 +143,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
         public async Task Then_Gets_Calculates_Reservations_Pending_Status_From_Service(
             GetAccountReservationStatusQuery query,
             List<AccountLegalEntity> accountLegalEntities,
+            List<Reservation> reservations,
             [Frozen] ValidationResult validationResult,
             [Frozen] Mock<IAccountLegalEntitiesService> mockService,
             [Frozen] Mock<IAccountsService> mockAccountsService,
@@ -156,7 +158,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
                 .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
                 .ReturnsAsync(accountLegalEntities);
             mockAccountsService.Setup(x => x.GetAccount(It.IsAny<long>())).ReturnsAsync(new Domain.Account.Account(accountDetails, 10));
-            mockAccountReservationsService.Setup(x => x.GetRemainingReservations(It.IsAny<long>(), 10)).ReturnsAsync(0);
+            mockAccountReservationsService.Setup(x => x.GetAccountReservations(It.IsAny<long>())).ReturnsAsync(reservations);
 
             mockGlobalRulesService
                 .Setup(x => x.HasReachedReservationLimit(query.AccountId, accountLegalEntities[0].IsLevy))
@@ -164,7 +166,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
 
             var result = await handler.Handle(query, CancellationToken.None);
 
-            result.HasPendingReservations.Should().BeFalse();
+            result.HasPendingReservations.Should().Be(reservations.Count(x => !x.IsExpired && x.Status == ReservationStatus.Pending) > 0);
         }
     }
 }
