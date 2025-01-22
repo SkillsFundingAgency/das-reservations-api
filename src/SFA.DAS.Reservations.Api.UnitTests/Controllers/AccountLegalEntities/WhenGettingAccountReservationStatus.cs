@@ -33,7 +33,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(argumentException);
 
-            var result = await controller.GetAccountReservationStatus(accountId, null) as BadRequestObjectResult;
+            var result = await controller.GetAccountReservationStatus(accountId) as BadRequestObjectResult;
 
             result.StatusCode.Should().Be((int) HttpStatusCode.BadRequest);
             var model = result.Value.Should().BeOfType<ArgumentErrorViewModel>().Subject;
@@ -54,7 +54,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(notFoundException);
 
-            var result = await controller.GetAccountReservationStatus(accountId, null) as NotFoundResult;
+            var result = await controller.GetAccountReservationStatus(accountId) as NotFoundResult;
 
             result.StatusCode.Should().Be((int) HttpStatusCode.NotFound);
         }
@@ -72,30 +72,9 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.AccountLegalEntities
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(response);
             
-            var result = await controller.GetAccountReservationStatus(accountId, null) as OkObjectResult;
+            var result = await controller.GetAccountReservationStatus(accountId) as OkObjectResult;
 
             result.StatusCode.Should().Be((int) HttpStatusCode.OK);
-            var model = result.Value as AccountReservationStatus;
-            model.Should().BeEquivalentTo(new AccountReservationStatus(response));
-        }
-
-        [Test, MoqAutoData]
-        public async Task Then_Returns_AccountReservationStatus_For_TransferSenderAccountId(
-            long accountId,
-            long? transferSenderAccountId,
-            GetAccountReservationStatusResponse response,
-            [Frozen] Mock<IMediator> mockMediator,
-             [NoAutoProperties] AccountLegalEntitiesController controller)
-        {
-            mockMediator
-                .Setup(mediator => mediator.Send(
-                    It.Is<GetAccountReservationStatusQuery>(query => query.AccountId == accountId && query.TransferSenderAccountId == transferSenderAccountId),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
-
-            var result = await controller.GetAccountReservationStatus(accountId, transferSenderAccountId) as OkObjectResult;
-
-            result.StatusCode.Should().Be((int)HttpStatusCode.OK);
             var model = result.Value as AccountReservationStatus;
             model.Should().BeEquivalentTo(new AccountReservationStatus(response));
         }
