@@ -38,8 +38,6 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
         {
             var validationResult = await _validator.ValidateAsync(request);
 
-            var accountId = request.TransferSenderAccountId ?? request.AccountId;
-
             if (!validationResult.IsValid())
             {
                 throw new ArgumentException(
@@ -48,22 +46,22 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
                         .Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var accountLegalEntities = await _accountLegalEntitiesService.GetAccountLegalEntities(accountId);
+            var accountLegalEntities = await _accountLegalEntitiesService.GetAccountLegalEntities(request.AccountId);
 
-            var account = await _accountsService.GetAccount(accountId);
+            var account = await _accountsService.GetAccount(request.AccountId);
 
             if (accountLegalEntities == null || accountLegalEntities.Count == 0)
             {
                 throw new EntityNotFoundException<Domain.Entities.AccountLegalEntity>();
             }
 
-            var accountReservations = await _accountReservationService.GetAccountReservations(accountId);
+            var accountReservations = await _accountReservationService.GetAccountReservations(request.AccountId);
             var numOfPendingReservations = accountReservations.Count(x => !x.IsExpired && x.Status == ReservationStatus.Pending);
 
             return new GetAccountReservationStatusResponse
             {
                 CanAutoCreateReservations = account.IsLevy,
-                HasReachedReservationsLimit = await _rulesService.HasReachedReservationLimit(accountId, account.IsLevy),
+                HasReachedReservationsLimit = await _rulesService.HasReachedReservationLimit(request.AccountId, account.IsLevy),
                 HasPendingReservations = numOfPendingReservations > 0,
                 AccountLegalEntityAgreementStatus = accountLegalEntities
                     .ToDictionary(key=>key.AccountLegalEntityId, value => value.AgreementSigned)
