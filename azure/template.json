@@ -152,10 +152,7 @@
             "value": 2
           }
         }
-      },
-      "dependsOn": [
-        "[variables('resourceGroupName')]"
-      ]
+      }
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -230,10 +227,7 @@
             "value": "[parameters('sharedManagementResourceGroup')]"
           }
         }
-      },
-      "dependsOn": [
-        "[variables('resourceGroupName')]"
-      ]
+      }
     },
     {
       "apiVersion": "2020-10-01",
@@ -299,10 +293,7 @@
             "value": "[parameters('appServiceAllowedIPs')]"
           }
         }
-      },
-      "dependsOn": [
-        "[variables('resourceGroupName')]"
-      ]
+      }
     },
     {
       "condition": "[equals(parameters('enableFailedRequestAlert'), true())]",
