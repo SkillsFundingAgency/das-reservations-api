@@ -14,7 +14,7 @@
     "resourceGroupLocation": {
       "type": "string"
     },
-    "appServiceAllowedIPs": {
+    "backEndAccessRestrictions": {
       "type": "array"
     },
     "environmentName": {
@@ -290,7 +290,7 @@
             "value": "[reference(concat('app-service-certificate-', parameters('utcValue'))).outputs.certificateThumbprint.value]"
           },
           "ipSecurityRestrictions": {
-            "value": "[parameters('appServiceAllowedIPs')]"
+            "value": "[parameters('backEndAccessRestrictions')]"
           }
         }
       }
