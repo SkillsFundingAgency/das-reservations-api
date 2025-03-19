@@ -34,7 +34,7 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             CourseId.IndexOf("-", StringComparison.CurrentCultureIgnoreCase) != -1
             ? ApprenticeshipType.Framework
             : ApprenticeshipType.Standard;
-
+        public string StandardApprenticeshipType { get; }
         public ICollection<Rule> Rules { get; }
       
         public IEnumerable<Rule> GetActiveRules(ReservationDates dates)
