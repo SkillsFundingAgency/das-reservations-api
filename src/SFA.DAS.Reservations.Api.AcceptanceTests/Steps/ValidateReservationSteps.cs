@@ -11,13 +11,13 @@ using TechTalk.SpecFlow.Assist;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class ValidateReservationSteps : StepsBase
+    public class ValidateReservationSteps(
+        TestData testData,
+        TestResults testResults,
+        TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
         private IActionResult _validationResult;
-
-        public ValidateReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-        }
 
         // Given
 

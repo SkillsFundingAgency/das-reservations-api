@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class IndexedReservationSearchResult
     {
-        public IndexedReservationSearchResult()
-        {
-            Reservations = new ReservationIndex[0];
-            Filters = new SearchFilters();
-        }
-
-        public SearchFilters Filters { get; set; }
-        public IEnumerable<ReservationIndex> Reservations { get; set; }
+        public SearchFilters Filters { get; set; } = new();
+        public IEnumerable<ReservationIndex> Reservations { get; set; } = Array.Empty<ReservationIndex>();
         public uint TotalReservations { get; set; }
         public int TotalReservationsForProvider { get; set; }
     }

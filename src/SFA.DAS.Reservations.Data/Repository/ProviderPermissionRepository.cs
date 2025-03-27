@@ -6,19 +6,12 @@ using SFA.DAS.Reservations.Domain.ProviderPermissions;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class ProviderPermissionRepository : IProviderPermissionRepository
+    public class ProviderPermissionRepository(IReservationsDataContext dataContext) : IProviderPermissionRepository
     {
-        private readonly IReservationsDataContext _dataContext;
-
-        public ProviderPermissionRepository(IReservationsDataContext dataContext)
-        {
-            _dataContext = dataContext;
-        }
-
         public async Task<IList<ProviderPermission>> GetAllowedNonLevyPermissionsForProvider(uint ukPrn)
         {
             var providerPermissions =
-                await _dataContext
+                await dataContext
                 .ProviderPermissions
                 .Include(p => p.AccountLegalEntity)
                 .Where(pp =>

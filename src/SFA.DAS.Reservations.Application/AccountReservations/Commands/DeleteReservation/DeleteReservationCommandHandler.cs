@@ -10,25 +10,15 @@ using SFA.DAS.UnitOfWork.Context;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteReservation
 {
-    public class DeleteReservationCommandHandler : IRequestHandler<DeleteReservationCommand>
+    public class DeleteReservationCommandHandler(
+        IValidator<DeleteReservationCommand> validator,
+        IAccountReservationService reservationService,
+        IUnitOfWorkContext context)
+        : IRequestHandler<DeleteReservationCommand>
     {
-        private readonly IValidator<DeleteReservationCommand> _validator;
-        private readonly IAccountReservationService _reservationService;
-        private readonly IUnitOfWorkContext _context;
-
-        public DeleteReservationCommandHandler(
-            IValidator<DeleteReservationCommand> validator,
-            IAccountReservationService reservationService,
-            IUnitOfWorkContext context)
-        {
-            _validator = validator;
-            _reservationService = reservationService;
-            _context = context;
-        }
-
         public async Task Handle(DeleteReservationCommand command, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(command);
+            var validationResult = await validator.ValidateAsync(command);
             if (!validationResult.IsValid())
             {
                 throw new ArgumentException(
@@ -36,7 +26,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
                     validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var reservationToDelete = await _reservationService.GetReservation(command.ReservationId);
+            var reservationToDelete = await reservationService.GetReservation(command.ReservationId);
 
             var deletedEvent = new ReservationDeletedEvent(
                 command.ReservationId,
@@ -52,9 +42,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.DeleteRe
                 reservationToDelete.ProviderId,
                 command.EmployerDeleted);
 
-            await _reservationService.DeleteReservation(command.ReservationId);
+            await reservationService.DeleteReservation(command.ReservationId);
             
-            _context.AddEvent(deletedEvent);
+            context.AddEvent(deletedEvent);
         }
     }
 }

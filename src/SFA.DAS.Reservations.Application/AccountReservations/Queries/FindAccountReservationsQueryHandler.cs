@@ -8,20 +8,14 @@ using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 {
-    public class FindAccountReservationsQueryHandler :  IRequestHandler<FindAccountReservationsQuery, FindAccountReservationsResult>
+    public class FindAccountReservationsQueryHandler(
+        IAccountReservationService service,
+        IValidator<FindAccountReservationsQuery> validator)
+        : IRequestHandler<FindAccountReservationsQuery, FindAccountReservationsResult>
     {
-        private readonly IAccountReservationService _service;
-        private readonly IValidator<FindAccountReservationsQuery> _validator;
-
-        public FindAccountReservationsQueryHandler(IAccountReservationService service,
-            IValidator<FindAccountReservationsQuery> validator)
-        {
-            _service = service;
-            _validator = validator;
-        }
         public async Task<FindAccountReservationsResult> Handle(FindAccountReservationsQuery query, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(query);
+            var validationResult = await validator.ValidateAsync(query);
 
             if (!validationResult.IsValid())
             {
@@ -30,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                                                                  .Aggregate((item1, item2)=> item1 +", "+item2));
             }
 
-            var result = await _service.FindReservations(
+            var result = await service.FindReservations(
                 query.ProviderId,
                 query.SearchTerm,
                 query.PageNumber,

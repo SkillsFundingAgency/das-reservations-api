@@ -6,15 +6,8 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace SFA.DAS.Reservations.Data.UnitTests.DatabaseMock
 {
-    public class InMemoryAsyncQueryProvider<TEntity> : IAsyncQueryProvider
+    public class InMemoryAsyncQueryProvider<TEntity>(IQueryProvider innerQueryProvider) : IAsyncQueryProvider
     {
-        private readonly IQueryProvider innerQueryProvider;
-
-        public InMemoryAsyncQueryProvider(IQueryProvider innerQueryProvider)
-        {
-            this.innerQueryProvider = innerQueryProvider;
-        }
-
         public IQueryable CreateQuery(Expression expression)
         {
             return new InMemoryAsyncEnumerable<TEntity>(expression);
@@ -27,12 +20,12 @@ namespace SFA.DAS.Reservations.Data.UnitTests.DatabaseMock
 
         public object Execute(Expression expression)
         {
-            return this.innerQueryProvider.Execute(expression);
+            return innerQueryProvider.Execute(expression);
         }
 
         public TResult Execute<TResult>(Expression expression)
         {
-            return this.innerQueryProvider.Execute<TResult>(expression);
+            return innerQueryProvider.Execute<TResult>(expression);
         }
 
         public Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken)

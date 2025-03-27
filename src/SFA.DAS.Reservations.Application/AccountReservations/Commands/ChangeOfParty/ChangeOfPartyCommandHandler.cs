@@ -8,22 +8,14 @@ using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOfParty
 {
-    public class ChangeOfPartyCommandHandler : IRequestHandler<ChangeOfPartyCommand, ChangeOfPartyResult>
+    public class ChangeOfPartyCommandHandler(
+        IValidator<ChangeOfPartyCommand> validator,
+        IAccountReservationService reservationService)
+        : IRequestHandler<ChangeOfPartyCommand, ChangeOfPartyResult>
     {
-        private readonly IValidator<ChangeOfPartyCommand> _validator;
-        private readonly IAccountReservationService _reservationService;
-
-        public ChangeOfPartyCommandHandler(
-            IValidator<ChangeOfPartyCommand> validator,
-            IAccountReservationService reservationService)
-        {
-            _validator = validator;
-            _reservationService = reservationService;
-        }
-        
         public async Task<ChangeOfPartyResult> Handle(ChangeOfPartyCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(request);
+            var validationResult = await validator.ValidateAsync(request);
 
             if (!validationResult.IsValid())
             {
@@ -32,7 +24,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.ChangeOf
                     validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var clonedReservationId = await _reservationService.ChangeOfParty(new ChangeOfPartyServiceRequest
+            var clonedReservationId = await reservationService.ChangeOfParty(new ChangeOfPartyServiceRequest
             {
                 ReservationId = request.ReservationId,
                 AccountLegalEntityId = request.AccountLegalEntityId,

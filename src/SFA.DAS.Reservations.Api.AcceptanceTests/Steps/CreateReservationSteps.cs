@@ -14,14 +14,9 @@ using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class CreateReservationSteps : StepsBase
+    public class CreateReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
-
-        public CreateReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) 
-            : base(testData,testResults, serviceProvider)
-        {
-        }
-        
         [Given(@"I have a non levy account")]
         public void GivenIHaveANonLevyAccount()
         {

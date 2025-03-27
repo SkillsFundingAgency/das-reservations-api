@@ -2,38 +2,29 @@
 
 namespace SFA.DAS.Reservations.Messages
 {
-    public class ReservationCreatedEvent
+    public class ReservationCreatedEvent(
+        Guid id,
+        long accountId,
+        long accountLegalEntityId,
+        string accountLegalEntityName,
+        DateTime startDate,
+        DateTime endDate,
+        DateTime createdDate,
+        string courseId,
+        string courseName,
+        string courseLevel,
+        uint? providerId)
     {
-     
-        public ReservationCreatedEvent(Guid id, 
-            long accountId, long accountLegalEntityId, string accountLegalEntityName,
-            DateTime startDate, DateTime endDate, DateTime createdDate, 
-            string courseId, string courseName, string courseLevel,
-            uint? providerId)
-        {
-            Id = id;
-            AccountId = accountId;
-            AccountLegalEntityId = accountLegalEntityId;
-            AccountLegalEntityName = accountLegalEntityName;
-            StartDate = startDate;
-            EndDate = endDate;
-            CreatedDate = createdDate;
-            CourseId = courseId;
-            CourseName = courseName;
-            CourseLevel = courseLevel;
-            ProviderId = providerId;
-        }
-
-        public Guid Id { get; set; }
-        public long AccountId { get; set; }
-        public long AccountLegalEntityId { get; set; }
-        public string AccountLegalEntityName { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public string CourseId { get; set; }
-        public string CourseName { get; set; }
-        public string CourseLevel { get; set; }
-        public uint? ProviderId { get; set; }
+        public Guid Id { get; set; } = id;
+        public long AccountId { get; set; } = accountId;
+        public long AccountLegalEntityId { get; set; } = accountLegalEntityId;
+        public string AccountLegalEntityName { get; set; } = accountLegalEntityName;
+        public DateTime StartDate { get; set; } = startDate;
+        public DateTime EndDate { get; set; } = endDate;
+        public DateTime CreatedDate { get; set; } = createdDate;
+        public string CourseId { get; set; } = courseId;
+        public string CourseName { get; set; } = courseName;
+        public string CourseLevel { get; set; } = courseLevel;
+        public uint? ProviderId { get; set; } = providerId;
     }
 }

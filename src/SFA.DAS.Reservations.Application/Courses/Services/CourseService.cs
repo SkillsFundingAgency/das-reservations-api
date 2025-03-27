@@ -7,25 +7,18 @@ using Course = SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course;
 
 namespace SFA.DAS.Reservations.Application.Courses.Services
 {
-    public class CourseService : ICourseService
+    public class CourseService(ICourseRepository repository) : ICourseService
     {
-        private readonly ICourseRepository _repository;
-
-        public CourseService(ICourseRepository repository)
-        {
-            _repository = repository;
-        }
-
         public async Task<IEnumerable<Course>> GetCourses()
         {
-            var courseEntities = await _repository.GetCourses();
+            var courseEntities = await repository.GetCourses();
 
             return courseEntities.Select(entity => new Course(entity)).ToArray();
         }
 
         public async Task<Course> GetCourseById(string id)
         {
-            var entity = await _repository.GetCourseById(id);
+            var entity = await repository.GetCourseById(id);
 
             return entity == null ? null : new Course(entity);
         }

@@ -10,13 +10,9 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class DeleteReservationSteps: StepsBase
+    public class DeleteReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
-        public DeleteReservationSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-
-        }
-    
         [When(@"I delete the reservation")]
         public void WhenIDeleteTheReservation()
         {

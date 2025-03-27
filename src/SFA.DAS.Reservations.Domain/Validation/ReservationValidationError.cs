@@ -1,14 +1,8 @@
 ﻿namespace SFA.DAS.Reservations.Domain.Validation
 {
-    public class ReservationValidationError
+    public class ReservationValidationError(string propertyName, string reason)
     {
-        public string PropertyName { get; }
-        public string Reason { get;  }
-
-        public ReservationValidationError(string propertyName, string reason)
-        {
-            PropertyName = propertyName;
-            Reason = reason;
-        }
+        public string PropertyName { get; } = propertyName;
+        public string Reason { get;  } = reason;
     }
 }

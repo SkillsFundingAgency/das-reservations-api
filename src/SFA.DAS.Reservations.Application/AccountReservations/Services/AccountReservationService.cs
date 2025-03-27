@@ -13,31 +13,17 @@ using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 {
-    public class AccountReservationService : IAccountReservationService
+    public class AccountReservationService(
+        IReservationRepository reservationRepository,
+        IRuleRepository ruleRepository,
+        IOptions<ReservationsConfiguration> options,
+        IReservationIndexRepository reservationIndexRepository,
+        IAccountLegalEntitiesRepository accountLegalEntitiesRepository)
+        : IAccountReservationService
     {
-        private readonly IReservationRepository _reservationRepository;
-        private readonly IRuleRepository _ruleRepository;
-        private readonly IOptions<ReservationsConfiguration> _options;
-        private readonly IReservationIndexRepository _reservationIndexRepository;
-        private readonly IAccountLegalEntitiesRepository _accountLegalEntitiesRepository;
-
-        public AccountReservationService(
-            IReservationRepository reservationRepository, 
-            IRuleRepository ruleRepository,
-            IOptions<ReservationsConfiguration> options, 
-            IReservationIndexRepository reservationIndexRepository,
-            IAccountLegalEntitiesRepository accountLegalEntitiesRepository)
-        {
-            _reservationRepository = reservationRepository;
-            _ruleRepository = ruleRepository;
-            _options = options;
-            _reservationIndexRepository = reservationIndexRepository;
-            _accountLegalEntitiesRepository = accountLegalEntitiesRepository;
-        }
-
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
         {
-            var result = await _reservationRepository.GetAccountReservations(accountId);
+            var result = await reservationRepository.GetAccountReservations(accountId);
 
             var reservations = result
                 .Select(MapReservation)
@@ -49,7 +35,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         public async Task<Reservation> GetReservation(Guid id)
         {
-            var reservation = await _reservationRepository.GetById(id);
+            var reservation = await reservationRepository.GetById(id);
 
             return reservation == null ? null : MapReservation(reservation);
         }
@@ -57,7 +43,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         public async Task<ReservationSearchResult> FindReservations(
             long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SelectedSearchFilters selectedFilters)
         {
-            var result = await _reservationIndexRepository.Find(
+            var result = await reservationIndexRepository.Find(
                 providerId, searchTerm, pageNumber, pageItemCount, selectedFilters);
 
             return new ReservationSearchResult
@@ -75,7 +61,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 command.Id,
                 command.AccountId,
                 command.StartDate,
-                _options.Value.ExpiryPeriodInMonths,
+                options.Value.ExpiryPeriodInMonths,
                 command.AccountLegalEntityName,
                 command.CourseId,
                 command.ProviderId,
@@ -84,7 +70,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 command.TransferSenderAccountId,
                 command.UserId);
 
-            var entity = await _reservationRepository.CreateAccountReservation(MapReservation(reservation));
+            var entity = await reservationRepository.CreateAccountReservation(MapReservation(reservation));
             var result = MapReservation(entity);
 
             return result;
@@ -92,7 +78,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         public async Task DeleteReservation(Guid reservationId)
         {
-            await _reservationRepository.DeleteAccountReservation(reservationId);
+            await reservationRepository.DeleteAccountReservation(reservationId);
         }
 
         public async Task<IList<Guid>> BulkCreateAccountReservation(uint reservationCount, long accountLegalEntityId,
@@ -105,14 +91,14 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 reservations.Add(CreateReservation(accountId,accountLegalEntityId, accountLegalEntityName, transferSenderAccountId));
             }
 
-            await _reservationRepository.CreateAccountReservations(reservations);
+            await reservationRepository.CreateAccountReservations(reservations);
 
             return reservations.Select(c=>c.Id).ToList();
         }
 
         public async Task<Guid> ChangeOfParty(ChangeOfPartyServiceRequest request)
         {
-            var existingReservation = await _reservationRepository.GetById(request.ReservationId);
+            var existingReservation = await reservationRepository.GetById(request.ReservationId);
             if (existingReservation == null)
             {
                 throw new EntityNotFoundException<Domain.Entities.Reservation>();
@@ -146,7 +132,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
             if (request.AccountLegalEntityId.HasValue)
             {
-                var newAccountLegalEntity = await _accountLegalEntitiesRepository.Get(request.AccountLegalEntityId.Value);
+                var newAccountLegalEntity = await accountLegalEntitiesRepository.Get(request.AccountLegalEntityId.Value);
 
                 newReservation.AccountId = newAccountLegalEntity.AccountId;
                 newReservation.AccountLegalEntityId = newAccountLegalEntity.AccountLegalEntityId;
@@ -158,17 +144,17 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
                 newReservation.ProviderId = request.ProviderId;
             }
 
-            await _reservationRepository.CreateAccountReservation(newReservation);
+            await reservationRepository.CreateAccountReservation(newReservation);
             return newReservation.Id;
         }
 
         public async Task<int> GetRemainingReservations(long accountId, int totalReservationAllowed)
         {
-            var result = await _reservationRepository.GetAccountReservations(accountId);
+            var result = await reservationRepository.GetAccountReservations(accountId);
 
             var usedReservation = result
                 .Count(r => !r.IsLevyAccount
-                    && r.CreatedDate >= _options.Value.ResetReservationDate
+                    && r.CreatedDate >= options.Value.ResetReservationDate
                     && IsNotExpired(r));
 
             return totalReservationAllowed - usedReservation;
@@ -195,7 +181,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         private Reservation MapReservation(Domain.Entities.Reservation reservation)
         {
-            var mapReservation = new Reservation(_ruleRepository.GetReservationRules,
+            var mapReservation = new Reservation(ruleRepository.GetReservationRules,
                 reservation.Id,
                 reservation.AccountId,
                 reservation.IsLevyAccount,

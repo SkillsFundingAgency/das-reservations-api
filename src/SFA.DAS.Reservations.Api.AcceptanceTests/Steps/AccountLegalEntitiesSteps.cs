@@ -10,13 +10,12 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class AccountLegalEntitiesSteps : StepsBase
+    public class AccountLegalEntitiesSteps(
+        TestData testData,
+        TestResults testResults,
+        TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
-
-        public AccountLegalEntitiesSteps(TestData testData,TestResults testResults, TestServiceProvider serviceProvider) : base(testData,testResults, serviceProvider)
-        {
-        }
-
         [Given("I am a provider who can act on behalf of an employer")]
         public void GivenIAmAProviderWhoCanActOnBehalfOfAnEmployer()
         {

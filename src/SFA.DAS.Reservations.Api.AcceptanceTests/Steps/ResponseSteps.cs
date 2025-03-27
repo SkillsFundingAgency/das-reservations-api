@@ -9,16 +9,12 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class ResponseSteps : StepsBase
+    public class ResponseSteps(
+        TestData testData,
+        TestResults testResults,
+        TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
-        public ResponseSteps(
-            TestData testData, 
-            TestResults testResults, 
-            TestServiceProvider serviceProvider) 
-            : base(testData, testResults, serviceProvider)
-        {
-        }
-
         [Then("an http status code of (.*) is returned")]
         public void ThenAnHttpStatusCodeIsReturned(int httpStatusCode)
         {

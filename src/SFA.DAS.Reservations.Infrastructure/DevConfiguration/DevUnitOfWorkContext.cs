@@ -7,14 +7,9 @@ using SFA.DAS.UnitOfWork.Managers;
 
 namespace SFA.DAS.Reservations.Infrastructure.DevConfiguration
 {
-    public class DevUnitOfWorkContext : IUnitOfWorkContext
+    public class DevUnitOfWorkContext(ILogger<string> logger) : IUnitOfWorkContext
     {
-        private readonly ILogger _logger;
-
-        public DevUnitOfWorkContext(ILogger<string> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger _logger = logger;
 
         public void AddEvent<T>(T message) where T : class
         {

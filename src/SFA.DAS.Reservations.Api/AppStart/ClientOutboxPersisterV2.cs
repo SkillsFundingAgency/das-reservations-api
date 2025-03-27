@@ -16,7 +16,8 @@ using SFA.DAS.NServiceBus.SqlServer.Data;
 
 namespace SFA.DAS.Reservations.Api.AppStart
 {
-    public class ClientOutboxPersisterV2 : IClientOutboxStorageV2
+    public class ClientOutboxPersisterV2(IDateTimeService dateTimeService, ReadOnlySettings settings)
+        : IClientOutboxStorageV2
     {
         public const string GetCommandText = "SELECT EndpointName, Operations FROM dbo.ClientOutboxData WHERE MessageId = @MessageId";
 
@@ -30,15 +31,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
 
         public const int CleanupBatchSize = 10000;
 
-        private readonly IDateTimeService _dateTimeService;
-
-        private readonly Func<DbConnection> _connectionBuilder;
-
-        public ClientOutboxPersisterV2(IDateTimeService dateTimeService, ReadOnlySettings settings)
-        {
-            _dateTimeService = dateTimeService;
-            _connectionBuilder = settings.Get<Func<DbConnection>>("SqlPersistence.ConnectionBuilder");
-        }
+        private readonly Func<DbConnection> _connectionBuilder = settings.Get<Func<DbConnection>>("SqlPersistence.ConnectionBuilder");
 
         public async Task<IClientOutboxTransaction> BeginTransactionAsync()
         {
@@ -75,7 +68,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             using DbCommand command = connection.CreateCommand();
             command.CommandText = "SELECT MessageId, EndpointName FROM dbo.ClientOutboxData WHERE Dispatched = 0 AND CreatedAt <= @CreatedAt AND PersistenceVersion = '2.0.0' ORDER BY CreatedAt";
             command.CommandType = CommandType.Text;
-            command.AddParameter("CreatedAt", _dateTimeService.UtcNow.AddSeconds(-10.0));
+            command.AddParameter("CreatedAt", dateTimeService.UtcNow.AddSeconds(-10.0));
             using DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(continueOnCapturedContext: false);
             List<IClientOutboxMessageAwaitingDispatch> clientOutboxMessages = new List<IClientOutboxMessageAwaitingDispatch>();
             while (await reader.ReadAsync().ConfigureAwait(continueOnCapturedContext: false))
@@ -96,7 +89,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             command.CommandText = "UPDATE dbo.ClientOutboxData SET Dispatched = 1, DispatchedAt = @DispatchedAt, Operations = '[]' WHERE MessageId = @MessageId";
             command.CommandType = CommandType.Text;
             command.AddParameter("MessageId", messageId);
-            command.AddParameter("DispatchedAt", _dateTimeService.UtcNow);
+            command.AddParameter("DispatchedAt", dateTimeService.UtcNow);
             await command.ExecuteNonQueryAsync().ConfigureAwait(continueOnCapturedContext: false);
         }
 
@@ -108,7 +101,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             dbCommand.CommandType = CommandType.Text;
             dbCommand.Transaction = sqlStorageSession.Transaction;
             dbCommand.AddParameter("MessageId", messageId);
-            dbCommand.AddParameter("DispatchedAt", _dateTimeService.UtcNow);
+            dbCommand.AddParameter("DispatchedAt", dateTimeService.UtcNow);
             await dbCommand.ExecuteNonQueryAsync();
         }
 
@@ -121,7 +114,7 @@ namespace SFA.DAS.Reservations.Api.AppStart
             dbCommand.Transaction = sqlClientOutboxTransaction.Transaction;
             dbCommand.AddParameter("MessageId", clientOutboxMessage.MessageId);
             dbCommand.AddParameter("EndpointName", clientOutboxMessage.EndpointName);
-            dbCommand.AddParameter("CreatedAt", _dateTimeService.UtcNow);
+            dbCommand.AddParameter("CreatedAt", dateTimeService.UtcNow);
             dbCommand.AddParameter("Operations", JsonConvert.SerializeObject(clientOutboxMessage.TransportOperations, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto

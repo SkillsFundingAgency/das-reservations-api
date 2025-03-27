@@ -7,16 +7,12 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class ChangeOfPartySteps : StepsBase
+    public class ChangeOfPartySteps(
+        TestData testData,
+        TestResults testResults,
+        TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
-        public ChangeOfPartySteps(
-            TestData testData, 
-            TestResults testResults, 
-            TestServiceProvider serviceProvider) 
-            : base(testData, testResults, serviceProvider)
-        {
-        }
-
         [Given(@"I want to change provider to (.*)")]
         public void GivenIWantToChangeProviderTo(uint providerId)
         {

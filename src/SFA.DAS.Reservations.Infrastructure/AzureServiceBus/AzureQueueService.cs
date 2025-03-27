@@ -10,14 +10,9 @@ using SFA.DAS.Reservations.Domain.Infrastructure;
 
 namespace SFA.DAS.Reservations.Infrastructure.AzureServiceBus
 {
-    public class AzureQueueService : IAzureQueueService
+    public class AzureQueueService(IOptions<ReservationsConfiguration> options) : IAzureQueueService
     {
-        private readonly ReservationsConfiguration _configuration;
-
-        public AzureQueueService(IOptions<ReservationsConfiguration> options)
-        {
-            _configuration = options.Value;
-        }
+        private readonly ReservationsConfiguration _configuration = options.Value;
 
         public IList<QueueMonitor> GetQueuesToMonitor()
         {

@@ -15,15 +15,17 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             Level = entity.Level.ToString();
             EffectiveTo = entity.EffectiveTo;
             Rules = entity.ReservationRule;
+            StandardApprenticeshipType = entity.ApprenticeshipType;
         }
 
-        public Course(string courseId, string title, string level, DateTime? effectiveTo)
+        public Course(string courseId, string title, string level, DateTime? effectiveTo, string apprenticeshipType)
         {
             CourseId = courseId;
             Title = title;
             Level = level;
             EffectiveTo = effectiveTo;
             Rules = new List<Rule>();
+            StandardApprenticeshipType = apprenticeshipType;
         }
 
         public string CourseId { get; }
@@ -32,8 +34,8 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
         public DateTime? EffectiveTo { get; set; }
         public ApprenticeshipType Type => 
             CourseId.IndexOf("-", StringComparison.CurrentCultureIgnoreCase) != -1
-            ? ApprenticeshipType.Framework
-            : ApprenticeshipType.Standard;
+            ? ApprenticeshipCourse.ApprenticeshipType.Framework
+            : ApprenticeshipCourse.ApprenticeshipType.Standard;
         public string StandardApprenticeshipType { get; }
         public ICollection<Rule> Rules { get; }
       

@@ -6,12 +6,7 @@ namespace SFA.DAS.Reservations.Domain.Validation
     public class ValidationResult
     {
         public bool IsUnauthorized { get; set; }
-        public Dictionary<string, string> ValidationDictionary { get; set; }
-
-        public ValidationResult()
-        {
-            ValidationDictionary = new Dictionary<string, string>();
-        }
+        public Dictionary<string, string> ValidationDictionary { get; set; } = new();
 
         public void AddError(string propertyName)
         {
