@@ -5,19 +5,14 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Application.Account.Services
 {
-    public class AccountsService : IAccountsService
+    public class AccountsService(IAccountRepository repository, IOptions<ReservationsConfiguration> configuration)
+        : IAccountsService
     {
-        private readonly IAccountRepository _repository;
-        private readonly ReservationsConfiguration _configuration;
+        private readonly ReservationsConfiguration _configuration = configuration.Value;
 
-        public AccountsService (IAccountRepository repository, IOptions<ReservationsConfiguration> configuration)
-        {
-            _repository = repository;
-            _configuration = configuration.Value;
-        }
         public async Task<Domain.Account.Account> GetAccount(long accountId)
         {
-            var account = await _repository.Get(accountId);
+            var account = await repository.Get(accountId);
 
             return MapAccount(account);
         }

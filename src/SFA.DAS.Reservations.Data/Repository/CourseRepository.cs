@@ -9,18 +9,11 @@ using Course = SFA.DAS.Reservations.Domain.Entities.Course;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class CourseRepository : ICourseRepository
+    public class CourseRepository(IReservationsDataContext reservationsDataContext) : ICourseRepository
     {
-        private readonly IReservationsDataContext _reservationsDataContext;
-
-        public CourseRepository(IReservationsDataContext reservationsDataContext)
-        {
-            _reservationsDataContext = reservationsDataContext;
-        }
-
         public async Task<IEnumerable<Course>> GetCourses()
         {
-            return await _reservationsDataContext.Courses
+            return await reservationsDataContext.Courses
                 .Where(x => x.EffectiveTo == null || x.EffectiveTo > DateTime.UtcNow)
                 .Where(x => !x.CourseId.Contains("-"))
                 .ToListAsync();
@@ -28,7 +21,7 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<Course> GetCourseById(string id)
         {
-            return await _reservationsDataContext.Courses.FindAsync(id);
+            return await reservationsDataContext.Courses.FindAsync(id);
         }
     }
 }

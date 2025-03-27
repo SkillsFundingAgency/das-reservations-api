@@ -12,12 +12,12 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class GetAccountLegalEntitiesSteps : StepsBase
+    public class GetAccountLegalEntitiesSteps(
+        TestData testData,
+        TestResults testResults,
+        TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
-        public GetAccountLegalEntitiesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-        }
-
         [Given(@"I have a legal entity with unsigned agreement")]
         public void GivenIHaveALegalEntityWithUnsignedAgreement()
         {

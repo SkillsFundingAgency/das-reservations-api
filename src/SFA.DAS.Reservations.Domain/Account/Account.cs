@@ -1,27 +1,14 @@
 namespace SFA.DAS.Reservations.Domain.Account
 {
-    public class Account
+    public class Account(long id, bool isLevy, string name, int? reservationLimit)
     {
-        public long Id { get ;  }
-        public bool IsLevy { get ;  }
-        public string Name { get ;  }
-        public int? ReservationLimit { get;  }
+        public long Id { get ;  } = id;
+        public bool IsLevy { get ;  } = isLevy;
+        public string Name { get ;  } = name;
+        public int? ReservationLimit { get;  } = reservationLimit;
 
-        public Account(Domain.Entities.Account account, int? globalReservationLimit)
+        public Account(Domain.Entities.Account account, int? globalReservationLimit) : this(account.Id, account.IsLevy, account.Name, account.ReservationLimit ?? globalReservationLimit)
         {
-            Id = account.Id;
-            IsLevy = account.IsLevy;
-            Name = account.Name;
-            ReservationLimit = account.ReservationLimit ?? globalReservationLimit;
         }
-        
-        public Account(long id, bool isLevy, string name, int? reservationLimit)
-        {
-            Id = id;
-            IsLevy = isLevy;
-            Name = name;
-            ReservationLimit = reservationLimit;
-        }
-
     }
 }

@@ -15,36 +15,19 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 {
-    public class BulkValidateCommandHandler : IRequestHandler<BulkValidateCommand, BulkValidationResults>
+    public class BulkValidateCommandHandler(
+        IAccountReservationService accountReservationService,
+        IGlobalRulesService globalRulesService,
+        IAccountLegalEntitiesService accountLegalEntitiesService,
+        IAccountsService accountsService,
+        IMediator mediator,
+        IOptions<ReservationsConfiguration> options,
+        ILogger<BulkValidateCommandHandler> logger,
+        ICurrentDateTime currentDateTime)
+        : IRequestHandler<BulkValidateCommand, BulkValidationResults>
     {
-        private readonly IAccountReservationService _accountReservationService;
-        private readonly IGlobalRulesService _globalRulesService;
-        private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
-        private readonly IAccountsService _accountService;
-        private readonly IMediator _mediator;
-        private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities;
-        private readonly ReservationsConfiguration _configuration;
-        private readonly ILogger<BulkValidateCommandHandler> _logger;
-        private readonly ICurrentDateTime _currentDateTime;
-
-        public BulkValidateCommandHandler(IAccountReservationService accountReservationService,
-            IGlobalRulesService globalRulesService,
-            IAccountLegalEntitiesService accountLegalEntitiesService, IAccountsService accountsService,
-            IMediator mediator,
-            IOptions<ReservationsConfiguration> options,
-            ILogger<BulkValidateCommandHandler> logger,
-            ICurrentDateTime currentDateTime)
-        {
-            _accountReservationService = accountReservationService;
-            _globalRulesService = globalRulesService;
-            _accountLegalEntitiesService = accountLegalEntitiesService;
-            _accountService = accountsService;
-            _mediator = mediator;
-            _cachedAccountLegalEntities = new Dictionary<long, AccountLegalEntity>();
-            _configuration = options.Value;
-            _logger = logger;
-            _currentDateTime = currentDateTime;
-        }
+        private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities = new();
+        private readonly ReservationsConfiguration _configuration = options.Value;
 
         public async Task<BulkValidationResults> Handle(BulkValidateCommand bulkRequest, CancellationToken cancellationToken)
         {
@@ -107,13 +90,13 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                         else
                         {
                             // calling legacy service, we may be able to remove this, but will need to investigate further.
-                            var reservationRule = await _globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
+                            var reservationRule = await globalRulesService.CheckReservationAgainstRules(GetBulkCheckReservationAgainRule(validateRequest, accountLegalEntity));
                             if (reservationRule == null)
                             {
                                 continue;
                             }
 
-                            _logger.LogInformation("Failed reservation rule for reason : {Reason}.", reservationRule.RuleTypeText);
+                            logger.LogInformation("Failed reservation rule for reason : {Reason}.", reservationRule.RuleTypeText);
                             result.ValidationErrors.Add(new BulkValidation { Reason = "Failed reservation rules", RowNumber = validateRequest.RowNumber });
                         }
                     }
@@ -156,25 +139,25 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                 return _cachedAccountLegalEntities.GetValueOrDefault(accountLegalEntityId);
             }
 
-            var accountLegalEntity = await _accountLegalEntitiesService.GetAccountLegalEntity(accountLegalEntityId);
+            var accountLegalEntity = await accountLegalEntitiesService.GetAccountLegalEntity(accountLegalEntityId);
             _cachedAccountLegalEntities.Add(accountLegalEntityId, accountLegalEntity);
             return accountLegalEntity;
         }
 
         private async Task<string> FailedStartDateValidation(DateTime? startDate, long accountLegalEntityId, long accountId)
         {
-            var availableDates = await _mediator.Send(new GetAvailableDatesQuery { AccountLegalEntityId = accountLegalEntityId });
+            var availableDates = await mediator.Send(new GetAvailableDatesQuery { AccountLegalEntityId = accountLegalEntityId });
             if (availableDates == null || !availableDates.AvailableDates.Any())
             {
                 return "No available dates for reservation found";
             }
 
-            var response = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
+            var response = await mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
             var activeRule = response?.GlobalRules?.Where(r => r != null)?.MinBy(x => x.ActiveFrom);
 
             if (activeRule != null)
             {
-                _logger.LogInformation($"Found an active rule {activeRule.RuleTypeText} for accountId {accountId} with ActiveTo is {activeRule.ActiveTo?.ToString() ?? "Null"}");
+                logger.LogInformation($"Found an active rule {activeRule.RuleTypeText} for accountId {accountId} with ActiveTo is {activeRule.ActiveTo?.ToString() ?? "Null"}");
             }
 
             var possibleDates = activeRule == null
@@ -194,7 +177,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
                 return "No reservation dates found for account";
             }
 
-            var previousMonthDate = _currentDateTime.GetDate().AddMonths(-1);
+            var previousMonthDate = currentDateTime.GetDate().AddMonths(-1);
             var firstDayOfPreviousMonth = new DateTime(previousMonthDate.Year, previousMonthDate.Month, 1);
             
             if (startDate.Value < firstDayOfPreviousMonth)
@@ -224,7 +207,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
         private async Task<bool> FailedAccountRuleValidation(long accountId)
         {
-            var accountFundingRulesApiResponse = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
+            var accountFundingRulesApiResponse = await mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
             if (accountFundingRulesApiResponse?.GlobalRules?.Any(c => c != null && c.RuleType == GlobalRuleType.ReservationLimit) ?? false)
             {
                 return true;
@@ -235,7 +218,7 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
         private async Task<bool> FailedGlobalRuleValidation()
         {
-            var globalRulesApiResponse = await _mediator.Send(new GetRulesQuery());
+            var globalRulesApiResponse = await mediator.Send(new GetRulesQuery());
             if (globalRulesApiResponse?.GlobalRules != null && globalRulesApiResponse.GlobalRules.Any(c => c != null && c.RuleType == GlobalRuleType.FundingPaused && DateTime.UtcNow >= c.ActiveFrom))
             {
                 return true;
@@ -246,10 +229,10 @@ namespace SFA.DAS.Reservations.Application.BulkUpload.Queries
 
         private async Task<bool> ApprenticeshipCountExceedsRemainingReservations(long accountId, int numberOfNewReservation)
         {
-            var account = await _accountService.GetAccount(accountId);
+            var account = await accountsService.GetAccount(accountId);
 
             var reservationLimit = account.ReservationLimit;
-            var remainingReservation = await _accountReservationService.GetRemainingReservations(accountId, reservationLimit ?? 0);
+            var remainingReservation = await accountReservationService.GetRemainingReservations(accountId, reservationLimit ?? 0);
 
             return remainingReservation < numberOfNewReservation;
         }

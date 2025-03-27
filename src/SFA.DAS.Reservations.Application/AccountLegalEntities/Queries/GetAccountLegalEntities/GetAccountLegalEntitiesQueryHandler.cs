@@ -8,27 +8,21 @@ using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountLegalEntities
 {
-    public class GetAccountLegalEntitiesQueryHandler : IRequestHandler<GetAccountLegalEntitiesQuery, GetAccountLegalEntitiesResponse>
+    public class GetAccountLegalEntitiesQueryHandler(
+        IValidator<GetAccountLegalEntitiesQuery> validator,
+        IAccountLegalEntitiesService service)
+        : IRequestHandler<GetAccountLegalEntitiesQuery, GetAccountLegalEntitiesResponse>
     {
-        private readonly IValidator<GetAccountLegalEntitiesQuery> _validator;
-        private readonly IAccountLegalEntitiesService _service;
-
-        public GetAccountLegalEntitiesQueryHandler(IValidator<GetAccountLegalEntitiesQuery> validator, IAccountLegalEntitiesService service)
-        {
-            _validator = validator;
-            _service = service;
-        }
-
         public async Task<GetAccountLegalEntitiesResponse> Handle(GetAccountLegalEntitiesQuery request, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(request);
+            var validationResult = await validator.ValidateAsync(request);
 
             if (!validationResult.IsValid())
             {
                 throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            var accountLegalEntities = await _service.GetAccountLegalEntities(request.AccountId);
+            var accountLegalEntities = await service.GetAccountLegalEntities(request.AccountId);
 
             return new GetAccountLegalEntitiesResponse { AccountLegalEntities= accountLegalEntities };
         }

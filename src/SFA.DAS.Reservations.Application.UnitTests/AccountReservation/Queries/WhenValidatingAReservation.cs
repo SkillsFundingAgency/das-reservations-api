@@ -35,7 +35,7 @@ public class WhenValidatingAReservation
     {
         var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             
-        _course = new Course(CourseId, "Test Course", "1", DateTime.Today);
+        _course = new Course(CourseId, "Test Course", "1", DateTime.Today, "Apprenticeship");
 
         _courseService = new Mock<ICourseService>();
         _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
@@ -365,7 +365,7 @@ public class WhenValidatingAReservation
             StartDate = _reservation.StartDate.Value
         };
 
-        var course = new Course("12-34", "Test Course", "1", DateTime.Today);
+        var course = new Course("12-34", "Test Course", "1", DateTime.Today, "Apprenticeship");
 
         _courseService.Setup(s => s.GetCourseById(It.IsAny<string>())).ReturnsAsync(course);
 

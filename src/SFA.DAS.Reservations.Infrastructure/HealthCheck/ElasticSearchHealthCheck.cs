@@ -6,26 +6,18 @@ using SFA.DAS.Reservations.Domain.Reservations;
 
 namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
 {
-    public class ElasticSearchHealthCheck : IHealthCheck
+    public class ElasticSearchHealthCheck(IReservationIndexRepository repository) : IHealthCheck
     {
-        private readonly IReservationIndexRepository _repository;
-
-
-        public ElasticSearchHealthCheck(IReservationIndexRepository repository)
-        {
-            _repository = repository;
-        }
-
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
         {
-            var elasticInstanceOnline = await _repository.PingAsync();
+            var elasticInstanceOnline = await repository.PingAsync();
 
             if (!elasticInstanceOnline)
             {
                 return HealthCheckResult.Unhealthy("Ping to elastic instance failed");
             }
 
-            var latestIndex = await _repository.GetCurrentReservationIndex();
+            var latestIndex = await repository.GetCurrentReservationIndex();
 
             if (latestIndex == null)
             {

@@ -14,30 +14,18 @@ using SFA.DAS.UnitOfWork.Context;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation
 {
-    public class CreateAccountReservationCommandHandler : IRequestHandler<CreateAccountReservationCommand, CreateAccountReservationResult>
+    public class CreateAccountReservationCommandHandler(
+        IAccountReservationService accountReservationService,
+        IValidator<CreateAccountReservationCommand> validator,
+        IGlobalRulesService globalRulesService,
+        IUnitOfWorkContext context,
+        IAccountLegalEntitiesService accountLegalEntitiesService,
+        ICurrentDateTime currentDateTime)
+        : IRequestHandler<CreateAccountReservationCommand, CreateAccountReservationResult>
     {
-        private readonly IAccountReservationService _accountReservationService;
-        private readonly IValidator<CreateAccountReservationCommand> _validator;
-        private readonly IGlobalRulesService _globalRulesService;
-        private readonly IUnitOfWorkContext _context;
-        private readonly IAccountLegalEntitiesService _accountLegalEntitiesService;
-        private readonly ICurrentDateTime _currentDateTime;
-
-        public CreateAccountReservationCommandHandler(IAccountReservationService accountReservationService,
-            IValidator<CreateAccountReservationCommand> validator, IGlobalRulesService globalRulesService,
-            IUnitOfWorkContext context, IAccountLegalEntitiesService accountLegalEntitiesService, ICurrentDateTime currentDateTime)
-        {
-            _accountReservationService = accountReservationService;
-            _validator = validator;
-            _globalRulesService = globalRulesService;
-            _context = context;
-            _accountLegalEntitiesService = accountLegalEntitiesService;
-            _currentDateTime = currentDateTime;
-        }
-
         public async Task<CreateAccountReservationResult> Handle(CreateAccountReservationCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(request);
+            var validationResult = await validator.ValidateAsync(request);
 
             if (!validationResult.IsValid())
             {
@@ -48,7 +36,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
 
             ValidateStartDate(request);
 
-            var globalRule = await _globalRulesService.CheckReservationAgainstRules(request);
+            var globalRule = await globalRulesService.CheckReservationAgainstRules(request);
 
             if (globalRule != null)
             {
@@ -86,7 +74,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
             }
 
             var accountLegalEntity =
-                await _accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
+                await accountLegalEntitiesService.GetAccountLegalEntity(request.AccountLegalEntityId);
 
             if (request.IsLevyAccount)
             {
@@ -102,9 +90,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                 };
             }
 
-            var reservation = await _accountReservationService.CreateAccountReservation(request);
+            var reservation = await accountReservationService.CreateAccountReservation(request);
             
-            _context.AddEvent(() =>
+            context.AddEvent(() =>
             {
                 var startDate = DateTime.MinValue;
                 if (reservation.StartDate.HasValue)
@@ -146,7 +134,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
             if (!item.StartDate.HasValue || item.StartDate.Value == DateTime.MinValue)
                 throw new StartDateException("You must enter a start date to reserve new funding");
 
-            var currentDate = _currentDateTime.GetDate();
+            var currentDate = currentDateTime.GetDate();
             var currentFirstOfTheMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
             var validFromDate = currentDate.AddMonths(-1).ToString("MM yyyy");
             var validToDate = currentDate.AddMonths(2).ToString("MM yyyy");

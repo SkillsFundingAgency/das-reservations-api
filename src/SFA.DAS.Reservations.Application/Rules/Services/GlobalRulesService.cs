@@ -11,46 +11,33 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Rules.Services
 {
-    public class GlobalRulesService : IGlobalRulesService
+    public class GlobalRulesService(
+        IGlobalRuleRepository repository,
+        IOptions<ReservationsConfiguration> options,
+        IAccountReservationService reservationService,
+        IAccountsService accountService,
+        ILogger<GlobalRulesService> logger)
+        : IGlobalRulesService
     {
-        private readonly IGlobalRuleRepository _repository;
-        private readonly IAccountReservationService _reservationService;
-        private readonly IAccountsService _accountService;
-        private readonly ReservationsConfiguration _options;
-        ILogger<GlobalRulesService> _logger;
-
-        public GlobalRulesService(
-            IGlobalRuleRepository repository, 
-            IOptions<ReservationsConfiguration> options,
-            IAccountReservationService reservationService, 
-            IAccountsService accountService,
-            ILogger<GlobalRulesService> logger
-            )
-        {
-            _repository = repository;
-            _reservationService = reservationService;
-            _accountService = accountService;
-            _options = options.Value;
-            _logger = logger;
-        }
+        private readonly ReservationsConfiguration _options = options.Value;
 
         public async Task<IList<GlobalRule>> GetAllRules()
         {
-            var result = await _repository.GetAll();
+            var result = await repository.GetAll();
 
             return result.Select(globalRule => new GlobalRule(globalRule)).ToList();
         }
 
         public async Task<IList<GlobalRule>> GetActiveRules(DateTime fromDate)
         {
-            var result = await _repository.FindActive(fromDate);
+            var result = await repository.FindActive(fromDate);
 
             return result.Select(globalRule => new GlobalRule(globalRule)).ToList();
         }
 
         public async Task<GlobalRule> CheckReservationAgainstRules(IReservationRequest request)
         {
-            var resultsList = await _repository.FindActive(request.CreatedDate);
+            var resultsList = await repository.FindActive(request.CreatedDate);
 
             resultsList = resultsList
                 .Where(r => r.RuleType != (byte)GlobalRuleType.DynamicPause || r.ActiveTo > request.StartDate)
@@ -106,7 +93,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
 
         private async Task<int?> GetReservationLimit(long accountId)
         {
-            var account = await _accountService.GetAccount(accountId);
+            var account = await accountService.GetAccount(accountId);
             return account.ReservationLimit;
         }
 
@@ -124,16 +111,16 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
                 return null;
             }
 
-            var remainingReservations = await _reservationService.GetRemainingReservations(accountId, maxNumberOfReservations.Value);
+            var remainingReservations = await reservationService.GetRemainingReservations(accountId, maxNumberOfReservations.Value);
 
-            _logger.LogWarning("Reset reservation date:" +
+            logger.LogWarning("Reset reservation date:" +
                 (_options.ResetReservationDate.HasValue 
                 ? _options.ResetReservationDate.Value.ToString("dd/MM/yyyy")
                 : "no reset reservation date set"));
 
             if (remainingReservations <= 0)
             {
-                _logger.LogWarning($"Account: {accountId} has {remainingReservations} remainingReservations");
+                logger.LogWarning($"Account: {accountId} has {remainingReservations} remainingReservations");
                 return new GlobalRule(new Domain.Entities.GlobalRule
                 {
                     Id = 0,

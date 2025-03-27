@@ -3,21 +3,13 @@ using SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccountRe
 
 namespace SFA.DAS.Reservations.Api.Models
 {
-    public class AccountReservationStatus
+    public class AccountReservationStatus(GetAccountReservationStatusResponse response)
     {
-        public AccountReservationStatus(GetAccountReservationStatusResponse response)
-        {
-            CanAutoCreateReservations = response.CanAutoCreateReservations;
-            AccountLegalEntityAgreementStatus = response.AccountLegalEntityAgreementStatus;
-            HasPendingReservations = response.HasPendingReservations;
-            HasReachedReservationsLimit = response.HasReachedReservationsLimit;
-        }
+        public Dictionary<long, bool> AccountLegalEntityAgreementStatus { get ; } = response.AccountLegalEntityAgreementStatus;
 
-        public Dictionary<long, bool> AccountLegalEntityAgreementStatus { get ; }
+        public bool CanAutoCreateReservations { get; } = response.CanAutoCreateReservations;
 
-        public bool CanAutoCreateReservations { get; }
-
-        public bool HasReachedReservationsLimit { get; }
-        public bool HasPendingReservations { get; }
+        public bool HasReachedReservationsLimit { get; } = response.HasReachedReservationsLimit;
+        public bool HasPendingReservations { get; } = response.HasPendingReservations;
     }
 }

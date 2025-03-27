@@ -1,15 +1,8 @@
 ﻿namespace SFA.DAS.Reservations.Domain.Rules
 {
-    public class GlobalRuleAccountExemption
+    public class GlobalRuleAccountExemption(Entities.GlobalRuleAccountExemption accountExemption)
     {
-
-        public GlobalRuleAccountExemption(Entities.GlobalRuleAccountExemption accountExemption)
-        {
-            GlobalRuleId = accountExemption.GlobalRuleId;
-            AccountId = accountExemption.AccountId;
-        }
-
-        public long GlobalRuleId{ get; set; }
-        public long AccountId { get; set; }
+        public long GlobalRuleId{ get; set; } = accountExemption.GlobalRuleId;
+        public long AccountId { get; set; } = accountExemption.AccountId;
     }
 }

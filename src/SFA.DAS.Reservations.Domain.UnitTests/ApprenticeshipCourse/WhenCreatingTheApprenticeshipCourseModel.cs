@@ -15,7 +15,7 @@ namespace SFA.DAS.Reservations.Domain.UnitTests.ApprenticeshipCourse
         public void Then_The_ApprenticeshipType_Is_Correctly_Worked_Out_From_The_Course_Id(string courseId, bool isStandard)
         {
             //Arrange Act
-            var actualApprenticeship = new Course(courseId, "", "", DateTime.Today);
+            var actualApprenticeship = new Course(courseId, "", "", DateTime.Today, "Apprenticeship");
             
             //Assert
             var expectedType = isStandard ? ApprenticeshipType.Standard : ApprenticeshipType.Framework;

@@ -5,34 +5,26 @@ using Microsoft.Extensions.Logging;
 
 namespace SFA.DAS.Reservations.NServiceBusListener
 {
-    internal class LifetimeEventsHostedService : IHostedService
+    internal class LifetimeEventsHostedService(
+        ILogger<LifetimeEventsHostedService> logger,
+        IApplicationLifetime appLifetime,
+        NServiceBusConsole console)
+        : IHostedService
     {
-        private readonly ILogger _logger;
-        private readonly IApplicationLifetime _appLifetime;
-        private readonly NServiceBusConsole _console;
-
-        public LifetimeEventsHostedService(
-            ILogger<LifetimeEventsHostedService> logger, 
-            IApplicationLifetime appLifetime,
-            NServiceBusConsole console)
-        {
-            _logger = logger;
-            _appLifetime = appLifetime;
-            _console = console;
-        }
+        private readonly ILogger _logger = logger;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _appLifetime.ApplicationStarted.Register(OnStarted);
-            _appLifetime.ApplicationStopping.Register(OnStopping);
-            _appLifetime.ApplicationStopped.Register(OnStopped);
+            appLifetime.ApplicationStarted.Register(OnStarted);
+            appLifetime.ApplicationStopping.Register(OnStopping);
+            appLifetime.ApplicationStopped.Register(OnStopped);
 
-            await _console.Start();
+            await console.Start();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _console.Stop();
+            await console.Stop();
         }
 
         private void OnStarted()

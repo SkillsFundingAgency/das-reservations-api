@@ -15,31 +15,23 @@ namespace SFA.DAS.Reservations.Api.Controllers
 {
     [Route("api/[controller]/")]
     [ApiController]
-    public class AccountLegalEntitiesController : ControllerBase
+    public class AccountLegalEntitiesController(
+        IMediator mediator,
+        ILogger<AccountLegalEntitiesController> logger)
+        : ControllerBase
     {
-        private readonly IMediator _mediator;
-        private readonly ILogger<AccountLegalEntitiesController> _logger;
-
-        public AccountLegalEntitiesController(
-            IMediator mediator,
-            ILogger<AccountLegalEntitiesController> logger)
-        {
-            _mediator = mediator;
-            _logger = logger;
-        }
-        
         [HttpGet]
         [Route("/api/{accountId}/[controller]")]
         public async Task<IActionResult> GetByAccountId(long accountId)
         {
             try
             {
-                var response = await _mediator.Send(new GetAccountLegalEntitiesQuery { AccountId = accountId });
+                var response = await mediator.Send(new GetAccountLegalEntitiesQuery { AccountId = accountId });
                 return Ok(response.AccountLegalEntities);
             }
             catch (ArgumentException e)
             {
-                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = e.Message,
@@ -54,13 +46,13 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new GetAccountLegalEntityQuery { Id = legalEntityId });
+                var response = await mediator.Send(new GetAccountLegalEntityQuery { Id = legalEntityId });
                 
                 return Ok(response.LegalEntity);
             }
             catch (ArgumentException e)
             {
-                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = e.Message,
@@ -75,7 +67,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new GetAccountReservationStatusQuery
+                var response = await mediator.Send(new GetAccountReservationStatusQuery
                 {
                     AccountId = accountId,
                 });
@@ -84,7 +76,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException e)
             {
-                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = e.Message,
@@ -93,7 +85,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (EntityNotFoundException<AccountLegalEntity> e)
             {
-                _logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
+                logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
                 return NotFound();
             }
         }
@@ -104,13 +96,13 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new GetAccountLegalEntitiesForProviderQuery { ProviderId = providerId });
+                var response = await mediator.Send(new GetAccountLegalEntitiesForProviderQuery { ProviderId = providerId });
                 
                 return Ok(response.ProviderPermissions);
             }
             catch (ArgumentException e)
             {
-                _logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
+                logger.LogDebug($"Handled argument exception, Message:[{e.Message}], Params:[{e.ParamName}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = e.Message,

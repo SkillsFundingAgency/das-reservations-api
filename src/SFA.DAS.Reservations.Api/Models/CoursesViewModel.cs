@@ -3,13 +3,8 @@ using SFA.DAS.Reservations.Domain.ApprenticeshipCourse;
 
 namespace SFA.DAS.Reservations.Api.Models
 {
-    public class CoursesViewModel
+    public class CoursesViewModel(IEnumerable<Course> courses)
     {
-        public IEnumerable<Course> Courses { get; }
-
-        public CoursesViewModel(IEnumerable<Course> courses)
-        {
-            Courses = courses;
-        }
+        public IEnumerable<Course> Courses { get; } = courses;
     }
 }

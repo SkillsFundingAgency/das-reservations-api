@@ -7,28 +7,23 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
 namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Services
 {
-    public class AccountLegalEntitiesService : IAccountLegalEntitiesService
+    public class AccountLegalEntitiesService(
+        IAccountLegalEntitiesRepository repository,
+        IOptions<ReservationsConfiguration> configuration)
+        : IAccountLegalEntitiesService
     {
-        private readonly IAccountLegalEntitiesRepository _repository;
-        private readonly ReservationsConfiguration _configuration;
-
-        public AccountLegalEntitiesService(IAccountLegalEntitiesRepository repository,
-            IOptions<ReservationsConfiguration> configuration)
-        {
-            _repository = repository;
-            _configuration = configuration.Value;
-        }
+        private readonly ReservationsConfiguration _configuration = configuration.Value;
 
         public async Task<IList<AccountLegalEntity>> GetAccountLegalEntities(long accountId)
         {
-            var results = await _repository.GetByAccountId(accountId);
+            var results = await repository.GetByAccountId(accountId);
 
             return results.Select(MapAccountLegalEntity).ToList();
         }
 
         public async Task<AccountLegalEntity> GetAccountLegalEntity(long accountLegalEntityId)
         {
-            var entity = await _repository.Get(accountLegalEntityId);
+            var entity = await repository.Get(accountLegalEntityId);
             return MapAccountLegalEntity(entity);
         }
 

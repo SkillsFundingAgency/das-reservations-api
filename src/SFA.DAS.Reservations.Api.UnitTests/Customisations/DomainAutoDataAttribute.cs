@@ -4,20 +4,14 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Customisations
 {
-    public class DomainAutoDataAttribute : AutoDataAttribute
+    public class DomainAutoDataAttribute() : AutoDataAttribute(() =>
     {
-        public DomainAutoDataAttribute()
-            : base(() =>
-            {
-                var fixture = new Fixture();
+        var fixture = new Fixture();
 
-                fixture
-                    .Customize(new DomainCustomisations())
-                    .Customize<BindingInfo>(c => c.OmitAutoProperties());
+        fixture
+            .Customize(new DomainCustomisations())
+            .Customize<BindingInfo>(c => c.OmitAutoProperties());
 
-                return fixture;
-            })
-        { }
-
-    }
+        return fixture;
+    });
 }

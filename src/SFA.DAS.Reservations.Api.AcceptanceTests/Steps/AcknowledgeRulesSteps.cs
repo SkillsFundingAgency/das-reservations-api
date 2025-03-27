@@ -15,12 +15,9 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class AcknowledgeRulesSteps : StepsBase
+    public class AcknowledgeRulesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
-        public AcknowledgeRulesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-        }
-
         [Given(@"I have upcoming rules")]
         public void GivenIHaveUpcomingRules()
         {

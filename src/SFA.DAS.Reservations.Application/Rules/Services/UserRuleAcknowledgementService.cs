@@ -3,20 +3,14 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Rules.Services
 {
-    public class UserRuleAcknowledgementService : IUserRuleAcknowledgementService
+    public class UserRuleAcknowledgementService(IUserRuleAcknowledgementRepository userRuleAcknowledgementRepository)
+        : IUserRuleAcknowledgementService
     {
-        private readonly IUserRuleAcknowledgementRepository _userRuleAcknowledgementRepository;
-
-        public UserRuleAcknowledgementService(IUserRuleAcknowledgementRepository userRuleAcknowledgementRepository)
-        {
-            _userRuleAcknowledgementRepository = userRuleAcknowledgementRepository;
-        }
-
         public async Task<UserRuleAcknowledgement> CreateUserRuleAcknowledgement(IUserRuleAcknowledgementRequest request)
         {
             var entity = MapUserRuleAcknowledgement(request);
 
-            var result = await _userRuleAcknowledgementRepository.Add(entity);
+            var result = await userRuleAcknowledgementRepository.Add(entity);
 
             return MapUserRuleAcknowledgement(result);
         }

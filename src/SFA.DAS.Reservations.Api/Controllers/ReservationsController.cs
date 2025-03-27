@@ -23,25 +23,17 @@ namespace SFA.DAS.Reservations.Api.Controllers
 {
     
     [ApiController]
-    public class ReservationsController : ControllerBase
+    public class ReservationsController(
+        ILogger<ReservationsController> logger,
+        IMediator mediator)
+        : ControllerBase
     {
-        private readonly ILogger<ReservationsController> _logger;
-        private readonly IMediator _mediator;
-
-        public ReservationsController(
-            ILogger<ReservationsController> logger,
-            IMediator mediator)
-        {
-            _logger = logger;
-            _mediator = mediator;
-        }
-
         [HttpPost]
         [ProducesResponseType(400)]
         [Route("api/[controller]/accounts/Bulk-Create")]
         public async Task<IActionResult> BulkCreate(BulkCreateReservationsRequest request)
         {
-            var response = await _mediator.Send(new BulkCreateReservationsCommand
+            var response = await mediator.Send(new BulkCreateReservationsCommand
             {
                 Reservations = request.Reservations
             });
@@ -56,7 +48,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new GetAccountReservationsQuery {AccountId = accountId});
+                var response = await mediator.Send(new GetAccountReservationsQuery {AccountId = accountId});
                 return Ok(response.Reservations);
             }
             catch (ArgumentException e)
@@ -76,7 +68,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new CreateAccountReservationCommand
+                var response = await mediator.Send(new CreateAccountReservationCommand
                 {
                     Id = reservation.Id,
                     AccountId = reservation.AccountId,
@@ -96,7 +88,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     var modelStateDictionary = new ModelStateDictionary();
                     var errorMessage = $"{response.Rule.RuleTypeText} for {response.Rule.RestrictionText}";
                     modelStateDictionary.AddModelError(response.Rule.Id.ToString(),errorMessage);
-                    _logger.LogWarning($"Rule Id: [{response.Rule.Id.ToString()}], error: [{errorMessage}]");
+                    logger.LogWarning($"Rule Id: [{response.Rule.Id.ToString()}], error: [{errorMessage}]");
                     return UnprocessableEntity(modelStateDictionary);
                 }
 
@@ -105,7 +97,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     var modelStateDictionary = new ModelStateDictionary();
                     var errorMessage = $"None levy Account Id: {reservation.AccountId} has tried to make reservation with no agreement signed";
                     modelStateDictionary.AddModelError("ReservationFailure", errorMessage);
-                    _logger.LogWarning($"None levy no agreement reservation creation failure, error: [{errorMessage}]");
+                    logger.LogWarning($"None levy no agreement reservation creation failure, error: [{errorMessage}]");
                     return UnprocessableEntity(modelStateDictionary);
                 }
 
@@ -135,7 +127,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new GetReservationQuery
+                var response = await mediator.Send(new GetReservationQuery
                 {
                     Id = id
                 });
@@ -166,7 +158,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new FindAccountReservationsQuery
+                var response = await mediator.Send(new FindAccountReservationsQuery
                 {
                     ProviderId = providerId, 
                     SearchTerm = searchTerm,
@@ -207,7 +199,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     StartDate = startDate
                 };
 
-                var response = await _mediator.Send(request);
+                var response = await mediator.Send(request);
 
                 if (response == null)
                 {
@@ -227,7 +219,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException e)
             {
-                _logger.LogWarning(e, e.Message);
+                logger.LogWarning(e, e.Message);
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = e.Message,
@@ -236,7 +228,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (EntityNotFoundException<Domain.Reservations.Reservation> e)
             {
-                _logger.LogError(e, e.Message);
+                logger.LogError(e, e.Message);
                 return NotFound();
             }
         }
@@ -249,12 +241,12 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                await _mediator.Send(new DeleteReservationCommand {ReservationId = id, EmployerDeleted = employerDeleted});
+                await mediator.Send(new DeleteReservationCommand {ReservationId = id, EmployerDeleted = employerDeleted});
                 return NoContent();
             }
             catch (ArgumentException argumentException)
             {
-                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
+                logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = argumentException.Message,
@@ -263,12 +255,12 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (InvalidOperationException exception)
             {
-                _logger.LogWarning(exception, exception.Message);
+                logger.LogWarning(exception, exception.Message);
                 return BadRequest();
             }
             catch (EntityNotFoundException<Domain.Entities.Reservation> notFoundException)
             {
-                _logger.LogWarning(notFoundException, notFoundException.Message);
+                logger.LogWarning(notFoundException, notFoundException.Message);
                 return StatusCode(410);
             }
         }
@@ -280,7 +272,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var result = await _mediator.Send(new BulkCreateAccountReservationsCommand
+                var result = await mediator.Send(new BulkCreateAccountReservationsCommand
                 {
                     AccountLegalEntityId = accountLegalEntityId,
                     ReservationCount = bulkReservation.Count,
@@ -290,7 +282,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException argumentException)
             {
-                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
+                logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = argumentException.Message,
@@ -299,7 +291,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (EntityNotFoundException<Domain.Entities.AccountLegalEntity> e)
             {
-                _logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
+                logger.LogDebug($"Handled EntityNotFoundException, Message:[{e.Message}]");
                 return NotFound();
             }
         }
@@ -311,7 +303,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var result = await _mediator.Send(new ChangeOfPartyCommand
+                var result = await mediator.Send(new ChangeOfPartyCommand
                 {
                     ReservationId = id,
                     AccountLegalEntityId = request.AccountLegalEntityId,
@@ -326,7 +318,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (ArgumentException argumentException)
             {
-                _logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
+                logger.LogDebug($"Handled ArgumentException, Message:[{argumentException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = argumentException.Message,
@@ -335,7 +327,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (EntityNotFoundException<Domain.Entities.Reservation> notFoundException)
             {
-                _logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
+                logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = notFoundException.Message
@@ -343,7 +335,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             }
             catch (EntityNotFoundException<Domain.Entities.AccountLegalEntity> notFoundException)
             {
-                _logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
+                logger.LogDebug(notFoundException, $"Handled EntityNotFoundException, Message:[{notFoundException.Message}]");
                 return BadRequest(new ArgumentErrorViewModel
                 {
                     Message = notFoundException.Message
@@ -369,7 +361,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
                }
             ).ToList();
 
-            var response = await _mediator.Send(new BulkValidateCommand
+            var response = await mediator.Send(new BulkValidateCommand
             {
                  Requests = requests
             });

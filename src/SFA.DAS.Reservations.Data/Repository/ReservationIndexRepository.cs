@@ -13,31 +13,23 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
  namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class ReservationIndexRepository : IReservationIndexRepository
+    public class ReservationIndexRepository(
+        IElasticLowLevelClient client,
+        ReservationsApiEnvironment environment,
+        IElasticSearchQueries elasticQueries,
+        ILogger<ReservationIndexRepository> logger)
+        : IReservationIndexRepository
     {
-        private readonly IElasticLowLevelClient _client;
-        private readonly ReservationsApiEnvironment _environment;
-        private readonly IElasticSearchQueries _elasticQueries;
-        private readonly ILogger<ReservationIndexRepository> _logger;
-
-        public ReservationIndexRepository(IElasticLowLevelClient client, ReservationsApiEnvironment environment, IElasticSearchQueries elasticQueries, ILogger<ReservationIndexRepository> logger)
-        {
-            _client = client;
-            _environment = environment;
-            _elasticQueries = elasticQueries;
-            _logger = logger;
-        }
-
         public async Task<IndexedReservationSearchResult> Find(
             long providerId, string searchTerm, ushort pageNumber, ushort pageItemCount, SelectedSearchFilters selectedFilters)
         {
-            _logger.LogInformation("Starting reservation search");
+            logger.LogInformation("Starting reservation search");
 
             var reservationIndex = await GetCurrentReservationIndex();
 
             if (string.IsNullOrWhiteSpace(reservationIndex?.Name))
             {
-                _logger.LogWarning("Searching failed. Latest Reservation index does not have a name value");
+                logger.LogWarning("Searching failed. Latest Reservation index does not have a name value");
 
                 return new IndexedReservationSearchResult();
             }
@@ -49,11 +41,11 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
             if (elasticSearchResult == null)
             {
-                _logger.LogWarning("Searching failed. Elastic search response could not be de-serialised");
+                logger.LogWarning("Searching failed. Elastic search response could not be de-serialised");
                 return new IndexedReservationSearchResult();
             }
 
-            _logger.LogDebug("Searching complete, returning search results");
+            logger.LogDebug("Searching complete, returning search results");
 
             var totalRecordCount = await GetSearchResultCount(reservationIndex.Name, providerId);
 
@@ -80,7 +72,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
             var request = GetFilterValuesQuery(providerId);
             
             var jsonResponse =
-                await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
+                await client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
             
             var response = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
 
@@ -105,10 +97,10 @@ using SFA.DAS.Reservations.Domain.Configuration;
                 GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, selectedFilters) :
                 GetReservationsSearchString(startingDocumentIndex, pageItemCount, providerId, searchTerm, selectedFilters);
 
-            _logger.LogDebug($"Searching with search term: {searchTerm}");
+            logger.LogDebug($"Searching with search term: {searchTerm}");
 
             var jsonResponse =
-                await _client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
+                await client.SearchAsync<StringResponse>(reservationIndexName, PostData.String(request));
 
             var searchResult = JsonConvert.DeserializeObject<ElasticResponse<ReservationIndex>>(jsonResponse.Body);
 
@@ -119,11 +111,11 @@ using SFA.DAS.Reservations.Domain.Configuration;
         {
             var index = await GetCurrentReservationIndex();
 
-            var pingResponse = await _client.CountAsync<StringResponse>(index.Name, PostData.String(""), new CountRequestParameters(), CancellationToken.None);
+            var pingResponse = await client.CountAsync<StringResponse>(index.Name, PostData.String(""), new CountRequestParameters(), CancellationToken.None);
 
             if (!pingResponse.Success)
             {
-                _logger.LogDebug($"Elastic search ping failed: {pingResponse.DebugInformation ?? "no information available"}");
+                logger.LogDebug($"Elastic search ping failed: {pingResponse.DebugInformation ?? "no information available"}");
             }
 
             return pingResponse.Success;
@@ -131,12 +123,12 @@ using SFA.DAS.Reservations.Domain.Configuration;
 
         public async Task<IndexRegistryEntry> GetCurrentReservationIndex()
         {
-            var data = PostData.String(_elasticQueries.LastIndexSearchQuery);
+            var data = PostData.String(elasticQueries.LastIndexSearchQuery);
 
-            _logger.LogDebug("Getting latest reservation index name");
+            logger.LogDebug("Getting latest reservation index name");
 
-            var response = await _client.SearchAsync<StringResponse>(
-                _environment.EnvironmentName + _elasticQueries.ReservationIndexLookupName, data);
+            var response = await client.SearchAsync<StringResponse>(
+                environment.EnvironmentName + elasticQueries.ReservationIndexLookupName, data);
 
             var elasticResponse = JsonConvert.DeserializeObject<ElasticResponse<IndexRegistryEntry>>(response.Body);
 
@@ -145,25 +137,25 @@ using SFA.DAS.Reservations.Domain.Configuration;
                 return elasticResponse.Items.First();
             }
 
-            _logger.LogWarning("Searching failed. Could not find any reservation index names to search");
+            logger.LogWarning("Searching failed. Could not find any reservation index names to search");
 
             return null;
         }
 
         private string GetFilterValuesQuery(long providerId)
         {
-            return _elasticQueries.GetFilterValuesQuery.Replace("{providerId}", providerId.ToString());
+            return elasticQueries.GetFilterValuesQuery.Replace("{providerId}", providerId.ToString());
         }
 
         private string GetReservationCountForProviderQuery(long providerId)
         {
-            return _elasticQueries.GetReservationCountQuery.Replace("{providerId}", providerId.ToString());
+            return elasticQueries.GetReservationCountQuery.Replace("{providerId}", providerId.ToString());
         }
 
         private string GetReservationsSearchString(
             ushort startingDocumentIndex, ushort pageItemCount, long providerId, SelectedSearchFilters selectedFilters)
         {
-            var query = _elasticQueries.GetAllReservationsQuery.Replace("{startingDocumentIndex}", startingDocumentIndex.ToString());
+            var query = elasticQueries.GetAllReservationsQuery.Replace("{startingDocumentIndex}", startingDocumentIndex.ToString());
             query = query.Replace("{providerId}", providerId.ToString());
             query = query.Replace("{pageItemCount}", pageItemCount.ToString());
 
@@ -181,7 +173,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
         private string GetReservationsSearchString(
             ushort startingDocumentIndex, ushort pageItemCount, long providerId, string searchTerm, SelectedSearchFilters selectedFilters)
         {
-            var query = _elasticQueries.FindReservationsQuery.Replace("{startingDocumentIndex}", startingDocumentIndex.ToString());
+            var query = elasticQueries.FindReservationsQuery.Replace("{startingDocumentIndex}", startingDocumentIndex.ToString());
             query = query.Replace("{providerId}", providerId.ToString());
             query = query.Replace("{pageItemCount}", pageItemCount.ToString());
             query = query.Replace("{searchTerm}", searchTerm);
@@ -199,7 +191,7 @@ using SFA.DAS.Reservations.Domain.Configuration;
         {
             var query = GetReservationCountForProviderQuery(providerId);
 
-            var jsonResponse = await _client.CountAsync<StringResponse>(reservationIndexName,
+            var jsonResponse = await client.CountAsync<StringResponse>(reservationIndexName,
                 PostData.String(query));
 
             var result = JsonConvert.DeserializeObject<ElasticCountResponse>(jsonResponse.Body);

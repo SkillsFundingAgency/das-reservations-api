@@ -4,15 +4,8 @@ using TechTalk.SpecFlow.Assist;
 
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.ValueComparers
 {
-    public class CustomDateTimeComparer : IValueComparer
+    public class CustomDateTimeComparer(CustomDateTimeValueRetriever dateTimeValueRetriever) : IValueComparer
     {
-        private readonly CustomDateTimeValueRetriever _dateTimeValueRetriever;
-
-        public CustomDateTimeComparer(CustomDateTimeValueRetriever dateTimeValueRetriever)
-        {
-            _dateTimeValueRetriever = dateTimeValueRetriever;
-        }
-
         public bool CanCompare(object actualValue)
         {
             return actualValue is DateTime;
@@ -22,7 +15,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests.ValueComparers
         {
             if (DateTime.TryParse(expectedValue, out var expected) == false)
             {
-                expected = _dateTimeValueRetriever.GetValue(expectedValue);
+                expected = dateTimeValueRetriever.GetValue(expectedValue);
                 if (expected == DateTime.MinValue)
                 {
                     return false;

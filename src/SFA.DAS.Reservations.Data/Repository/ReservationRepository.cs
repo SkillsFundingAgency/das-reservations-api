@@ -9,18 +9,11 @@ using Reservation = SFA.DAS.Reservations.Domain.Entities.Reservation;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class ReservationRepository : IReservationRepository
+    public class ReservationRepository(IReservationsDataContext reservationsDataContext) : IReservationRepository
     {
-        private readonly IReservationsDataContext _reservationsDataContext;
-        
-        public ReservationRepository(IReservationsDataContext reservationsDataContext)
-        {
-            _reservationsDataContext = reservationsDataContext;
-        }
-
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
         {
-            var result = await _reservationsDataContext.Reservations
+            var result = await reservationsDataContext.Reservations
                 .Where(c=>
                     c.AccountId.Equals(accountId) &&
                     c.Status != (int)ReservationStatus.Deleted &&
@@ -32,23 +25,23 @@ namespace SFA.DAS.Reservations.Data.Repository
 
         public async Task<Reservation> CreateAccountReservation(Reservation reservation)
         {
-            var reservationResult = await _reservationsDataContext.Reservations.AddAsync(reservation);
+            var reservationResult = await reservationsDataContext.Reservations.AddAsync(reservation);
 
-            _reservationsDataContext.SaveChanges();
+            reservationsDataContext.SaveChanges();
 
             return reservationResult.Entity;
         }
 
         public async Task<Reservation> GetById(Guid id)
         {
-            var reservationResult = await _reservationsDataContext.Reservations.FindAsync(id);
+            var reservationResult = await reservationsDataContext.Reservations.FindAsync(id);
 
             return reservationResult;
         }
 
         public async Task DeleteAccountReservation(Guid reservationId)
         {
-            var reservationToDelete = await _reservationsDataContext.Reservations.FindAsync(reservationId);
+            var reservationToDelete = await reservationsDataContext.Reservations.FindAsync(reservationId);
 
             if (reservationToDelete == null)
                 throw new EntityNotFoundException<Reservation>();
@@ -61,14 +54,14 @@ namespace SFA.DAS.Reservations.Data.Repository
             
             reservationToDelete.Status = (int) ReservationStatus.Deleted;
 
-            _reservationsDataContext.SaveChanges();
+            reservationsDataContext.SaveChanges();
         }
 
         public async Task CreateAccountReservations(List<Reservation> reservations)
         {
-            await _reservationsDataContext.Reservations.AddRangeAsync(reservations);
+            await reservationsDataContext.Reservations.AddRangeAsync(reservations);
 
-            _reservationsDataContext.SaveChanges();
+            reservationsDataContext.SaveChanges();
         }
     }
 }

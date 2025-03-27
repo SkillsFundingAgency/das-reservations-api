@@ -7,20 +7,14 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class RuleRepository : IRuleRepository
+    public class RuleRepository(IReservationsDataContext reservationsDataContext) : IRuleRepository
     {
-        private readonly IReservationsDataContext _reservationsDataContext;
-
-        public RuleRepository(IReservationsDataContext reservationsDataContext)
-        {
-            _reservationsDataContext = reservationsDataContext;
-        }
         public async Task<IList<Domain.Entities.Rule>> GetReservationRules(DateTime startDate)
         {
             
             var endDate = DateTime.UtcNow;
             
-            var result = await _reservationsDataContext
+            var result = await reservationsDataContext
                 .Rules
                 .Where(c => startDate >= c.ActiveFrom && c.ActiveTo >= endDate)
                 .Include(c=>c.Course)
