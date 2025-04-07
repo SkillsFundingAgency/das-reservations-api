@@ -11,18 +11,12 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCreateReservationsWithNonLevy
 {
-    public class BulkCreateReservationsCommandHandler : IRequestHandler<BulkCreateReservationsCommand, BulkCreateReservationsWithNonLevyResult>
+    public class BulkCreateReservationsCommandHandler(
+        IMediator mediator,
+        IAccountLegalEntitiesService accountLegalEntitiesService)
+        : IRequestHandler<BulkCreateReservationsCommand, BulkCreateReservationsWithNonLevyResult>
     {
-        private readonly IMediator _mediator;
-        private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities;
-        private IAccountLegalEntitiesService _accountLegalEntitiesService;
-
-        public BulkCreateReservationsCommandHandler(IMediator mediator, IAccountLegalEntitiesService accountLegalEntitiesService)
-        {
-            _mediator = mediator;
-            _cachedAccountLegalEntities = new Dictionary<long, AccountLegalEntity>();
-            _accountLegalEntitiesService = accountLegalEntitiesService;
-        }
+        private readonly Dictionary<long, AccountLegalEntity> _cachedAccountLegalEntities = new();
 
         public async Task<BulkCreateReservationsWithNonLevyResult> Handle(BulkCreateReservationsCommand request, CancellationToken cancellationToken)
         {
@@ -75,7 +69,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
         private async Task<BulkValidationResults> Validate(BulkCreateReservationsCommand request)
         {
             var validateRequests = request.Reservations.Select(x => (BulkValidateRequest)x).ToList();
-            var bulkValidationResults = await _mediator.Send(new BulkValidateCommand
+            var bulkValidationResults = await mediator.Send(new BulkValidateCommand
             {
                 Requests = validateRequests
             });
@@ -88,7 +82,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             foreach (var nonLevyEntity in nonLevyAccounts)
             {
                 var account = await GetAccountLegalEntity(nonLevyEntity.AccountLegalEntityId.Value);
-                var createdReservation = await _mediator.Send(new CreateAccountReservationCommand
+                var createdReservation = await mediator.Send(new CreateAccountReservationCommand
                 {
                     AccountId = account.AccountId,
                     AccountLegalEntityId = nonLevyEntity.AccountLegalEntityId.Value,
@@ -119,7 +113,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
             var levyGroupedByAccountLegalEntities = levyAccounts.GroupBy(x => new { x.AccountLegalEntityId, x.TransferSenderAccountId });
             foreach (var levyEntity in levyGroupedByAccountLegalEntities)
             {
-                var createdReservations = await _mediator.Send(new BulkCreateAccountReservationsCommand { AccountLegalEntityId = levyEntity.Key.AccountLegalEntityId.Value, TransferSenderAccountId = levyEntity.Key.TransferSenderAccountId, ReservationCount = (uint)levyEntity.Count() });
+                var createdReservations = await mediator.Send(new BulkCreateAccountReservationsCommand { AccountLegalEntityId = levyEntity.Key.AccountLegalEntityId.Value, TransferSenderAccountId = levyEntity.Key.TransferSenderAccountId, ReservationCount = (uint)levyEntity.Count() });
 
                 var mergedReservationIds = createdReservations.ReservationIds.Zip(levyEntity.Select(x => x.ULN), (reservationId, uln) => new BulkCreateReservationResult { ReservationId = reservationId, ULN = uln });
                 results.AddRange(mergedReservationIds);
@@ -135,7 +129,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.BulkCrea
                 return _cachedAccountLegalEntities.GetValueOrDefault(accountLegalEntityId);
             }
 
-            var accountLegalEntity = await _accountLegalEntitiesService.GetAccountLegalEntity(accountLegalEntityId);
+            var accountLegalEntity = await accountLegalEntitiesService.GetAccountLegalEntity(accountLegalEntityId);
             _cachedAccountLegalEntities.Add(accountLegalEntityId, accountLegalEntity);
             return accountLegalEntity;
         }

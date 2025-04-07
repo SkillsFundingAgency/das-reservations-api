@@ -8,25 +8,19 @@ using SFA.DAS.Reservations.Domain.Infrastructure;
 
 namespace SFA.DAS.Reservations.Infrastructure.HealthCheck
 {
-    public class QueueHealthCheck : IHealthCheck
+    public class QueueHealthCheck(IAzureQueueService azureQueueService) : IHealthCheck
     {
         private const string HealthCheckResultDescription = "Reservation ServiceBus Queue check";
-        private readonly IAzureQueueService _azureQueueService;
-
-        public QueueHealthCheck(IAzureQueueService azureQueueService)
-        {
-            _azureQueueService = azureQueueService;
-        }
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
             CancellationToken cancellationToken = new CancellationToken())
         {
             var timer = Stopwatch.StartNew();
-            var queues = _azureQueueService.GetQueuesToMonitor();
+            var queues = azureQueueService.GetQueuesToMonitor();
 
             foreach (var queue in queues)
             {
-                var queueStatus = await _azureQueueService.IsQueueHealthy(queue.QueueName);
+                var queueStatus = await azureQueueService.IsQueueHealthy(queue.QueueName);
 
                 if (queue.IsHealthy.HasValue && queueStatus == queue.IsHealthy)
                 {

@@ -10,13 +10,13 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class CheckAccountAutoReservationStatusSteps : StepsBase
+    public class CheckAccountAutoReservationStatusSteps(
+        TestData testData,
+        TestResults testResults,
+        TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
         private bool _canAutoCreateReservations;
-
-        public CheckAccountAutoReservationStatusSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-        }
 
         [When(@"I get the account reservation status")]
         public void WhenIGetTheAccountReservationStatus()

@@ -9,18 +9,12 @@ using SFA.DAS.Reservations.Domain.Exceptions;
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class AccountLegalEntityRepository : IAccountLegalEntitiesRepository
+    public class AccountLegalEntityRepository(IReservationsDataContext reservationsDataContext)
+        : IAccountLegalEntitiesRepository
     {
-        private readonly IReservationsDataContext _reservationsDataContext;
-
-        public AccountLegalEntityRepository(IReservationsDataContext reservationsDataContext)
-        {
-            _reservationsDataContext = reservationsDataContext;
-        }
-
         public async Task<IList<AccountLegalEntity>> GetByAccountId(long accountId)
         {
-            var legalEntities = await _reservationsDataContext
+            var legalEntities = await reservationsDataContext
                 .AccountLegalEntities
                 .Where(c => c.AccountId.Equals(accountId))
                 .ToListAsync();
@@ -32,7 +26,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         {
             try
             {
-                return await _reservationsDataContext.AccountLegalEntities
+                return await reservationsDataContext.AccountLegalEntities
                     .SingleAsync(entity => entity.AccountLegalEntityId == accountLegalEntityId);
             }
             catch (InvalidOperationException e)

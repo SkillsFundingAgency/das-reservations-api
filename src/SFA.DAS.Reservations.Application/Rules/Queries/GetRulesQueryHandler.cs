@@ -6,20 +6,12 @@ using SFA.DAS.Reservations.Domain.Rules;
 
 namespace SFA.DAS.Reservations.Application.Rules.Queries
 {
-    public class GetRulesQueryHandler : IRequestHandler<GetRulesQuery, GetRulesResult>
+    public class GetRulesQueryHandler(IRulesService rulesService, IGlobalRulesService globalRulesService)
+        : IRequestHandler<GetRulesQuery, GetRulesResult>
     {
-        private readonly IRulesService _rulesService;
-        private readonly IGlobalRulesService _globalRulesService;
-
-        public GetRulesQueryHandler(IRulesService rulesService, IGlobalRulesService globalRulesService)
-        {
-            _rulesService = rulesService;
-            _globalRulesService = globalRulesService;
-        }
-
         public async Task<GetRulesResult> Handle(GetRulesQuery request, CancellationToken cancellationToken)
         {
-            var globalRules = await _globalRulesService.GetAllRules();
+            var globalRules = await globalRulesService.GetAllRules();
 
             if (globalRules.Any())
             {
@@ -29,7 +21,7 @@ namespace SFA.DAS.Reservations.Application.Rules.Queries
                 };
             }
 
-            var rules = await _rulesService.GetRules();
+            var rules = await rulesService.GetRules();
 
             return new GetRulesResult
             {

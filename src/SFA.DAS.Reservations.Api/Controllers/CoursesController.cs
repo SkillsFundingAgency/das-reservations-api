@@ -8,19 +8,12 @@ namespace SFA.DAS.Reservations.Api.Controllers
 {
     [Route("api/[controller]/")]
     [ApiController]
-    public class CoursesController : ControllerBase
+    public class CoursesController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public CoursesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var response = await _mediator.Send(new GetCoursesQuery());
+            var response = await mediator.Send(new GetCoursesQuery());
 
             var viewModel = new CoursesViewModel(response.Courses);
 

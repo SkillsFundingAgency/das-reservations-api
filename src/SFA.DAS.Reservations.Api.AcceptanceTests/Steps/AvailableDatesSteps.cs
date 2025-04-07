@@ -14,14 +14,11 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class AvailableDatesSteps: StepsBase
+    public class AvailableDatesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
         private const int DefaultAvailableDatesMonthCount = 6;
         private GetAvailableDatesResult _availableDatesResult;
-
-        public AvailableDatesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-        }
 
         [Given(@"I have signed an Agreement")]
         public void GivenIHaveSignedAnAgreement()

@@ -14,14 +14,10 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class GetCoursesSteps : StepsBase
+    public class GetCoursesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
         private List<Course> _collectedCourses;
-
-        public GetCoursesSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-            
-        }
 
         // Given
 

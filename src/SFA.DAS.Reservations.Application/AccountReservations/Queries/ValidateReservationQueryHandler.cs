@@ -12,31 +12,22 @@ using SFA.DAS.Reservations.Domain.Validation;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 {
-    public class ValidateReservationQueryHandler : IRequestHandler<ValidateReservationQuery, ValidateReservationResponse>
+    public class ValidateReservationQueryHandler(
+        IAccountReservationService reservationService,
+        ICourseService courseService,
+        IValidator<ValidateReservationQuery> validator)
+        : IRequestHandler<ValidateReservationQuery, ValidateReservationResponse>
     {
-        private readonly IAccountReservationService _reservationService;
-        private readonly ICourseService _courseService;
-        private readonly IValidator<ValidateReservationQuery> _validator;
-
-        public ValidateReservationQueryHandler(IAccountReservationService reservationService,
-            ICourseService courseService,
-            IValidator<ValidateReservationQuery> validator)
-        {
-            _reservationService = reservationService;
-            _courseService = courseService;
-            _validator = validator;
-        }
-
         public async Task<ValidateReservationResponse> Handle(ValidateReservationQuery request, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAsync(request);
+            var validationResult = await validator.ValidateAsync(request);
 
             if (!validationResult.IsValid())
             {
                 throw new ArgumentException("The following parameters have failed validation", validationResult.ValidationDictionary.Select(c=>c.Key).Aggregate((item1, item2)=> item1 + ", " + item2));
             }
             
-            var reservation = await _reservationService.GetReservation(request.ReservationId);
+            var reservation = await reservationService.GetReservation(request.ReservationId);
 
             if (reservation == null)
             {
@@ -85,7 +76,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
         {
             var errors = new List<ReservationValidationError>();
 
-            var course = await _courseService.GetCourseById(request.CourseCode);
+            var course = await courseService.GetCourseById(request.CourseCode);
 
             if (course == null)
             {

@@ -31,14 +31,9 @@ using SFA.DAS.UnitOfWork.Mvc.Extensions;
 
 namespace SFA.DAS.Reservations.Api;
 
-public class Startup
+public class Startup(IConfiguration configuration)
 {
-    private readonly IConfiguration _configuration;
-
-    public Startup(IConfiguration configuration)
-    {
-        _configuration = configuration.BuildDasConfiguration();
-    }
+    private readonly IConfiguration _configuration = configuration.BuildDasConfiguration();
 
     public void ConfigureServices(IServiceCollection services)
     {

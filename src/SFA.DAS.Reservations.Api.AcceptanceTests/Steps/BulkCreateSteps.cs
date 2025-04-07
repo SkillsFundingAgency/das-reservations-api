@@ -12,14 +12,11 @@ using TechTalk.SpecFlow;
 namespace SFA.DAS.Reservations.Api.AcceptanceTests.Steps
 {
     [Binding]
-    public class BulkCreateSteps : StepsBase
+    public class BulkCreateSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider)
+        : StepsBase(testData, testResults, serviceProvider)
     {
         private int _reservationCount;
         private long? _transferSenderId = null;
-
-        public BulkCreateSteps(TestData testData, TestResults testResults, TestServiceProvider serviceProvider) : base(testData, testResults, serviceProvider)
-        {
-        }
 
         [When(@"I bulk create (.*) reservations")]
         public void WhenIBulkCreateReservations(uint reservationCount)

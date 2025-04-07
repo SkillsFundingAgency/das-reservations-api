@@ -4,20 +4,14 @@ using UserRuleNotification = SFA.DAS.Reservations.Domain.Entities.UserRuleNotifi
 
 namespace SFA.DAS.Reservations.Data.Repository
 {
-    public class UserRuleAcknowledgementRepository : IUserRuleAcknowledgementRepository
+    public class UserRuleAcknowledgementRepository(IReservationsDataContext reservationsDataContext)
+        : IUserRuleAcknowledgementRepository
     {
-        private readonly IReservationsDataContext _reservationsDataContext;
-
-        public UserRuleAcknowledgementRepository(IReservationsDataContext reservationsDataContext)
-        {
-            _reservationsDataContext = reservationsDataContext;
-        }
-
         public async Task<UserRuleNotification> Add(UserRuleNotification userRuleNotification)
         {
-            var result = await _reservationsDataContext.UserRuleNotifications.AddAsync(userRuleNotification);
+            var result = await reservationsDataContext.UserRuleNotifications.AddAsync(userRuleNotification);
 
-            _reservationsDataContext.SaveChanges();
+            reservationsDataContext.SaveChanges();
 
             return result.Entity;
         }

@@ -1,14 +1,8 @@
 ﻿namespace SFA.DAS.Reservations.Domain.Infrastructure
 {
-    public class QueueMonitor
+    public class QueueMonitor(string queueName, bool? isHealthy)
     {
-        public string QueueName { get; }
-        public bool? IsHealthy { get; set; }
-
-        public QueueMonitor(string queueName, bool? isHealthy)
-        {
-            QueueName = queueName;
-            IsHealthy = isHealthy;
-        }
+        public string QueueName { get; } = queueName;
+        public bool? IsHealthy { get; set; } = isHealthy;
     }
 }

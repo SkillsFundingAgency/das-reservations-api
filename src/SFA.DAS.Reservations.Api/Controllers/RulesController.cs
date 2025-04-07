@@ -12,19 +12,12 @@ namespace SFA.DAS.Reservations.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RulesController : ControllerBase
+    public class RulesController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public RulesController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         [HttpGet]
         public async Task<IActionResult> All()
         {
-            var response = await _mediator.Send(new GetRulesQuery());
+            var response = await mediator.Send(new GetRulesQuery());
 
             return Ok(response);
         }
@@ -36,7 +29,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
             try
             {
                 var response =
-                    await _mediator.Send(new GetAvailableDatesQuery {AccountLegalEntityId = accountLegalEntityId});
+                    await mediator.Send(new GetAvailableDatesQuery {AccountLegalEntityId = accountLegalEntityId});
 
                 return Ok(response);
             }
@@ -58,7 +51,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         {
             try
             {
-                var response = await _mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
+                var response = await mediator.Send(new GetAccountRulesQuery { AccountId = accountId });
 
                 return Ok(response);
             }
@@ -76,7 +69,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AcknowledgeRuleAsRead(CreateUserRuleAcknowledgementCommand command)
         {
-            await _mediator.Send(command);
+            await mediator.Send(command);
 
             return Ok();
         }
