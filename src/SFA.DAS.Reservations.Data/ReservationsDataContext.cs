@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using Microsoft.Azure.Services.AppAuthentication;
+using Azure.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.Reservations.Data.Configuration;
@@ -41,16 +41,16 @@ namespace SFA.DAS.Reservations.Data
         public DbSet<Domain.Entities.GlobalRuleAccountExemption> GlobalRulesAccountExemption { get; set; }
 
         private readonly ReservationsConfiguration _configuration;
-        private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
+        private readonly DefaultAzureCredential _credential;
 
         public ReservationsDataContext()
         {
         }
 
-        public ReservationsDataContext(IDbConnection connection, ReservationsConfiguration configuration, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
+        public ReservationsDataContext(IDbConnection connection, ReservationsConfiguration configuration, DbContextOptions options, DefaultAzureCredential credential) : base(options)
         {
             _configuration = configuration;
-            _azureServiceTokenProvider = azureServiceTokenProvider;
+            _credential = credential;
             _connection = connection;
         }
 
@@ -64,49 +64,48 @@ namespace SFA.DAS.Reservations.Data
             }
             else
             {
-                if (_configuration == null || _azureServiceTokenProvider == null)
+                if (_configuration == null || _credential == null)
                 {
                     return;
                 }
 
                 var connectionStringBuilder = new SqlConnectionStringBuilder(_configuration.ConnectionString);
                 bool useManagedIdentity = !connectionStringBuilder.IntegratedSecurity && string.IsNullOrEmpty(connectionStringBuilder.UserID);
-                var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 
                 var connection = useManagedIdentity
                     ? new SqlConnection
                     {
                         ConnectionString = _configuration.ConnectionString,
-                        AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+                        AccessToken = _credential.GetToken(new Azure.Core.TokenRequestContext(new[] { AzureResource })).Token
                     }
                     : new SqlConnection(_configuration.ConnectionString);
 
-            optionsBuilder.UseSqlServer(connection, options =>
-                 options.EnableRetryOnFailure(
-                     5,
-                     TimeSpan.FromSeconds(20),
-                     null
-                 ));
+                optionsBuilder.UseSqlServer(connection, options =>
+                     options.EnableRetryOnFailure(
+                         5,
+                         TimeSpan.FromSeconds(20),
+                         null
+                     ));
+            }
+        }
+
+        public ReservationsDataContext(DbContextOptions options) : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new Course());
+            modelBuilder.ApplyConfiguration(new Reservation());
+            modelBuilder.ApplyConfiguration(new Rule());
+            modelBuilder.ApplyConfiguration(new GlobalRule());
+            modelBuilder.ApplyConfiguration(new AccountLegalEntity());
+            modelBuilder.ApplyConfiguration(new UserRuleNotification());
+            modelBuilder.ApplyConfiguration(new ProviderPermission());
+            modelBuilder.ApplyConfiguration(new Account());
+            modelBuilder.ApplyConfiguration(new GlobalRuleAccountExemption());
+
+            base.OnModelCreating(modelBuilder);
         }
     }
-
-    public ReservationsDataContext(DbContextOptions options) : base(options)
-    {
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.ApplyConfiguration(new Course());
-        modelBuilder.ApplyConfiguration(new Reservation());
-        modelBuilder.ApplyConfiguration(new Rule());
-        modelBuilder.ApplyConfiguration(new GlobalRule());
-        modelBuilder.ApplyConfiguration(new AccountLegalEntity());
-        modelBuilder.ApplyConfiguration(new UserRuleNotification());
-        modelBuilder.ApplyConfiguration(new ProviderPermission());
-        modelBuilder.ApplyConfiguration(new Account());
-        modelBuilder.ApplyConfiguration(new GlobalRuleAccountExemption());
-
-        base.OnModelCreating(modelBuilder);
-    }
-}
 }
