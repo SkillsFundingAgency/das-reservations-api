@@ -1,5 +1,5 @@
 ﻿using System.Data.Common;
-using Microsoft.Azure.Services.AppAuthentication;
+using Azure.Identity;
 using Microsoft.Data.SqlClient;
 
 namespace SFA.DAS.Reservations.Api.AppStart
@@ -15,12 +15,13 @@ namespace SFA.DAS.Reservations.Api.AppStart
 
             if (useManagedIdentity)
             {
-                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                var credential = new DefaultAzureCredential();
+                var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { AzureResource })).Token;
 
                 return new SqlConnection
                 {
                     ConnectionString = connectionString,
-                    AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+                    AccessToken = token
                 };
             }
             else
