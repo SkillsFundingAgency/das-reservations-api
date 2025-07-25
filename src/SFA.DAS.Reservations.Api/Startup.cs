@@ -48,10 +48,11 @@ public class Startup(IConfiguration configuration)
             .Get<ReservationsConfiguration>();
 
         services.AddElasticSearch(config);
+        services.AddAzureSearch(config);
         services.AddSingleton(new ReservationsApiEnvironment(_configuration["Environment"]));
 
-        services.AddHealthChecks().AddDbContextCheck<ReservationsDataContext>();
         services.AddHealthChecks()
+            .AddDbContextCheck<ReservationsDataContext>()
             .AddCheck<QueueHealthCheck>(
                 "ServiceBus Queue Health",
                 HealthStatus.Unhealthy,
@@ -59,6 +60,10 @@ public class Startup(IConfiguration configuration)
             .AddCheck<ElasticSearchHealthCheck>(
                 "Elastic Search Health",
                 HealthStatus.Unhealthy,
+                new[] { "ready" })
+            .AddCheck<AzureSearchHealthCheck>(
+                "Azure search re-indexing health",
+                HealthStatus.Degraded,
                 new[] { "ready" });
 
         if (!ConfigurationIsLocalOrDev())
@@ -151,13 +156,13 @@ public class Startup(IConfiguration configuration)
         {
             return;
         }
-        
+
         serviceProvider.StartNServiceBus(_configuration, ConfigurationIsLocalOrDev());
 
         // Replacing ClientOutboxPersisterV2 with a local version to fix unit of work issue due to propogating Task up the chain rathert than awaiting on DB Command.
         // not clear why this fixes the issue. Attempted to make the change in SFA.DAS.Nservicebus.SqlServer however it conflicts when upgraded with SFA.DAS.UnitOfWork.Nservicebus
         // which would require upgrading to NET6 to resolve.
-        var serviceDescriptor =  serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
+        var serviceDescriptor = serviceProvider.FirstOrDefault(serv => serv.ServiceType == typeof(IClientOutboxStorageV2));
         serviceProvider.Remove(serviceDescriptor);
         serviceProvider.AddScoped<IClientOutboxStorageV2, AppStart.ClientOutboxPersisterV2>();
     }

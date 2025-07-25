@@ -63,7 +63,7 @@ public class WhenCreatingAccountReservations
             _reservationRepository.Object, 
             _ruleRepository.Object, 
             _options.Object, 
-            Mock.Of<IReservationIndexRepository>(),
+            Mock.Of<IAzureSearchReservationIndexRepository>(),
             Mock.Of<IAccountLegalEntitiesRepository>());
     }
 

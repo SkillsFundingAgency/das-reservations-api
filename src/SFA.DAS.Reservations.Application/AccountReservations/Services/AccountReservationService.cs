@@ -17,7 +17,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
         IReservationRepository reservationRepository,
         IRuleRepository ruleRepository,
         IOptions<ReservationsConfiguration> options,
-        IReservationIndexRepository reservationIndexRepository,
+        IAzureSearchReservationIndexRepository reservationIndexRepository,
         IAccountLegalEntitiesRepository accountLegalEntitiesRepository)
         : IAccountReservationService
     {

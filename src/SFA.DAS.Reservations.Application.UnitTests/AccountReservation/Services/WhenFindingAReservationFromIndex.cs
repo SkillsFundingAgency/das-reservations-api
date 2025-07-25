@@ -23,7 +23,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
 
         private AccountReservationService _service;
         private Mock<IReservationRepository> _reservationRepository;
-        private Mock<IReservationIndexRepository> _reservationIndexRepository;
+        private Mock<IAzureSearchReservationIndexRepository> _reservationIndexRepository;
         private Mock<IRuleRepository> _ruleRepository;
         private Mock<IOptions<ReservationsConfiguration>> _options;
         private SelectedSearchFilters _expectedSelectedFilter;
@@ -32,7 +32,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         public void Init()
         {
             _reservationRepository = new Mock<IReservationRepository>();
-            _reservationIndexRepository = new Mock<IReservationIndexRepository>();
+            _reservationIndexRepository = new Mock<IAzureSearchReservationIndexRepository>();
             _ruleRepository = new Mock<IRuleRepository>();
             _options = new Mock<IOptions<ReservationsConfiguration>>();
 

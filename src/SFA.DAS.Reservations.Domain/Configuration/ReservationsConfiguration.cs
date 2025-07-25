@@ -17,5 +17,6 @@ namespace SFA.DAS.Reservations.Domain.Configuration
         public string ElasticSearchPassword { get; set; }
         public string ElasticSearchServerUrl { get; set; }
         public DateTime? ResetReservationDate { get; set; }
+        public string AzureSearchBaseUrl { get; set; }
     }
 }

@@ -1,16 +1,19 @@
-﻿using System;
-using Elasticsearch.Net;
+﻿using Elasticsearch.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SFA.DAS.NServiceBus.Services;
+using SFA.DAS.Reservations.Data.AzureSearch;
 using SFA.DAS.Reservations.Data.ElasticSearch;
+using SFA.DAS.Reservations.Data.Repository;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Infrastructure;
+using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.UnitOfWork.DependencyResolution.Microsoft;
 using SFA.DAS.UnitOfWork.Managers;
 using SFA.DAS.UnitOfWork.NServiceBus.Features.ClientOutbox.Managers;
 using SFA.DAS.UnitOfWork.NServiceBus.Services;
 using SFA.DAS.UnitOfWork.Pipeline;
+using System;
 
 namespace SFA.DAS.Reservations.Api.StartupExtensions
 {
@@ -39,6 +42,13 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
                         
             collection.AddTransient<IElasticLowLevelClient>(sp => new ElasticLowLevelClient(settings));
             collection.AddSingleton<IElasticSearchQueries, ElasticSearchQueries>();
+        }
+
+        public static IServiceCollection AddAzureSearch(this IServiceCollection collection, ReservationsConfiguration configuration)
+        {
+            collection.AddTransient<IAzureSearchHelper, AzureSearchHelper>();
+            collection.AddTransient<IAzureSearchReservationIndexRepository, AzureSearchReservationIndexRepository>();
+            return collection;
         }
     }
 }
