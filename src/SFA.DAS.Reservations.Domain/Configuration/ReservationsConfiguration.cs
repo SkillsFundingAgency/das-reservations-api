@@ -13,9 +13,6 @@ namespace SFA.DAS.Reservations.Domain.Configuration
         public string NServiceBusConnectionString { get; set; }
         public virtual DateTime? CurrentDateTime { get; set; }
         public string QueueMonitorItems { get; set; }
-        public string ElasticSearchUsername { get; set; }
-        public string ElasticSearchPassword { get; set; }
-        public string ElasticSearchServerUrl { get; set; }
         public DateTime? ResetReservationDate { get; set; }
         public string AzureSearchBaseUrl { get; set; }
     }

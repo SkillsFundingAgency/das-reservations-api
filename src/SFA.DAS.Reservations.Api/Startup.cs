@@ -46,8 +46,7 @@ public class Startup(IConfiguration configuration)
         var config = _configuration
             .GetSection("Reservations")
             .Get<ReservationsConfiguration>();
-
-        services.AddElasticSearch(config);
+        
         services.AddAzureSearch(config);
         services.AddSingleton(new ReservationsApiEnvironment(_configuration["Environment"]));
 
@@ -55,10 +54,6 @@ public class Startup(IConfiguration configuration)
             .AddDbContextCheck<ReservationsDataContext>()
             .AddCheck<QueueHealthCheck>(
                 "ServiceBus Queue Health",
-                HealthStatus.Unhealthy,
-                new[] { "ready" })
-            .AddCheck<ElasticSearchHealthCheck>(
-                "Elastic Search Health",
                 HealthStatus.Unhealthy,
                 new[] { "ready" })
             .AddCheck<AzureSearchHealthCheck>(

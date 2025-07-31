@@ -47,7 +47,6 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
                     new KeyValuePair<string, string>("ConfigNames", "SFA.DAS.Reservations.Api"),
                     new KeyValuePair<string, string>("Environment", "DEV"),
                     new KeyValuePair<string, string>("Version", "1.0"),
-                    new KeyValuePair<string, string>("Reservations:ElasticSearchServerUrl", "http://localhost:9200"),
                     new KeyValuePair<string, string>("Reservations:ResetReservationDate", DateTime.Now.ToString("MM/dd/yyyy")),
                     new KeyValuePair<string, string>("Reservations:CurrentDateTime", new DateTime(DateTime.Today.Year, 8, 15).ToString("MM/dd/yyyy")),
                     new KeyValuePair<string, string>("Reservations:AzureSearchBaseUrl", "https://localhost"),
