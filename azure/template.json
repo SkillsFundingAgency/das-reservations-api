@@ -60,6 +60,9 @@
             "type": "string",
             "defaultValue": "S0"
         },
+        "sharedAiSearchName": {
+            "type": "string"
+        },
         "databaseTier": {
             "type": "string",
             "defaultValue": "Standard"
@@ -311,6 +314,30 @@
                     },
                     "ipSecurityRestrictions": {
                         "value": "[parameters('appServiceAllowedIPs')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2021-04-01",
+            "name": "[concat('role-assignment-', variables('appServiceName'), '-', parameters('utcValue'))]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-ai-search.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[reference(concat(variables('appServiceName'), '-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
+                    },
+                    "assignmentType": {
+                        "value": "AiSearchIndexReader"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedAiSearchName')]"
                     }
                 }
             }
