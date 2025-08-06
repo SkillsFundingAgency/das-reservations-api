@@ -331,7 +331,7 @@
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[reference(concat(variables('appServiceName'), '-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
+                        "value": "[reference(concat('app-service-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "AiSearchIndexReader"
