@@ -38,7 +38,7 @@ public static class AddServiceExtension
         services.AddTransient<IAccountLegalEntitiesService, AccountLegalEntitiesService>();
         services.AddTransient<IUserRuleAcknowledgementService, UserRuleAcknowledgementService>();
         services.AddTransient<IAzureQueueService, AzureQueueService>();
-        services.AddTransient<IReservationIndexRepository, ReservationIndexRepository>();
+        services.AddTransient<IAzureSearchReservationIndexRepository, AzureSearchReservationIndexRepository>();
         services.AddTransient<IProviderPermissionRepository, ProviderPermissionRepository>();
 
         services.AddSingleton<ICurrentDateTime>(config.CurrentDateTime.HasValue

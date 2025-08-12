@@ -48,7 +48,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
                 _reservationRepository.Object, 
                 _ruleRepository.Object, 
                 Mock.Of<IOptions<ReservationsConfiguration>>(), 
-                Mock.Of<IReservationIndexRepository>(),
+                Mock.Of<IAzureSearchReservationIndexRepository>(),
                 Mock.Of<IAccountLegalEntitiesRepository>());
         }
 
