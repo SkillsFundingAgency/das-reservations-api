@@ -25,6 +25,7 @@ You can also run it using **LOCAL** which will require a SQL instance and also A
 - Clone repository
 - Publish `SFA.DAS.Reservations.Database` project to SQL instance
 - Create table in Azure Storage called Configuration, and add an extra column called **Data**. Set partitionkey to `LOCAL`, Rowkey to `SFA.DAS.Reservations.API_1.0`, then for the Data column add the following:
+- Run  Elastic Search running on docker - there is a [docker compose file](https://github.com/SkillsFundingAgency/das-reservations-jobs/tree/master/docker) which will setup ElasticSearch and Kibana for you
 ```
 {   
 	"Reservations": {    
