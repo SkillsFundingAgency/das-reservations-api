@@ -1,4 +1,7 @@
-﻿IF (EXISTS (SELECT * 
+-- ARCHIVED: No longer run on DACPAC deploy. Retained for auditability.
+-- One-time data fix: adjusted Reservation.ExpiryDate from midnight to end-of-day.
+
+IF (EXISTS (SELECT * 
                  FROM INFORMATION_SCHEMA.TABLES 
                  WHERE TABLE_SCHEMA = 'dbo' 
                  AND  TABLE_NAME = 'Reservation'))
