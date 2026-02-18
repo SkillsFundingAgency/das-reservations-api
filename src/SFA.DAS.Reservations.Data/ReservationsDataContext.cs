@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.Common;
-using Microsoft.Azure.Services.AppAuthentication;
+using Azure.Core;
+using Azure.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SFA.DAS.Reservations.Data.Configuration;
@@ -27,7 +28,6 @@ namespace SFA.DAS.Reservations.Data
 
     public partial class ReservationsDataContext : DbContext, IReservationsDataContext
     {
-        private const string AzureResource = "https://database.windows.net/";
         private readonly IDbConnection _connection;
 
         public DbSet<Domain.Entities.Course> Courses { get; set; }
@@ -41,16 +41,16 @@ namespace SFA.DAS.Reservations.Data
         public DbSet<Domain.Entities.GlobalRuleAccountExemption> GlobalRulesAccountExemption { get; set; }
 
         private readonly ReservationsConfiguration _configuration;
-        private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
+        private readonly DefaultAzureCredential _azureCredential;
 
         public ReservationsDataContext()
         {
         }
 
-        public ReservationsDataContext(IDbConnection connection, ReservationsConfiguration configuration, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
+        public ReservationsDataContext(IDbConnection connection, ReservationsConfiguration configuration, DbContextOptions options, DefaultAzureCredential azureCredential) : base(options)
         {
             _configuration = configuration;
-            _azureServiceTokenProvider = azureServiceTokenProvider;
+            _azureCredential = azureCredential;
             _connection = connection;
         }
 
@@ -64,31 +64,39 @@ namespace SFA.DAS.Reservations.Data
             }
             else
             {
-                if (_configuration == null || _azureServiceTokenProvider == null)
+                if (_configuration == null)
                 {
                     return;
                 }
 
                 var connectionStringBuilder = new SqlConnectionStringBuilder(_configuration.ConnectionString);
                 bool useManagedIdentity = !connectionStringBuilder.IntegratedSecurity && string.IsNullOrEmpty(connectionStringBuilder.UserID);
-                var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 
                 var connection = useManagedIdentity
-                    ? new SqlConnection
-                    {
-                        ConnectionString = _configuration.ConnectionString,
-                        AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
-                    }
+                    ? GetSqlConnectionWithManagedIdentity(_configuration.ConnectionString)
                     : new SqlConnection(_configuration.ConnectionString);
 
-            optionsBuilder.UseSqlServer(connection, options =>
-                 options.EnableRetryOnFailure(
-                     5,
-                     TimeSpan.FromSeconds(20),
-                     null
-                 ));
+                optionsBuilder.UseSqlServer(connection, options =>
+                     options.EnableRetryOnFailure(
+                         5,
+                         TimeSpan.FromSeconds(20),
+                         null
+                     ));
+            }
         }
-    }
+
+        private SqlConnection GetSqlConnectionWithManagedIdentity(string connectionString)
+        {
+            var credential = _azureCredential ?? new DefaultAzureCredential();
+            var tokenRequestContext = new TokenRequestContext(["https://database.windows.net/.default"]);
+            var accessToken = credential.GetTokenAsync(tokenRequestContext, default).GetAwaiter().GetResult();
+            
+            return new SqlConnection
+            {
+                ConnectionString = connectionString,
+                AccessToken = accessToken.Token
+            };
+        }
 
     public ReservationsDataContext(DbContextOptions options) : base(options)
     {
