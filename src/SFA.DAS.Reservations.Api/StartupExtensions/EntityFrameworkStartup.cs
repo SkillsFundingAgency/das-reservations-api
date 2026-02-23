@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+using Azure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NServiceBus.Persistence;
@@ -18,14 +18,14 @@ namespace SFA.DAS.Reservations.Api.StartupExtensions
             return services.AddScoped(p =>
             {
                 var unitOfWorkContext = p.GetService<IUnitOfWorkContext>();
-                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                var azureCredential = new DefaultAzureCredential();
                 ReservationsDataContext dbContext;
                 try
                 {                    
                     var synchronizedStorageSession = unitOfWorkContext.Get<SynchronizedStorageSession>();
                     var sqlStorageSession = synchronizedStorageSession.GetSqlStorageSession();
                     var optionsBuilder = new DbContextOptionsBuilder<ReservationsDataContext>().UseSqlServer(sqlStorageSession.Connection);                    
-                    dbContext = new ReservationsDataContext(sqlStorageSession.Connection, config, optionsBuilder.Options, azureServiceTokenProvider);
+                    dbContext = new ReservationsDataContext(sqlStorageSession.Connection, config, optionsBuilder.Options, azureCredential);
                     dbContext.Database.UseTransaction(sqlStorageSession.Transaction);
                 }
                 catch (KeyNotFoundException)
