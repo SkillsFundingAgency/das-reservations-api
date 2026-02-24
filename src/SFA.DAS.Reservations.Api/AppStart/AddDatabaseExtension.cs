@@ -1,13 +1,12 @@
 ﻿using System.Data.Common;
-using Microsoft.Azure.Services.AppAuthentication;
+using Azure.Core;
+using Azure.Identity;
 using Microsoft.Data.SqlClient;
 
 namespace SFA.DAS.Reservations.Api.AppStart
 {
     public static class AddDatabaseExtension
     {
-        private const string AzureResource = "https://database.windows.net/";
-
         public static DbConnection GetSqlConnection(string connectionString)
         {
             var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
@@ -15,12 +14,15 @@ namespace SFA.DAS.Reservations.Api.AppStart
 
             if (useManagedIdentity)
             {
-                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                var credential = new DefaultAzureCredential();
+                var tokenRequestContext = new TokenRequestContext(["https://database.windows.net/.default"]);
+                
+                var accessToken = credential.GetTokenAsync(tokenRequestContext, default).GetAwaiter().GetResult();
 
                 return new SqlConnection
                 {
                     ConnectionString = connectionString,
-                    AccessToken = azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+                    AccessToken = accessToken.Token
                 };
             }
             else
