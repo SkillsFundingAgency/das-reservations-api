@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[Course]
 	[Level] TINYINT NOT NULL,
 	[EffectiveTo] DATETIME NULL,
 	[ApprenticeshipType] VARCHAR(50) NULL,
-	[LearningType] VARCHAR(50) NULL
+	[LearningType] TINYINT NULL
 )
 GO;
 
