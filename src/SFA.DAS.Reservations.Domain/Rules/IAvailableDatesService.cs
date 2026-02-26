@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace SFA.DAS.Reservations.Domain.Rules
+namespace SFA.DAS.Reservations.Domain.Rules;
+
+public interface IAvailableDatesService
 {
-    public interface IAvailableDatesService
-    {
-        IEnumerable<AvailableDateStartWindow> GetAvailableDates();
-    }
+    IEnumerable<AvailableDateStartWindow> GetAvailableDates(bool includePreviousMonth = true);
 }

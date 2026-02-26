@@ -44,5 +44,6 @@ public static class AddServiceExtension
         services.AddSingleton<ICurrentDateTime>(config.CurrentDateTime.HasValue
             ? new CurrentDateTime(config.CurrentDateTime)
             : new CurrentDateTime());
+        services.AddSingleton<IAvailableDatesRestrictionProvider, AvailableDatesRestrictionProvider>();
     }
 }

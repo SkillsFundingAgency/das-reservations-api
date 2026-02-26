@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Domain.Configuration;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -10,13 +11,16 @@ namespace SFA.DAS.Reservations.Application.Rules.Services
     {
         private readonly ReservationsConfiguration _configuration = options.Value;
 
-        public IEnumerable<AvailableDateStartWindow> GetAvailableDates()
+        public IEnumerable<AvailableDateStartWindow> GetAvailableDates(bool includePreviousMonth = true)
         {
+            var now = currentDateTime.GetDate();
+
             return new AvailableDates(
-                currentDateTime.GetDate(),
+                now,
                 _configuration.NumberOfAvailableDates,
                 _configuration.AvailableDatesMinDate,
-                _configuration.AvailableDatesMaxDate)
+                _configuration.AvailableDatesMaxDate,
+                includePreviousMonth)
                 .Dates;
         }
     }

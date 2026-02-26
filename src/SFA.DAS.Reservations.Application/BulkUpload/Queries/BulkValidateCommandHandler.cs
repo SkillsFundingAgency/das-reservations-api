@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Reservations.Application.Rules.Queries;
+using SFA.DAS.Reservations.Application.Rules.Queries.GetAvailableDates;
 using SFA.DAS.Reservations.Domain.Account;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
