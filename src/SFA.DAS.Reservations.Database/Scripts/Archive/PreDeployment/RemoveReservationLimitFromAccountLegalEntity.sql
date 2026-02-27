@@ -1,4 +1,7 @@
-﻿IF EXISTS(select 1 from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'AccountLegalEntity' and COLUMN_NAME = 'ReservationLimit')
+-- ARCHIVED: No longer run on DACPAC deploy. Retained for auditability.
+-- One-time migration: dropped ReservationLimit from AccountLegalEntity and recreated indexes.
+
+IF EXISTS(select 1 from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'AccountLegalEntity' and COLUMN_NAME = 'ReservationLimit')
 BEGIN 
 	ALTER TABLE [dbo].[AccountLegalEntity] DROP COLUMN [ReservationLimit];
 END
