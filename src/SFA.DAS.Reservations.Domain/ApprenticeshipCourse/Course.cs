@@ -37,10 +37,11 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
         public DateTime? EffectiveTo { get; set; }
         public ApprenticeshipType Type =>
             CourseId.IndexOf("-", StringComparison.CurrentCultureIgnoreCase) != -1
-            ? ApprenticeshipCourse.ApprenticeshipType.Framework
-            : ApprenticeshipCourse.ApprenticeshipType.Standard;
+            ? ApprenticeshipType.Framework
+            : ApprenticeshipType.Standard;
         public string StandardApprenticeshipType { get; }
         public LearningType? LearningType { get; }
+        public bool AllowPreviousDate => LearningType != Types.LearningType.ApprenticeshipUnit;
         public ICollection<Rule> Rules { get; }
       
         public IEnumerable<Rule> GetActiveRules(ReservationDates dates)
