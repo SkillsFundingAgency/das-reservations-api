@@ -31,21 +31,21 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "A Team",
-                    Course = new Course {Title = "Book Keeping", Level = 1},
+                    Course = new Course {Title = "Book Keeping", Level = 1, ApprenticeshipType = "Apprenticeship"},
                     CreatedDate = today
                 },
                 new Reservation
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "A Team",
-                    Course = new Course {Title = "Plant Engineering", Level = 1},
+                    Course = new Course {Title = "Plant Engineering", Level = 1, ApprenticeshipType = "ApprenticeshipUnit"},
                     CreatedDate = today
                 },
                 new Reservation
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "B Team",
-                    Course = new Course {Title = "Accounting", Level = 1},
+                    Course = new Course {Title = "Accounting", Level = 1, ApprenticeshipType = "FoundationApprenticeship"},
                     CreatedDate = today
 
                 },
@@ -53,14 +53,14 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "B Team",
-                    Course = new Course {Title = "Accounting", Level = 2},
+                    Course = new Course {Title = "Accounting", Level = 2, ApprenticeshipType = "ApprenticeshipUnit"},
                     CreatedDate = today
                 },
                 new Reservation
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "C Team",
-                    Course = new Course {Title = "Computing", Level = 1},
+                    Course = new Course {Title = "Computing", Level = 1, ApprenticeshipType = "Apprenticeship"},
                     CreatedDate = today,
                     StartDate = today.AddDays(3)
                 },
@@ -68,7 +68,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "C Team",
-                    Course = new Course {Title = "Computing", Level = 1},
+                    Course = new Course {Title = "Computing", Level = 1, ApprenticeshipType = "Apprenticeship"},
                     CreatedDate = today,
                     StartDate = today.AddDays(1)
 
@@ -77,21 +77,21 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "A Team",
-                    Course = new Course {Title = "Accounting", Level = 3},
+                    Course = new Course {Title = "Accounting", Level = 3, ApprenticeshipType = "ApprenticeshipUnit"},
                     Status = (int)ReservationStatus.Deleted
                 },
                 new Reservation
                 {
                     AccountId = 1,
                     AccountLegalEntityName = "A Team",
-                    Course = new Course {Title = "Accounting", Level = 3},
+                    Course = new Course {Title = "Accounting", Level = 3, ApprenticeshipType = "ApprenticeshipUnit"},
                     Status = (int)ReservationStatus.Change
                 },
                 new Reservation
                 {
                     AccountId = 2,
                     AccountLegalEntityName = "A Team",
-                    Course = new Course {Title = "Accounting", Level = 1},
+                    Course = new Course {Title = "Accounting", Level = 1, ApprenticeshipType = "Apprenticeship"},
                     CreatedDate = today
                 },
             };
@@ -123,6 +123,19 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             //Assert
             actual.Should().HaveCount(6);
+        }
+
+        [Test]
+        public async Task Then_The_Results_Are_Filtered_By_Account_Id_And_Include_LearningType()
+        {
+            //Act
+            var actual = await _reservationRepository.GetAccountReservations(1);
+
+            //Assert
+            actual.Should().HaveCount(6);
+            actual.Where(x => x.Course.ApprenticeshipType == "Apprenticeship").Should().HaveCount(3);
+            actual.Where(x => x.Course.ApprenticeshipType == "FoundationApprenticeship").Should().HaveCount(1);
+            actual.Where(x => x.Course.ApprenticeshipType == "ApprenticeshipUnit").Should().HaveCount(2);
         }
 
         [Test]

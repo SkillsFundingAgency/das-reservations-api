@@ -14,6 +14,7 @@ namespace SFA.DAS.Reservations.Data.Repository
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
         {
             var result = await reservationsDataContext.Reservations
+                .Include(x => x.Course)
                 .Where(c=>
                     c.AccountId.Equals(accountId) &&
                     c.Status != (int)ReservationStatus.Deleted &&
