@@ -1,87 +1,86 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace SFA.DAS.Reservations.Domain.Rules
+namespace SFA.DAS.Reservations.Domain.Rules;
+
+public class AvailableDates
 {
-    public class AvailableDates
+    private const int DefaultExpiryMonths = 6;
+
+    public AvailableDates(
+        DateTime dateTimeNow,
+        int? expiryPeriodInMonths = 6,
+        DateTime? minStartDate = null,
+        DateTime? maxStartDate = null,
+        bool includePreviousMonth = true)
     {
-        private const int DefaultExpiryMonths = 6;
+        var expiryMonths = expiryPeriodInMonths == 0 ? DefaultExpiryMonths : expiryPeriodInMonths;
 
-        public AvailableDates(
-            DateTime dateTimeNow,
-            int? expiryPeriodInMonths = 6, 
-            DateTime? minStartDate = null,
-            DateTime? maxStartDate = null
-            )
-        {         
-            var expiryMonths = expiryPeriodInMonths == 0 ? DefaultExpiryMonths : expiryPeriodInMonths;
+        if (expiryMonths > 12)
+        {
+            expiryMonths = 12;
+        }
 
-            if (expiryMonths > 12)
-            {
-                expiryMonths = 12;
-            }
-           
-            var startDate = minStartDate ?? dateTimeNow;            
-            var twoMonthsFromNow = startDate.AddMonths(2);
-            var lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
+        var startDate = minStartDate ?? dateTimeNow;
+        var twoMonthsFromNow = startDate.AddMonths(2);
+        var lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
 
-            if (maxStartDate.HasValue && startDate > maxStartDate)
-            {
-                Dates =  new List<AvailableDateStartWindow>();
-                return;
-            }
+        if (maxStartDate.HasValue && startDate > maxStartDate)
+        {
+            Dates = [];
+            return;
+        }
 
-            var availableDates = new List<AvailableDateStartWindow>();
+        var availableDates = new List<AvailableDateStartWindow>();
 
-            if (minStartDate is null && maxStartDate is null)
-            {
-                availableDates.Add(GetPreviousMonth(dateTimeNow));
-            }
+        if (includePreviousMonth && minStartDate is null && maxStartDate is null)
+        {
+            availableDates.Add(GetPreviousMonth(dateTimeNow));
+        }
             
-            availableDates.Add(new()
+        availableDates.Add(new()
+        {
+            StartDate = new DateTime(startDate.Year, startDate.Month, 1),
+            EndDate = new DateTime(twoMonthsFromNow.Year, twoMonthsFromNow.Month, lastDayOfTheMonth)
+        });
+
+        for (var i = 1; i < expiryMonths; i++)
+        {
+            if (maxStartDate.HasValue && 
+                new DateTime(maxStartDate.Value.Year, maxStartDate.Value.Month, 1) <= dateTimeNow)
+                break;
+
+            var monthToAdd = startDate.AddMonths(i);
+            twoMonthsFromNow = monthToAdd.AddMonths(2);
+            lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
+            availableDates.Add(new AvailableDateStartWindow
             {
-                StartDate = new DateTime(startDate.Year, startDate.Month, 1),
+                StartDate = new DateTime(monthToAdd.Year, monthToAdd.Month, 1),
                 EndDate = new DateTime(twoMonthsFromNow.Year, twoMonthsFromNow.Month, lastDayOfTheMonth)
             });
 
-            for (var i = 1; i < expiryMonths; i++)
+            if (maxStartDate.HasValue &&
+                monthToAdd >= maxStartDate)
             {
-                if (maxStartDate.HasValue && 
-                    new DateTime(maxStartDate.Value.Year, maxStartDate.Value.Month, 1) <= dateTimeNow)
-                    break;
-
-                var monthToAdd = startDate.AddMonths(i);
-                twoMonthsFromNow = monthToAdd.AddMonths(2);
-                lastDayOfTheMonth = DateTime.DaysInMonth(twoMonthsFromNow.Year, twoMonthsFromNow.Month);
-                availableDates.Add(new AvailableDateStartWindow
-                {
-                    StartDate = new DateTime(monthToAdd.Year, monthToAdd.Month, 1),
-                    EndDate = new DateTime(twoMonthsFromNow.Year, twoMonthsFromNow.Month, lastDayOfTheMonth)
-                });
-
-                if (maxStartDate.HasValue &&
-                    monthToAdd >= maxStartDate)
-                {
-                    break;
-                }
+                break;
             }
-
-            Dates = availableDates;
         }
 
-        public IList<AvailableDateStartWindow> Dates { get; }
+        Dates = availableDates;
+    }
 
-        private static AvailableDateStartWindow GetPreviousMonth(DateTime dateTimeNow)
+    public List<AvailableDateStartWindow> Dates { get; }
+
+    private static AvailableDateStartWindow GetPreviousMonth(DateTime dateTimeNow)
+    {
+        var previousMonth = dateTimeNow.AddMonths(-1);
+        var expiryMonth = previousMonth.AddMonths(2);
+        var nextMonthLastDay = DateTime.DaysInMonth(expiryMonth.Year, expiryMonth.Month);
+
+        return new()
         {
-            var previousMonth = dateTimeNow.AddMonths(-1);
-            var expiryMonth = previousMonth.AddMonths(2);
-            var nextMonthLastDay = DateTime.DaysInMonth(expiryMonth.Year, expiryMonth.Month);
-
-            return new()
-            {
-                StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
-                EndDate = new DateTime(expiryMonth.Year, expiryMonth.Month, nextMonthLastDay)
-            };
-        }
+            StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1),
+            EndDate = new DateTime(expiryMonth.Year, expiryMonth.Month, nextMonthLastDay)
+        };
     }
 }

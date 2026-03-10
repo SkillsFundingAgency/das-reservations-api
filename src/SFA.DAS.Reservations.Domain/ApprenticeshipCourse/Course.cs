@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Types;
 
 namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
 {
@@ -15,28 +16,32 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             Level = entity.Level.ToString();
             EffectiveTo = entity.EffectiveTo;
             Rules = entity.ReservationRule;
-            LearningType = entity.ApprenticeshipType;
+            StandardApprenticeshipType = entity.ApprenticeshipType;
+            LearningType = entity.LearningType;
         }
 
-        public Course(string courseId, string title, string level, DateTime? effectiveTo, string apprenticeshipType)
+        public Course(string courseId, string title, string level, DateTime? effectiveTo, string apprenticeshipType, LearningType? learningType = null)
         {
             CourseId = courseId;
             Title = title;
             Level = level;
             EffectiveTo = effectiveTo;
             Rules = new List<Rule>();
-            LearningType = apprenticeshipType;
+            StandardApprenticeshipType = apprenticeshipType;
+            LearningType = learningType;
         }
 
         public string CourseId { get; }
         public string Title { get;}
         public string Level { get; }
         public DateTime? EffectiveTo { get; set; }
-        public ApprenticeshipType Type => 
+        public ApprenticeshipType Type =>
             CourseId.IndexOf("-", StringComparison.CurrentCultureIgnoreCase) != -1
-            ? ApprenticeshipCourse.ApprenticeshipType.Framework
-            : ApprenticeshipCourse.ApprenticeshipType.Standard;
-        public string LearningType { get; }
+            ? ApprenticeshipType.Framework
+            : ApprenticeshipType.Standard;
+        public string StandardApprenticeshipType { get; }
+        public LearningType? LearningType { get; }
+        public bool AllowPreviousDate => LearningType != Types.LearningType.ApprenticeshipUnit;
         public ICollection<Rule> Rules { get; }
       
         public IEnumerable<Rule> GetActiveRules(ReservationDates dates)
