@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Types;
@@ -40,6 +42,7 @@ namespace SFA.DAS.Reservations.Domain.ApprenticeshipCourse
             ? ApprenticeshipType.Framework
             : ApprenticeshipType.Standard;
         public string StandardApprenticeshipType { get; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public LearningType? LearningType { get; }
         public bool AllowPreviousDate => LearningType != Types.LearningType.ApprenticeshipUnit;
         public ICollection<Rule> Rules { get; }
