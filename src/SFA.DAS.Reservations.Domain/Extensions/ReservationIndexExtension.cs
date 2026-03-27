@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.Reservations.Domain.Entities;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Types;
 using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 
 namespace SFA.DAS.Reservations.Domain.Extensions
@@ -18,7 +19,8 @@ namespace SFA.DAS.Reservations.Domain.Extensions
                 {
                     CourseId = index.CourseId,
                     Title = index.CourseTitle,
-                    Level = index.CourseLevel.Value
+                    Level = index.CourseLevel.Value,
+                    LearningType = index.CourseLearningType.HasValue ? (LearningType)index.CourseLearningType.Value : 0
                 };
             }
 
