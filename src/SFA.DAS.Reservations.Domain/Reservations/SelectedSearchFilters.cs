@@ -1,14 +1,18 @@
-﻿namespace SFA.DAS.Reservations.Domain.Reservations
+﻿using SFA.DAS.Reservations.Domain.Types;
+
+namespace SFA.DAS.Reservations.Domain.Reservations
 {
     public class SelectedSearchFilters
     {
         public string CourseFilter { get; set; }
         public string EmployerNameFilter { get; set; }
         public string StartDateFilter { get; set; }
+        public LearningType? LearningType { get; set; }
 
         public bool HasFilters => 
             !string.IsNullOrWhiteSpace(CourseFilter) ||
             !string.IsNullOrWhiteSpace(EmployerNameFilter) ||
-            !string.IsNullOrWhiteSpace(StartDateFilter);
+            !string.IsNullOrWhiteSpace(StartDateFilter) ||
+            !LearningType.HasValue;
     }
 }
