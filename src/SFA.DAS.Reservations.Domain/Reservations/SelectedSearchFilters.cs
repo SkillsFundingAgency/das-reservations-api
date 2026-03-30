@@ -13,6 +13,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
             !string.IsNullOrWhiteSpace(CourseFilter) ||
             !string.IsNullOrWhiteSpace(EmployerNameFilter) ||
             !string.IsNullOrWhiteSpace(StartDateFilter) ||
-            !LearningType.HasValue;
+            LearningType.HasValue;
     }
 }
