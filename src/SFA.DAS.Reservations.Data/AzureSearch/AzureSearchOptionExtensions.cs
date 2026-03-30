@@ -39,7 +39,7 @@ public static class AzureSearchOptionExtensions
             filterParts.Add($"search.ismatch('{selectedFilters.StartDateFilter}', 'ReservationPeriod', 'simple', 'all')");
 
         if (selectedFilters.LearningType.HasValue)
-            filterParts.Add($"CourseLearningType eq '{(byte)selectedFilters.LearningType}'");
+            filterParts.Add($"CourseLearningType eq {(byte)selectedFilters.LearningType}");
 
         filter += filterParts.Any() ? " and " + string.Join(" and ", filterParts) : "";
 
