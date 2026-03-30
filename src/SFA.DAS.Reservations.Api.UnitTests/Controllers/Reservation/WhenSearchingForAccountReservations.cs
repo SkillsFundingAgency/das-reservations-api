@@ -13,6 +13,7 @@ using SFA.DAS.Reservations.Api.Controllers;
 using SFA.DAS.Reservations.Api.Models;
 using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Types;
 
 namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
 {
@@ -88,6 +89,18 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Controllers.Reservation
             _mediator.Verify(m => m.Send(It.Is<FindAccountReservationsQuery>(q => q.SelectedFilters.StartDateFilter.Equals(selectedStartDate)), It.IsAny<CancellationToken>()));
         }
 
+        [Test]
+        public async Task Then_Will_Filter_Reservations_By_Learning_Type()
+        {
+            //Arrange
+            var selectedLearningType = LearningType.ApprenticeshipUnit;
+
+            //Act
+            await _reservationsController.Search(ExpectedProviderId, ExpectedSearchTerm, null, null, null, selectedLearningType);
+
+            //Assert
+            _mediator.Verify(m => m.Send(It.Is<FindAccountReservationsQuery>(q => q.SelectedFilters.LearningType.Equals(selectedLearningType)), It.IsAny<CancellationToken>()));
+        }
 
         [Test]
         public async Task Then_The_Reservations_Are_Returned()
