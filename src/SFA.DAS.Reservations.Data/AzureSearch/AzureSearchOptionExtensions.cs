@@ -38,6 +38,9 @@ public static class AzureSearchOptionExtensions
         if (!string.IsNullOrWhiteSpace(selectedFilters.StartDateFilter))
             filterParts.Add($"search.ismatch('{selectedFilters.StartDateFilter}', 'ReservationPeriod', 'simple', 'all')");
 
+        if (selectedFilters.LearningType.HasValue)
+            filterParts.Add($"CourseLearningType eq {(byte)selectedFilters.LearningType}");
+
         filter += filterParts.Any() ? " and " + string.Join(" and ", filterParts) : "";
 
         searchOptions.Filter = filter;

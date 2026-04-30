@@ -16,6 +16,7 @@ using SFA.DAS.Reservations.Application.AccountReservations.Queries;
 using SFA.DAS.Reservations.Application.BulkUpload.Queries;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
+using SFA.DAS.Reservations.Domain.Types;
 using Reservation = SFA.DAS.Reservations.Api.Models.Reservation;
 
 
@@ -154,7 +155,7 @@ namespace SFA.DAS.Reservations.Api.Controllers
         [ProducesResponseType(404)]
         [Route("api/[controller]/search")]
         public async Task<IActionResult> Search(
-            long providerId, string searchTerm, string selectedCourse, string selectedEmployer, string selectedStartDate, ushort pageNumber = 1, ushort pageItemCount = 10)
+            long providerId, string searchTerm, string selectedCourse, string selectedEmployer, string selectedStartDate, LearningType? selectedLearningType, ushort pageNumber = 1, ushort pageItemCount = 10)
         {
             try
             {
@@ -168,7 +169,8 @@ namespace SFA.DAS.Reservations.Api.Controllers
                     {
                         CourseFilter = selectedCourse,
                         EmployerNameFilter = selectedEmployer,
-                        StartDateFilter = selectedStartDate
+                        StartDateFilter = selectedStartDate,
+                        LearningType = selectedLearningType
                     }
                 });
 
