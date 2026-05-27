@@ -141,5 +141,29 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountLegalEntities.Querie
 
             result.HasPendingReservations.Should().Be(reservations.Count(x => !x.IsExpired && x.Status == ReservationStatus.Pending) > 0);
         }
+
+        [Test, MoqAutoData]
+        public async Task Then_Gets_Calculated_RemainingReservationsCount_From_Service(
+            GetAccountReservationStatusQuery query,
+            List<AccountLegalEntity> accountLegalEntities,
+            [Frozen] ValidationResult validationResult,
+            [Frozen] Mock<IAccountLegalEntitiesService> mockService,
+            [Frozen] Mock<IAccountsService> mockAccountsService,
+            [Frozen] Mock<IAccountReservationService> mockAccountReservationsService,
+            [Frozen] int reservationLimit,
+            GetAccountReservationStatusQueryHandler handler)
+        {
+            var accountDetails = new Entities.Account();
+            validationResult.ValidationDictionary.Clear();
+            mockService
+                .Setup(service => service.GetAccountLegalEntities(It.IsAny<long>()))
+                .ReturnsAsync(accountLegalEntities);
+            mockAccountsService.Setup(x => x.GetAccount(It.IsAny<long>())).ReturnsAsync(new Domain.Account.Account(accountDetails, reservationLimit));
+            mockAccountReservationsService.Setup(x => x.GetRemainingReservations(It.IsAny<long>(), It.IsAny<int>())).ReturnsAsync(reservationLimit);
+
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            result.RemainingReservationsCount.Should().Be(reservationLimit);
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace SFA.DAS.Reservations.Api.UnitTests.Models
 
             model.CanAutoCreateReservations.Should().Be(response.CanAutoCreateReservations);
             model.AccountLegalEntityAgreementStatus.Should().BeEquivalentTo(response.AccountLegalEntityAgreementStatus);
+            model.RemainingReservationsCount.Should().Be(response.RemainingReservationsCount);
         }
     }
 }

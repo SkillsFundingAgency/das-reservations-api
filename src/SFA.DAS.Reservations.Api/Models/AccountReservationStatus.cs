@@ -11,5 +11,6 @@ namespace SFA.DAS.Reservations.Api.Models
 
         public bool HasReachedReservationsLimit { get; } = response.HasReachedReservationsLimit;
         public bool HasPendingReservations { get; } = response.HasPendingReservations;
+        public int RemainingReservationsCount { get; } = response.RemainingReservationsCount;
     }
 }
