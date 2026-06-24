@@ -322,7 +322,11 @@
                         "value": "[parameters('appServiceAllowedIPs')]"
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "[variables('resourceGroupName')]",
+                "[concat('app-service-plan-', parameters('utcValue'))]"
+            ]
         },
         {
             "apiVersion": "2021-04-01",
