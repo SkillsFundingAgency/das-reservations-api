@@ -325,7 +325,7 @@
             },
             "dependsOn": [
                 "[variables('resourceGroupName')]",
-                "[concat('app-service-plan-', parameters('utcValue'))]"
+                "[resourceId('Microsoft.Resources/deployments', concat('app-service-plan-', parameters('utcValue')))]"
             ]
         },
         {
