@@ -277,7 +277,7 @@
                         "value": "[parameters('sharedBackEndAppServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[parameters('sharedEnvResourceGroup')]"
+                        "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
                         "value": "[parameters('sharedBackEndSubnetResourceId')]"
@@ -322,11 +322,7 @@
                         "value": "[parameters('appServiceAllowedIPs')]"
                     }
                 }
-            },
-            "dependsOn": [
-                "[variables('resourceGroupName')]",
-                "[resourceId('Microsoft.Resources/deployments', concat('app-service-plan-', parameters('utcValue')))]"
-            ]
+            }
         },
         {
             "apiVersion": "2021-04-01",
