@@ -50,6 +50,7 @@ namespace SFA.DAS.Reservations.Api.AcceptanceTests
                     new KeyValuePair<string, string>("Reservations:ResetReservationDate", DateTime.Now.ToString("MM/dd/yyyy")),
                     new KeyValuePair<string, string>("Reservations:CurrentDateTime", new DateTime(DateTime.Today.Year, 8, 15).ToString("MM/dd/yyyy")),
                     new KeyValuePair<string, string>("Reservations:AzureSearchBaseUrl", "https://localhost"),
+                    new KeyValuePair<string, string>("Reservations:MaxNumberOfReservations", "20")
                 }
             };
             

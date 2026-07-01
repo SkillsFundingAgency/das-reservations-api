@@ -42,6 +42,7 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
             }
 
             var accountReservations = await accountReservationService.GetAccountReservations(request.AccountId);
+            var remainingReservationsCount = account.IsLevy ? 0 : await accountReservationService.GetRemainingReservations(request.AccountId, account.ReservationLimit.Value);
             var numOfPendingReservations = accountReservations.Count(x => !x.IsExpired && x.Status == ReservationStatus.Pending);
 
             return new GetAccountReservationStatusResponse
@@ -50,7 +51,8 @@ namespace SFA.DAS.Reservations.Application.AccountLegalEntities.Queries.GetAccou
                 HasReachedReservationsLimit = await rulesService.HasReachedReservationLimit(request.AccountId, account.IsLevy),
                 HasPendingReservations = numOfPendingReservations > 0,
                 AccountLegalEntityAgreementStatus = accountLegalEntities
-                    .ToDictionary(key=>key.AccountLegalEntityId, value => value.AgreementSigned)
+                    .ToDictionary(key => key.AccountLegalEntityId, value => value.AgreementSigned),
+                RemainingReservationsCount = remainingReservationsCount
             };
         }
     }
