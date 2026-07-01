@@ -12,8 +12,7 @@ public class Program
     }
 
     private static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        WebHost.CreateDefaultBuilder(args)
-            .UseApplicationInsights()
+        WebHost.CreateDefaultBuilder(args)           
             .UseNServiceBusContainer()
             .UseStartup<Startup>();
 }

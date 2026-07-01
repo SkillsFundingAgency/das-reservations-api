@@ -86,6 +86,9 @@
         "sharedKeyVaultName": {
             "type": "string"
         },
+        "appServicePlanResourceGroup": {
+            "type": "string"
+        },
         "sharedBackEndAppServicePlanName": {
             "type": "string"
         },
@@ -277,7 +280,7 @@
                         "value": "[parameters('sharedBackEndAppServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[parameters('sharedEnvResourceGroup')]"
+                        "value": "[parameters('appServicePlanResourceGroup')]"
                     },
                     "subnetResourceId": {
                         "value": "[parameters('sharedBackEndSubnetResourceId')]"
