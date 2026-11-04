@@ -15,5 +15,6 @@ namespace SFA.DAS.Reservations.Domain.Reservations
         Task<IList<Guid>> BulkCreateAccountReservation(uint reservationCount, long accountLegalEntityId, long accountId, string accountLegalEntityName, long? transferSenderAccountId);
         Task<Guid> ChangeOfParty(ChangeOfPartyServiceRequest request);
         Task<int> GetRemainingReservations(long accountId, int totalReservationAllowed);
+        Task<int> CountPendingNonLevyReservations(long accountId);
     }
 }
