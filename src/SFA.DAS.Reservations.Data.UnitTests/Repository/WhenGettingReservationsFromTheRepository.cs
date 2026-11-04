@@ -94,6 +94,14 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                     Course = new Course {Title = "Accounting", Level = 1, ApprenticeshipType = "Apprenticeship"},
                     CreatedDate = today
                 },
+                new Reservation
+                {
+                    AccountId = 1,
+                    IsLevyAccount = true,
+                    AccountLegalEntityName = "Levy Team",
+                    Course = new Course {Title = "Accounting", Level = 1, ApprenticeshipType = "Apprenticeship"},
+                    CreatedDate = today
+                },
             };
 
             var unorderedReservations = new List<Reservation>
@@ -106,6 +114,7 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
                 _reservations[2],
                 _reservations[1],
                 _reservations[0],
+                _reservations[9],
             };
          
             _reservationsDataContext = new Mock<IReservationsDataContext>();
@@ -164,6 +173,28 @@ namespace SFA.DAS.Reservations.Data.UnitTests.Repository
 
             //Assert
             actual.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task Then_Only_NonExpired_Pending_NonLevy_Reservations_Are_Countable()
+        {
+            _reservations[0].ExpiryDate = DateTime.UtcNow.AddMinutes(-1);
+            _reservations[1].IsLevyAccount = true;
+
+            var actual = await _reservationRepository.CountPendingNonLevyReservations(1);
+
+            actual.Should().Be(4);
+        }
+
+        [Test]
+        public async Task Then_Only_Active_NonLevy_Reservations_Are_Countable_Towards_The_Limit()
+        {
+            _reservations[0].ExpiryDate = DateTime.UtcNow.AddMinutes(-1);
+            _reservations[1].IsLevyAccount = true;
+
+            var actual = await _reservationRepository.CountReservationsTowardsLimit(1, DateTime.MinValue);
+
+            actual.Should().Be(4);
         }
     }
 }
