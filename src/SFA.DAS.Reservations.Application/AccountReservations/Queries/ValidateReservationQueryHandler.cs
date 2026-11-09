@@ -9,6 +9,7 @@ using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Validation;
+using SFA.DAS.Reservations.Domain.Types;
 
 namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 {
@@ -86,6 +87,25 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
                 return errors;
             }
 
+            if(request.CourseCode != reservation.Course.CourseId)
+            {
+                var oldCourse = await courseService.GetCourseById(reservation.Course.CourseId);
+
+                if(!AreLearningTypesTransferable(oldCourse.LearningType, course.LearningType))
+                {
+                    if(oldCourse.LearningType == LearningType.ApprenticeshipUnit)
+                    {
+                        errors.Add(new ReservationValidationError(nameof(request.CourseCode),
+                            "Choose a learner doing an apprenticeship unit to use this reservation"));
+                    }
+                    else
+                    {
+                        errors.Add(new ReservationValidationError(nameof(request.CourseCode),
+                            "Choose a learner doing an apprenticeship to use this reservation"));
+                    }
+                }
+            }
+
             if (course.Type == ApprenticeshipType.Framework)
             {
                 errors.Add(new ReservationValidationError(nameof(request.CourseCode),
@@ -109,6 +129,21 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             }
 
             return errors;
+        }
+
+        private bool AreLearningTypesTransferable(LearningType? oldLearningType, LearningType? newLearningType)
+        {
+            if(oldLearningType != LearningType.ApprenticeshipUnit && newLearningType != LearningType.ApprenticeshipUnit)
+            {
+                return true;
+            }
+
+            if (oldLearningType == LearningType.ApprenticeshipUnit && newLearningType == LearningType.ApprenticeshipUnit)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
