@@ -89,7 +89,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
 
             if(request.CourseCode != reservation.Course.CourseId)
             {
-                var oldCourse = await courseService.GetCourseById(reservation.Course.CourseId);
+                var oldCourse = reservation.Course;
 
                 if(!AreLearningTypesTransferable(oldCourse.LearningType, course.LearningType))
                 {
@@ -131,7 +131,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Queries
             return errors;
         }
 
-        private bool AreLearningTypesTransferable(LearningType? oldLearningType, LearningType? newLearningType)
+        private static bool AreLearningTypesTransferable(LearningType? oldLearningType, LearningType? newLearningType)
         {
             if(oldLearningType != LearningType.ApprenticeshipUnit && newLearningType != LearningType.ApprenticeshipUnit)
             {

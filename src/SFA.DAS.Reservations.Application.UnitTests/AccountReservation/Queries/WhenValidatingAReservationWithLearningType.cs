@@ -28,7 +28,6 @@ public class WhenValidatingAReservationWithLearningType
     private Mock<IValidator<ValidateReservationQuery>> _validator;
     private Reservation _reservation;
     private Course _course;
-    private Course _oldCourse;
 
     public void SetupLearningTypes(LearningType? oldLearningType, LearningType? newLearningType)
     {
@@ -42,13 +41,10 @@ public class WhenValidatingAReservationWithLearningType
             .Setup(r => r.GetReservation(It.IsAny<Guid>()))
             .ReturnsAsync(_reservation);
 
-        _oldCourse = new Course(CourseId, "Some Other Course", "1", DateTime.Today, "Apprenticeship", oldLearningType);
         _course = new Course(CourseId, "Another Test Course", "1", DateTime.Today, "Apprenticeship", newLearningType);
 
         _courseService = new Mock<ICourseService>();
-        _courseService.Setup(s => s.GetCourseById(_reservation.Course.CourseId))
-            .ReturnsAsync(_oldCourse);
-        _courseService.Setup(s => s.GetCourseById(CourseId))
+        _courseService.Setup(s => s.GetCourseById(It.IsAny<string>()))
             .ReturnsAsync(_course);
 
         _validator = new Mock<IValidator<ValidateReservationQuery>>();
