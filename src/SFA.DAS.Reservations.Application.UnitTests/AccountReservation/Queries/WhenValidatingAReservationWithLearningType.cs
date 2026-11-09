@@ -15,7 +15,6 @@ using Reservation = SFA.DAS.Reservations.Domain.Reservations.Reservation;
 using Course = SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course;
 using SFA.DAS.Reservations.Domain.Types;
 
-
 namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Queries;
 
 public class WhenValidatingAReservationWithLearningType
