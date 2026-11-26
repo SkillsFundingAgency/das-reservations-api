@@ -8,9 +8,11 @@ using NUnit.Framework;
 using SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAccountReservation;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Entities;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
+using SFA.DAS.Reservations.Domain.Types;
 using SFA.DAS.Reservations.Domain.Validation;
 using SFA.DAS.Reservations.Infrastructure.Configuration;
 using SFA.DAS.Reservations.Messages;
@@ -37,6 +39,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
         private Mock<IGlobalRulesService> _globalRulesService;
         private Mock<IUnitOfWorkContext> _unitOfWork;
         private Mock<IAccountLegalEntitiesService> _accountLegalEntitiesService;
+        private Mock<ICourseService> _courseService;
+        private Mock<IAvailableDatesRestrictionProvider> _restrictionProvider;
         private AccountLegalEntity _expectedAccountLegalEntity;
         private CurrentDateTime _currentDateTime;
 
@@ -85,10 +89,23 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _accountLegalEntitiesService.Setup(x => x.GetAccountLegalEntity(_command.AccountLegalEntityId))
                 .ReturnsAsync(_expectedAccountLegalEntity);
 
+            _courseService = new Mock<ICourseService>();
+            _restrictionProvider = new Mock<IAvailableDatesRestrictionProvider>();
+            _restrictionProvider.Setup(x => x.IncludePreviousMonth(It.IsAny<SFA.DAS.Reservations.Domain.Types.LearningType?>()))
+                .Returns(true);
+
             _unitOfWork = new Mock<IUnitOfWorkContext>();
             _currentDateTime = new CurrentDateTime();
 
-            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object, _unitOfWork.Object, _accountLegalEntitiesService.Object, _currentDateTime);
+            _handler = new CreateAccountReservationCommandHandler(
+                _accountReservationsService.Object,
+                _validator.Object,
+                _globalRulesService.Object,
+                _unitOfWork.Object,
+                _accountLegalEntitiesService.Object,
+                _currentDateTime,
+                _courseService.Object,
+                _restrictionProvider.Object);
         }
 
         [Test]
@@ -242,7 +259,15 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             _accountReservationsService
                 .Setup(x => x.CreateAccountReservation(_command))
                 .ReturnsAsync(_reservationCreated);
-            _handler = new CreateAccountReservationCommandHandler(_accountReservationsService.Object, _validator.Object, _globalRulesService.Object, _unitOfWork.Object, _accountLegalEntitiesService.Object, _currentDateTime);
+            _handler = new CreateAccountReservationCommandHandler(
+                _accountReservationsService.Object,
+                _validator.Object,
+                _globalRulesService.Object,
+                _unitOfWork.Object,
+                _accountLegalEntitiesService.Object,
+                _currentDateTime,
+                _courseService.Object,
+                _restrictionProvider.Object);
 
             //Act
             await _handler.Handle(_command, _cancellationToken);
@@ -319,6 +344,50 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Commands
             var startDate = _currentDateTime.GetDate().AddMonths(monthsToAdd);
             var firstOfMonthStartDate = new DateTime(startDate.Year, startDate.Month, 1);
             _command.StartDate = firstOfMonthStartDate;
+
+            var result = await _handler.Handle(_command, _cancellationToken);
+
+            result.Reservation.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task Then_An_Apprenticeship_Unit_Cannot_Be_Backdated()
+        {
+            var course = new SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course("AU-1", "Apprenticeship unit", "4", null, null, LearningType.ApprenticeshipUnit);
+            _courseService.Setup(x => x.GetCourseById("AU-1")).ReturnsAsync(course);
+            _restrictionProvider.Setup(x => x.IncludePreviousMonth(LearningType.ApprenticeshipUnit)).Returns(false);
+            _command.CourseId = "AU-1";
+            _command.StartDate = new DateTime(_currentDateTime.GetDate().Year, _currentDateTime.GetDate().Month, 1).AddMonths(-1);
+
+            var act = async () => await _handler.Handle(_command, _cancellationToken);
+
+            await act.Should().ThrowAsync<StartDateException>();
+            _accountReservationsService.Verify(x => x.CreateAccountReservation(It.IsAny<CreateAccountReservationCommand>()), Times.Never);
+        }
+
+        [Test]
+        public async Task Then_An_Apprenticeship_Unit_Can_Start_In_The_Current_Month()
+        {
+            var course = new SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course("AU-1", "Apprenticeship unit", "4", null, null, LearningType.ApprenticeshipUnit);
+            _courseService.Setup(x => x.GetCourseById("AU-1")).ReturnsAsync(course);
+            _restrictionProvider.Setup(x => x.IncludePreviousMonth(LearningType.ApprenticeshipUnit)).Returns(false);
+            _command.CourseId = "AU-1";
+            _command.StartDate = new DateTime(_currentDateTime.GetDate().Year, _currentDateTime.GetDate().Month, 1);
+
+            var result = await _handler.Handle(_command, _cancellationToken);
+
+            result.Reservation.Should().NotBeNull();
+        }
+
+        [Test]
+        public async Task Then_A_Non_Apprenticeship_Unit_Can_Start_In_The_Previous_Month()
+        {
+            var course = new SFA.DAS.Reservations.Domain.ApprenticeshipCourse.Course("STD-1", "Apprenticeship", "4", null, null, LearningType.Apprenticeship);
+            _courseService.Setup(x => x.GetCourseById("STD-1")).ReturnsAsync(course);
+            _restrictionProvider.Setup(x => x.IncludePreviousMonth(LearningType.Apprenticeship)).Returns(true);
+            _command.CourseId = "STD-1";
+            var previousMonth = _currentDateTime.GetDate().AddMonths(-1);
+            _command.StartDate = new DateTime(previousMonth.Year, previousMonth.Month, 1);
 
             var result = await _handler.Handle(_command, _cancellationToken);
 

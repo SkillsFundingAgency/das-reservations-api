@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using SFA.DAS.Reservations.Domain.AccountLegalEntities;
 using SFA.DAS.Reservations.Domain.Configuration;
+using SFA.DAS.Reservations.Domain.Courses;
 using SFA.DAS.Reservations.Domain.Exceptions;
 using SFA.DAS.Reservations.Domain.Reservations;
 using SFA.DAS.Reservations.Domain.Rules;
@@ -20,7 +21,9 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
         IGlobalRulesService globalRulesService,
         IUnitOfWorkContext context,
         IAccountLegalEntitiesService accountLegalEntitiesService,
-        ICurrentDateTime currentDateTime)
+        ICurrentDateTime currentDateTime,
+        ICourseService courseService,
+        IAvailableDatesRestrictionProvider restrictionProvider)
         : IRequestHandler<CreateAccountReservationCommand, CreateAccountReservationResult>
     {
         public async Task<CreateAccountReservationResult> Handle(CreateAccountReservationCommand request, CancellationToken cancellationToken)
@@ -34,7 +37,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
                     validationResult.ValidationDictionary.Select(c => c.Key).Aggregate((item1, item2) => item1 + ", " + item2));
             }
 
-            ValidateStartDate(request);
+            await ValidateStartDate(request);
 
             var globalRule = await globalRulesService.CheckReservationAgainstRules(request);
 
@@ -126,7 +129,7 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
             };
         }
 
-        private void ValidateStartDate(CreateAccountReservationCommand item)
+        private async Task ValidateStartDate(CreateAccountReservationCommand item)
         {
             if (item.IsLevyAccount)
                 return;
@@ -136,11 +139,24 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Commands.CreateAc
 
             var currentDate = currentDateTime.GetDate();
             var currentFirstOfTheMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
-            var validFromDate = currentDate.AddMonths(-1).ToString("MM yyyy");
+            var includePreviousMonth = true;
+            if (!string.IsNullOrWhiteSpace(item.CourseId))
+            {
+                var course = await courseService.GetCourseById(item.CourseId);
+                if (course != null)
+                {
+                    includePreviousMonth = restrictionProvider.IncludePreviousMonth(course.LearningType);
+                }
+            }
+
+            var earliestStartDate = includePreviousMonth
+                ? currentFirstOfTheMonth.AddMonths(-1)
+                : currentFirstOfTheMonth;
+            var validFromDate = earliestStartDate.ToString("MM yyyy");
             var validToDate = currentDate.AddMonths(2).ToString("MM yyyy");
             var errorMessage = $"Training start date must be between the funding reservation dates {validFromDate} to {validToDate}";
             var startDate = item.StartDate.Value;
-            if (currentFirstOfTheMonth.AddMonths(-1) > startDate || currentFirstOfTheMonth.AddMonths(2) < startDate)
+            if (earliestStartDate > startDate || currentFirstOfTheMonth.AddMonths(2) < startDate)
             {
                 throw new StartDateException(errorMessage);
             }
