@@ -21,6 +21,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
         private AccountReservationService _service;
         private Mock<IReservationRepository> _reservationRepository;
         private Mock<IRuleRepository> _ruleRepository;
+        private Mock<IOptions<ReservationsConfiguration>> _options;
         private Reservation _expectedReservation;
         private Reservation _secondReservation;
 
@@ -32,6 +33,8 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _ruleRepository = new Mock<IRuleRepository>();
             _ruleRepository.Setup(x => x.GetReservationRules(It.IsAny<DateTime>())).ReturnsAsync(new List<Rule>());
             _reservationRepository = new Mock<IReservationRepository>();
+            _options = new Mock<IOptions<ReservationsConfiguration>>();
+            _options.Setup(x => x.Value).Returns(new ReservationsConfiguration());
             _expectedReservation = new Reservation
             {
                 AccountId = ExpectedAccountId,
@@ -71,7 +74,7 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             _service = new AccountReservationService(
                 _reservationRepository.Object, 
                 _ruleRepository.Object, 
-                Mock.Of<IOptions<ReservationsConfiguration>>(), 
+                _options.Object,
                 Mock.Of<IAzureSearchReservationIndexRepository>(),
                 Mock.Of<IAccountLegalEntitiesRepository>());
         }
@@ -117,6 +120,37 @@ namespace SFA.DAS.Reservations.Application.UnitTests.AccountReservation.Services
             actualReservation.Course.Title.Should().Be(_expectedReservation.Course.Title);
             actualReservation.Course.Level.Should().Be(_expectedReservation.Course.Level.ToString());
 
+        }
+
+        [Test]
+        public async Task Then_The_Configured_Limit_Is_Returned_When_There_Is_No_Reset_Date()
+        {
+            var actual = await _service.GetRemainingReservations(ExpectedAccountId, 10);
+
+            actual.Should().Be(10);
+            _reservationRepository.Verify(
+                x => x.CountReservationsTowardsLimit(It.IsAny<long>(), It.IsAny<DateTime>()),
+                Times.Never);
+        }
+
+        [Test]
+        public async Task Then_The_Reservation_Count_Is_Subtracted_When_There_Is_A_Reset_Date()
+        {
+            var resetDate = DateTime.UtcNow.AddMonths(-1);
+            _options.Setup(x => x.Value).Returns(new ReservationsConfiguration
+            {
+                ResetReservationDate = resetDate
+            });
+            _reservationRepository
+                .Setup(x => x.CountReservationsTowardsLimit(ExpectedAccountId, resetDate))
+                .ReturnsAsync(3);
+
+            var actual = await _service.GetRemainingReservations(ExpectedAccountId, 10);
+
+            actual.Should().Be(7);
+            _reservationRepository.Verify(
+                x => x.CountReservationsTowardsLimit(ExpectedAccountId, resetDate),
+                Times.Once);
         }
     }
 }

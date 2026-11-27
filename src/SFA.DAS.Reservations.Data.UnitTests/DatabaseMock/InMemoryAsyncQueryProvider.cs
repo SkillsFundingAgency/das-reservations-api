@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query;
@@ -40,7 +41,18 @@ namespace SFA.DAS.Reservations.Data.UnitTests.DatabaseMock
 
         TResult IAsyncQueryProvider.ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var resultType = typeof(TResult).GetGenericArguments()[0];
+            var result = typeof(IQueryProvider)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Single(method => method.Name == nameof(IQueryProvider.Execute)
+                    && method.IsGenericMethod)
+                .MakeGenericMethod(resultType)
+                .Invoke(this, new object[] { expression });
+
+            return (TResult)typeof(Task)
+                .GetMethod(nameof(Task.FromResult))!
+                .MakeGenericMethod(resultType)
+                .Invoke(null, new[] { result })!;
         }
     }
 }

@@ -150,19 +150,21 @@ namespace SFA.DAS.Reservations.Application.AccountReservations.Services
 
         public async Task<int> GetRemainingReservations(long accountId, int totalReservationAllowed)
         {
-            var result = await reservationRepository.GetAccountReservations(accountId);
+            if (!options.Value.ResetReservationDate.HasValue)
+            {
+                return totalReservationAllowed;
+            }
 
-            var usedReservation = result
-                .Count(r => !r.IsLevyAccount
-                    && r.CreatedDate >= options.Value.ResetReservationDate
-                    && IsNotExpired(r));
+            var usedReservation = await reservationRepository.CountReservationsTowardsLimit(
+                accountId,
+                options.Value.ResetReservationDate.Value);
 
             return totalReservationAllowed - usedReservation;
         }
 
-        private static bool IsNotExpired(Domain.Entities.Reservation r)
+        public Task<int> CountPendingNonLevyReservations(long accountId)
         {
-            return !(r.Status == (short)ReservationStatus.Pending && r.ExpiryDate < DateTime.UtcNow);
+            return reservationRepository.CountPendingNonLevyReservations(accountId);
         }
 
         private Domain.Entities.Reservation CreateReservation(long accountId, long accountLegalEntityId, string accountLegalEntityName, long? transferSenderAccountId)

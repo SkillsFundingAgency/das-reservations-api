@@ -14,14 +14,42 @@ namespace SFA.DAS.Reservations.Data.Repository
         public async Task<IList<Reservation>> GetAccountReservations(long accountId)
         {
             var result = await reservationsDataContext.Reservations
+                .AsNoTracking()
                 .Include(x => x.Course)
                 .Where(c=>
                     c.AccountId.Equals(accountId) &&
+                    !c.IsLevyAccount &&
                     c.Status != (int)ReservationStatus.Deleted &&
                     c.Status != (int)ReservationStatus.Change)
                 .ToListAsync();
             
             return result;
+        }
+
+        public Task<int> CountPendingNonLevyReservations(long accountId)
+        {
+            var now = DateTime.UtcNow;
+
+            return reservationsDataContext.Reservations.CountAsync(reservation =>
+                reservation.AccountId == accountId
+                && !reservation.IsLevyAccount
+                && reservation.Status == (int)ReservationStatus.Pending
+                && (reservation.ExpiryDate == null || reservation.ExpiryDate >= now));
+        }
+
+        public Task<int> CountReservationsTowardsLimit(long accountId, DateTime resetReservationDate)
+        {
+            var now = DateTime.UtcNow;
+
+            return reservationsDataContext.Reservations.CountAsync(reservation =>
+                reservation.AccountId == accountId
+                && !reservation.IsLevyAccount
+                && reservation.Status != (int)ReservationStatus.Deleted
+                && reservation.Status != (int)ReservationStatus.Change
+                && reservation.CreatedDate >= resetReservationDate
+                && (reservation.Status != (int)ReservationStatus.Pending
+                    || reservation.ExpiryDate == null
+                    || reservation.ExpiryDate >= now));
         }
 
         public async Task<Reservation> CreateAccountReservation(Reservation reservation)
