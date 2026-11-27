@@ -34,7 +34,7 @@ public class AzureSearchReservationIndexRepository(
                 "yyyyMMddHHmmss",
                 CultureInfo.InvariantCulture);
 
-            if (indexCreatedDateTime < DateTime.UtcNow.AddHours(-1))
+            if (indexCreatedDateTime < DateTime.UtcNow.AddHours(-25))
             {
                 return HealthCheckResult.Degraded;
             }

@@ -51,10 +51,25 @@ public class WhenGettingHealthCheckStatus
     }
 
     [Test]
+    public async Task Then_Returns_Healthy_When_Index_Is_Within_Daily_Refresh_Window()
+    {
+        var indexDate = DateTime.UtcNow.AddHours(-2);
+        var indexName = $"{AzureSearchIndex.IndexName}-{indexDate:yyyyMMddHHmmss}";
+
+        _mockSearchHelper
+            .Setup(x => x.GetIndexName(_cancellationToken))
+            .ReturnsAsync(indexName);
+
+        var result = await _repository.GetHealthCheckStatus(_cancellationToken);
+
+        result.Should().Be(HealthCheckResult.Healthy);
+    }
+
+    [Test]
     public async Task Then_Returns_Degraded_When_Index_Is_Stale()
     {
         // Arrange
-        var staleDate = DateTime.UtcNow.AddHours(-2);
+        var staleDate = DateTime.UtcNow.AddHours(-26);
         var indexName = $"{AzureSearchIndex.IndexName}-{staleDate:yyyyMMddHHmmss}";
 
         _mockSearchHelper
